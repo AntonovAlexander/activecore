@@ -31,8 +31,8 @@
 								<option id="gnu.cpp.compiler.option.other.pic.1576612742" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1997544225" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/${ProjName}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/ac_rtl/include/&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/ac_pipe/include/&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/rtl/include/&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/pipe/include/&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.files.1625749795" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" useByScannerDiscovery="false"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.641888162" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -48,12 +48,12 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.1770986583" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.debug">
 								<option defaultValue="true" id="gnu.cpp.link.so.debug.option.shared.183121289" name="Shared (-shared)" superClass="gnu.cpp.link.so.debug.option.shared" useByScannerDiscovery="false" valueType="boolean"/>
 								<option id="gnu.cpp.link.option.libs.629381312" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
-									<listOptionValue builtIn="false" value="ac_rtl"/>
-									<listOptionValue builtIn="false" value="ac_pipe"/>
+									<listOptionValue builtIn="false" value="rtl"/>
+									<listOptionValue builtIn="false" value="pipe"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1650068301" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
-									<listOptionValue builtIn="false" value="${workspace_loc}/ac_rtl/Debug/"/>
-									<listOptionValue builtIn="false" value="${workspace_loc}/ac_pipe/Debug/"/>
+									<listOptionValue builtIn="false" value="${workspace_loc}/rtl/Debug/"/>
+									<listOptionValue builtIn="false" value="${workspace_loc}/pipe/Debug/"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1837062579" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -99,8 +99,8 @@
 								<option id="gnu.cpp.compiler.so.release.option.debugging.level.356758781" name="Debug Level" superClass="gnu.cpp.compiler.so.release.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1857414893" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/${ProjName}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/ac_pipe/include/&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/ac_rtl/include/&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/pipe/include/&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/rtl/include/&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.pic.727694252" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1051862973" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -115,13 +115,13 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.release.1434267978" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.release">
 								<option defaultValue="true" id="gnu.cpp.link.so.release.option.shared.1201137353" name="Shared (-shared)" superClass="gnu.cpp.link.so.release.option.shared" useByScannerDiscovery="false" valueType="boolean"/>
-								<option id="gnu.cpp.link.option.paths.1090400983" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/ac_rtl/Release/&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/ac_pipe/Release/&quot;"/>
+								<option id="gnu.cpp.link.option.paths.1090400983" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/rtl/Release/&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/pipe/Release/&quot;"/>
 								</option>
-								<option id="gnu.cpp.link.option.libs.1698021236" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
-									<listOptionValue builtIn="false" value="ac_rtl"/>
-									<listOptionValue builtIn="false" value="ac_pipe"/>
+								<option id="gnu.cpp.link.option.libs.1698021236" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
+									<listOptionValue builtIn="false" value="rtl"/>
+									<listOptionValue builtIn="false" value="pipe"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1007141821" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
