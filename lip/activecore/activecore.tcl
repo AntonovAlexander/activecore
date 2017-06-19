@@ -1,8 +1,5 @@
 ## See LICENSE file for license details
 
-set ROOT_PATH /home/alexander/work/activecore/prj
-load [file join $ROOT_PATH lip/activecore/Release/libactivecore.so]
-
 ## utils ##
 try {namespace delete ActiveCore} on error {} {}
 namespace eval ActiveCore {
@@ -237,14 +234,9 @@ proc signext {op size} {
 	__ac_core_signext $size
 }
 
-source [file join $ROOT_PATH tcl rtl.tcl]
-source [file join $ROOT_PATH tcl pipe.tcl]
-
 proc ActiveCore_Reset {} {
 	rtl::reset
 	ActiveCore::reset
 }
 
-#ActiveCore::debug_set
-ActiveCore_Reset
-
+source [file join $LIP_PATH activecore config.tcl]

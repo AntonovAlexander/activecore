@@ -1,8 +1,5 @@
 ## See LICENSE file for license details
 
-source ../../tcl/activecore.tcl
-set PRJ_PATH [file join $ROOT_PATH designs dlx]
-
 try {namespace delete dlx} on error {} {}
 namespace eval dlx {
 
@@ -773,10 +770,3 @@ rtl::module dlx
 	pipe::endpproc
 
 #endmodule
-
-set filename dlx.v
-
-rtl::monitor [file join $PRJ_PATH debug_rtl.txt]
-pipe::monitor [file join $PRJ_PATH debug_pipe.txt]
-
-ActiveCore::export verilog [file join $PRJ_PATH $filename]

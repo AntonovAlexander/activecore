@@ -1,5 +1,4 @@
-source ../../tcl/activecore.tcl
-set PRJ_PATH [file join $ROOT_PATH designs ram]
+## See LICENSE file for license details
 
 proc get_bram_if {addrwidth datawidth rwmode crmode} {
 	set ret_if ""
@@ -129,9 +128,3 @@ proc genmodule_RAM {width depth rwports rports wports clk_separate} {
 	return $module_name
 }
 
-set module_name [genmodule_RAM 32 32 0 2 1 false]
-set filename $module_name.v
-
-rtl::monitor [file join $PRJ_PATH debug.txt]
-
-ActiveCore::export verilog [file join $PRJ_PATH $filename]
