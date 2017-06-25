@@ -214,24 +214,6 @@ rtl::module dlx
 				s= opcode [indexed instr_code {5 0}]
 			endif
 
-			#s= regfile 0
-
-			#s= jump_req 		0
-			#s= jump_cond 		0
-			#s= jump_cond_eqz 	0
-			#s= jump_src			$dlx::JMP_SRC_OP1
-
-			#s= rs0_req 		0
-			#s= rs1_req 		0
-			#s= rd_req 		0
-			#s= rd_source 	$dlx::RD_ALU_RES
-
-			#s= immediate 	0
-			#s= alu_req		0
-			#s= alu_opcode 	$dlx::ALU_ADD
-			#s= op1_source 	$dlx::OP1_SRC_REG
-			#s= op2_source 	$dlx::OP2_SRC_REG
-
 			s= rs0_addr [indexed instr_code {25 21}]
 			s= rs1_addr [indexed instr_code {20 16}]
 			s= rd_addr  [indexed instr_code {15 11}]
@@ -682,7 +664,7 @@ rtl::module dlx
 			endif
 
 			begif [s== op1_source $dlx::OP1_SRC_PC]
-				s= alu_op1 curinstr_addr
+				s= alu_op1 nextinstr_addr
 			endif
 
 			begif [s== op2_source $dlx::OP2_SRC_REG]
