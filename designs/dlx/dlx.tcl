@@ -74,48 +74,78 @@ rtl::module dlx
 	rtl::input 	{0 0} 	clk_i
 	rtl::input 	{0 0} 	rst_i
 	
-	rtl::output {31 0} 	instr_mem_addr
-	rtl::input 	{31 0} 	instr_mem_rdata
-	rtl::output {31 0} 	data_mem_addr
-	rtl::output {31 0} 	data_mem_wdata
-	rtl::output {0 0} 	data_mem_we
-	rtl::input 	{31 0} 	data_mem_rdata
+	rtl::output {0 0} 	mem_req
+	rtl::output {0 0} 	mem_we
+	rtl::input 	{0 0} 	mem_ack
+	rtl::output {31 0} 	mem_addr
+	rtl::output {31 0} 	mem_wdata
+	rtl::output	{3 0}	mem_be
+	rtl::input 	{0 0}	mem_resp
+	rtl::input 	{31 0}	mem_rdata
 
-	## instructions memory interface
-	# instructions request
-	rtl::comb {0 0} 	ram_instr_fifo_full 	0
-	rtl::comb {0 0} 	ram_instr_fifo_wr 		0
-	rtl::comb {31 0} 	ram_instr_fifo_wdata 	0
-	# instructions fetch
-	rtl::comb {0 0} 	ram_instr_empty 		0
-	rtl::comb {0 0} 	ram_instr_rd 			0
-	rtl::comb {31 0}	ram_instr_rdata 		0
+	rtl::comb 	{0 0} 	instr_mem_req 	0
+	rtl::comb 	{0 0} 	instr_mem_we 	0
+	rtl::comb 	{0 0} 	instr_mem_ack 	0
+	rtl::comb 	{31 0} 	instr_mem_addr 	0
+	rtl::comb 	{31 0} 	instr_mem_wdata	0
+	rtl::comb	{3 0}	instr_mem_be	0
+	rtl::comb	{0 0}	instr_mem_resp	0
+	rtl::comb 	{31 0}	instr_mem_rdata	0
 
-	## data memory interface
-	# data request
-	rtl::comb {0 0} 	ram_data_fifo_full 		0
-	rtl::comb {0 0} 	ram_data_fifo_wr		0
-	# 65 - access, 64 - cmd, 63:32 - addr, 31:0 - wdata
-	rtl::comb {65 0} 	ram_data_fifo_wdata		0
-	# data fetch
-	rtl::comb {0 0} 	ram_data_fifo_empty 	0
-	rtl::comb {0 0} 	ram_data_fifo_rd 		0
-	rtl::comb {31 0}	ram_data_fifo_rdata		0
+	rtl::comb 	{0 0} 	data_mem_req	0
+	rtl::comb 	{0 0} 	data_mem_we		0
+	rtl::comb 	{0 0} 	data_mem_ack	0
+	rtl::comb 	{31 0} 	data_mem_addr	0
+	rtl::comb 	{31 0} 	data_mem_wdata	0
+	rtl::comb	{3 0}	data_mem_be		0
+	rtl::comb	{0 0}	data_mem_resp	0
+	rtl::comb 	{31 0}	data_mem_rdata	0
+
+	# request commutation
+	rtl::cproc
+		s= mem_req 			instr_mem_req
+		s= mem_we 			instr_mem_we
+		s= mem_addr 		instr_mem_addr
+		s= mem_wdata 		instr_mem_wdata
+		s= mem_be 			instr_mem_be
+		s= instr_mem_ack	mem_ack
+		s= data_mem_ack		0
+
+		begif data_mem_req
+			s= mem_req 			data_mem_req
+			s= mem_we 			data_mem_we
+			s= mem_addr 		data_mem_addr
+			s= mem_wdata 		data_mem_wdata
+			s= mem_be 			data_mem_be
+			s= data_mem_ack		mem_ack
+			s= instr_mem_ack	0
+		endif
+	rtl::endcproc
+
+	# response commutation
+	rtl::ff {0 0} mem_resp_route
+	rtl::comb {0 0} mem_resp_route_next 0
+	rtl::_mem_addsource mem_resp_route clk_i pos mem_resp_route_next
+	rtl::_mem_addreset_sync mem_resp_route rst_i pos 0
 
 	rtl::cproc
-		# instruction memory interface connection
-		s= instr_mem_addr ram_instr_fifo_wdata
-		s= ram_instr_fifo_full 0
-		s= ram_instr_rdata instr_mem_rdata
-		s= ram_instr_empty 0
-		
-		# data memory interface connection
-		s= data_mem_addr [indexed ram_data_fifo_wdata {63 32}]
-		s= ram_data_fifo_full 0
-		s= data_mem_wdata [indexed ram_data_fifo_wdata {31 0}]
-		s= data_mem_we [indexed ram_data_fifo_wdata 64]
-		s= ram_data_fifo_rdata data_mem_rdata
-		s= ram_data_fifo_empty 0
+		s= mem_resp_route_next 0
+		begif [s& [s& data_mem_req data_mem_ack] [s! data_mem_we]]
+			s= mem_resp_route_next 1
+		endif
+	rtl::endcproc
+
+	rtl::cproc
+		s= instr_mem_resp mem_resp
+		s= instr_mem_rdata mem_rdata
+		s= data_mem_resp 0
+		s= data_mem_rdata 0
+		begif mem_resp_route
+			s= instr_mem_resp 0
+			s= instr_mem_rdata 0
+			s= data_mem_resp mem_resp
+			s= data_mem_rdata mem_rdata
+		endif
 	rtl::endcproc
 
 	pipe::pproc clk_i rst_i
@@ -184,11 +214,14 @@ rtl::module dlx
 					s= curinstr_addr [pipe::prr EXEC jump_vector]
 				endif
 			endif
-			
-			#pipe::pwfe curinstr_addr {ram_instr_fifo_full ram_instr_fifo_wr ram_instr_fifo_wdata}
-			pipe::pwe 1 ram_instr_fifo_wr
-			pipe::pwe curinstr_addr ram_instr_fifo_wdata
-			begif [pipe::pre ram_instr_fifo_full]
+
+			pipe::pwe 1 instr_mem_req
+			pipe::pwe 0 instr_mem_we
+			pipe::pwe curinstr_addr instr_mem_addr
+			pipe::pwe 0 instr_mem_wdata
+			pipe::pwe 0xf instr_mem_be
+
+			begif [s! [pipe::pre instr_mem_ack]]
 				pipe::pstall
 			endif
 
@@ -196,12 +229,10 @@ rtl::module dlx
 		
 		pipe::pstage IDECODE
 
-			#s= instr_code [pipe::prfe {ram_instr_empty ram_instr_rd ram_instr_rdata}]
-			s= instr_code [pipe::pre ram_instr_rdata]
-			pipe::pwe 1 ram_instr_rd
-			begif [pipe::pre ram_instr_empty]
+			begif [s! [pipe::pre instr_mem_resp]]
 				pipe::pstall
 			endif
+			s= instr_code [pipe::pre instr_mem_rdata]
 
 			begif [pipe::isactive EXEC]
 				begif [pipe::prr EXEC jump_req]
@@ -365,6 +396,8 @@ rtl::module dlx
 				s= alu_opcode 	$dlx::ALU_ADD
 				s= op1_source 	$dlx::OP1_SRC_REG
 				s= op2_source 	$dlx::OP2_SRC_IMM
+				s= mem_req 		1
+				s= mem_cmd 		0
 			endif
 
 			begif [s== opcode $dlx::opcode_OR]
@@ -589,6 +622,8 @@ rtl::module dlx
 				s= op1_source 	$dlx::OP1_SRC_REG
 				s= op2_source 	$dlx::OP2_SRC_IMM
 				s= rs1_addr [indexed instr_code {15 11}]
+				s= mem_req 		1
+				s= mem_cmd 		1
 			endif
 
 			begif [s== opcode $dlx::opcode_XOR]
@@ -724,26 +759,23 @@ rtl::module dlx
 				s= jump_vector alu_result
 			endif
 
-			# pipe::pwfe [cnct {mem_req mem_cmd mem_addr mem_wdata}] {ram_data_fifo_full ram_data_fifo_wr ram_data_fifo_wdata}
-			begif mem_req
-				pipe::pwe 1 ram_data_fifo_wr
-				pipe::pwe [cnct {mem_cmd mem_addr mem_wdata}] ram_data_fifo_wdata
-				begif [pipe::pre ram_data_fifo_full]
-					pipe::pstall
-				endif
-			endif
-
 		pipe::pstage MEM
-			begif mem_req
-				pipe::pwe 1 ram_data_fifo_rd
-				s= mem_rdata [pipe::pre ram_data_fifo_rdata]
-				s= rd_wdata mem_rdata
-				begif [pipe::pre ram_data_fifo_empty]
-					pipe::pstall
-				endif
+			pipe::pwe mem_req data_mem_req
+			pipe::pwe mem_cmd data_mem_we
+			pipe::pwe mem_addr data_mem_addr
+			pipe::pwe mem_wdata data_mem_wdata
+			pipe::pwe 0xf data_mem_be
+
+			begif [s! [pipe::pre data_mem_ack]]
+				pipe::pstall
 			endif
 
 		pipe::pstage WB
+			
+			begif [s& [s& mem_req [s! mem_cmd]] [s! [pipe::pre data_mem_resp]]]
+				pipe::pstall
+			endif
+
 			begif rd_req
 				_acc_index rd_addr
 				s= regfile rd_wdata
