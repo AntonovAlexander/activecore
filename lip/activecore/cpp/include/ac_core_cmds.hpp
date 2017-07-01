@@ -25,7 +25,7 @@ int expr_zeroext_cmd(unsigned int target_width, ac_param param, ac_var** respvar
 int expr_signext_cmd(unsigned int target_width, ac_param param, ac_var** respvar);
 int expr_initval_cmd(unsigned int width, std::string value, ac_var** respvar);
 int expr_begif_cmd(ac_var* cond_op);
-int expr_elsif_cmd(ac_var* cond_op);
+int expr_begelsif_cmd(ac_var* cond_op);
 int expr_begelse_cmd();
 int expr_endif_cmd();
 

@@ -474,7 +474,7 @@ int expr_initval_cmd(unsigned int width, std::string value, ac_var** respvar)
 
 int expr_begif_cmd(ac_var* cond_op)
 {
-	ac_execode* new_expr = new ac_execode("begif");
+	ac_execode* new_expr = new ac_execode("if");
 	new_expr->AddRdVar(cond_op);
 
 	ExeStack[ExeStack.size()-1]->AddExpr(new_expr);
@@ -483,17 +483,45 @@ int expr_begif_cmd(ac_var* cond_op)
 	return 0;
 }
 
-int expr_elsif_cmd(ac_var* cond_op)
+int expr_begelsif_cmd(ac_var* cond_op)
 {
-	ac_execode* new_expr = new ac_execode("elsif");
-	new_expr->AddRdVar(cond_op);
+	bool preif_found = false;
+	ac_var* preif_cond;
+	for (int i = (ExeStack[ExeStack.size()-1]->expressions.size() - 1); i > (-1); i--)
+	{
+		if (ExeStack[ExeStack.size()-1]->expressions[i]->opcode == "if")
+		{
+			preif_found = true;
+			preif_cond = ExeStack[ExeStack.size()-1]->expressions[i]->rdvars[0];
+			break;
+		}
+	}
+
+	if (preif_found == false)
+	{
+		printf("ActiveCore ERROR: begelsif not preceded by begif!");
+		return 1;
+	}
+
+	ac_var* preif_ncond;
+	std::vector<ac_param> preif_cond_params;
+	preif_cond_params.push_back(ac_param(preif_cond));
+	if (expr_op_cmd("!", preif_cond_params, &preif_ncond) != 0) return 1;
+
+	ac_var* curif_cond;
+	std::vector<ac_param> curif_cond_params;
+	curif_cond_params.push_back(ac_param(preif_ncond));
+	curif_cond_params.push_back(ac_param(cond_op));
+	if (expr_op_cmd("&&", curif_cond_params, &curif_cond) != 0) return 1;
+
+	ac_execode* new_expr = new ac_execode("if");
+	new_expr->AddRdVar(curif_cond);
 
 	for (unsigned int i = 0; i < ExeStack[ExeStack.size()-1]->wrvars.size(); i++)
 	{
 		AddIfTargetVarToStack(ExeStack[ExeStack.size()-1]->wrvars[i]);
 	}
 
-	ExeStack.pop_back();
 	ExeStack[ExeStack.size()-1]->AddExpr(new_expr);
 	ExeStack.push_back(new_expr);
 
@@ -502,14 +530,53 @@ int expr_elsif_cmd(ac_var* cond_op)
 
 int expr_begelse_cmd()
 {
-	ac_execode* new_expr = new ac_execode("else");
+	/*
+	printf("ExeStack size: %d\n", ExeStack.size());
+	printf("ExeStack expressions size: %d\n", ExeStack[ExeStack.size()-1]->expressions.size());
+	for (unsigned int i = 0; i < ExeStack.size(); i++)
+	{
+		printf("proc opcode: %s\n", StringToCharArr(ExeStack[i]->opcode));
+		for (unsigned int j = 0; j < ExeStack[i]->expressions.size(); j ++)
+		{
+			printf("in cproc: %s\n", StringToCharArr(ExeStack[i]->expressions[j]->opcode));
+			for (unsigned int k = 0; k < ExeStack[i]->expressions[j]->expressions.size(); k++)
+			{
+				printf("in begif: %s\n", StringToCharArr(ExeStack[i]->expressions[j]->expressions[k]->opcode));
+			}
+		}
+	}
+	*/
+	bool preif_found = false;
+	ac_var* preif_cond;
+	for (int i = (ExeStack[ExeStack.size()-1]->expressions.size() - 1); i > (-1); i--)
+	{
+		if (ExeStack[ExeStack.size()-1]->expressions[i]->opcode == "if")
+		{
+			preif_found = true;
+			preif_cond = ExeStack[ExeStack.size()-1]->expressions[i]->rdvars[0];
+			break;
+		}
+	}
+
+	if (preif_found == false)
+	{
+		printf("ActiveCore ERROR: begelse not preceded by begif!\n");
+		return 1;
+	}
+
+	ac_var* preif_ncond;
+	std::vector<ac_param> preif_ncond_params;
+	preif_ncond_params.push_back(ac_param(preif_cond));
+	if (expr_op_cmd("!", preif_ncond_params, &preif_ncond) != 0) return 1;
+
+	ac_execode* new_expr = new ac_execode("if");
+	new_expr->AddRdVar(preif_ncond);
 
 	for (unsigned int i = 0; i < ExeStack[ExeStack.size()-1]->wrvars.size(); i++)
 	{
 		AddIfTargetVarToStack(ExeStack[ExeStack.size()-1]->wrvars[i]);
 	}
 
-	ExeStack.pop_back();
 	ExeStack[ExeStack.size()-1]->AddExpr(new_expr);
 	ExeStack.push_back(new_expr);
 
@@ -523,8 +590,6 @@ int expr_endif_cmd()
 		AddIfTargetVarToStack(ExeStack[ExeStack.size()-1]->wrvars[i]);
 	}
 	ExeStack.pop_back();
-	ac_execode* new_expr = new ac_execode("endif");
-	ExeStack[ExeStack.size()-1]->AddExpr(new_expr);
 	return 0;
 }
 

@@ -360,7 +360,7 @@ int TCL_expr_begif_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_
 	return TCL_OK;
 }
 
-int TCL_expr_elsif_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
+int TCL_expr_begelsif_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
 {
 	if (DEBUG_FLAG == true) printf("Elsif command!\n");
 	if (objc != 2)
@@ -369,7 +369,7 @@ int TCL_expr_elsif_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_
 		return TCL_ERROR;
 	}
 	std::string cond_op = std::string(Tcl_GetString(objv[1]));
-	if (expr_elsif_cmd_string(cond_op) != 0) return TCL_ERROR;
+	if (expr_begelsif_cmd_string(cond_op) != 0) return TCL_ERROR;
 	return TCL_OK;
 }
 
@@ -421,7 +421,7 @@ int TCL_core_InitCmds(Tcl_Interp *interp)
 	Tcl_CreateObjCommand(interp, "__ac_core_zeroext", TCL_expr_zeroext_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__ac_core_signext", TCL_expr_signext_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__ac_core_begif", TCL_expr_begif_cmd, NULL, NULL);
-	//Tcl_CreateObjCommand(interp, "__ac_core_elsif", TCL_expr_elsif_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__ac_core_begelsif", TCL_expr_begelsif_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__ac_core_begelse", TCL_expr_begelse_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__ac_core_endif", TCL_expr_endif_cmd, NULL, NULL);
 }

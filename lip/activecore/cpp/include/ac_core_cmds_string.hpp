@@ -19,7 +19,7 @@ int expr_zeroext_cmd_string(std::string size, std::vector<ac_param> params, std:
 int expr_signext_cmd_string(std::string size, std::vector<ac_param> params, std::string * respvarname);
 int expr_initval_cmd_string(std::string width, std::string value, std::string * respvarname);
 int expr_begif_cmd_string(std::string cond_op);
-int expr_elsif_cmd_string(std::string cond_op);
+int expr_begelsif_cmd_string(std::string cond_op);
 int expr_begelse_cmd_string();
 int expr_endif_cmd_string();
 

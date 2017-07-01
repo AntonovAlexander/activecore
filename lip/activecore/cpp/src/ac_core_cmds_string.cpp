@@ -126,13 +126,13 @@ int expr_begif_cmd_string(std::string cond_op)
 	return ret_val;
 }
 
-int expr_elsif_cmd_string(std::string cond_op)
+int expr_begelsif_cmd_string(std::string cond_op)
 {
 	if (ExeStack.size() == 0) return 1;
 
 	ac_var* cond_op_var;
 	if (SetVarReadable(cond_op, &cond_op_var) != 0) return 1;
-	int ret_val = expr_elsif_cmd(cond_op_var);
+	int ret_val = expr_begelsif_cmd(cond_op_var);
 
 	return ret_val;
 }

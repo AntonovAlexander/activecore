@@ -200,8 +200,12 @@ proc begif {condition} {
 	__ac_core_begif $condition
 }
 
-proc elsif {condition} {
-	__ac_core_elsif $condition
+proc begelsif {condition} {
+	__ac_core_begelsif $condition
+}
+
+proc begelse {} {
+	__ac_core_begelse
 }
 
 proc endif {} {
