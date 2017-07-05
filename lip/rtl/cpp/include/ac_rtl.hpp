@@ -82,8 +82,10 @@ namespace rtl
 	extern std::vector<ac_execode*> Cprocs;
 
 	int SetPtrs();
+	int comb_cmd(ac_comb** new_comb, std::string name_in, unsigned int msb, unsigned int lsb, std::string defval_in);
 	int comb_cmd(ac_comb** new_comb, std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
 	int port_cmd(ac_port** new_port, std::string name_in, std::string port_type_in, ac_dimensions_static dimensions_in, std::string defval_in);
+	int mem_cmd(ac_mem** new_mem, std::string name_in, unsigned int msb, unsigned int lsb, bool sync_levedge_in);
 	int mem_cmd(ac_mem** new_mem, std::string name_in, ac_dimensions_static dimensions_in, bool sync_levedge_in);
 	int mem_addsource_cmd(std::string mem_name, std::string sync_posneg_in, std::string sync_signal_in, ac_param sync_source_in);
 	int mem_addreset_cmd(std::string mem_name, std::string sync_levedge_in, std::string sync_posneg_in, std::string sync_signal_in, ac_param reset_source_in);

@@ -38,6 +38,21 @@ namespace eval pipe {
 		}
 	}
 
+	proc copipeif {copipeif_name req we ack wdata resp rdata} {
+		__ac_pipe_copipeif $copipeif_name $req $we $ack $wdata $resp $rdata
+	}
+
+	proc copipereq {copipeif_name we wdata} {
+		__ac_core_acc_param_clr
+		ActiveCore::_accum_param $we
+		ActiveCore::_accum_param $wdata
+		__ac_pipe_copipereq $copipeif_name
+	}
+
+	proc copiperesp {copipeif_name} {
+		__ac_pipe_copiperesp $copipeif_name
+	}
+
 	# interface functions
 	proc pstage {pstage_name} {
 		__ac_pipe_pstage $pstage_name

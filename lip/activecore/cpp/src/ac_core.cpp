@@ -81,6 +81,13 @@ ac_param::ac_param(ac_imm* imm_in)
 	imm = imm_in;
 }
 
+ac_param::ac_param(unsigned int width, std::string value)
+{
+	ac_imm * new_imm = new ac_imm(width-1, 0, value);
+	type = PARAM_TYPE_VAL;
+	imm = new_imm;
+}
+
 std::string ac_param::GetString()
 {
 	if (type == PARAM_TYPE_VAR) return var->name;

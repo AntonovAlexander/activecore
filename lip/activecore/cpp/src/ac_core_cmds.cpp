@@ -106,6 +106,12 @@ int expr_assign_cmd(ac_dimensions dimensions, ac_var* target, ac_param param)
 	return ret_val;
 }
 
+int expr_assign_cmd(ac_var* target, ac_param param)
+{
+	ac_dimensions * dimensions = new ac_dimensions();
+	return (expr_assign_cmd(*dimensions, target, param));
+}
+
 int GetImmWidth(std::string imm, ac_dimensions_static ** genvar_dimensions)
 {
 	unsigned int length =  pow (imm.length(), 4);
@@ -367,6 +373,21 @@ int expr_op_cmd(std::string opcode, std::vector<ac_param> params, ac_var** respv
 		return 1;
 	}
 	return 0;
+}
+
+int expr_1op_cmd(std::string opcode, ac_param param, ac_var** respvar)
+{
+	std::vector<ac_param> params;
+	params.push_back(param);
+	return expr_op_cmd(opcode, params, respvar);
+}
+
+int expr_2op_cmd(std::string opcode, ac_param param0, ac_param param1, ac_var** respvar)
+{
+	std::vector<ac_param> params;
+	params.push_back(param0);
+	params.push_back(param1);
+	return expr_op_cmd(opcode, params, respvar);
 }
 
 int expr_zeroext_cmd(unsigned int target_width, ac_param param, ac_var** respvar)
