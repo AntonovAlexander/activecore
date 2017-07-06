@@ -55,6 +55,48 @@ namespace pipe
 		}
 	};
 
+	class wrfifo_if
+	{
+	public:
+		std::string name;
+
+		ac_var * req_var;
+		ac_var * ack_var;
+		ac_var * wdata_var;
+
+		rtl::ac_comb * req_done_next;
+		rtl::ac_mem * req_done_ff;
+
+		wrfifo_if(std::string name_in, ac_var * req_var_in, ac_var * ack_var_in, ac_var * wdata_var_in)
+		{
+			name = name_in;
+			req_var = req_var_in;
+			ack_var = ack_var_in;
+			wdata_var = wdata_var_in;
+		}
+	};
+
+	class rdfifo_if
+	{
+	public:
+		std::string name;
+
+		ac_var * req_var;
+		ac_var * ack_var;
+		ac_var * rdata_var;
+
+		rtl::ac_comb * req_done_next;
+		rtl::ac_mem * req_done_ff;
+
+		rdfifo_if(std::string name_in, ac_var * req_var_in, ac_var * ack_var_in, ac_var * rdata_var_in)
+		{
+			name = name_in;
+			req_var = req_var_in;
+			ack_var = ack_var_in;
+			rdata_var = rdata_var_in;
+		}
+	};
+
 	class ac_pproc : public ac_execode
 	{
 	public:
@@ -68,11 +110,16 @@ namespace pipe
 		std::vector<ac_var*> gpvars;
 
 		std::vector<copipe_if*> copipe_ifs;
+		std::vector<wrfifo_if*> wrfifo_ifs;
+		std::vector<rdfifo_if*> rdfifo_ifs;
 
 		std::vector<prr_vector> prr_vectors;
 
 		ac_pproc(ac_var * clk_in, ac_var * rst_in);
+
 		bool GetCopipeIf(std::string copipeif_name, copipe_if ** copipe_if_fetched);
+		bool GetWrfifoIf(std::string wrfifoif_name, wrfifo_if ** wrfifo_if_fetched);
+		bool GetRdfifoIf(std::string rdfifoif_name, rdfifo_if ** rdfifo_if_fetched);
 	};
 
 	extern char PVAR_STRING[];
@@ -90,9 +137,17 @@ namespace pipe
 	int pwe_cmd(std::vector<ac_param> params, std::string ext_varname);
 	int prr_cmd(std::string pstage_name, std::string ext_varname, std::string * int_varname);
 	int isactive_cmd(std::string pstage_name, std::string * int_varname);
+
 	int copipeif_cmd(std::string copipeif_name, std::string req_varname, std::string we_varname, std::string ack_varname, std::string wdata_varname, std::string resp_varname, std::string rdata_varname);
 	int copipereq_cmd(std::string copipeif_name, std::vector<ac_param> params);
 	int copiperesp_cmd(std::string copipeif_name, std::string * resp_varname);
+
+	int wrfifoif_cmd(std::string wrfifoif_name, std::string req_signame, std::string ack_signame, std::string wdata_signame);
+	int wrfiforeq_cmd(std::string wrfifoif_name, std::vector<ac_param> params);
+
+	int rdfifoif_cmd(std::string rdfifoif_name, std::string req_signame, std::string ack_signame, std::string rdata_signame);
+	int rdfiforeq_cmd(std::string rdfifoif_name, std::string * int_varname);
+
 	int export_cmd();
 
 }
