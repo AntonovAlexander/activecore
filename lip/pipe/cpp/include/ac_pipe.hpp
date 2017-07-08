@@ -31,6 +31,9 @@ namespace pipe
 	class copipe_if
 	{
 	public:
+		enum {UNUSED, REQUESTED, COMPLETE} status;
+		unsigned int pstage_num_start;
+		unsigned int pstage_num_stop;
 		std::string name;
 
 		// external signals (request also used by pipeline)
@@ -46,18 +49,12 @@ namespace pipe
 		rtl::ac_mem * req_done_ff;
 
 		// copipe-pipeline interaction signals
-		rtl::ac_comb * resp_req_var;
-		rtl::ac_comb * resp_ack_var;
+		rtl::ac_comb * resp_rdy_var;
 		rtl::ac_comb * resp_rdata_var;
-
-		// pipeline response status signals
-		rtl::ac_comb * resp_done_next;
-		rtl::ac_mem * resp_done_ff;
-		rtl::ac_comb * rdata_done_next;
-		rtl::ac_mem * rdata_done_ff;
 
 		copipe_if(std::string name_in, ac_var * req_var_in, ac_var * we_var_in, ac_var * ack_var_in, ac_var * wdata_var_in, ac_var * resp_var_in, ac_var * rdata_var_in)
 		{
+			status = UNUSED;
 			name = name_in;
 			req_var = req_var_in;
 			we_var = we_var_in;
@@ -65,6 +62,41 @@ namespace pipe
 			wdata_var = wdata_var_in;
 			resp_var = resp_var_in;
 			rdata_var = rdata_var_in;
+		}
+
+		int Request(unsigned int pstage_num)
+		{
+			if (status != UNUSED)
+			{
+				printf("Pipe ERROR: requested copipe %s has been requested before!\n", StringToCharArr(name));
+				return 1;
+			}
+			status = REQUESTED;
+			pstage_num_start = pstage_num;
+			return 0;
+		}
+
+		int Response(unsigned int pstage_num)
+		{
+			if (status != REQUESTED)
+			{
+				printf("Pipe ERROR: unable to associate response of copipe %s with request!\n", StringToCharArr(name));
+				return 1;
+			}
+			status = COMPLETE;
+			pstage_num_stop = pstage_num;
+			return 0;
+		}
+
+		int CheckCompleteness()
+		{
+			if (status != COMPLETE) return 1;
+			else return 0;
+		}
+
+		int GetPstageNumbers()
+		{
+			return pstage_num_stop - pstage_num_start + 1;
 		}
 	};
 
