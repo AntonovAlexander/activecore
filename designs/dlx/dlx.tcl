@@ -233,7 +233,7 @@ rtl::module dlx
 		
 		pipe::pstage IDECODE
 
-			#s= instr_code [pipe::copiperesp instr_mem]
+			s= instr_code [pipe::copiperesp instr_mem]
 
 			begif [pipe::isactive EXEC]
 				begif [pipe::prr EXEC jump_req]
@@ -768,9 +768,9 @@ rtl::module dlx
 
 		pipe::pstage WB
 			
-			#begif mem_req
-			#	s= mem_rdata [pipe::copiperesp data_mem]
-			#endif
+			begif mem_req
+				s= mem_rdata [pipe::copiperesp data_mem]
+			endif
 
 			begif [s== rd_source $dlx::RD_MEM]
 				s= rd_wdata mem_rdata

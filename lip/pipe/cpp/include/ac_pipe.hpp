@@ -33,6 +33,7 @@ namespace pipe
 	public:
 		std::string name;
 
+		// external signals (request also used by pipeline)
 		ac_var * req_var;
 		ac_var * we_var;
 		ac_var * ack_var;
@@ -40,8 +41,20 @@ namespace pipe
 		ac_var * resp_var;
 		ac_var * rdata_var;
 
+		// pipeline request status signals
 		rtl::ac_comb * req_done_next;
 		rtl::ac_mem * req_done_ff;
+
+		// copipe-pipeline interaction signals
+		rtl::ac_comb * resp_req_var;
+		rtl::ac_comb * resp_ack_var;
+		rtl::ac_comb * resp_rdata_var;
+
+		// pipeline response status signals
+		rtl::ac_comb * resp_done_next;
+		rtl::ac_mem * resp_done_ff;
+		rtl::ac_comb * rdata_done_next;
+		rtl::ac_mem * rdata_done_ff;
 
 		copipe_if(std::string name_in, ac_var * req_var_in, ac_var * we_var_in, ac_var * ack_var_in, ac_var * wdata_var_in, ac_var * resp_var_in, ac_var * rdata_var_in)
 		{
@@ -60,6 +73,7 @@ namespace pipe
 	public:
 		std::string name;
 
+		// external signals
 		ac_var * req_var;
 		ac_var * ack_var;
 		ac_var * wdata_var;
@@ -81,12 +95,15 @@ namespace pipe
 	public:
 		std::string name;
 
+		// external signals
 		ac_var * req_var;
 		ac_var * ack_var;
 		ac_var * rdata_var;
 
 		rtl::ac_comb * req_done_next;
 		rtl::ac_mem * req_done_ff;
+		rtl::ac_comb * rdata_done_next;
+		rtl::ac_mem * rdata_done_ff;
 
 		rdfifo_if(std::string name_in, ac_var * req_var_in, ac_var * ack_var_in, ac_var * rdata_var_in)
 		{

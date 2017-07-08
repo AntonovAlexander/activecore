@@ -551,22 +551,6 @@ int expr_begelsif_cmd(ac_var* cond_op)
 
 int expr_begelse_cmd()
 {
-	/*
-	printf("ExeStack size: %d\n", ExeStack.size());
-	printf("ExeStack expressions size: %d\n", ExeStack[ExeStack.size()-1]->expressions.size());
-	for (unsigned int i = 0; i < ExeStack.size(); i++)
-	{
-		printf("proc opcode: %s\n", StringToCharArr(ExeStack[i]->opcode));
-		for (unsigned int j = 0; j < ExeStack[i]->expressions.size(); j ++)
-		{
-			printf("in cproc: %s\n", StringToCharArr(ExeStack[i]->expressions[j]->opcode));
-			for (unsigned int k = 0; k < ExeStack[i]->expressions[j]->expressions.size(); k++)
-			{
-				printf("in begif: %s\n", StringToCharArr(ExeStack[i]->expressions[j]->expressions[k]->opcode));
-			}
-		}
-	}
-	*/
 	bool preif_found = false;
 	ac_var* preif_cond;
 	for (int i = (ExeStack[ExeStack.size()-1]->expressions.size() - 1); i > (-1); i--)
