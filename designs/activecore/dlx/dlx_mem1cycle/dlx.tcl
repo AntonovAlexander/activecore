@@ -74,75 +74,20 @@ rtl::module dlx
 	rtl::input 	{0 0} 	clk_i
 	rtl::input 	{0 0} 	rst_i
 	
-	rtl::output {0 0} 	mem_req
-	rtl::output {0 0} 	mem_we
-	rtl::input 	{0 0} 	mem_ack
-	rtl::output {31 0} 	mem_addr
-	rtl::output {31 0} 	mem_wdata
-	rtl::output	{3 0}	mem_be
-	rtl::input 	{0 0}	mem_resp
-	rtl::input 	{31 0}	mem_rdata
+	rtl::output {0 0} 	instr_mem_req
+	rtl::output {0 0} 	instr_mem_we
+	rtl::output {31 0} 	instr_mem_addr
+	rtl::output {31 0} 	instr_mem_wdata
+	rtl::output	{3 0}	instr_mem_be
+	rtl::input 	{31 0}	instr_mem_rdata
 
-	rtl::comb 	{0 0} 	instr_copipe_req 	0
-	rtl::comb 	{0 0} 	instr_copipe_we 	0
-	rtl::comb 	{0 0} 	instr_copipe_ack 	0
-	rtl::comb 	{63 0} 	instr_copipe_wdata	0
-	rtl::comb	{0 0}	instr_copipe_resp	0
-	rtl::comb 	{31 0}	instr_copipe_rdata	0
+	rtl::output {0 0} 	data_mem_req
+	rtl::output {0 0} 	data_mem_we
+	rtl::output {31 0} 	data_mem_addr
+	rtl::output {31 0} 	data_mem_wdata
+	rtl::output	{3 0}	data_mem_be
+	rtl::input 	{31 0}	data_mem_rdata
 
-	rtl::comb 	{0 0} 	data_copipe_req		0
-	rtl::comb 	{0 0} 	data_copipe_we		0
-	rtl::comb 	{0 0} 	data_copipe_ack		0
-	rtl::comb 	{63 0} 	data_copipe_wdata	0
-	rtl::comb	{0 0}	data_copipe_resp	0
-	rtl::comb 	{31 0}	data_copipe_rdata	0
-
-	# request commutation
-	rtl::cproc
-		s= mem_req 			instr_copipe_req
-		s= mem_we 			instr_copipe_we
-		s= mem_addr 		[indexed instr_copipe_wdata {63 32}]
-		s= mem_wdata 		[indexed instr_copipe_wdata {31 0}]
-		s= mem_be 			0xf
-		s= instr_copipe_ack	mem_ack
-		s= data_copipe_ack		0
-
-		begif data_copipe_req
-			s= mem_req 			data_copipe_req
-			s= mem_we 			data_copipe_we
-			s= mem_addr 		[indexed data_copipe_wdata {63 32}]
-			s= mem_wdata 		[indexed data_copipe_wdata {31 0}]
-			s= mem_be 			0xf
-			s= data_copipe_ack		mem_ack
-			s= instr_copipe_ack	0
-		endif
-	rtl::endcproc
-
-	# response commutation
-	rtl::ff {0 0} mem_resp_route
-	rtl::comb {0 0} mem_resp_route_next 0
-	rtl::_mem_addsource mem_resp_route clk_i pos mem_resp_route_next
-	rtl::_mem_addreset_sync mem_resp_route rst_i pos 0
-
-	rtl::cproc
-		s= mem_resp_route_next 0
-		begif [s& [s& data_copipe_req data_copipe_ack] [s! data_copipe_we]]
-			s= mem_resp_route_next 1
-		endif
-	rtl::endcproc
-
-	rtl::cproc
-		s= instr_copipe_resp mem_resp
-		s= instr_copipe_rdata mem_rdata
-		s= data_copipe_resp 0
-		s= data_copipe_rdata 0
-		begif mem_resp_route
-			s= instr_copipe_resp 0
-			s= instr_copipe_rdata 0
-			s= data_copipe_resp mem_resp
-			s= data_copipe_rdata mem_rdata
-		endif
-	rtl::endcproc
 
 	pipe::pproc clk_i rst_i
 
@@ -201,22 +146,6 @@ rtl::module dlx
 		_acc_index {31 0}
 		pipe::gpvar {31 0} 	regfile			0
 
-		pipe::copipeif instr_mem \
-					instr_copipe_req 	\
-					instr_copipe_we 	\
-					instr_copipe_ack 	\
-					instr_copipe_wdata	\
-					instr_copipe_resp	\
-					instr_copipe_rdata
-
-		pipe::copipeif data_mem \
-					data_copipe_req	\
-					data_copipe_we		\
-					data_copipe_ack	\
-					data_copipe_wdata	\
-					data_copipe_resp	\
-					data_copipe_rdata
-
 		pipe::pstage IFETCH
 			begif [pipe::isactive IDECODE]
 				s= curinstr_addr [pipe::prr IDECODE nextinstr_addr]
@@ -227,13 +156,17 @@ rtl::module dlx
 				endif
 			endif
 
-			pipe::copipereq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
+			pipe::pwe 1 instr_mem_req
+			pipe::pwe 0 instr_mem_we
+			pipe::pwe curinstr_addr instr_mem_addr
+			pipe::pwe 0 instr_mem_wdata
+			pipe::pwe 0xf instr_mem_be
 
 			s= nextinstr_addr [s+ curinstr_addr 4]
 		
 		pipe::pstage IDECODE
 
-			s= instr_code [pipe::copiperesp instr_mem]
+			s= instr_code [pipe::pre instr_mem_rdata]
 
 			begif [pipe::isactive EXEC]
 				begif [pipe::prr EXEC jump_req]
@@ -763,14 +696,19 @@ rtl::module dlx
 		pipe::pstage MEM
 			
 			begif mem_req
-				pipe::copipereq data_mem mem_cmd [cnct {mem_addr mem_wdata}]
+				pipe::pwe 1 data_mem_req
+				pipe::pwe mem_cmd data_mem_we
+				pipe::pwe mem_addr data_mem_addr
+				pipe::pwe mem_wdata data_mem_wdata
+				pipe::pwe 0xf data_mem_be
 			endif
 
 		pipe::pstage WB
 			
 			begif mem_req
-				s= mem_rdata [pipe::copiperesp data_mem]
+				s= mem_rdata [pipe::pre data_mem_rdata]
 			endif
+
 
 			begif [s== rd_source $dlx::RD_MEM]
 				s= rd_wdata mem_rdata
