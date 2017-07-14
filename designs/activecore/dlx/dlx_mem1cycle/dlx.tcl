@@ -108,12 +108,12 @@ rtl::module dlx
 		pipe::pvar {31 0}	jump_vector		0
 
 		# regfile control signals
-		pipe::pvar {0 0}	rs0_req 		0
-		pipe::pvar {4 0} 	rs0_addr		0
-		pipe::pvar {31 0}	rs0_rdata 		0
 		pipe::pvar {0 0}	rs1_req 		0
 		pipe::pvar {4 0} 	rs1_addr		0
 		pipe::pvar {31 0}	rs1_rdata 		0
+		pipe::pvar {0 0}	rs2_req 		0
+		pipe::pvar {4 0} 	rs2_addr		0
+		pipe::pvar {31 0}	rs2_rdata 		0
 		pipe::pvar {0 0}	rd_req 			0
 		pipe::pvar {4 0} 	rd_addr			0
 		pipe::pvar {31 0}	rd_wdata 		0
@@ -179,17 +179,16 @@ rtl::module dlx
 				s= opcode [indexed instr_code {5 0}]
 			endif
 
-			s= rs0_addr [indexed instr_code {25 21}]
-			s= rs1_addr [indexed instr_code {20 16}]
+			s= rs1_addr [indexed instr_code {25 21}]
+			s= rs2_addr [indexed instr_code {20 16}]
 			s= rd_addr  [indexed instr_code {15 11}]
 
 			s= immediate [signext [indexed instr_code {15 0}] 32]
 			
 			begif [s== opcode $dlx::opcode_ADD]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
-				s= rd_source 	1
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_ADD
 				s= op1_source 	$dlx::OP1_SRC_REG
@@ -197,10 +196,9 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_ADDI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
-				s= rd_source 	1
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_ADD
@@ -209,10 +207,9 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_AND]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
-				s= rd_source 	1
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_AND
 				s= op1_source 	$dlx::OP1_SRC_REG
@@ -220,16 +217,14 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_ANDI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
-				s= rd_source 	1
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_AND
 				s= op1_source 	$dlx::OP1_SRC_REG
 				s= op2_source 	$dlx::OP2_SRC_IMM
-				s= immediate [zeroext [indexed instr_code {15 0}] 32]
 			endif
 
 			begif [s== opcode $dlx::opcode_BEQZ]
@@ -237,8 +232,8 @@ rtl::module dlx
 				s= jump_cond 		1
 				s= jump_cond_eqz 	1
 				s= jump_src			$dlx::JMP_SRC_ALU
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		0
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
@@ -252,8 +247,8 @@ rtl::module dlx
 				s= jump_cond 		1
 				s= jump_cond_eqz 	0
 				s= jump_src			$dlx::JMP_SRC_ALU
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		0
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
@@ -265,7 +260,7 @@ rtl::module dlx
 			begif [s== opcode $dlx::opcode_J]
 				s= jump_req 	1
 				s= jump_src		$dlx::JMP_SRC_ALU
-				s= rs1_req 		0
+				s= rs2_req 		0
 				s= rd_req 		0
 				s= rd_source	$dlx::RD_PC_INC
 				s= alu_req		1
@@ -278,9 +273,9 @@ rtl::module dlx
 			begif [s== opcode $dlx::opcode_JAL]
 				s= jump_req 	1
 				s= jump_src		$dlx::JMP_SRC_ALU
-				s= rs1_req 		0
+				s= rs2_req 		0
 				s= rd_req 		1
-				s= rd_source 	1
+				s= rd_source 	$dlx::RD_PC_INC
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_ADD
 				s= op1_source 	$dlx::OP1_SRC_PC
@@ -292,8 +287,8 @@ rtl::module dlx
 			begif [s== opcode $dlx::opcode_JALR]
 				s= jump_req 		1
 				s= jump_src			$dlx::JMP_SRC_OP1
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
 				s= rd_source 	$dlx::RD_PC_INC
 				s= rd_addr  [indexed instr_code {20 16}]
@@ -304,25 +299,24 @@ rtl::module dlx
 			begif [s== opcode $dlx::opcode_JR]
 				s= jump_req 		1
 				s= jump_src			$dlx::JMP_SRC_OP1
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		0
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		0
 			endif
 
 			begif [s== opcode $dlx::opcode_LHI]
-				s= rs1_req 		0
+				s= rs2_req 		0
 				s= rd_req 		1
 				s= rd_source 	$dlx::RD_LHI
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		0
-				s= immediate [zeroext [indexed instr_code {15 0}] 32]
 			endif
 
 			begif [s== opcode $dlx::opcode_LW]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
 				s= rd_source 	$dlx::RD_MEM
 				s= rd_addr  [indexed instr_code {20 16}]
@@ -335,10 +329,9 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_OR]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
-				s= rd_source 	1
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_OR
 				s= op1_source 	$dlx::OP1_SRC_REG
@@ -346,21 +339,19 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_ORI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
-				s= rd_source 	1
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_OR
 				s= op1_source 	$dlx::OP1_SRC_REG
 				s= op2_source 	$dlx::OP2_SRC_IMM
-				s= immediate [zeroext [indexed instr_code {15 0}] 32]
 			endif
 
 			begif [s== opcode $dlx::opcode_SEQ]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
 				s= rd_source 	$dlx::RD_ZF_COND
 				s= alu_req		1
@@ -370,8 +361,8 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SEQI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
 				s= rd_source 	$dlx::RD_ZF_COND
 				s= rd_addr  [indexed instr_code {20 16}]
@@ -382,8 +373,8 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SLE]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
 				s= rd_source 	$dlx::RD_CF_COND
 				s= alu_req		1
@@ -393,8 +384,8 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SLEI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
 				s= rd_source 	$dlx::RD_CF_COND
 				s= rd_addr  [indexed instr_code {20 16}]
@@ -405,10 +396,9 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SLL]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
-				s= rd_source 	1
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_SLL
 				s= op1_source 	$dlx::OP1_SRC_REG
@@ -416,23 +406,20 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SLLI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
-				s= rd_source 	1
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_SLL
 				s= op1_source 	$dlx::OP1_SRC_REG
 				s= op2_source 	$dlx::OP2_SRC_IMM
-				s= immediate [zeroext [indexed instr_code {15 0}] 32]
 			endif
 
 			begif [s== opcode $dlx::opcode_SLT]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
-				s= rd_source 	1
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_SUB
 				s= op1_source 	$dlx::OP1_SRC_REG
@@ -440,10 +427,9 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SLTI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
-				s= rd_source 	1
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_SUB
@@ -452,8 +438,8 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SNE]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
 				s= rd_source 	$dlx::RD_nZF_COND
 				s= alu_req		1
@@ -463,8 +449,8 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SNEI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
 				s= rd_source 	$dlx::RD_nZF_COND
 				s= rd_addr  [indexed instr_code {20 16}]
@@ -475,10 +461,9 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SRA]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
-				s= rd_source 	1
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_SRA
 				s= op1_source 	$dlx::OP1_SRC_REG
@@ -486,23 +471,20 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SRAI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
-				s= rd_source 	1
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_SRA
 				s= op1_source 	$dlx::OP1_SRC_REG
 				s= op2_source 	$dlx::OP2_SRC_IMM
-				s= immediate [zeroext [indexed instr_code {15 0}] 32]
 			endif
 
 			begif [s== opcode $dlx::opcode_SRL]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
-				s= rd_source 	1
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_SRL
 				s= op1_source 	$dlx::OP1_SRC_REG
@@ -510,23 +492,20 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SRLI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
-				s= rd_source 	1
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_SRL
 				s= op1_source 	$dlx::OP1_SRC_REG
 				s= op2_source 	$dlx::OP2_SRC_IMM
-				s= immediate [zeroext [indexed instr_code {15 0}] 32]
 			endif
 
 			begif [s== opcode $dlx::opcode_SUB]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
-				s= rd_source 	1
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_SUB
 				s= op1_source 	$dlx::OP1_SRC_REG
@@ -534,10 +513,9 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SUBI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
-				s= rd_source 	1
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_SUB
@@ -546,25 +524,21 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_SW]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		0
-				s= rd_source 	1
-				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_ADD
 				s= op1_source 	$dlx::OP1_SRC_REG
 				s= op2_source 	$dlx::OP2_SRC_IMM
-				s= rs1_addr [indexed instr_code {15 11}]
 				s= mem_req 		1
 				s= mem_cmd 		1
 			endif
 
 			begif [s== opcode $dlx::opcode_XOR]
-				s= rs0_req 		1
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= rd_req 		1
-				s= rd_source 	1
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_XOR
 				s= op1_source 	$dlx::OP1_SRC_REG
@@ -572,28 +546,39 @@ rtl::module dlx
 			endif
 
 			begif [s== opcode $dlx::opcode_XORI]
-				s= rs0_req 		1
-				s= rs1_req 		0
+				s= rs1_req 		1
+				s= rs2_req 		0
 				s= rd_req 		1
-				s= rd_source 	1
 				s= rd_addr  [indexed instr_code {20 16}]
 				s= alu_req		1
 				s= alu_opcode 	$dlx::ALU_XOR
 				s= op1_source 	$dlx::OP1_SRC_REG
 				s= op2_source 	$dlx::OP2_SRC_IMM
-				s= immediate [zeroext [indexed instr_code {15 0}] 32]
 			endif
 
+			## data collection ##
 			# reading regfile
-			s= rs0_rdata [indexed regfile rs0_addr]
 			s= rs1_rdata [indexed regfile rs1_addr]
-
-			begif [s== rs0_addr 0]
-				s= rs0_rdata 0
-			endif
+			s= rs2_rdata [indexed regfile rs2_addr]
 
 			begif [s== rs1_addr 0]
 				s= rs1_rdata 0
+			endif
+
+			begif [s== rs2_addr 0]
+				s= rs2_rdata 0
+			endif
+			
+			# pipeline WB data hazard resolve
+			begif [pipe::isactive WB]
+				begif [pipe::prr WB rd_req]
+					begif [s== [pipe::prr WB rd_addr] rs1_addr]
+						s= rs1_rdata [pipe::prr WB rd_wdata]
+					endif
+					begif [s== [pipe::prr WB rd_addr] rs2_addr]
+						s= rs2_rdata [pipe::prr WB rd_wdata]
+					endif
+				endif
 			endif
 
 		pipe::pstage EXEC
@@ -601,11 +586,11 @@ rtl::module dlx
 			# pipeline WB data hazard resolve
 			begif [pipe::isactive WB]
 				begif [pipe::prr WB rd_req]
-					begif [s== [pipe::prr WB rd_addr] rs0_addr]
-						s= rs0_rdata [pipe::prr WB rd_wdata]
-					endif
 					begif [s== [pipe::prr WB rd_addr] rs1_addr]
 						s= rs1_rdata [pipe::prr WB rd_wdata]
+					endif
+					begif [s== [pipe::prr WB rd_addr] rs2_addr]
+						s= rs2_rdata [pipe::prr WB rd_wdata]
 					endif
 				endif
 			endif
@@ -613,23 +598,24 @@ rtl::module dlx
 			# pipeline MEM data hazard resolve
 			begif [pipe::isactive MEM]
 				begif [pipe::prr MEM rd_req]
-					begif [s== [pipe::prr MEM rd_addr] rs0_addr]
-						begif [s== [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
-							pipe::pstall
-						endif
-						s= rs0_rdata [pipe::prr MEM rd_wdata]
-					endif
 					begif [s== [pipe::prr MEM rd_addr] rs1_addr]
-						begif [s== [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
+						begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
 							pipe::pstall
 						endif
 						s= rs1_rdata [pipe::prr MEM rd_wdata]
 					endif
+					begif [s== [pipe::prr MEM rd_addr] rs2_addr]
+						begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
+							pipe::pstall
+						endif
+						s= rs2_rdata [pipe::prr MEM rd_wdata]
+					endif
 				endif
 			endif
 
+			# ALU processing
 			begif [s== op1_source $dlx::OP1_SRC_REG]
-				s= alu_op1 rs0_rdata
+				s= alu_op1 rs1_rdata
 			endif
 
 			begif [s== op1_source $dlx::OP1_SRC_PC]
@@ -637,7 +623,7 @@ rtl::module dlx
 			endif
 
 			begif [s== op2_source $dlx::OP2_SRC_REG]
-				s= alu_op2 rs1_rdata
+				s= alu_op2 rs2_rdata
 			endif
 
 			begif [s== op2_source $dlx::OP2_SRC_IMM]
@@ -682,8 +668,45 @@ rtl::module dlx
 			begif [s== alu_result 0]
 				s= alu_ZF 1
 			endif
+			
+			# rd wdata processing
+			begif [s== rd_source $dlx::RD_ALU_RES]
+				s= rd_wdata alu_result
+			endif
 
-			s= rd_wdata alu_result_wide
+			begif [s== rd_source $dlx::RD_PC_INC]
+				s= rd_wdata nextinstr_addr
+			endif
+
+			begif [s== rd_source $dlx::RD_LHI]
+				s= rd_wdata [s<< immediate 16]
+			endif
+
+			begif [s== rd_source $dlx::RD_ZF_COND]
+				s= rd_wdata alu_ZF
+			endif
+
+			begif [s== rd_source $dlx::RD_nZF_COND]
+				s= rd_wdata [s! alu_ZF]
+			endif
+
+			begif [s== rd_source $dlx::RD_CF_COND]
+				s= rd_wdata alu_CF
+			endif
+
+			# jump vector processing
+			begif jump_cond
+				begif [s&& jump_cond_eqz [s!= alu_op1 0]]
+					s= jump_req 0
+				endif
+				begif [s&& [s! jump_cond_eqz] [s== alu_op1 0]]
+					s= jump_req 0
+				endif
+			endif
+
+			# mem addr processing
+			s= mem_addr alu_result
+			s= mem_wdata rs2_rdata
 
 			begif [s== jump_src $dlx::JMP_SRC_OP1]
 				s= jump_vector alu_op1
