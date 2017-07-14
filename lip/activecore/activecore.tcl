@@ -184,6 +184,10 @@ proc s== {op1 op2} {
 	ActiveCore::expr_2op "==" $op1 $op2
 }
 
+proc s!= {op1 op2} {
+	ActiveCore::expr_2op "!=" $op1 $op2
+}
+
 proc indexed {op index} {
 	if {[llength $index] > 2} {
 		ActiveCore::ERROR Index\ $index\ of\ operand\ $op\ is\ incorrect!
