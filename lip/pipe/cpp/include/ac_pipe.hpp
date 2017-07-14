@@ -149,6 +149,8 @@ namespace pipe
 	class ac_pproc : public ac_execode
 	{
 	public:
+		std::string name;
+
 		ac_var * clk;
 		ac_var * rst;
 
@@ -164,7 +166,7 @@ namespace pipe
 
 		std::vector<prr_vector> prr_vectors;
 
-		ac_pproc(ac_var * clk_in, ac_var * rst_in);
+		ac_pproc(std::string pproc_name, ac_var * clk_in, ac_var * rst_in);
 
 		bool GetCopipeIf(std::string copipeif_name, copipe_if ** copipe_if_fetched);
 		bool GetWrfifoIf(std::string wrfifoif_name, wrfifo_if ** wrfifo_if_fetched);
@@ -174,7 +176,7 @@ namespace pipe
 	extern char PVAR_STRING[];
 	extern std::deque<ac_pproc*> Pprocs;
 
-	int pproc_cmd(std::string clk_varname, std::string rst_varname);
+	int pproc_cmd(std::string pproc_name, std::string clk_varname, std::string rst_varname);
 	int endpproc_cmd();
 	int pvar_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
 	int gpvar_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);

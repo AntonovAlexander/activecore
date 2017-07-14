@@ -88,8 +88,8 @@ namespace eval pipe {
 		__ac_pipe_isactive $pipe_step_name
 	}
 
-	proc pproc {clk rst} {
-		__ac_pipe_pproc $clk $rst
+	proc pproc {name clk rst} {
+		__ac_pipe_pproc $name $clk $rst
 	}
 
 	proc endpproc {} {

@@ -89,7 +89,7 @@ rtl::module dlx
 	rtl::input 	{31 0}	data_mem_rdata
 
 
-	pipe::pproc clk_i rst_i
+	pipe::pproc instrpipe clk_i rst_i
 
 		# transaction context
 		pipe::pvar {0 0} 	reset_active	0
