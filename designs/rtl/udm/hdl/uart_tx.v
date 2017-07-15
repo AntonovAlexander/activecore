@@ -1,0 +1,139 @@
+/*
+ PSS
+
+ Copyright (c) 2016 Alexander Antonov <153287@niuitmo.ru>
+ All rights reserved.
+
+ Version 0.99
+
+ The FreeBSD license
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following
+    disclaimer in the documentation and/or other materials
+    provided with the distribution.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY
+ EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ PSS PROJECT OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+
+module uart_tx
+(
+	input clk_i, rst_i,
+
+	input tx_start_i,
+	input [7:0] din_bi,
+
+	input locked_i,
+	input [28:0] bitperiod_i,
+
+	output reg tx_done_tick_o,
+    output reg tx_o
+);
+
+reg [7:0] 	databuf;
+reg [3:0] 	state;
+reg [31:0] 	clk_counter;
+reg [2:0] 	bit_counter;
+
+localparam ST_IDLE 		= 8'h0;
+localparam ST_START 	= 8'h1;
+localparam ST_TX_DATA 	= 8'h2;
+localparam ST_STOP 		= 8'h3;
+
+always @(posedge clk_i)
+	begin
+	if (rst_i)
+		begin
+		state <= ST_IDLE;
+		databuf <= 8'h0;
+		clk_counter <= 32'h0;
+		tx_o <= 1'b1;
+		tx_done_tick_o <= 1'b0;
+		end
+	else 
+		begin
+		
+		tx_done_tick_o <= 1'b0;
+
+		case (state)
+
+			ST_IDLE:
+				begin
+				tx_o <= 1'b1;
+				if ((tx_start_i == 1'b1) && (locked_i == 1'b1))
+					begin
+					tx_o <= 1'b0;
+					state <= ST_START;
+					databuf <= din_bi;
+					clk_counter <= 32'h0;
+					end
+				end
+
+			ST_START:
+				begin
+				clk_counter <= clk_counter + 32'h1;
+				if (clk_counter == {3'h0, bitperiod_i})
+					begin
+					state <= ST_TX_DATA;
+					clk_counter <= 32'h0;
+					bit_counter <= 3'h0;
+					tx_o <= databuf[0];
+					databuf <= {1'b0, databuf[7:1]};
+					end
+				end
+
+			ST_TX_DATA:
+				begin
+				clk_counter <= clk_counter + 32'h1;
+				if (clk_counter == {3'h0, bitperiod_i})
+					begin
+					clk_counter <= 32'h0;
+					bit_counter <= bit_counter + 3'h1;
+					if (bit_counter == 3'h7)
+						begin
+						tx_o <= 1'b1;
+						state <= ST_STOP;
+						end
+					else 
+						begin
+						tx_o <= databuf[0];
+						databuf <= {1'b0, databuf[7:1]};
+						end
+					end
+				end
+
+			ST_STOP:
+				begin
+				clk_counter <= clk_counter + 32'h1;
+				if (clk_counter == {2'h0, bitperiod_i, 1'b0})		// 2 * bit
+					begin
+					tx_o <= 1'b1;
+					tx_done_tick_o <= 1'b1;
+					state <= ST_IDLE;
+					end
+				end
+
+		endcase
+
+		end
+	end
+
+endmodule
