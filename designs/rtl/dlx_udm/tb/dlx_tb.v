@@ -63,7 +63,7 @@ wire [31:0] LED;
 dlx_udm
 #(
 	//.mem_data("../../../activecore/dlx/sw/io_heartbeat/io_heartbeat.hex"),
-	.mem_data("../../../activecore/dlx/sw/mem_hazard/mem_hazard.hex"),
+	.mem_data("../../../../activecore/dlx/sw/mem_hazard/mem_hazard.hex"),
 	.mem_size(1024)
 ) dlx_udm
 (
