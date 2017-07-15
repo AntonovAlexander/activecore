@@ -2,6 +2,7 @@ set sync_byte       \x55
 set escape_byte     \x5a
 set idcode_cmd      \x00
 set rst_cmd         \x80
+set nrst_cmd        \xc0
 set wr_cmd          \x81
 set rd_cmd          \x82
 set wr_cmd_noinc    \x83
@@ -66,6 +67,21 @@ proc udm_sendbyte {databyte} {
 
     if {$databyte == $sync_byte || $databyte == $escape_byte} {puts -nonewline $com $escape_byte}
     puts -nonewline $com $databyte
+}
+
+proc udm_rst {} {
+	puts -nonewline $com $sync_byte
+	puts -nonewline $com $rst_cmd
+}
+
+proc udm_nrst {} {
+	puts -nonewline $com $sync_byte
+	puts -nonewline $com $nrst_cmd
+}
+
+proc udm_hreset {} {
+	udm_rst
+	udm_nrst
 }
 
 proc udm_sendword {dataword} {
@@ -224,36 +240,8 @@ proc udm_wrfile_be {address filename} {
     close $datafile
 }
 
-
-proc udm_reset {} {
-    global reg_cpu_control_addr
-
-    udm_wr $reg_cpu_control_addr 0x00000001
-    puts "CPU put in reset state"
-}
-
-
-proc udm_start {} {
-    global reg_cpu_control_addr
-
-    udm_wr $reg_cpu_control_addr 0x00000000
-    puts "CPU started"
-}
-
-
-proc udm_restart {} {
-    udm_reset
-    udm_start
-}
-
-
 proc udm_loadbin {filename} {
-    udm_reset
+    udm_rst
     udm_wrfile_be 0x00000000 $filename
-    udm_start
+    udm_nrst
 }
-
-
-udm_cc com3 115200
-udm_loadbin "<path-to-svn>/pss/trunk/pss/SW/onboard/Heartbeatdelay/heartbeatdelay.bin"
-udm_discon

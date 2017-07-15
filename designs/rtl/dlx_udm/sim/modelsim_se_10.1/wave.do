@@ -128,8 +128,10 @@ add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC com
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_active_req
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_prepeat_req
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_post_pstall_req
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_nextinstr_addr
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_rs1_rdata
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_rs2_rdata
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_immediate
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_rd_req
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_rd_source
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_rd_addr
@@ -151,8 +153,6 @@ add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC com
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_jump_cond_eqz
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_mem_req
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_mem_cmd
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_nextinstr_addr
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_immediate
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/clk_i
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_active_req
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_prepeat_req
@@ -187,7 +187,7 @@ add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_mem_req
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_data_mem_rdata
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {117188 ps} 0}
+WaveRestoreCursors {{Cursor 1} {3160435 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 670
 configure wave -valuecolwidth 100
@@ -203,4 +203,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {820314 ps}
+WaveRestoreZoom {2793296 ps} {3613610 ps}
