@@ -696,10 +696,10 @@ rtl::module dlx
 
 			# jump vector processing
 			begif jump_cond
-				begif [s&& jump_cond_eqz [s!= alu_op1 0]]
+				begif [s&& jump_cond_eqz [s!= rs1_rdata 0]]
 					s= jump_req 0
 				endif
-				begif [s&& [s! jump_cond_eqz] [s== alu_op1 0]]
+				begif [s&& [s! jump_cond_eqz] [s== rs1_rdata 0]]
 					s= jump_req 0
 				endif
 			endif
