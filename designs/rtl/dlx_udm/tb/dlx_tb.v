@@ -62,8 +62,8 @@ wire [31:0] LED;
 	
 dlx_udm
 #(
-	//.mem_data("../../../activecore/dlx/sw/io_heartbeat/io_heartbeat.hex"),
-	.mem_data("../../../../activecore/dlx/sw/mem_hazard/mem_hazard.hex"),
+	//.mem_data("../../../../activecore/dlx/sw/io_heartbeat/io_heartbeat.hex"),
+	.mem_data("../../../../activecore/dlx/sw/io_heartbeat_variable/io_heartbeat_variable.hex"),
 	.mem_size(1024)
 ) dlx_udm
 (
@@ -306,6 +306,6 @@ end
 //
 always #`HALF_PERIOD CLK_50MHZ = ~CLK_50MHZ;
 
-// always #50000 SW = SW + 8'h1;
+always #1000 SW = SW + 8'h1;
 //
 endmodule

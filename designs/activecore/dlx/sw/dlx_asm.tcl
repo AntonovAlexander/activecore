@@ -100,8 +100,10 @@ namespace eval dlx_asm {
 	proc I-type {opcode rd rs1 imm} {
 		set rd_decoded [decode_reg $rd]
 		set rs1_decoded [decode_reg $rs1]
-		if {[isnumeric $imm] == 0} {
-			error Immediate\ definition\ $imm\ is\ incorrect!
+		if {$opcode != 0x04 && $opcode != 0x05} {
+			if {[isnumeric $imm] == 0} {
+				error Immediate\ definition\ $imm\ is\ incorrect!
+			}
 		}
 		lappend dlx_asm::cmds [list $dlx_asm::cmd_pointer I-type $opcode $rd_decoded $rs1_decoded $imm]
 		set dlx_asm::cmd_pointer [expr $dlx_asm::cmd_pointer + 4]
@@ -117,8 +119,8 @@ namespace eval dlx_asm {
 		foreach label $dlx_asm::labels {
 			if {$name == [lindex $label 0]} {
 				set ret_val [lindex $label 1]
+				set label_found 1
 			}
-			set label_found 1
 		}
 		if {$label_found == 0} {
 			error Label\ $name\ is\ not\ found!
@@ -126,9 +128,15 @@ namespace eval dlx_asm {
 		return $ret_val
 	}
 
-	proc compute_relative_offset {instr_addr name} {
+	proc compute_relative_offset_26 {instr_addr name} {
 		set target_addr [get_label $name]
 		set ret_val [format %08x [expr ($target_addr - $instr_addr - 4) & 0x0000000003ffffff]]
+		return 0x$ret_val
+	}
+	
+	proc compute_relative_offset_16 {instr_addr name} {
+		set target_addr [get_label $name]
+		set ret_val [format %08x [expr ($target_addr - $instr_addr - 4) & 0x000000000000ffff]]
 		return 0x$ret_val
 	}
 
@@ -177,10 +185,17 @@ namespace eval dlx_asm {
 			if {[lindex $cmd 1] == "R-type"} {
 				set cmd_code [expr ([lindex $cmd 4] << 21) + ([lindex $cmd 5] << 16) + ([lindex $cmd 3] << 11) + [lindex $cmd 2]]
 			} elseif {[lindex $cmd 1] == "I-type"} {
-				set cmd_code [expr ([lindex $cmd 2] << 26) + ([lindex $cmd 4] << 21) + ([lindex $cmd 3] << 16) + [lindex $cmd 5]]
+				# BEQZ or BNEZ
+				if {[lindex $cmd 2] == 0x04 || [lindex $cmd 2] == 0x05} {
+					set label [lindex $cmd 5]
+					set value [compute_relative_offset_16 [lindex $cmd 0] $label]
+					set cmd_code [expr ([lindex $cmd 2] << 26) + ([lindex $cmd 4] << 21) + ([lindex $cmd 3] << 16) + $value]
+				} else {
+					set cmd_code [expr ([lindex $cmd 2] << 26) + ([lindex $cmd 4] << 21) + ([lindex $cmd 3] << 16) + [lindex $cmd 5]]
+				}
 			} elseif {[lindex $cmd 1] == "J-type"} {
 				set label [lindex $cmd 3]
-				set value [compute_relative_offset [lindex $cmd 0] $label]
+				set value [compute_relative_offset_26 [lindex $cmd 0] $label]
 				set cmd_code [expr ([lindex $cmd 2] << 26) + $value]
 			} elseif {[lindex $cmd 1] == "data"} {
 				set dataword [lindex $cmd 2]
@@ -248,12 +263,12 @@ proc andi {rd rs1 imm} {
     dlx_asm::I-type 0x0C $rd $rs1 $imm
 }
 
-proc beqz {rd rs1 imm} {
-    dlx_asm::I-type 0x04 $rd $rs1 $imm
+proc beqz {rs1 imm} {
+    dlx_asm::I-type 0x04 r0 $rs1 $imm
 }
 
-proc bnez {rd rs1 imm} {
-    dlx_asm::I-type 0x05 $rd $rs1 $imm
+proc bnez {rs1 imm} {
+    dlx_asm::I-type 0x05 r0 $rs1 $imm
 }
 
 proc j {imm} {
