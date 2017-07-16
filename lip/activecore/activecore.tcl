@@ -248,3 +248,5 @@ proc ActiveCore_Reset {} {
 }
 
 source [file join $LIP_PATH activecore config.tcl]
+
+#ActiveCore::debug_set

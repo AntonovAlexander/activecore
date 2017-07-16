@@ -18,6 +18,7 @@
 
 // External cmds //
 int expr_assign_cmd_generated(ac_dimensions dimensions, ac_var* target, ac_param param);
+int expr_assign_cmd_generated(ac_var* target, ac_param param);
 int expr_assign_cmd(ac_dimensions dimensions, ac_var* target, ac_param param);
 int expr_assign_cmd(ac_var* target, ac_param param);
 int expr_op_cmd_generated(ac_execode** new_expr, std::string opcode, std::vector<ac_param> params, ac_var * target);

@@ -112,6 +112,12 @@ int expr_assign_cmd(ac_var* target, ac_param param)
 	return (expr_assign_cmd(*dimensions, target, param));
 }
 
+int expr_assign_cmd_generated(ac_var* target, ac_param param)
+{
+	ac_dimensions * dimensions = new ac_dimensions();
+	return (expr_assign_cmd_generated(*dimensions, target, param));
+}
+
 int GetImmWidth(std::string imm, ac_dimensions_static ** genvar_dimensions)
 {
 	unsigned int length =  pow (imm.length(), 4);
