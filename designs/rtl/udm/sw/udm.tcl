@@ -70,11 +70,17 @@ proc udm_sendbyte {databyte} {
 }
 
 proc udm_rst {} {
+    global com
+    global sync_byte
+    global rst_cmd
 	puts -nonewline $com $sync_byte
 	puts -nonewline $com $rst_cmd
 }
 
 proc udm_nrst {} {
+    global com
+    global sync_byte
+    global nrst_cmd
 	puts -nonewline $com $sync_byte
 	puts -nonewline $com $nrst_cmd
 }
