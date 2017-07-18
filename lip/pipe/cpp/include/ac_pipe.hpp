@@ -188,7 +188,9 @@ namespace pipe
 	int isactive_cmd(std::string pstage_name, std::string * int_varname);
 	int isworking_cmd(std::string pstage_name, std::string * int_varname);
 	int isstalled_cmd(std::string pstage_name, std::string * int_varname);
-	int isdone_cmd(std::string pstage_name, std::string * int_varname);
+	int issucc_cmd(std::string pstage_name, std::string * int_varname);
+	int isbroken_cmd(std::string pstage_name, std::string * int_varname);
+	int isfinished_cmd(std::string pstage_name, std::string * int_varname);
 
 	int copipeif_cmd(std::string copipeif_name, std::string req_varname, std::string we_varname, std::string ack_varname, std::string wdata_varname, std::string resp_varname, std::string rdata_varname);
 	int copipereq_cmd(std::string copipeif_name, std::vector<ac_param> params);

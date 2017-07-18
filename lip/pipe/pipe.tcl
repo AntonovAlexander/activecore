@@ -96,8 +96,8 @@ namespace eval pipe {
 		__ac_pipe_isstalled $pipe_step_name
 	}
 
-	proc isdone {pipe_step_name} {
-		__ac_pipe_isdone $pipe_step_name
+	proc issucc {pipe_step_name} {
+		__ac_pipe_issucc $pipe_step_name
 	}
 
 	proc pproc {name clk rst} {
