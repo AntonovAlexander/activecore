@@ -570,7 +570,7 @@ rtl::module dlx
 			endif
 			
 			# pipeline WB data hazard resolve
-			begif [pipe::isactive WB]
+			begif [pipe::issucc WB]
 				begif [pipe::prr WB rd_req]
 					begif [s== [pipe::prr WB rd_addr] rs1_addr]
 						s= rs1_rdata [pipe::prr WB rd_wdata]
@@ -584,7 +584,7 @@ rtl::module dlx
 		pipe::pstage EXEC
 
 			# pipeline WB data hazard resolve
-			begif [pipe::isactive WB]
+			begif [pipe::issucc WB]
 				begif [pipe::prr WB rd_req]
 					begif [s== [pipe::prr WB rd_addr] rs1_addr]
 						s= rs1_rdata [pipe::prr WB rd_wdata]
@@ -596,7 +596,7 @@ rtl::module dlx
 			endif
 
 			# pipeline MEM data hazard resolve
-			begif [pipe::isactive MEM]
+			begif [pipe::issucc MEM]
 				begif [pipe::prr MEM rd_req]
 					begif [s== [pipe::prr MEM rd_addr] rs1_addr]
 						begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
