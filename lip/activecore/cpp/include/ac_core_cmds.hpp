@@ -30,9 +30,13 @@ int expr_2op_cmd(std::string opcode, ac_param param0, ac_param param1, ac_var** 
 int expr_zeroext_cmd(unsigned int target_width, ac_param param, ac_var** respvar);
 int expr_signext_cmd(unsigned int target_width, ac_param param, ac_var** respvar);
 int expr_initval_cmd(unsigned int width, std::string value, ac_var** respvar);
+
 int expr_begif_cmd(ac_var* cond_op);
 int expr_begelsif_cmd(ac_var* cond_op);
 int expr_begelse_cmd();
 int expr_endif_cmd();
+
+int expr_begwhile_cmd(ac_var* cond_op);
+int expr_endwhile_cmd();
 
 #endif /* AC_CORE_CMDS_H_ */

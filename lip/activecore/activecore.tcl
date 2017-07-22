@@ -216,6 +216,14 @@ proc endif {} {
 	__ac_core_endif
 }
 
+proc begwhile {condition} {
+	__ac_core_begwhile $condition
+}
+
+proc endwhile {} {
+	__ac_core_endwhile
+}
+
 proc cnct {ops} {
 	__ac_core_acc_param_clr
 	foreach op $ops {

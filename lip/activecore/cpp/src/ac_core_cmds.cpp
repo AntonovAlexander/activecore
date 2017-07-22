@@ -604,3 +604,20 @@ int expr_endif_cmd()
 	return 0;
 }
 
+int expr_begwhile_cmd(ac_var* cond_op)
+{
+	ac_execode* new_expr = new ac_execode("while");
+	new_expr->AddRdVar(cond_op);
+
+	ExeStack[ExeStack.size()-1]->AddExpr(new_expr);
+	ExeStack.push_back(new_expr);
+
+	return 0;
+}
+
+int expr_endwhile_cmd()
+{
+	ExeStack.pop_back();
+	return 0;
+}
+

@@ -152,4 +152,22 @@ int expr_endif_cmd_string()
 	return ret_val;
 }
 
+int expr_begwhile_cmd_string(std::string cond_op)
+{
+	if (ExeStack.size() == 0) return 1;
 
+	ac_var* cond_op_var;
+	if (SetVarReadable(cond_op, &cond_op_var) != 0) return 1;
+	int ret_val = expr_begwhile_cmd(cond_op_var);
+
+	return ret_val;
+}
+
+int expr_endwhile_cmd_string()
+{
+	if (ExeStack.size() == 0) return 1;
+
+	int ret_val = expr_endwhile_cmd();
+
+	return ret_val;
+}
