@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <deque>
+#include <list>
 #include <sstream>
 #include </usr/include/tcl/tcl.h>
 

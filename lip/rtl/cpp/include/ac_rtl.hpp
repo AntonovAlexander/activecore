@@ -10,6 +10,7 @@
 #define AC_RTL_H_
 
 #include "ac_core.hpp"
+#include "ac_core_cmds.hpp"
 #include "ac_utils.hpp"
 
 namespace rtl

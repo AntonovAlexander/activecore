@@ -21,7 +21,7 @@ bool DEBUG_FLAG = false;
 
 // AST state
 int GenCounter = 0;
-std::vector<ac_execode*> ExeStack;
+std::deque<ac_execode*> ExeStack;
 std::vector<std::vector<ac_var*>* > SignalsReadable;
 std::vector<std::vector<ac_var*>* > SignalsWriteable;
 ac_dimensions DimensionsAccumulator;
@@ -340,6 +340,22 @@ bool ac_execode::AddIfTargetVar(ac_var* new_iftvar)
 ac_execode::ac_execode(std::string opcode_in)
 {
 	opcode = opcode_in;
+}
+
+void ac_execode::AddExpr(unsigned int * cursor, ac_execode* new_expr)
+{
+	std::deque<ac_execode*>::iterator it = ExeStack[ExeStack.size()-1]->expressions.begin() + (*cursor);
+	for (unsigned int i = 0; i < new_expr->wrvars.size(); i++)
+	{
+		AddWrVar(new_expr->wrvars[i]);
+	}
+
+	for (unsigned int i = 0; i < new_expr->rdvars.size(); i++)
+	{
+		AddRdVar(new_expr->rdvars[i]);
+	}
+	expressions.insert(it, new_expr);
+	(*cursor)++;
 }
 
 void ac_execode::AddExpr(ac_execode* new_expr)

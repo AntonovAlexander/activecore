@@ -208,7 +208,7 @@ class ac_execode
 public:
 	std::string opcode;
 	std::vector<ac_param> params;
-	std::deque<std::string> string_params;
+	std::vector<std::string> string_params;
 	std::deque<ac_execode*> expressions;
 
 	ac_dimensions dimensions;
@@ -222,6 +222,7 @@ public:
 	ac_execode(std::string opcode_in);
 
 	void AddExpr(ac_execode* new_expr);
+	void AddExpr(unsigned int * cursor, ac_execode* new_expr);
 	bool AddWrVar(ac_var* new_wrvar);
 	bool AddRdVar(ac_var* new_rdvar);
 	void AddGenVar(ac_var* new_genvar);
@@ -239,7 +240,7 @@ public:
 extern bool DEBUG_FLAG;
 
 // AST state
-extern std::vector<ac_execode*> ExeStack;
+extern std::deque<ac_execode*> ExeStack;
 extern std::vector<std::vector<ac_var*>* > SignalsReadable;
 extern std::vector<std::vector<ac_var*>* > SignalsWriteable;
 extern ac_dimensions DimensionsAccumulator;
