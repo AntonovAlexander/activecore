@@ -42,15 +42,20 @@ namespace eval pipe {
 		__ac_pipe_copipeif $copipeif_name $req $we $ack $wdata $resp $rdata
 	}
 
-	proc copipereq {copipeif_name we wdata} {
+	proc copipe_wrreq {copipeif_name param} {
 		__ac_core_acc_param_clr
-		ActiveCore::_accum_param $we
-		ActiveCore::_accum_param $wdata
-		__ac_pipe_copipereq $copipeif_name
+		ActiveCore::_accum_param $param
+		__ac_pipe_copipe_wrreq $copipeif_name
 	}
 
-	proc copiperesp {copipeif_name} {
-		__ac_pipe_copiperesp $copipeif_name
+	proc copipe_rdreq {copipeif_name param} {
+		__ac_core_acc_param_clr
+		ActiveCore::_accum_param $param
+		__ac_pipe_copipe_rdreq $copipeif_name
+	}
+
+	proc copipe_resp {copipeif_name} {
+		__ac_pipe_copipe_resp $copipeif_name
 	}
 
 	# interface functions

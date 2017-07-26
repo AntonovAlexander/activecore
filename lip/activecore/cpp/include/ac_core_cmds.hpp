@@ -36,6 +36,8 @@ int expr_op_cmd(std::string opcode, std::vector<ac_param> params, ac_var** respv
 
 int expr_1op_cmd(std::string opcode, ac_param param, ac_var** respvar);
 int expr_2op_cmd(std::string opcode, ac_param param0, ac_param param1, ac_var** respvar);
+int expr_1op_cmd_generated(std::string opcode, ac_param param, ac_var* target);
+int expr_2op_cmd_generated(std::string opcode, ac_param param0, ac_param param1, ac_var* target);
 
 int expr_zeroext_cmd(unsigned int * cursor, unsigned int target_width, ac_param param, ac_var** respvar);
 int expr_zeroext_cmd(unsigned int target_width, ac_param param, ac_var** respvar);

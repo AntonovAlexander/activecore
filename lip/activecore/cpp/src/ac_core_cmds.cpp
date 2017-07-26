@@ -431,12 +431,29 @@ int expr_1op_cmd(std::string opcode, ac_param param, ac_var** respvar)
 	return expr_op_cmd(opcode, params, respvar);
 }
 
+int expr_1op_cmd_generated(std::string opcode, ac_param param, ac_var* target)
+{
+	ac_execode* new_expr;
+	std::vector<ac_param> params;
+	params.push_back(param);
+	return expr_op_cmd_generated(&new_expr, opcode, params, target);
+}
+
 int expr_2op_cmd(std::string opcode, ac_param param0, ac_param param1, ac_var** respvar)
 {
 	std::vector<ac_param> params;
 	params.push_back(param0);
 	params.push_back(param1);
 	return expr_op_cmd(opcode, params, respvar);
+}
+
+int expr_2op_cmd_generated(std::string opcode, ac_param param0, ac_param param1, ac_var* target)
+{
+	ac_execode* new_expr;
+	std::vector<ac_param> params;
+	params.push_back(param0);
+	params.push_back(param1);
+	return expr_op_cmd_generated(&new_expr, opcode, params, target);
 }
 
 int expr_zeroext_cmd(unsigned int * cursor, unsigned int target_width, ac_param param, ac_var** respvar)

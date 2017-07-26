@@ -207,13 +207,13 @@ rtl::module dlx
 				endif
 			endif
 
-			pipe::copipereq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
+			pipe::copipe_rdreq instr_mem [cnct {curinstr_addr curinstr_addr}]
 
 			s= nextinstr_addr [s+ curinstr_addr 4]
 		
 		pipe::pstage IDECODE
 
-			s= instr_code [pipe::copiperesp instr_mem]
+			s= instr_code [pipe::copipe_resp instr_mem]
 
 			begif [pipe::isactive EXEC]
 				begif [pipe::prr EXEC jump_req]
@@ -766,13 +766,18 @@ rtl::module dlx
 		pipe::pstage MEM
 			
 			begif mem_req
-				pipe::copipereq data_mem mem_cmd [cnct {mem_addr mem_wdata}]
+				begif mem_cmd
+					pipe::copipe_wrreq data_mem [cnct {mem_addr mem_wdata}]
+				endif
+				begelse
+					pipe::copipe_rdreq data_mem [cnct {mem_addr mem_wdata}]
+				endif
 			endif
 
 		pipe::pstage WB
 			
 			begif mem_req
-				s= mem_rdata [pipe::copiperesp data_mem]
+				s= mem_rdata [pipe::copipe_resp data_mem]
 			endif
 
 
