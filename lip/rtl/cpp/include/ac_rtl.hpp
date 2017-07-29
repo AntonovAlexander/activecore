@@ -74,9 +74,18 @@ namespace rtl
 		ac_comb(std::string name_in, unsigned int msb, unsigned int lsb, std::string defval_in) : ac_var(COMB_STRING, name_in, msb, lsb, defval_in) {};
 	};
 
+	class ac_ffvar : public ac_var
+	{
+	public:
+		ac_ffvar(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in, ac_var * clk, ac_var * rst);
+
+		ac_mem * mem;
+	};
+
 	extern std::string ModuleName;
 	extern std::vector<ac_comb*> Combs;
 	extern std::vector<ac_mem*> Mems;
+	extern std::vector<ac_ffvar*> Ffvars;
 	extern std::vector<ac_port*> Ports_in;
 	extern std::vector<ac_port*> Ports_out;
 	extern std::vector<ac_port*> Ports_inout;
@@ -90,6 +99,11 @@ namespace rtl
 	int mem_cmd(ac_mem** new_mem, std::string name_in, ac_dimensions_static dimensions_in, bool sync_levedge_in);
 	int mem_addsource_cmd(std::string mem_name, std::string sync_posneg_in, std::string sync_signal_in, ac_param sync_source_in);
 	int mem_addreset_cmd(std::string mem_name, std::string sync_levedge_in, std::string sync_posneg_in, std::string sync_signal_in, ac_param reset_source_in);
+
+	int ffvar_cmd_string(ac_ffvar** new_ffvar, std::string name, ac_dimensions_static dimensions_in, std::string defval, std::string clk_name, std::string rst_name);
+	int ffvar_cmd(ac_ffvar** new_ffvar, std::string name, ac_dimensions_static dimensions_in, std::string defval, ac_var* clk, ac_var* rst);
+	int rdprev_cmd(std::string ffvar_name, std::string * respvar_name);
+
 	int cproc_cmd();
 	int endcproc_cmd();
 	int export_cmd(std::string language, char* filename);

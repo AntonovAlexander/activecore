@@ -254,6 +254,14 @@ namespace eval rtl {
 		_mem_addreset $mem_name async $signal $posneg $source
 	}
 
+	proc ffvar {dimension name defval clk rst} {
+		__ac_rtl_ffvar_ranged [lindex $dimension 0] [lindex $dimension 1] $name $defval $clk $rst
+	}
+
+	proc rdprev {name} {
+		__ac_rtl_rdprev $name
+	}
+
 	proc cproc {} {
 		__ac_rtl_cproc
 	}

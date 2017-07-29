@@ -81,6 +81,13 @@ ac_param::ac_param(ac_imm* imm_in)
 	imm = imm_in;
 }
 
+ac_param::ac_param(ac_dimensions_static dimensions_in, std::string value)
+{
+	ac_imm * new_imm = new ac_imm(dimensions_in, value);
+	type = PARAM_TYPE_VAL;
+	imm = new_imm;
+}
+
 ac_param::ac_param(unsigned int width, std::string value)
 {
 	ac_imm * new_imm = new ac_imm(width-1, 0, value);

@@ -71,6 +71,7 @@ public:
 	ac_param() {};
 	ac_param(ac_var* var_in);
 	ac_param(ac_imm* imm_in);
+	ac_param(ac_dimensions_static dimensions_in, std::string value);
 	ac_param(unsigned int width, std::string value);
 
 	std::string GetString();

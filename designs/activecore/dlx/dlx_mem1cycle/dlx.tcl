@@ -568,18 +568,6 @@ rtl::module dlx
 			begif [s== rs2_addr 0]
 				s= rs2_rdata 0
 			endif
-			
-			# pipeline WB data hazard resolve
-			begif [pipe::issucc WB]
-				begif [pipe::prr WB rd_req]
-					begif [s== [pipe::prr WB rd_addr] rs1_addr]
-						s= rs1_rdata [pipe::prr WB rd_wdata]
-					endif
-					begif [s== [pipe::prr WB rd_addr] rs2_addr]
-						s= rs2_rdata [pipe::prr WB rd_wdata]
-					endif
-				endif
-			endif
 
 		pipe::pstage EXEC
 

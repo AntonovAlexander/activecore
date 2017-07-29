@@ -77,12 +77,6 @@ int expr_assign_cmd(unsigned int * cursor, ac_dimensions dimensions, ac_var* tar
 	if (dimensions.GetPower(&targetDePower) != 0) return 1;
 	targetDePowered = targetPower - targetDePower;
 
-	//printf("source Power: %d\n", param.GetDimensions().size());
-	//printf("targetPower: %d\n", targetPower);
-	//printf("targetDePower: %d\n", targetDePower);
-	//printf("targetDePowered: %d\n", targetDePowered);
-	//printf("repeating: %d\n", target->dimensions[targetDePowered-1].GetWidth());
-
 	if ((param.type == PARAM_TYPE_VAR) && (targetDePowered != param.GetDimensions().size()))
 	{
 		printf("ERROR: dimensions do not match!\n");
