@@ -8,34 +8,16 @@ namespace eval pipe {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ pvar\ $name\ is\ not\ a\ number!
 		}
-		if {[llength $dimensions] != 2} {
-			ActiveCore::ERROR dimension\ length\ of\ pvar\ $name\ is\ incorrect!
-		} else {
-			if {[ActiveCore::isnumeric [lindex $dimensions 0]] == 0} {
-				ActiveCore::ERROR Pvar\ $name\ has\ variable\ length!
-			}
-			if {[ActiveCore::isnumeric [lindex $dimensions 1]] == 0} {
-				ActiveCore::ERROR Pvar\ $name\ has\ variable\ length!
-			}
-			__ac_pipe_pvar_ranged [lindex $dimensions 0] [lindex $dimensions 1] $name $defval
-		}
+		_acc_index $dimensions
+		__ac_pipe_pvar $name $defval
 	}
 
 	proc gpvar {dimensions name defval} {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ pvar\ $name\ is\ not\ a\ number!
 		}
-		if {[llength $dimensions] != 2} {
-			ActiveCore::ERROR dimension\ length\ of\ pvar\ $name\ is\ incorrect!
-		} else {
-			if {[ActiveCore::isnumeric [lindex $dimensions 0]] == 0} {
-				ActiveCore::ERROR Pvar\ $name\ has\ variable\ length!
-			}
-			if {[ActiveCore::isnumeric [lindex $dimensions 1]] == 0} {
-				ActiveCore::ERROR Pvar\ $name\ has\ variable\ length!
-			}
-			__ac_pipe_gpvar_ranged [lindex $dimensions 0] [lindex $dimensions 1] $name $defval
-		}
+		_acc_index $dimensions
+		__ac_pipe_gpvar $name $defval
 	}
 
 	proc copipeif {copipeif_name req we ack wdata resp rdata} {

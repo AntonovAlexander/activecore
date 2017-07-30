@@ -172,36 +172,17 @@ namespace eval rtl {
 		return $retval
 	}
 
-	proc _port {type dimension name} {
-		if {[llength $dimension] != 2} {
-			ActiveCore::ERROR dimension\ length\ of\ port\ $name\ is\ incorrect!
-		} else {
-
-			if {[ActiveCore::isnumeric [lindex $dimension 0]] == 0} {
-				ActiveCore::ERROR Port\ $name\ has\ variable\ length!
-			}
-			if {[ActiveCore::isnumeric [lindex $dimension 1]] == 0} {
-				ActiveCore::ERROR Port\ $name\ has\ variable\ length!
-			}
-			__ac_rtl_port_ranged $type [lindex $dimension 0] [lindex $dimension 1] $name
-		}
+	proc _port {type dimensions name} {
+		_acc_index $dimensions
+		__ac_rtl_port $type $name
 	}
 
-	proc comb {dimension name defval} {
+	proc comb {dimensions name defval} {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ comb\ $name\ is\ not\ a\ number!
 		}
-		if {[llength $dimension] != 2} {
-			ActiveCore::ERROR dimension\ length\ of\ comb\ $name\ is\ incorrect!
-		} else {
-			if {[ActiveCore::isnumeric [lindex $dimension 0]] == 0} {
-				ActiveCore::ERROR Comb\ $name\ has\ variable\ length!
-			}
-			if {[ActiveCore::isnumeric [lindex $dimension 1]] == 0} {
-				ActiveCore::ERROR Comb\ $name\ has\ variable\ length!
-			}
-			__ac_rtl_comb_ranged [lindex $dimension 0] [lindex $dimension 1] $name $defval
-		}
+		_acc_index $dimensions
+		__ac_rtl_comb $name $defval
 	}
 
 	set SYNC_LEVEL 	false
@@ -209,21 +190,13 @@ namespace eval rtl {
 	set SYNC_POS	false
 	set	SYNC_NEG	true
 
-	proc mem {dimension name sync_levedge} {
+	proc mem {dimensions name sync_levedge} {
+		_acc_index $dimensions
 		if { $sync_levedge != true && $sync_levedge != false } {
 			ActiveCore::ERROR sync\ parameter\ of\ mem\ $name\ is\ not\ a\ number!
 		}
-		if {[llength $dimension] != 2} {
-			ActiveCore::ERROR dimension\ length\ of\ mem\ $name\ is\ incorrect!
-		} else {
-			if {[ActiveCore::isnumeric [lindex $dimension 0]] == 0} {
-				ActiveCore::ERROR Mem\ $name\ has\ variable\ length!
-			}
-			if {[ActiveCore::isnumeric [lindex $dimension 1]] == 0} {
-				ActiveCore::ERROR Mem\ $name\ has\ variable\ length!
-			}
-			__ac_rtl_mem_ranged [lindex $dimension 0] [lindex $dimension 1] $name $sync_levedge
-		}
+		_acc_index $dimension
+		__ac_rtl_mem $name $sync_levedge
 	}
 
 	proc latch {dimension name} {
@@ -254,8 +227,9 @@ namespace eval rtl {
 		_mem_addreset $mem_name async $signal $posneg $source
 	}
 
-	proc ffvar {dimension name defval clk rst} {
-		__ac_rtl_ffvar_ranged [lindex $dimension 0] [lindex $dimension 1] $name $defval $clk $rst
+	proc ffvar {dimensions name defval clk rst} {
+		_acc_index $dimensions
+		__ac_rtl_ffvar $name $defval $clk $rst
 	}
 
 	proc rdprev {name} {
