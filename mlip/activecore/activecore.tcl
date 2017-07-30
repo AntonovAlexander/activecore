@@ -255,6 +255,6 @@ proc ActiveCore_Reset {} {
 	ActiveCore::reset
 }
 
-source [file join $LIP_PATH activecore config.tcl]
+source [file join $MLIP_PATH activecore config.tcl]
 
 #ActiveCore::debug_set

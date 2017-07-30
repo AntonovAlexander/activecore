@@ -1,8 +1,8 @@
 ## See LICENSE file for license details
 
-set LIP_PATH /home/alexander/work/activecore/prj/lip
-load [file join $LIP_PATH activecore/cpp/Release/libactivecore.so]
-source [file join $LIP_PATH activecore activecore.tcl]
+set MLIP_PATH /home/alexander/work/activecore/prj/mlip
+load [file join $MLIP_PATH activecore/cpp/Release/libactivecore.so]
+source [file join $MLIP_PATH activecore activecore.tcl]
 
 #ActiveCore::debug_set
 ActiveCore_Reset
