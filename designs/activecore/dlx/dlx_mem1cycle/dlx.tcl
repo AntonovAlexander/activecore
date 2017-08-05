@@ -556,10 +556,28 @@ rtl::module dlx
 				s= op2_source 	$dlx::OP2_SRC_IMM
 			endif
 
-			## data collection ##
-			# reading regfile
-			s= rs1_rdata [indexed regfile rs1_addr]
-			s= rs2_rdata [indexed regfile rs2_addr]
+			#### data collection - reading regfile ##
+			
+			## unoptimized
+			# s= rs1_rdata [indexed regfile rs1_addr]
+			# s= rs2_rdata [indexed regfile rs2_addr]
+			##
+			
+			## optimized for synthesis
+			s= rs1_rdata [indexed [pipe::rdprev regfile] rs1_addr]
+			s= rs2_rdata [indexed [pipe::rdprev regfile] rs2_addr]
+			# pipeline WB data hazard resolve
+			begif [pipe::issucc WB]
+				begif [pipe::prr WB rd_req]
+					begif [s== [pipe::prr WB rd_addr] rs1_addr]
+						s= rs1_rdata [pipe::prr WB rd_wdata]
+					endif
+					begif [s== [pipe::prr WB rd_addr] rs2_addr]
+						s= rs2_rdata [pipe::prr WB rd_wdata]
+					endif
+				endif
+			endif
+			##
 
 			begif [s== rs1_addr 0]
 				s= rs1_rdata 0

@@ -20,6 +20,10 @@ namespace eval pipe {
 		__ac_pipe_gpvar $name $defval
 	}
 
+	proc rdprev {name} {
+		__ac_pipe_rdprev $name
+	}
+
 	proc copipeif {copipeif_name req we ack wdata resp rdata} {
 		__ac_pipe_copipeif $copipeif_name $req $we $ack $wdata $resp $rdata
 	}

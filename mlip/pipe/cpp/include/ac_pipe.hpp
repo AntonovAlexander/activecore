@@ -24,6 +24,7 @@ namespace pipe
 	int endpproc_cmd();
 	int pvar_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
 	int gpvar_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
+	int rdprev_cmd(std::string gpvar_name, std::string * respvar_name);
 	int pstage_cmd(std::string pstage_name);
 	int pbreak_cmd();
 	int pstall_cmd();
