@@ -21,7 +21,7 @@ wire bus_we;
 wire [31:0] bus_addr;
 wire [31:0] bus_wdata;
 reg bus_ack;
-wire bus_rdata;
+wire [31:0] bus_rdata;
 
 // port0 bus //
 wire [0:0] port0_req;

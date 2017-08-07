@@ -12,8 +12,8 @@ module NEXYS4_DDR
 
 dlx_udm
 #(
-	//.mem_data("../../../../activecore/dlx/sw/io_heartbeat/io_heartbeat.hex")
-	.mem_data("../../../../activecore/dlx/sw/io_heartbeat_variable/io_heartbeat_variable.hex")
+	//.mem_data("io_heartbeat.hex")
+	.mem_data("io_heartbeat_variable.hex")
 	, .mem_size(1024)
 ) dlx_udm
 (
@@ -21,7 +21,7 @@ dlx_udm
 	, .rst_i(!CPU_RESETN)
 	, .rx_i(UART_TXD_IN)
 	, .tx_o(UART_RXD_OUT)
-	, .SW({8'h0, SW, 16'h0})
+	, .SW({8'h0, SW, 8'h0})
 	, .LED(LED)
 );
 
