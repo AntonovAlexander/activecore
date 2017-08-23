@@ -20,6 +20,7 @@ namespace pipe
 
 	int reset_cmd();
 
+	int SetPtrs();
 	int pproc_cmd(std::string pproc_name, std::string clk_varname, std::string rst_varname);
 	int endpproc_cmd();
 	int pvar_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);

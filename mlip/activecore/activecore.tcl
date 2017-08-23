@@ -5,7 +5,7 @@ try {namespace delete ActiveCore} on error {} {}
 namespace eval ActiveCore {
 
 	proc reset {} {
-		__ac_core_reset
+		__gplc_reset
 	}
 
 	proc isnumeric {value} {
@@ -26,9 +26,9 @@ namespace eval ActiveCore {
 			} else {
 				set width [getimmlength $param]
 			}
-			__ac_core_acc_param_c [expr $width - 1] 0 [expr $param + 0]
+			__gplc_acc_param_c [expr $width - 1] 0 [expr $param + 0]
 		} else {
-			__ac_core_acc_param_v_rd $param
+			__gplc_acc_param_v_rd $param
 		}
 	}
 
@@ -46,11 +46,11 @@ namespace eval ActiveCore {
 	}
 
 	proc debug_set {} {
-		__ac_core_debug_set
+		__gplc_debug_set
 	}
 
 	proc debug_clr {} {
-		__ac_core_debug_clr
+		__gplc_debug_clr
 	}
 
 	proc getimmlength {imm} {
@@ -63,24 +63,24 @@ namespace eval ActiveCore {
 	}
 
 	proc expr_1op {opcode op} {
-		__ac_core_acc_param_clr
+		__gplc_acc_param_clr
 		_accum_param $op
-		__ac_core_op $opcode
+		__gplc_op $opcode
 	}
 
 	proc expr_2op {opcode op1 op2} {
-		__ac_core_acc_param_clr
+		__gplc_acc_param_clr
 		_accum_param $op1
 		_accum_param $op2
-		__ac_core_op $opcode
+		__gplc_op $opcode
 	}
 
 	proc expr_3op {opcode op1 op2 op3} {
-		__ac_core_acc_param_clr
+		__gplc_acc_param_clr
 		_accum_param $op1
 		_accum_param $op2
 		_accum_param $op3
-		__ac_core_op $opcode
+		__gplc_op $opcode
 	}
 
 	proc export {language filename} {
@@ -95,22 +95,22 @@ proc _acc_index {index} {
 	}
 	if {[llength $index] == 1} {
 		if {[ActiveCore::isnumeric [lindex $index 0]] == 1} {
-			__ac_core_acc_index_c [lindex $index 0]
+			__gplc_acc_index_c [lindex $index 0]
 		} else {
-			__ac_core_acc_index_v [lindex $index 0]
+			__gplc_acc_index_v [lindex $index 0]
 		}
 	} else {
 		if {[ActiveCore::isnumeric [lindex $index 0]] == 1} {
 			if {[ActiveCore::isnumeric [lindex $index 1]] == 1} {
-				__ac_core_acc_range_cc [lindex $index 0] [lindex $index 1]
+				__gplc_acc_range_cc [lindex $index 0] [lindex $index 1]
 			} else {
-				__ac_core_acc_range_cv [lindex $index 0] [lindex $index 1]
+				__gplc_acc_range_cv [lindex $index 0] [lindex $index 1]
 			}
 		} else {
 			if {[ActiveCore::isnumeric [lindex $index 1]] == 1} {
-				__ac_core_acc_range_vc [lindex $index 0] [lindex $index 1]
+				__gplc_acc_range_vc [lindex $index 0] [lindex $index 1]
 			} else {
-				__ac_core_acc_range_vv [lindex $index 0] [lindex $index 1]
+				__gplc_acc_range_vv [lindex $index 0] [lindex $index 1]
 			}
 		}
 	}
@@ -121,7 +121,7 @@ proc s= {target source} {
 		ActiveCore::ERROR Target\ $target\ is\ numeric!
 	}
 	ActiveCore::_accum_param $source
-	__ac_core_assign $target
+	__gplc_assign $target
 }
 
 proc s~ {op} {
@@ -201,53 +201,53 @@ proc indexed {op index} {
 }
 
 proc begif {condition} {
-	__ac_core_begif $condition
+	__gplc_begif $condition
 }
 
 proc begelsif {condition} {
-	__ac_core_begelsif $condition
+	__gplc_begelsif $condition
 }
 
 proc begelse {} {
-	__ac_core_begelse
+	__gplc_begelse
 }
 
 proc endif {} {
-	__ac_core_endif
+	__gplc_endif
 }
 
 proc begwhile {condition} {
-	__ac_core_begwhile $condition
+	__gplc_begwhile $condition
 }
 
 proc endwhile {} {
-	__ac_core_endwhile
+	__gplc_endwhile
 }
 
 proc cnct {ops} {
-	__ac_core_acc_param_clr
+	__gplc_acc_param_clr
 	foreach op $ops {
 		ActiveCore::_accum_param $op
 	}
-	__ac_core_op "cnct"
+	__gplc_op "cnct"
 }
 
 proc zeroext {op size} {
 	if {[ActiveCore::isnumeric $size] == 0} {
 		ActiveCore::ERROR size\ cannot\ be\ variable!
 	}
-	__ac_core_acc_param_clr
+	__gplc_acc_param_clr
 	ActiveCore::_accum_param $op
-	__ac_core_zeroext $size
+	__gplc_zeroext $size
 }
 
 proc signext {op size} {
 	if {[ActiveCore::isnumeric $size] == 0} {
 		ActiveCore::ERROR size\ cannot\ be\ variable!
 	}
-	__ac_core_acc_param_clr
+	__gplc_acc_param_clr
 	ActiveCore::_accum_param $op
-	__ac_core_signext $size
+	__gplc_signext $size
 }
 
 proc ActiveCore_Reset {} {

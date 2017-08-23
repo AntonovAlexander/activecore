@@ -5,7 +5,7 @@ try {namespace delete rtl} on error {} {}
 namespace eval rtl {
 
 	proc reset {} {
-		__ac_rtl_reset
+		__mlip_rtl_reset
 		set rtl::interfaces		[list]
 		set rtl::interface_instances [list]
 	}
@@ -174,7 +174,7 @@ namespace eval rtl {
 
 	proc _port {type dimensions name} {
 		_acc_index $dimensions
-		__ac_rtl_port $type $name
+		__mlip_rtl_port $type $name
 	}
 
 	proc comb {dimensions name defval} {
@@ -182,7 +182,7 @@ namespace eval rtl {
 			ActiveCore::ERROR default\ value\ of\ comb\ $name\ is\ not\ a\ number!
 		}
 		_acc_index $dimensions
-		__ac_rtl_comb $name $defval
+		__mlip_rtl_comb $name $defval
 	}
 
 	set SYNC_LEVEL 	false
@@ -196,7 +196,7 @@ namespace eval rtl {
 			ActiveCore::ERROR sync\ parameter\ of\ mem\ $name\ is\ not\ a\ number!
 		}
 		_acc_index $dimension
-		__ac_rtl_mem $name $sync_levedge
+		__mlip_rtl_mem $name $sync_levedge
 	}
 
 	proc latch {dimension name} {
@@ -208,15 +208,15 @@ namespace eval rtl {
 	}
 
 	proc _mem_addsource {mem_name signal posneg source} {
-		__ac_core_acc_param_clr
+		__gplc_acc_param_clr
 		ActiveCore::_accum_param $source
-		__ac_rtl_mem_addsource $mem_name $signal $posneg
+		__mlip_rtl_mem_addsource $mem_name $signal $posneg
 	}
 
 	proc _mem_addreset {mem_name syncasync signal posneg source} {
-		__ac_core_acc_param_clr
+		__gplc_acc_param_clr
 		ActiveCore::_accum_param $source
-		__ac_rtl_mem_addreset $mem_name $syncasync $signal $posneg
+		__mlip_rtl_mem_addreset $mem_name $syncasync $signal $posneg
 	}
 
 	proc _mem_addreset_sync {mem_name signal posneg source} {
@@ -229,30 +229,30 @@ namespace eval rtl {
 
 	proc ffvar {dimensions name defval clk rst} {
 		_acc_index $dimensions
-		__ac_rtl_ffvar $name $defval $clk $rst
+		__mlip_rtl_ffvar $name $defval $clk $rst
 	}
 
 	proc rdprev {name} {
-		__ac_rtl_rdprev $name
+		__mlip_rtl_rdprev $name
 	}
 
 	proc cproc {} {
-		__ac_rtl_cproc
+		__mlip_rtl_cproc
 	}
 
 	proc endcproc {} {
-		__ac_rtl_endcproc
+		__mlip_rtl_endcproc
 	}
 
 	proc module {name} {
-		__ac_rtl_module_name $name
+		__mlip_rtl_module_name $name
 	}
 
 	proc export {language filename} {
-		__ac_rtl_export $language $filename
+		__mlip_rtl_export $language $filename
 	}
 
 	proc monitor {filename} {
-		__ac_rtl_monitor $filename
+		__mlip_rtl_monitor $filename
 	}
 }

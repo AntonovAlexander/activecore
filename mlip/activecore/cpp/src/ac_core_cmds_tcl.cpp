@@ -12,7 +12,7 @@
 #include "ac_core_cmds_string.hpp"
 
 
-int TCL_core_reset_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
+int TCL_gplc_reset_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
 {
 	if (DEBUG_FLAG == true) printf("Core reset command!\n");
 	if (objc != 1)
@@ -29,7 +29,7 @@ int TCL_core_reset_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_
 	return TCL_OK;
 }
 
-int TCL_core_debug_set_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
+int TCL_debug_set_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
 {
 	if (DEBUG_FLAG == true) printf("Core debug set command!\n");
 	if (objc != 1)
@@ -41,7 +41,7 @@ int TCL_core_debug_set_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	return TCL_OK;
 }
 
-int TCL_core_debug_clr_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
+int TCL_debug_clr_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
 {
 	if (DEBUG_FLAG == true) printf("Core debug clr command!\n");
 	if (objc != 1)
@@ -425,33 +425,33 @@ int TCL_expr_endwhile_cmd(ClientData clientData, Tcl_Interp *interp, int objc, T
 
 int TCL_core_InitCmds(Tcl_Interp *interp)
 {
-	Tcl_CreateObjCommand(interp, "__ac_core_reset", TCL_core_reset_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_debug_set", TCL_core_debug_set_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_debug_clr", TCL_core_debug_clr_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_reset", TCL_gplc_reset_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_debug_set", TCL_debug_set_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_debug_clr", TCL_debug_clr_cmd, NULL, NULL);
 
-	Tcl_CreateObjCommand(interp, "__ac_core_acc_param_clr", TCL_accum_param_clr_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_acc_param_c", TCL_accum_param_c_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_acc_param_v_rd", TCL_accum_param_v_rd_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_acc_param_v_wr", TCL_accum_param_v_wr_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_param_clr", TCL_accum_param_clr_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_param_c", TCL_accum_param_c_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_param_v_rd", TCL_accum_param_v_rd_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_param_v_wr", TCL_accum_param_v_wr_cmd, NULL, NULL);
 
-	Tcl_CreateObjCommand(interp, "__ac_core_acc_dim_clr", TCL_accum_dim_clr_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_acc_index_c", TCL_accum_index_c_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_acc_index_v", TCL_accum_index_v_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_acc_range_cc", TCL_accum_range_cc_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_acc_range_cv", TCL_accum_range_cv_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_acc_range_vc", TCL_accum_range_vc_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_acc_range_vv", TCL_accum_range_vv_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_dim_clr", TCL_accum_dim_clr_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_index_c", TCL_accum_index_c_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_index_v", TCL_accum_index_v_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_range_cc", TCL_accum_range_cc_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_range_cv", TCL_accum_range_cv_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_range_vc", TCL_accum_range_vc_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_range_vv", TCL_accum_range_vv_cmd, NULL, NULL);
 
-	Tcl_CreateObjCommand(interp, "__ac_core_assign", TCL_expr_assign_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_op", TCL_expr_op_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_zeroext", TCL_expr_zeroext_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_signext", TCL_expr_signext_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_assign", TCL_expr_assign_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_op", TCL_expr_op_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_zeroext", TCL_expr_zeroext_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_signext", TCL_expr_signext_cmd, NULL, NULL);
 
-	Tcl_CreateObjCommand(interp, "__ac_core_begif", TCL_expr_begif_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_begelsif", TCL_expr_begelsif_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_begelse", TCL_expr_begelse_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_endif", TCL_expr_endif_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_begif", TCL_expr_begif_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_begelsif", TCL_expr_begelsif_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_begelse", TCL_expr_begelse_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_endif", TCL_expr_endif_cmd, NULL, NULL);
 
-	Tcl_CreateObjCommand(interp, "__ac_core_begwhile", TCL_expr_begwhile_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__ac_core_endwhile", TCL_expr_endwhile_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_begwhile", TCL_expr_begwhile_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_endwhile", TCL_expr_endwhile_cmd, NULL, NULL);
 }
