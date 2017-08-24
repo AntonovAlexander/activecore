@@ -26,6 +26,7 @@ int TCL_gplc_reset_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_
 	SignalsWriteable.clear();
 	DimensionsAccumulator.clear();
 	ParamAccumulator.clear();
+	StringParamAccumulator.clear();
 	return TCL_OK;
 }
 
@@ -62,7 +63,20 @@ int TCL_accum_param_clr_cmd(ClientData clientData, Tcl_Interp *interp, int objc,
 		return TCL_ERROR;
 	}
 	ParamAccumulator.clear();
+	StringParamAccumulator.clear();
+	return TCL_OK;
+}
 
+int TCL_accum_param_string_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
+{
+	if (DEBUG_FLAG == true) printf("Param clr command!\n");
+	if (objc != 2)
+	{
+		printf("Incorrect command!\n");
+		return TCL_ERROR;
+	}
+	std::string param = std::string(Tcl_GetString(objv[1]));
+	StringParamAccumulator.push_back(param);
 	return TCL_OK;
 }
 
@@ -430,6 +444,7 @@ int TCL_core_InitCmds(Tcl_Interp *interp)
 	Tcl_CreateObjCommand(interp, "__gplc_debug_clr", TCL_debug_clr_cmd, NULL, NULL);
 
 	Tcl_CreateObjCommand(interp, "__gplc_acc_param_clr", TCL_accum_param_clr_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_param_string", TCL_accum_param_string_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_acc_param_c", TCL_accum_param_c_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_acc_param_v_rd", TCL_accum_param_v_rd_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_acc_param_v_wr", TCL_accum_param_v_wr_cmd, NULL, NULL);

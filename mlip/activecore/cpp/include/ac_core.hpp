@@ -246,6 +246,7 @@ extern std::vector<std::vector<ac_var*>* > SignalsReadable;
 extern std::vector<std::vector<ac_var*>* > SignalsWriteable;
 extern ac_dimensions DimensionsAccumulator;
 extern std::vector<ac_param> ParamAccumulator;
+extern std::vector<std::string> StringParamAccumulator;
 
 // Service functions
 void GenReset();

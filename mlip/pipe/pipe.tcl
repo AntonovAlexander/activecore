@@ -46,49 +46,68 @@ namespace eval pipe {
 
 	# interface functions
 	proc pstage {pstage_name} {
-		__mlip_pipe_pstage $pstage_name
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $pstage_name
+		__mlip_pipe_instop pstage
 	}
 
 	proc pbreak {} {
-		__mlip_pipe_pbreak
+		__gplc_acc_param_clr
+		__mlip_pipe_instop pbreak
 	}
 
 	proc pstall {} {
-		__mlip_pipe_pstall
+		__gplc_acc_param_clr
+		__mlip_pipe_instop pstall
 	}
 
 	proc prepeat {} {
-		__mlip_pipe_prepeat
+		__gplc_acc_param_clr
+		__mlip_pipe_instop prepeat
 	}
 
 	proc pre {ext_signal} {
-		__mlip_pipe_pre $ext_signal
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $ext_signal
+		__mlip_pipe_instop pre
 	}
 
 	proc pwe {pipe_signal ext_signal} {
 		__gplc_acc_param_clr
 		ActiveCore::_accum_param $pipe_signal
-		__mlip_pipe_pwe $ext_signal
+		__gplc_acc_param_string $ext_signal
+		__mlip_pipe_instop pwe
 	}
 
-	proc prr {pipe_step_name pipe_signal} {
-		__mlip_pipe_prr $pipe_step_name $pipe_signal
+	proc prr {pstage_name pipe_signal} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $pstage_name
+		__gplc_acc_param_string $pipe_signal
+		__mlip_pipe_instop prr
 	}
 
-	proc isactive {pipe_step_name} {
-		__mlip_pipe_isactive $pipe_step_name
+	proc isactive {pstage_name} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $pstage_name
+		__mlip_pipe_instop isactive
 	}
 
-	proc isworking {pipe_step_name} {
-		__mlip_pipe_isworking $pipe_step_name
+	proc isworking {pstage_name} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $pstage_name
+		__mlip_pipe_instop isworking
 	}
 
-	proc isstalled {pipe_step_name} {
-		__mlip_pipe_isstalled $pipe_step_name
+	proc isstalled {pstage_name} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $pstage_name
+		__mlip_pipe_instop isstalled
 	}
 
-	proc issucc {pipe_step_name} {
-		__mlip_pipe_issucc $pipe_step_name
+	proc issucc {pstage_name} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $pstage_name
+		__mlip_pipe_instop issucc
 	}
 
 	proc pproc {name clk rst} {
