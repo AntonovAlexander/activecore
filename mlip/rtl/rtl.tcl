@@ -209,14 +209,21 @@ namespace eval rtl {
 
 	proc _mem_addsource {mem_name signal posneg source} {
 		__gplc_acc_param_clr
+		__mlip_rtl_accum_mem $mem_name
+		__gplc_acc_param_v_rd $signal
 		ActiveCore::_accum_param $source
-		__mlip_rtl_mem_addsource $mem_name $signal $posneg
+		__gplc_acc_param_string $posneg
+		__mlip_rtl_instop addsource
 	}
 
 	proc _mem_addreset {mem_name syncasync signal posneg source} {
 		__gplc_acc_param_clr
+		__mlip_rtl_accum_mem $mem_name
+		__gplc_acc_param_v_rd $signal
 		ActiveCore::_accum_param $source
-		__mlip_rtl_mem_addreset $mem_name $syncasync $signal $posneg
+		__gplc_acc_param_string $syncasync
+		__gplc_acc_param_string $posneg
+		__mlip_rtl_instop addreset
 	}
 
 	proc _mem_addreset_sync {mem_name signal posneg source} {
@@ -236,23 +243,30 @@ namespace eval rtl {
 		__mlip_rtl_rdprev $name
 	}
 
+	proc module {name} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $name
+		__mlip_rtl_instop module
+	}
+
 	proc cproc {} {
-		__mlip_rtl_cproc
+		__mlip_rtl_instop cproc
 	}
 
 	proc endcproc {} {
-		__mlip_rtl_endcproc
-	}
-
-	proc module {name} {
-		__mlip_rtl_module_name $name
+		__mlip_rtl_instop endcproc
 	}
 
 	proc export {language filename} {
-		__mlip_rtl_export $language $filename
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $language
+		__gplc_acc_param_string $filename
+		__mlip_rtl_instop export
 	}
 
-	proc monitor {filename} {
-		__mlip_rtl_monitor $filename
+	proc monitor {file_name} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $file_name
+		__mlip_rtl_instop monitor
 	}
 }
