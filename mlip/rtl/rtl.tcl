@@ -173,16 +173,22 @@ namespace eval rtl {
 	}
 
 	proc _port {type dimensions name} {
+		__gplc_acc_param_clr
 		_acc_index $dimensions
-		__mlip_rtl_port $type $name
+		__gplc_acc_param_string $type
+		__gplc_acc_param_string $name
+		__mlip_rtl_call port
 	}
 
 	proc comb {dimensions name defval} {
+		__gplc_acc_param_clr
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ comb\ $name\ is\ not\ a\ number!
 		}
 		_acc_index $dimensions
-		__mlip_rtl_comb $name $defval
+		__gplc_acc_param_string $name
+		__gplc_acc_param_string $defval
+		__mlip_rtl_call comb
 	}
 
 	set SYNC_LEVEL 	false
@@ -191,12 +197,15 @@ namespace eval rtl {
 	set	SYNC_NEG	true
 
 	proc mem {dimensions name sync_levedge} {
+		__gplc_acc_param_clr
 		_acc_index $dimensions
 		if { $sync_levedge != true && $sync_levedge != false } {
 			ActiveCore::ERROR sync\ parameter\ of\ mem\ $name\ is\ not\ a\ number!
 		}
 		_acc_index $dimension
-		__mlip_rtl_mem $name $sync_levedge
+		__gplc_acc_param_string $name
+		__gplc_acc_param_string $sync_levedge
+		__mlip_rtl_call mem
 	}
 
 	proc latch {dimension name} {
@@ -213,7 +222,7 @@ namespace eval rtl {
 		__gplc_acc_param_v_rd $signal
 		ActiveCore::_accum_param $source
 		__gplc_acc_param_string $posneg
-		__mlip_rtl_instop addsource
+		__mlip_rtl_call addsource
 	}
 
 	proc _mem_addreset {mem_name syncasync signal posneg source} {
@@ -223,7 +232,7 @@ namespace eval rtl {
 		ActiveCore::_accum_param $source
 		__gplc_acc_param_string $syncasync
 		__gplc_acc_param_string $posneg
-		__mlip_rtl_instop addreset
+		__mlip_rtl_call addreset
 	}
 
 	proc _mem_addreset_sync {mem_name signal posneg source} {
@@ -235,38 +244,45 @@ namespace eval rtl {
 	}
 
 	proc ffvar {dimensions name defval clk rst} {
+		__gplc_acc_param_clr
 		_acc_index $dimensions
-		__mlip_rtl_ffvar $name $defval $clk $rst
+		__gplc_acc_param_string $name
+		__gplc_acc_param_string $defval
+		__gplc_acc_param_v_rd $clk
+		__gplc_acc_param_v_rd $rst
+		__mlip_rtl_call ffvar
 	}
 
 	proc rdprev {name} {
-		__mlip_rtl_rdprev $name
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $name
+		__mlip_rtl_call rdprev
 	}
 
 	proc module {name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $name
-		__mlip_rtl_instop module
+		__mlip_rtl_call module
 	}
 
 	proc cproc {} {
-		__mlip_rtl_instop cproc
+		__mlip_rtl_call cproc
 	}
 
 	proc endcproc {} {
-		__mlip_rtl_instop endcproc
+		__mlip_rtl_call endcproc
 	}
 
 	proc export {language filename} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $language
 		__gplc_acc_param_string $filename
-		__mlip_rtl_instop export
+		__mlip_rtl_call export
 	}
 
 	proc monitor {file_name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $file_name
-		__mlip_rtl_instop monitor
+		__mlip_rtl_call monitor
 	}
 }

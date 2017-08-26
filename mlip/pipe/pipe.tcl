@@ -8,20 +8,28 @@ namespace eval pipe {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ pvar\ $name\ is\ not\ a\ number!
 		}
+		__gplc_acc_param_clr
 		_acc_index $dimensions
-		__mlip_pipe_pvar $name $defval
+		__gplc_acc_param_string $name
+		__gplc_acc_param_string $defval
+		__mlip_pipe_call pvar
 	}
 
 	proc gpvar {dimensions name defval} {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ pvar\ $name\ is\ not\ a\ number!
 		}
+		__gplc_acc_param_clr
 		_acc_index $dimensions
-		__mlip_pipe_gpvar $name $defval
+		__gplc_acc_param_string $name
+		__gplc_acc_param_string $defval
+		__mlip_pipe_call gpvar
 	}
 
 	proc rdprev {name} {
-		__mlip_pipe_rdprev $name
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $name
+		__mlip_pipe_call rdprev
 	}
 
 	proc copipeif {copipeif_name req we ack wdata resp rdata} {
@@ -35,7 +43,7 @@ namespace eval pipe {
 		__gplc_acc_param_v_rd $resp
 		__gplc_acc_param_v_rd $rdata
 		__mlip_pipe_SetPtrs
-		__mlip_pipe_instop copipeif
+		__mlip_pipe_call copipeif
 	}
 
 	proc wrfifoif {wrfifoif_name req ack wdata} {
@@ -46,7 +54,7 @@ namespace eval pipe {
 		__gplc_acc_param_v_rd $ack
 		__gplc_acc_param_v_wr $wdata
 		__mlip_pipe_SetPtrs
-		__mlip_pipe_instop wrfifoif
+		__mlip_pipe_call wrfifoif
 	}
 
 	proc rdfifoif {rdfifoif_name req ack rdata} {
@@ -57,7 +65,7 @@ namespace eval pipe {
 		__gplc_acc_param_v_rd $ack
 		__gplc_acc_param_v_rd $rdata
 		__mlip_pipe_SetPtrs
-		__mlip_pipe_instop rdfifoif
+		__mlip_pipe_call rdfifoif
 	}
 
 	proc copipe_wrreq {copipeif_name param} {
@@ -80,22 +88,22 @@ namespace eval pipe {
 	proc pstage {pstage_name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $pstage_name
-		__mlip_pipe_instop pstage
+		__mlip_pipe_call pstage
 	}
 
 	proc pbreak {} {
 		__gplc_acc_param_clr
-		__mlip_pipe_instop pbreak
+		__mlip_pipe_call pbreak
 	}
 
 	proc pstall {} {
 		__gplc_acc_param_clr
-		__mlip_pipe_instop pstall
+		__mlip_pipe_call pstall
 	}
 
 	proc prepeat {} {
 		__gplc_acc_param_clr
-		__mlip_pipe_instop prepeat
+		__mlip_pipe_call prepeat
 	}
 
 	proc pre {ext_signal} {
@@ -103,7 +111,7 @@ namespace eval pipe {
 		__mlip_rtl_SetPtrs
 		__gplc_acc_param_v_rd $ext_signal
 		__mlip_pipe_SetPtrs
-		__mlip_pipe_instop pre
+		__mlip_pipe_call pre
 	}
 
 	proc pwe {pipe_signal ext_signal} {
@@ -112,38 +120,38 @@ namespace eval pipe {
 		__mlip_rtl_SetPtrs
 		__gplc_acc_param_v_wr $ext_signal
 		__mlip_pipe_SetPtrs
-		__mlip_pipe_instop pwe
+		__mlip_pipe_call pwe
 	}
 
 	proc prr {pstage_name pipe_signal} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $pstage_name
 		__gplc_acc_param_v_rd $pipe_signal
-		__mlip_pipe_instop prr
+		__mlip_pipe_call prr
 	}
 
 	proc isactive {pstage_name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $pstage_name
-		__mlip_pipe_instop isactive
+		__mlip_pipe_call isactive
 	}
 
 	proc isworking {pstage_name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $pstage_name
-		__mlip_pipe_instop isworking
+		__mlip_pipe_call isworking
 	}
 
 	proc isstalled {pstage_name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $pstage_name
-		__mlip_pipe_instop isstalled
+		__mlip_pipe_call isstalled
 	}
 
 	proc issucc {pstage_name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $pstage_name
-		__mlip_pipe_instop issucc
+		__mlip_pipe_call issucc
 	}
 
 	proc pproc {name clk rst} {
@@ -153,21 +161,21 @@ namespace eval pipe {
 		__gplc_acc_param_v_rd $rst
 		__mlip_pipe_SetPtrs
 		__gplc_acc_param_string $name
-		__mlip_pipe_instop pproc
+		__mlip_pipe_call pproc
 	}
 
 	proc endpproc {} {
-		__mlip_pipe_instop endpproc
+		__mlip_pipe_call endpproc
 	}
 
 	proc export {} {
-		__mlip_pipe_instop export
+		__mlip_pipe_call export
 	}
 
 	proc monitor {file_name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $file_name
-		__mlip_pipe_instop monitor
+		__mlip_pipe_call monitor
 	}
 }
 
