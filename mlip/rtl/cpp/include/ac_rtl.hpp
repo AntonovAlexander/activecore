@@ -99,6 +99,7 @@ namespace rtl
 	int mem_cmd(ac_mem** new_mem, std::string name_in, ac_dimensions_static dimensions_in, bool sync_levedge_in);
 
 	int ffvar_cmd(ac_ffvar** new_ffvar, std::string name, ac_dimensions_static dimensions_in, std::string defval, ac_var* clk, ac_var* rst);
+	int ffvar_cmd(ac_ffvar** new_ffvar, std::string name, unsigned int msb, unsigned int lsb, std::string defval, ac_var* clk, ac_var* rst);
 	int rdprev_cmd(std::string ffvar_name, std::string * respvar_name);
 
 	int cproc_cmd();

@@ -32,9 +32,9 @@ namespace eval pipe {
 		__mlip_pipe_call rdprev
 	}
 
-	proc copipeif {copipeif_name req we ack wdata resp rdata} {
+	proc mcopipeif {mcopipeif_name req we ack wdata resp rdata} {
 		__gplc_acc_param_clr
-		__gplc_acc_param_string $copipeif_name
+		__gplc_acc_param_string $mcopipeif_name
 		__mlip_rtl_SetPtrs
 		__gplc_acc_param_v_wr $req
 		__gplc_acc_param_v_wr $we
@@ -43,7 +43,7 @@ namespace eval pipe {
 		__gplc_acc_param_v_rd $resp
 		__gplc_acc_param_v_rd $rdata
 		__mlip_pipe_SetPtrs
-		__mlip_pipe_call copipeif
+		__mlip_pipe_call mcopipeif
 	}
 
 	proc wrfifoif {wrfifoif_name req ack wdata} {
@@ -68,20 +68,20 @@ namespace eval pipe {
 		__mlip_pipe_call rdfifoif
 	}
 
-	proc copipe_wrreq {copipeif_name param} {
+	proc mcopipe_wrreq {mcopipeif_name param} {
 		__gplc_acc_param_clr
 		ActiveCore::_accum_param $param
-		__mlip_pipe_copipe_wrreq $copipeif_name
+		__mlip_pipe_mcopipe_wrreq $mcopipeif_name
 	}
 
-	proc copipe_rdreq {copipeif_name param} {
+	proc mcopipe_rdreq {mcopipeif_name param} {
 		__gplc_acc_param_clr
 		ActiveCore::_accum_param $param
-		__mlip_pipe_copipe_rdreq $copipeif_name
+		__mlip_pipe_mcopipe_rdreq $mcopipeif_name
 	}
 
-	proc copipe_resp {copipeif_name} {
-		__mlip_pipe_copipe_resp $copipeif_name
+	proc mcopipe_resp {mcopipeif_name} {
+		__mlip_pipe_mcopipe_resp $mcopipeif_name
 	}
 
 	# interface functions

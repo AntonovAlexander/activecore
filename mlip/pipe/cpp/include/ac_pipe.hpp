@@ -15,7 +15,7 @@
 
 namespace pipe
 {
-	class copipe_if;
+	class mcopipe_if;
 	class wrfifo_if;
 	class rdfifo_if;
 
@@ -44,10 +44,10 @@ namespace pipe
 	int isbroken_cmd(std::string pstage_name, std::string * int_varname);
 	int isfinished_cmd(std::string pstage_name, std::string * int_varname);
 
-	int copipeif_cmd(std::string copipeif_name, ac_var * req_var, ac_var * we_var, ac_var * ack_var, ac_var * wdata_var, ac_var * resp_var, ac_var * rdata_var);
-	int copipe_wrreq_cmd(std::string copipeif_name, std::vector<ac_param> params);
-	int copipe_rdreq_cmd(std::string copipeif_name, std::vector<ac_param> params);
-	int copipe_resp_cmd(std::string copipeif_name, std::string * resp_varname);
+	int mcopipeif_cmd(std::string mcopipeif_name, ac_var * req_var, ac_var * we_var, ac_var * ack_var, ac_var * wdata_var, ac_var * resp_var, ac_var * rdata_var);
+	int mcopipe_wrreq_cmd(std::string mcopipeif_name, std::vector<ac_param> params);
+	int mcopipe_rdreq_cmd(std::string mcopipeif_name, std::vector<ac_param> params);
+	int mcopipe_resp_cmd(std::string mcopipeif_name, std::string * resp_varname);
 
 	int wrfifoif_cmd(std::string wrfifoif_name, ac_var * req_var, ac_var * ack_var, ac_var * wdata_var);
 	int wrfiforeq_cmd(std::string wrfifoif_name, std::vector<ac_param> params);

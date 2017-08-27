@@ -92,37 +92,37 @@ rtl::module dlx
 	rtl::input 	{0 0}	data_mem_resp
 	rtl::input 	{31 0}	data_mem_rdata
 
-	rtl::comb 	{0 0} 	instr_copipe_req 	0
-	rtl::comb 	{0 0} 	instr_copipe_we 	0
-	rtl::comb 	{0 0} 	instr_copipe_ack 	0
-	rtl::comb 	{63 0} 	instr_copipe_wdata	0
-	rtl::comb	{0 0}	instr_copipe_resp	0
-	rtl::comb 	{31 0}	instr_copipe_rdata	0
+	rtl::comb 	{0 0} 	instr_mcopipe_req 	0
+	rtl::comb 	{0 0} 	instr_mcopipe_we 	0
+	rtl::comb 	{0 0} 	instr_mcopipe_ack 	0
+	rtl::comb 	{63 0} 	instr_mcopipe_wdata	0
+	rtl::comb	{0 0}	instr_mcopipe_resp	0
+	rtl::comb 	{31 0}	instr_mcopipe_rdata	0
 
-	rtl::comb 	{0 0} 	data_copipe_req		0
-	rtl::comb 	{0 0} 	data_copipe_we		0
-	rtl::comb 	{0 0} 	data_copipe_ack		0
-	rtl::comb 	{63 0} 	data_copipe_wdata	0
-	rtl::comb	{0 0}	data_copipe_resp	0
-	rtl::comb 	{31 0}	data_copipe_rdata	0
+	rtl::comb 	{0 0} 	data_mcopipe_req		0
+	rtl::comb 	{0 0} 	data_mcopipe_we		0
+	rtl::comb 	{0 0} 	data_mcopipe_ack		0
+	rtl::comb 	{63 0} 	data_mcopipe_wdata	0
+	rtl::comb	{0 0}	data_mcopipe_resp	0
+	rtl::comb 	{31 0}	data_mcopipe_rdata	0
 
-	s= instr_mem_req instr_copipe_req
-	s= instr_mem_we instr_copipe_we
-	s= instr_copipe_ack instr_mem_ack
-	s= instr_mem_addr [indexed instr_copipe_wdata {63 32}]
-	s= instr_mem_wdata [indexed instr_copipe_wdata {31 0}]
+	s= instr_mem_req instr_mcopipe_req
+	s= instr_mem_we instr_mcopipe_we
+	s= instr_mcopipe_ack instr_mem_ack
+	s= instr_mem_addr [indexed instr_mcopipe_wdata {63 32}]
+	s= instr_mem_wdata [indexed instr_mcopipe_wdata {31 0}]
 	s= instr_mem_be 0xf
-	s= instr_copipe_resp instr_mem_resp
-	s= instr_copipe_rdata instr_mem_rdata
+	s= instr_mcopipe_resp instr_mem_resp
+	s= instr_mcopipe_rdata instr_mem_rdata
 
-	s= data_mem_req data_copipe_req
-	s= data_mem_we data_copipe_we
-	s= data_copipe_ack data_mem_ack
-	s= data_mem_addr [indexed data_copipe_wdata {63 32}]
-	s= data_mem_wdata [indexed data_copipe_wdata {31 0}]
+	s= data_mem_req data_mcopipe_req
+	s= data_mem_we data_mcopipe_we
+	s= data_mcopipe_ack data_mem_ack
+	s= data_mem_addr [indexed data_mcopipe_wdata {63 32}]
+	s= data_mem_wdata [indexed data_mcopipe_wdata {31 0}]
 	s= data_mem_be 0xf
-	s= data_copipe_resp data_mem_resp
-	s= data_copipe_rdata data_mem_rdata
+	s= data_mcopipe_resp data_mem_resp
+	s= data_mcopipe_rdata data_mem_rdata
 
 	pipe::pproc instrpipe clk_i rst_i
 
@@ -181,21 +181,21 @@ rtl::module dlx
 		_acc_index {31 0}
 		pipe::gpvar {31 0} 	regfile			0
 
-		pipe::copipeif instr_mem \
-					instr_copipe_req 	\
-					instr_copipe_we 	\
-					instr_copipe_ack 	\
-					instr_copipe_wdata	\
-					instr_copipe_resp	\
-					instr_copipe_rdata
+		pipe::mcopipeif instr_mem \
+					instr_mcopipe_req 	\
+					instr_mcopipe_we 	\
+					instr_mcopipe_ack 	\
+					instr_mcopipe_wdata	\
+					instr_mcopipe_resp	\
+					instr_mcopipe_rdata
 
-		pipe::copipeif data_mem \
-					data_copipe_req	\
-					data_copipe_we		\
-					data_copipe_ack	\
-					data_copipe_wdata	\
-					data_copipe_resp	\
-					data_copipe_rdata
+		pipe::mcopipeif data_mem \
+					data_mcopipe_req	\
+					data_mcopipe_we		\
+					data_mcopipe_ack	\
+					data_mcopipe_wdata	\
+					data_mcopipe_resp	\
+					data_mcopipe_rdata
 
 		pipe::pstage IFETCH
 			begif [pipe::isactive IDECODE]
@@ -207,13 +207,13 @@ rtl::module dlx
 				endif
 			endif
 
-			pipe::copipe_rdreq instr_mem [cnct {curinstr_addr curinstr_addr}]
+			pipe::mcopipe_rdreq instr_mem [cnct {curinstr_addr curinstr_addr}]
 
 			s= nextinstr_addr [s+ curinstr_addr 4]
 		
 		pipe::pstage IDECODE
 
-			s= instr_code [pipe::copipe_resp instr_mem]
+			s= instr_code [pipe::mcopipe_resp instr_mem]
 
 			begif [pipe::isactive EXEC]
 				begif [pipe::prr EXEC jump_req]
@@ -767,17 +767,17 @@ rtl::module dlx
 			
 			begif mem_req
 				begif mem_cmd
-					pipe::copipe_wrreq data_mem [cnct {mem_addr mem_wdata}]
+					pipe::mcopipe_wrreq data_mem [cnct {mem_addr mem_wdata}]
 				endif
 				begelse
-					pipe::copipe_rdreq data_mem [cnct {mem_addr mem_wdata}]
+					pipe::mcopipe_rdreq data_mem [cnct {mem_addr mem_wdata}]
 				endif
 			endif
 
 		pipe::pstage WB
 			
 			begif mem_req
-				s= mem_rdata [pipe::copipe_resp data_mem]
+				s= mem_rdata [pipe::mcopipe_resp data_mem]
 			endif
 
 
