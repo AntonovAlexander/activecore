@@ -106,6 +106,11 @@ namespace eval pipe {
 		__mlip_pipe_call prepeat
 	}
 
+	proc pflush {} {
+		__gplc_acc_param_clr
+		__mlip_pipe_call pflush
+	}
+
 	proc pre {ext_signal} {
 		__gplc_acc_param_clr
 		__mlip_rtl_SetPtrs

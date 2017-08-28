@@ -140,7 +140,7 @@ rtl::module dlx
 		pipe::pvar {0 0}	jump_src		$dlx::JMP_SRC_OP1
 		pipe::pvar {0 0} 	jump_cond 		0
 		pipe::pvar {0 0}	jump_cond_eqz 	0
-		pipe::pvar {31 0}	jump_vector		0
+		pipe::pvar {31 0} 	jump_vector		0
 
 		# regfile control signals
 		pipe::pvar {0 0}	rs1_req 		0
@@ -177,7 +177,8 @@ rtl::module dlx
 		pipe::pvar {31 0}	mem_wdata		0
 		pipe::pvar {31 0} 	mem_rdata 		0
 		pipe::pvar {0 0} 	mem_rshift		0
-
+		
+		pipe::gpvar {31 0} 	pc			0
 		_acc_index {31 0}
 		pipe::gpvar {31 0} 	regfile			0
 
@@ -198,12 +199,14 @@ rtl::module dlx
 					data_mcopipe_rdata
 
 		pipe::pstage IFETCH
+			
 			begif [pipe::isactive IDECODE]
 				s= curinstr_addr [pipe::prr IDECODE nextinstr_addr]
 			endif
+
 			begif [pipe::isactive EXEC]
 				begif [pipe::prr EXEC jump_req]
-					s= curinstr_addr [pipe::prr EXEC jump_vector]
+					s= curinstr_addr jump_vector
 				endif
 			endif
 
@@ -214,12 +217,6 @@ rtl::module dlx
 		pipe::pstage IDECODE
 
 			s= instr_code [pipe::mcopipe_resp instr_mem]
-
-			begif [pipe::isactive EXEC]
-				begif [pipe::prr EXEC jump_req]
-					pipe::pbreak
-				endif
-			endif
 
 			s= opcode [indexed instr_code {31 26}]
 			begif [s== opcode 0]
@@ -761,6 +758,10 @@ rtl::module dlx
 
 			begif [s== jump_src $dlx::JMP_SRC_ALU]
 				s= jump_vector alu_result
+			endif
+
+			begif jump_req
+				pipe::pflush
 			endif
 
 		pipe::pstage MEM

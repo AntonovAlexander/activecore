@@ -33,6 +33,7 @@ namespace pipe
 	int pbreak_cmd();
 	int pstall_cmd();
 	int prepeat_cmd();
+	int pflush_cmd();
 	int pre_cmd(ac_var * ext_var, ac_var ** int_var);
 	int pwe_cmd(ac_param param, ac_var * ext_var);
 	int prr_cmd(std::string pstage_name, ac_var * remote_var, ac_var ** int_var);
