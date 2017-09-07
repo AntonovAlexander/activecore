@@ -20,6 +20,7 @@ namespace pipe
 	class rdfifo_if;
 
 	extern char PVAR_STRING[];
+	extern char GPVAR_STRING[];
 
 	int reset_cmd();
 

@@ -29,14 +29,14 @@ int expr_assign_cmd_string(std::string target, ac_param param)
 	return ret_val;
 }
 
-int expr_op_cmd_string(std::string opcode, std::vector<ac_param> params, std::string * respvarname)
+int expr_op_cmd_string(std::string opcode, std::string * respvarname, std::vector<ac_param> params)
 {
 	bool cproc_gen = false;
 	if (ExeStack.size() == 0) cproc_gen = true;
 	if (cproc_gen == true) rtl::cproc_cmd();
 
 	ac_var* resp_var;
-	if (expr_op_cmd(opcode, params, &resp_var) != 0)
+	if (expr_op_cmd(opcode, &resp_var, params) != 0)
 	{
 		printf("expr_op_cmd_string: ERROR\n");
 		return 1;
@@ -47,7 +47,7 @@ int expr_op_cmd_string(std::string opcode, std::vector<ac_param> params, std::st
 	return 0;
 }
 
-int expr_zeroext_cmd_string(std::string size, std::vector<ac_param> params, std::string * respvarname)
+int expr_zeroext_cmd_string(std::string size, std::string * respvarname, std::vector<ac_param> params)
 {
 	if (params.size() != 1)
 	{
@@ -62,7 +62,7 @@ int expr_zeroext_cmd_string(std::string size, std::vector<ac_param> params, std:
 	if (cproc_gen == true) rtl::cproc_cmd();
 
 	ac_var* resp_var;
-	if (expr_zeroext_cmd(target_width, params[0], &resp_var) != 0)
+	if (expr_zeroext_cmd(target_width, &resp_var, params[0]) != 0)
 	{
 		printf("expr_op_cmd_string: ERROR\n");
 		return 1;
@@ -73,7 +73,7 @@ int expr_zeroext_cmd_string(std::string size, std::vector<ac_param> params, std:
 	return 0;
 }
 
-int expr_signext_cmd_string(std::string size, std::vector<ac_param> params, std::string * respvarname)
+int expr_signext_cmd_string(std::string size, std::string * respvarname, std::vector<ac_param> params)
 {
 	if (params.size() != 1)
 	{
@@ -87,7 +87,7 @@ int expr_signext_cmd_string(std::string size, std::vector<ac_param> params, std:
 	if (cproc_gen == true) rtl::cproc_cmd();
 
 	ac_var* resp_var;
-	if (expr_signext_cmd(target_width, params[0], &resp_var) != 0)
+	if (expr_signext_cmd(target_width, &resp_var, params[0]) != 0)
 	{
 		printf("expr_op_cmd_string: ERROR\n");
 		return 1;
@@ -98,7 +98,7 @@ int expr_signext_cmd_string(std::string size, std::vector<ac_param> params, std:
 	return 0;
 }
 
-int expr_initval_cmd_string(std::string width, std::string value, std::string * respvarname)
+int expr_initval_cmd_string(std::string width, std::string * respvarname, std::string value)
 {
 	bool cproc_gen = false;
 	if (ExeStack.size() == 0) cproc_gen = true;
@@ -107,7 +107,7 @@ int expr_initval_cmd_string(std::string width, std::string value, std::string * 
 	int conv_val = conv_string_to_int(width);
 
 	ac_var * resp_var;
-	int ret_stat = expr_initval_cmd(conv_val, value, &resp_var);
+	int ret_stat = expr_initval_cmd(conv_val, &resp_var, value);
 
 	if (cproc_gen == true) rtl::endcproc_cmd();
 
