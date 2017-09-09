@@ -71,8 +71,8 @@ dlx_udm
 	, .rst_i(RST)
 	, .rx_i(rx)
 	//, .tx_o()
-	, .SW(SW)
-	, .LED(LED)
+	, .gpio_bi(SW)
+	, .gpio_bo(LED)
 );
 
 //////////////////////////
@@ -282,8 +282,12 @@ begin
 	UART_SEND(`IDCODE_CMD);
 	udm_hreset();
 	
+	udm_rd_single(32'h00000000);
+	udm_wr_single(32'h00000000, 32'h123455aa);
+	udm_rd_single(32'h00000000);
+	udm_wr_single(32'h80000000, 32'h5aaa5aaa);
+	udm_rd_single(32'h80000004);
 	/*
-	udm_wr_single(32'h8a000000, 32'h5aaa5aaa);
 	WAIT(50000);
 	$display ("### READING MEMORY ###");
 	udm_rd_single(32'h00000000);

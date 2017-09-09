@@ -7,8 +7,8 @@ module dlx_udm
 	, input rst_i
 	, input rx_i
 	, output tx_o
-	, input [31:0] SW
-	, output [31:0] LED
+	, input [31:0] gpio_bi
+	, output [31:0] gpio_bo
 );
 
 wire udm_reset;
@@ -146,8 +146,8 @@ bus_unit
 	, .port1_be(port1_be)
 	, .port1_rdata(port1_rdata)
 	
-	, .SW(SW)
-	, .LED(LED)
+	, .gpio_bi(gpio_bi)
+	, .gpio_bo(gpio_bo)
 );
 
 endmodule

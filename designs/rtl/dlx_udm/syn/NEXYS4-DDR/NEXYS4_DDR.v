@@ -21,8 +21,8 @@ dlx_udm
 	, .rst_i(!CPU_RESETN)
 	, .rx_i(UART_TXD_IN)
 	, .tx_o(UART_RXD_OUT)
-	, .SW({8'h0, SW, 8'h0})
-	, .LED(LED)
+	, .gpio_bi({8'h0, SW, 8'h0})
+	, .gpio_bo(LED)
 );
 
 endmodule

@@ -21,8 +21,8 @@ dlx_udm
 	.rst_i(btn[0]),
 	.rx_i(RsRx),
 	.tx_o(RsTx),
-	.SW({8'h0, sw, 16'h0}),
-	.LED(Led)
+	.gpio_bi({8'h0, sw, 16'h0}),
+	.gpio_bo(Led)
 );
 
 endmodule
