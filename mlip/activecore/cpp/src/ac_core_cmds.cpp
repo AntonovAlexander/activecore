@@ -100,7 +100,7 @@ int expr_assign_cmd(unsigned int * cursor, ac_dimensions dimensions, ac_var* tar
 			ac_param * new_param = new ac_param(new_imm);
 			ac_params_new.push_back(*new_param);
 
-			if (expr_op_cmd(cursor, "indexed", ac_params_new, (&new_source)) != 0) return 1;
+			if (expr_op_cmd(cursor, "indexed", (&new_source), ac_params_new) != 0) return 1;
 			ret_val = expr_assign_cmd(cursor, dimensions, target, new_source);
 			dimensions.pop_front();
 			if (ret_val != 0) return ret_val;
@@ -272,7 +272,7 @@ int expr_2op_gen_dimensions(std::string opcode, ac_dimensions_static op1_dimensi
 	return 0;
 }
 
-int expr_op_cmd_generated(unsigned int * cursor, ac_execode** new_expr, std::string opcode, std::vector<ac_param> params, ac_var * target)
+int expr_op_cmd_generated(unsigned int * cursor, ac_execode** new_expr, std::string opcode, ac_var * target, std::vector<ac_param> params)
 {
 	(*new_expr) = new ac_execode(opcode);
 	for (unsigned int i = 0; i < params.size(); i++)
@@ -284,13 +284,13 @@ int expr_op_cmd_generated(unsigned int * cursor, ac_execode** new_expr, std::str
 	return 0;
 }
 
-int expr_op_cmd_generated(ac_execode** new_expr, std::string opcode, std::vector<ac_param> params, ac_var * target)
+int expr_op_cmd_generated(ac_execode** new_expr, std::string opcode, ac_var * target, std::vector<ac_param> params)
 {
 	unsigned int cursor = ExeStack[ExeStack.size()-1]->expressions.size();
-	return expr_op_cmd_generated(&cursor, new_expr, opcode, params, target);
+	return expr_op_cmd_generated(&cursor, new_expr, opcode, target, params);
 }
 
-int expr_op_cmd(unsigned int * cursor, std::string opcode, std::vector<ac_param> params, ac_var** respvar)
+int expr_op_cmd(unsigned int * cursor, std::string opcode, ac_var** respvar, std::vector<ac_param> params)
 {
 	if ((opcode == "~") || (opcode == "!")) {
 		if (params.size() != 1)
@@ -305,7 +305,7 @@ int expr_op_cmd(unsigned int * cursor, std::string opcode, std::vector<ac_param>
 		ac_var* genvar = new ac_var(DEFAULT_TYPEVAR, GetGenName("var"), genvar_dimensions, "0");
 
 		ac_execode* new_expr;
-		if (expr_op_cmd_generated(cursor, &new_expr, opcode, params, genvar) != 0) return 1;
+		if (expr_op_cmd_generated(cursor, &new_expr, opcode, genvar, params) != 0) return 1;
 		new_expr->AddGenVarWithStack(genvar);
 
 		*respvar = genvar;
@@ -340,7 +340,7 @@ int expr_op_cmd(unsigned int * cursor, std::string opcode, std::vector<ac_param>
 		ac_var* genvar = new ac_var(DEFAULT_TYPEVAR, GetGenName("var"), *genvar_dimensions, "0");
 
 		ac_execode* new_expr;
-		if (expr_op_cmd_generated(cursor, &new_expr, opcode, params, genvar) != 0) return 1;
+		if (expr_op_cmd_generated(cursor, &new_expr, opcode, genvar, params) != 0) return 1;
 		new_expr->AddGenVarWithStack(genvar);
 
 		*respvar = genvar;
@@ -370,7 +370,7 @@ int expr_op_cmd(unsigned int * cursor, std::string opcode, std::vector<ac_param>
 		ac_var* genvar = new ac_var(DEFAULT_TYPEVAR, GetGenName("var"), genvar_dimensions, "0");
 
 		ac_execode* new_expr;
-		if (expr_op_cmd_generated(cursor, &new_expr, opcode, params, genvar) != 0) return 1;
+		if (expr_op_cmd_generated(cursor, &new_expr, opcode, genvar, params) != 0) return 1;
 		new_expr->AddGenVarWithStack(genvar);
 
 		*respvar = genvar;
@@ -399,7 +399,7 @@ int expr_op_cmd(unsigned int * cursor, std::string opcode, std::vector<ac_param>
 		ac_var* genvar = new ac_var(DEFAULT_TYPEVAR, GetGenName("var"), genvar_dimensions, "0");
 
 		ac_execode* new_expr;
-		if (expr_op_cmd_generated(cursor, &new_expr, opcode, params, genvar) != 0) return 1;
+		if (expr_op_cmd_generated(cursor, &new_expr, opcode, genvar, params) != 0) return 1;
 		new_expr->AddGenVarWithStack(genvar);
 
 		*respvar = genvar;
@@ -412,45 +412,45 @@ int expr_op_cmd(unsigned int * cursor, std::string opcode, std::vector<ac_param>
 	return 0;
 }
 
-int expr_op_cmd(std::string opcode, std::vector<ac_param> params, ac_var** respvar)
+int expr_op_cmd(std::string opcode, ac_var** respvar, std::vector<ac_param> params)
 {
 	unsigned int cursor = ExeStack[ExeStack.size()-1]->expressions.size();
-	return expr_op_cmd(&cursor, opcode, params, respvar);
+	return expr_op_cmd(&cursor, opcode, respvar, params);
 }
 
-int expr_1op_cmd(std::string opcode, ac_param param, ac_var** respvar)
+int expr_1op_cmd(std::string opcode, ac_var** respvar, ac_param param)
 {
 	std::vector<ac_param> params;
 	params.push_back(param);
-	return expr_op_cmd(opcode, params, respvar);
+	return expr_op_cmd(opcode, respvar, params);
 }
 
-int expr_1op_cmd_generated(std::string opcode, ac_param param, ac_var* target)
+int expr_1op_cmd_generated(std::string opcode, ac_var* target, ac_param param)
 {
 	ac_execode* new_expr;
 	std::vector<ac_param> params;
 	params.push_back(param);
-	return expr_op_cmd_generated(&new_expr, opcode, params, target);
+	return expr_op_cmd_generated(&new_expr, opcode, target, params);
 }
 
-int expr_2op_cmd(std::string opcode, ac_param param0, ac_param param1, ac_var** respvar)
+int expr_2op_cmd(std::string opcode, ac_var** respvar, ac_param param0, ac_param param1)
 {
 	std::vector<ac_param> params;
 	params.push_back(param0);
 	params.push_back(param1);
-	return expr_op_cmd(opcode, params, respvar);
+	return expr_op_cmd(opcode, respvar, params);
 }
 
-int expr_2op_cmd_generated(std::string opcode, ac_param param0, ac_param param1, ac_var* target)
+int expr_2op_cmd_generated(std::string opcode, ac_var* target, ac_param param0, ac_param param1)
 {
 	ac_execode* new_expr;
 	std::vector<ac_param> params;
 	params.push_back(param0);
 	params.push_back(param1);
-	return expr_op_cmd_generated(&new_expr, opcode, params, target);
+	return expr_op_cmd_generated(&new_expr, opcode, target, params);
 }
 
-int expr_zeroext_cmd(unsigned int * cursor, unsigned int target_width, ac_param param, ac_var** respvar)
+int expr_zeroext_cmd(unsigned int * cursor, unsigned int target_width, ac_var** respvar, ac_param param)
 {
 	ac_dimensions_static source_dimensions = param.GetDimensions();
 	unsigned int source_width;
@@ -472,7 +472,7 @@ int expr_zeroext_cmd(unsigned int * cursor, unsigned int target_width, ac_param 
 		ac_param zeroconst_param(zeroconst);
 		new_params.push_back(zeroconst_param);
 		new_params.push_back(param);
-		if (expr_op_cmd_generated(cursor, &new_expr, "cnct", new_params, genvar) != 0) return 1;
+		if (expr_op_cmd_generated(cursor, &new_expr, "cnct", genvar, new_params) != 0) return 1;
 	} else if (target_width < source_width) {
 		new_params.push_back(param);
 		ac_imm * msb_imm = new ac_imm(NumberToString(target_width-1));
@@ -481,7 +481,7 @@ int expr_zeroext_cmd(unsigned int * cursor, unsigned int target_width, ac_param 
 		ac_imm * lsb_imm = new ac_imm(NumberToString(0));
 		ac_param lsb(lsb_imm);
 		new_params.push_back(lsb);
-		if (expr_op_cmd_generated(cursor, &new_expr, "ranged", new_params, genvar) != 0) return 1;
+		if (expr_op_cmd_generated(cursor, &new_expr, "ranged", genvar, new_params) != 0) return 1;
 	} else {
 		if (expr_assign_cmd_generated(cursor, &new_expr, ac_dimensions(), genvar, param) != 0) return 1;
 	}
@@ -491,13 +491,13 @@ int expr_zeroext_cmd(unsigned int * cursor, unsigned int target_width, ac_param 
 	return 0;
 }
 
-int expr_zeroext_cmd(unsigned int target_width, ac_param param, ac_var** respvar)
+int expr_zeroext_cmd(unsigned int target_width, ac_var** respvar, ac_param param)
 {
 	unsigned int cursor = ExeStack[ExeStack.size()-1]->expressions.size();
-	return expr_zeroext_cmd(&cursor, target_width, param, respvar);
+	return expr_zeroext_cmd(&cursor, target_width, respvar, param);
 }
 
-int expr_signext_cmd(unsigned int * cursor, unsigned int target_width, ac_param param, ac_var** respvar)
+int expr_signext_cmd(unsigned int * cursor, unsigned int target_width, ac_var** respvar, ac_param param)
 {
 	ac_dimensions_static source_dimensions = param.GetDimensions();
 	unsigned int source_width;
@@ -521,12 +521,12 @@ int expr_signext_cmd(unsigned int * cursor, unsigned int target_width, ac_param 
 		inter_params.push_back(param);
 		ac_imm * sign_imm = new ac_imm(NumberToString(source_width-1));
 		inter_params.push_back(ac_param(sign_imm));
-		if (expr_op_cmd(cursor, "indexed", inter_params, &signvar) != 0) return 1;
+		if (expr_op_cmd(cursor, "indexed", &signvar, inter_params) != 0) return 1;
 
 		for (unsigned int i = 0; i < (target_width - source_width); i++) new_params.push_back(ac_param(signvar));
 
 		new_params.push_back(param);
-		if (expr_op_cmd_generated(cursor, &new_expr, "cnct", new_params, genvar) != 0) return 1;
+		if (expr_op_cmd_generated(cursor, &new_expr, "cnct", genvar, new_params) != 0) return 1;
 	} else if (target_width < source_width) {
 		new_params.push_back(param);
 		ac_imm * msb_imm = new ac_imm(NumberToString(target_width-1));
@@ -535,7 +535,7 @@ int expr_signext_cmd(unsigned int * cursor, unsigned int target_width, ac_param 
 		ac_imm * lsb_imm = new ac_imm(NumberToString(0));
 		ac_param lsb(lsb_imm);
 		new_params.push_back(lsb);
-		if (expr_op_cmd_generated(cursor, &new_expr, "ranged", new_params, genvar) != 0) return 1;
+		if (expr_op_cmd_generated(cursor, &new_expr, "ranged", genvar, new_params) != 0) return 1;
 	} else {
 		if (expr_assign_cmd_generated(cursor, &new_expr, ac_dimensions(), genvar, param) != 0) return 1;
 	}
@@ -545,13 +545,13 @@ int expr_signext_cmd(unsigned int * cursor, unsigned int target_width, ac_param 
 	return 0;
 }
 
-int expr_signext_cmd(unsigned int target_width, ac_param param, ac_var** respvar)
+int expr_signext_cmd(unsigned int target_width, ac_var** respvar, ac_param param)
 {
 	unsigned int cursor = ExeStack[ExeStack.size()-1]->expressions.size();
-	return expr_signext_cmd(&cursor, target_width, param, respvar);
+	return expr_signext_cmd(&cursor, target_width, respvar, param);
 }
 
-int expr_initval_cmd(unsigned int width, std::string value, ac_var** respvar)
+int expr_initval_cmd(unsigned int width, ac_var** respvar, std::string value)
 {
 	ac_dimensions_static new_dimension;
 	dimension_range_static new_range(width-1, 0);
@@ -599,13 +599,13 @@ int expr_begelsif_cmd(ac_var* cond_op)
 	ac_var* preif_ncond;
 	std::vector<ac_param> preif_cond_params;
 	preif_cond_params.push_back(ac_param(preif_cond));
-	if (expr_op_cmd("!", preif_cond_params, &preif_ncond) != 0) return 1;
+	if (expr_op_cmd("!", &preif_ncond, preif_cond_params) != 0) return 1;
 
 	ac_var* curif_cond;
 	std::vector<ac_param> curif_cond_params;
 	curif_cond_params.push_back(ac_param(preif_ncond));
 	curif_cond_params.push_back(ac_param(cond_op));
-	if (expr_op_cmd("&&", curif_cond_params, &curif_cond) != 0) return 1;
+	if (expr_op_cmd("&&", &curif_cond, curif_cond_params) != 0) return 1;
 
 	ac_execode* new_expr = new ac_execode("if");
 	new_expr->AddRdVar(curif_cond);
@@ -644,7 +644,7 @@ int expr_begelse_cmd()
 	ac_var* preif_ncond;
 	std::vector<ac_param> preif_ncond_params;
 	preif_ncond_params.push_back(ac_param(preif_cond));
-	if (expr_op_cmd("!", preif_ncond_params, &preif_ncond) != 0) return 1;
+	if (expr_op_cmd("!", &preif_ncond, preif_ncond_params) != 0) return 1;
 
 	ac_execode* new_expr = new ac_execode("if");
 	new_expr->AddRdVar(preif_ncond);

@@ -178,9 +178,11 @@ rtl::module dlx
 		pipe::pvar {31 0} 	mem_rdata 		0
 		pipe::pvar {0 0} 	mem_rshift		0
 		
-		pipe::gpvar {31 0} 	pc			0
-		_acc_index {31 0}
+		pipe::gpvar {31 0} 	pc				0
+		_acc_index {31 0}	
 		pipe::gpvar {31 0} 	regfile			0
+		pipe::gpvar {0 0}	jump_req_cmd	0
+		pipe::gpvar {31 0} 	jump_vector_cmd	0
 
 		pipe::mcopipeif instr_mem \
 					instr_mcopipe_req 	\
@@ -200,19 +202,18 @@ rtl::module dlx
 
 		pipe::pstage IFETCH
 			
-			begif [pipe::isactive IDECODE]
-				s= curinstr_addr [pipe::prr IDECODE nextinstr_addr]
-			endif
+			s= curinstr_addr pc
 
-			begif [pipe::isactive EXEC]
-				begif [pipe::prr EXEC jump_req]
-					s= curinstr_addr jump_vector
-				endif
+			begif jump_req_cmd
+				s= curinstr_addr jump_vector_cmd
 			endif
+			s= jump_req_cmd 0
 
 			pipe::mcopipe_rdreq instr_mem [cnct {curinstr_addr curinstr_addr}]
 
 			s= nextinstr_addr [s+ curinstr_addr 4]
+
+			s= pc nextinstr_addr
 		
 		pipe::pstage IDECODE
 
@@ -760,6 +761,8 @@ rtl::module dlx
 				s= jump_vector alu_result
 			endif
 
+			s= jump_req_cmd jump_req
+			s= jump_vector_cmd jump_vector
 			begif jump_req
 				pipe::pflush
 			endif

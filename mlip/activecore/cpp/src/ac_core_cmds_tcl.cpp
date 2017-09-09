@@ -318,7 +318,7 @@ int TCL_expr_op_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj
 		if (DEBUG_FLAG == true) printf("---Param %d:, %s\n", i, StringToCharArr(ParamAccumulator[i].GetString()));
 	}
 
-	if (expr_op_cmd_string(opcode, ParamAccumulator, &genvar_name) != 0) return TCL_ERROR;
+	if (expr_op_cmd_string(opcode, &genvar_name, ParamAccumulator) != 0) return TCL_ERROR;
 	Tcl_SetResult(interp, StringToCharArr(genvar_name), TCL_VOLATILE);
 	ParamAccumulator.clear();
 	return TCL_OK;
@@ -336,7 +336,7 @@ int TCL_expr_zeroext_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tc
 	std::string size = std::string(Tcl_GetString(objv[1]));
 	std::string genvar_name;
 
-	if (expr_zeroext_cmd_string(size, ParamAccumulator, &genvar_name) != 0) return TCL_ERROR;
+	if (expr_zeroext_cmd_string(size, &genvar_name, ParamAccumulator) != 0) return TCL_ERROR;
 	Tcl_SetResult(interp, StringToCharArr(genvar_name), TCL_VOLATILE);
 	ParamAccumulator.clear();
 	return TCL_OK;
@@ -354,7 +354,7 @@ int TCL_expr_signext_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tc
 	std::string size = std::string(Tcl_GetString(objv[1]));
 	std::string genvar_name;
 
-	if (expr_signext_cmd_string(size, ParamAccumulator, &genvar_name) != 0) return TCL_ERROR;
+	if (expr_signext_cmd_string(size, &genvar_name, ParamAccumulator) != 0) return TCL_ERROR;
 	Tcl_SetResult(interp, StringToCharArr(genvar_name), TCL_VOLATILE);
 	ParamAccumulator.clear();
 	return TCL_OK;
