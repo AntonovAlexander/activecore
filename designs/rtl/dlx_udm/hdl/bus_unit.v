@@ -21,15 +21,15 @@ module bus_unit
 	input [3:0] port1_be,
 	output reg [31:0] port1_rdata,
 	
-	input [31:0] SW,
-	output [31:0] LED
+	input [31:0] gpio_bi,
+	output [31:0] gpio_bo
 );
 
-reg [31:0] led_reg;
-assign LED = led_reg;
+reg [31:0] gpio_bo_reg;
+assign gpio_bo = gpio_bo_reg;
 
-reg [31:0] sw_reg;
-always @(posedge clk_i) sw_reg <= SW;
+reg [31:0] gpio_bi_reg;
+always @(posedge clk_i) gpio_bi_reg <= gpio_bi;
 
 // ram/IO commutation
 reg ram_enb, io_enb;
@@ -46,7 +46,7 @@ always @(posedge clk_i)
 	begin
 	if (io_enb && port1_we)
 		begin
-		if (port1_addr[7:0] == 8'h0) led_reg <= port1_wdata;
+		if (port1_addr[7:0] == 8'h0) gpio_bo_reg <= port1_wdata;
 		end
 	end
 	
@@ -59,8 +59,8 @@ always @(posedge clk_i)
 	if (io_enb && !port1_we)
 		begin
 		io_resp <= 1'b1;
-		if (port1_addr[7:0] == 8'h0) io_rdata <= led_reg;
-		else if (port1_addr[7:0] == 8'h4) io_rdata <= sw_reg;
+		if (port1_addr[7:0] == 8'h0) io_rdata <= gpio_bo_reg;
+		else if (port1_addr[7:0] == 8'h4) io_rdata <= gpio_bi_reg;
 		end
 	end
 

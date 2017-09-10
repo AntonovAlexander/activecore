@@ -60,7 +60,7 @@ reg CLK_50MHZ, RST, rx;
 reg [31:0] SW;
 wire [31:0] LED;
 	
-dlx_udm
+dlx_udm_memsplit
 #(
 	//.mem_data("../../../../activecore/dlx/sw/io_heartbeat/io_heartbeat.hex"),
 	.mem_data("../../../../activecore/dlx/sw/io_heartbeat_variable/io_heartbeat_variable.hex"),

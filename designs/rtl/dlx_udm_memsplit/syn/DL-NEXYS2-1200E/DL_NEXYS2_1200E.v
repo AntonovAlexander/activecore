@@ -10,7 +10,7 @@ module DL_NEXYS2_1200E
 	output	RsTx
 );
 
-dlx_udm
+dlx_udm_memsplit
 #(
 	//.mem_data("../../../../activecore/dlx/sw/io_heartbeat/io_heartbeat.hex"),
 	.mem_data("../../../../activecore/dlx/sw/io_heartbeat_variable/io_heartbeat_variable.hex"),
