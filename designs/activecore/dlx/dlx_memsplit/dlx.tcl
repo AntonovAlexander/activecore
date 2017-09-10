@@ -601,10 +601,28 @@ rtl::module dlx
 				s= op2_source 	$dlx::OP2_SRC_IMM
 			endif
 
-			## data collection ##
-			# reading regfile
-			s= rs1_rdata [indexed regfile rs1_addr]
-			s= rs2_rdata [indexed regfile rs2_addr]
+			#### data fetching - reading regfile ##
+			
+			## unoptimized
+			# s= rs1_rdata [indexed regfile rs1_addr]
+			# s= rs2_rdata [indexed regfile rs2_addr]
+			##
+			
+			## optimized for synthesis
+			s= rs1_rdata [indexed [pipe::rdprev regfile] rs1_addr]
+			s= rs2_rdata [indexed [pipe::rdprev regfile] rs2_addr]
+			# pipeline WB data hazard resolve
+			begif [pipe::issucc WB]
+				begif [pipe::prr WB rd_req]
+					begif [s== [pipe::prr WB rd_addr] rs1_addr]
+						s= rs1_rdata [pipe::prr WB rd_wdata]
+					endif
+					begif [s== [pipe::prr WB rd_addr] rs2_addr]
+						s= rs2_rdata [pipe::prr WB rd_wdata]
+					endif
+				endif
+			endif
+			##
 
 			begif [s== rs1_addr 0]
 				s= rs1_rdata 0
@@ -770,20 +788,16 @@ rtl::module dlx
 		pipe::pstage MEM
 			
 			begif mem_req
-				begif mem_cmd
-					pipe::mcopipe_wrreq data_mem [cnct {mem_addr mem_wdata}]
-				endif
-				begelse
-					pipe::mcopipe_rdreq data_mem [cnct {mem_addr mem_wdata}]
-				endif
+				pipe::mcopipe_req data_mem mem_cmd [cnct {mem_addr mem_wdata}]
 			endif
 
 		pipe::pstage WB
 			
 			begif mem_req
-				s= mem_rdata [pipe::mcopipe_resp data_mem]
+				begif [s! mem_cmd]
+					s= mem_rdata [pipe::mcopipe_resp data_mem]
+				endif
 			endif
-
 
 			begif [s== rd_source $dlx::RD_MEM]
 				s= rd_wdata mem_rdata

@@ -68,16 +68,19 @@ namespace eval pipe {
 		__mlip_pipe_call rdfifoif
 	}
 
-	proc mcopipe_wrreq {mcopipeif_name param} {
+	proc mcopipe_req {mcopipeif_name cmd param} {
 		__gplc_acc_param_clr
+		ActiveCore::_accum_param $cmd
 		ActiveCore::_accum_param $param
-		__mlip_pipe_mcopipe_wrreq $mcopipeif_name
+		__mlip_pipe_mcopipe_req $mcopipeif_name
+	}
+
+	proc mcopipe_wrreq {mcopipeif_name param} {
+		mcopipe_req $mcopipeif_name 1 $param
 	}
 
 	proc mcopipe_rdreq {mcopipeif_name param} {
-		__gplc_acc_param_clr
-		ActiveCore::_accum_param $param
-		__mlip_pipe_mcopipe_rdreq $mcopipeif_name
+		mcopipe_req $mcopipeif_name 0 $param
 	}
 
 	proc mcopipe_resp {mcopipeif_name} {

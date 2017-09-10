@@ -47,8 +47,7 @@ namespace pipe
 	int isfinished_cmd(std::string pstage_name, std::string * int_varname);
 
 	int mcopipeif_cmd(std::string mcopipeif_name, ac_var * req_var, ac_var * we_var, ac_var * ack_var, ac_var * wdata_var, ac_var * resp_var, ac_var * rdata_var);
-	int mcopipe_wrreq_cmd(std::string mcopipeif_name, std::vector<ac_param> params);
-	int mcopipe_rdreq_cmd(std::string mcopipeif_name, std::vector<ac_param> params);
+	int mcopipe_req_cmd(std::string mcopipeif_name, std::vector<ac_param> params);
 	int mcopipe_resp_cmd(std::string mcopipeif_name, std::string * resp_varname);
 
 	int wrfifoif_cmd(std::string wrfifoif_name, ac_var * req_var, ac_var * ack_var, ac_var * wdata_var);
