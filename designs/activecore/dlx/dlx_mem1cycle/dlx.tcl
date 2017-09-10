@@ -556,7 +556,7 @@ rtl::module dlx
 				s= op2_source 	$dlx::OP2_SRC_IMM
 			endif
 
-			#### data collection - reading regfile ##
+			#### data fetching - reading regfile ##
 			
 			## unoptimized
 			# s= rs1_rdata [indexed regfile rs1_addr]
