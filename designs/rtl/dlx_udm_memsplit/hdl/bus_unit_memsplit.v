@@ -12,7 +12,7 @@ module bus_unit_memsplit
 	input [31:0] bus0_addr_bi,
 	input [3:0] bus0_be_bi,
 	input [31:0] bus0_wdata_bi,
-	output [0:0] bus0_ack_o,
+	output reg [0:0] bus0_ack_o,
 	
 	output reg [0:0] bus0_resp_o,
 	output reg [31:0] bus0_rdata_bo,
@@ -22,7 +22,7 @@ module bus_unit_memsplit
 	input [31:0] bus1_addr_bi,
 	input [3:0] bus1_be_bi,
 	input [31:0] bus1_wdata_bi,
-	output [0:0] bus1_ack_o,
+	output reg [0:0] bus1_ack_o,
 	
 	output reg [0:0] bus1_resp_o,
 	output reg [31:0] bus1_rdata_bo,
@@ -59,6 +59,7 @@ always @(posedge clk_i)
 	else
 		begin
 		if ((bus0_io_req == 1'b1) && (bus0_we_i == 1'b1) && (bus0_addr_bi[7:0] == 8'h0)) gpio_bo_reg <= bus0_wdata_bi;
+		if ((bus1_io_req == 1'b1) && (bus1_we_i == 1'b1) && (bus1_addr_bi[7:0] == 8'h0)) gpio_bo_reg <= bus1_wdata_bi;
 		end
 	end
 
@@ -120,6 +121,20 @@ always @*
 		bus1_rdata_bo = ram1_rdata;
 		end
 	end
+
+always @*
+	begin
+	bus0_ack_o = 1'b0;
+	if (bus0_ram_req) bus0_ack_o = ram0_ack;
+	if (bus0_io_req) bus0_ack_o = 1'b1;
+	end
+
+always @*
+	begin
+	bus1_ack_o = 1'b0;
+	if (bus1_ram_req) bus1_ack_o = ram1_ack;
+	if (bus1_io_req) bus1_ack_o = 1'b1;
+	end
 	
 ram_dual_memsplit
 #(
@@ -133,7 +148,7 @@ ram_dual_memsplit
 	
 	, .bus0_req_i(bus0_ram_req)
 	, .bus0_we_i(bus0_we_i)
-	, .bus0_addr_bi(bus0_addr_bi)
+	, .bus0_addr_bi(bus0_addr_bi[31:2])
 	, .bus0_be_bi(bus0_be_bi)
 	, .bus0_wdata_bi(bus0_wdata_bi)
 	, .bus0_ack_o(ram0_ack)
@@ -142,7 +157,7 @@ ram_dual_memsplit
 	
 	, .bus1_req_i(bus1_ram_req)
 	, .bus1_we_i(bus1_we_i)
-	, .bus1_addr_bi(bus1_addr_bi)
+	, .bus1_addr_bi(bus1_addr_bi[31:2])
 	, .bus1_be_bi(bus1_be_bi)
 	, .bus1_wdata_bi(bus1_wdata_bi)
 	, .bus1_ack_o(ram1_ack)
