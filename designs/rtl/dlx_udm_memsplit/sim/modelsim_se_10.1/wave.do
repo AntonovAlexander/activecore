@@ -58,15 +58,16 @@ add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH c
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_pc
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_jump_req_cmd
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_jump_vector_cmd
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_pctrl_activereq
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_pctrl_prepeatreq
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_pctrl_new
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_pctrl_working
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_pctrl_succ
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_pctrl_break
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_pctrl_finish
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_pctrl_stalled
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_pctrl_flushreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_genpctrl_activereq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_genpctrl_prepeatreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_genpctrl_new
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_genpctrl_working
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_genpctrl_succ
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_genpctrl_break
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_genpctrl_finish
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_genpctrl_stalled
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_genpctrl_flushreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_genpctrl_rdy
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_curinstr_addr
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_nextinstr_addr
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IFETCH_genmcopipe_instr_mem_genvar_req_done
@@ -93,15 +94,16 @@ add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IFETCH c
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal -childformat {{{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[31]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[30]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[29]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[28]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[27]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[26]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[25]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[24]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[23]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[22]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[21]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[20]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[19]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[18]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[17]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[16]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[15]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[14]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[13]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[12]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[11]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[10]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[9]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[8]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[7]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[6]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[5]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[4]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[3]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[2]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[1]} -radix hexadecimal} {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[0]} -radix hexadecimal}} -expand -subitemconfig {{/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[31]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[30]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[29]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[28]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[27]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[26]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[25]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[24]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[23]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[22]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[21]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[20]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[19]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[18]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[17]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[16]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[15]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[14]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[13]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[12]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[11]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[10]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[9]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[8]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[7]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[6]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[5]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[4]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[3]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[2]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[1]} {-height 21 -radix hexadecimal} {/dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile[0]} {-height 21 -radix hexadecimal}} /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_regfile
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/clk_i
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/rst_i
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_pctrl_activereq
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_pctrl_prepeatreq
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_pctrl_new
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_pctrl_working
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_pctrl_succ
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_pctrl_break
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_pctrl_finish
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_pctrl_stalled
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_pctrl_flushreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_genpctrl_activereq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_genpctrl_prepeatreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_genpctrl_new
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_genpctrl_working
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_genpctrl_succ
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_genpctrl_break
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_genpctrl_finish
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_genpctrl_stalled
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_genpctrl_flushreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_genpctrl_rdy
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_nextinstr_addr
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_instr_code
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {IDECODE combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_IDECODE_opcode
@@ -137,15 +139,16 @@ add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC com
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/rst_i
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_jump_req_cmd
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_gengpvar_jump_vector_cmd
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_pctrl_activereq
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_pctrl_prepeatreq
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_pctrl_new
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_pctrl_working
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_pctrl_succ
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_pctrl_break
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_pctrl_finish
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_pctrl_stalled
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_pctrl_flushreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_genpctrl_activereq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_genpctrl_prepeatreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_genpctrl_new
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_genpctrl_working
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_genpctrl_succ
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_genpctrl_break
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_genpctrl_finish
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_genpctrl_stalled
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_genpctrl_flushreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_genpctrl_rdy
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_nextinstr_addr
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_rs1_rdata
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_rs2_rdata
@@ -175,15 +178,16 @@ add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC com
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_EXEC_mem_wdata
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/clk_i
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/rst_i
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_pctrl_activereq
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_pctrl_prepeatreq
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_pctrl_new
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_pctrl_working
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_pctrl_succ
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_pctrl_break
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_pctrl_finish
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_pctrl_stalled
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_pctrl_flushreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_genpctrl_activereq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_genpctrl_prepeatreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_genpctrl_new
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_genpctrl_working
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_genpctrl_succ
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_genpctrl_break
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_genpctrl_finish
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_genpctrl_stalled
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_genpctrl_flushreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_genpctrl_rdy
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_rd_req
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_rd_addr
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_MEM_rd_wdata
@@ -215,15 +219,16 @@ add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM comb
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {MEM combs} -expand -group {DLX data reqbuf} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genmcopipe_data_mem_reqbuf_rdy
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/clk_i
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/rst_i
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_pctrl_activereq
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_pctrl_prepeatreq
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_pctrl_new
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_pctrl_working
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_pctrl_succ
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_pctrl_break
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_pctrl_finish
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_pctrl_stalled
-add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_pctrl_flushreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_genpctrl_activereq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_genpctrl_prepeatreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_genpctrl_new
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_genpctrl_working
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_genpctrl_succ
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_genpctrl_break
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_genpctrl_finish
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_genpctrl_stalled
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_genpctrl_flushreq
+add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_genpctrl_rdy
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_mem_rdata
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_rd_req
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_rd_addr
@@ -239,7 +244,7 @@ add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -expand -group {DLX data resp bus} -radix hexadecimal /dlx_tb/dlx_udm/dlx/data_mcopipe_resp
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -expand -group {DLX data resp bus} -radix hexadecimal /dlx_tb/dlx_udm/dlx/data_mcopipe_rdata
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {142224 ps} 0}
+WaveRestoreCursors {{Cursor 1} {7194898761 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 745
 configure wave -valuecolwidth 100
@@ -255,4 +260,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {512704 ps}
+WaveRestoreZoom {6998941925 ps} {7858650425 ps}
