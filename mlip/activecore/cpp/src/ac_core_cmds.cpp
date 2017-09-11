@@ -576,6 +576,13 @@ int expr_begif_cmd(ac_var* cond_op)
 	return 0;
 }
 
+int expr_begifnot_cmd(ac_var* cond_op)
+{
+	ac_var* genvar;
+	if (expr_1op_cmd("!", &genvar, cond_op) != 0) return 1;
+	return expr_begif_cmd(genvar);
+}
+
 int expr_begelsif_cmd(ac_var* cond_op)
 {
 	bool preif_found = false;
