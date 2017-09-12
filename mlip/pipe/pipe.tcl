@@ -4,6 +4,20 @@
 try {namespace delete pipe} on error {} {}
 namespace eval pipe {
 
+	proc pproc {name clk rst} {
+		__gplc_acc_param_clr
+		__mlip_rtl_SetPtrs
+		__gplc_acc_param_v_rd $clk
+		__gplc_acc_param_v_rd $rst
+		__mlip_pipe_SetPtrs
+		__gplc_acc_param_string $name
+		__mlip_pipe_call pproc
+	}
+
+	proc endpproc {} {
+		__mlip_pipe_call endpproc
+	}
+
 	proc pvar {dimensions name defval} {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ pvar\ $name\ is\ not\ a\ number!
@@ -68,25 +82,6 @@ namespace eval pipe {
 		__mlip_pipe_call rdfifoif
 	}
 
-	proc mcopipe_req {mcopipeif_name cmd param} {
-		__gplc_acc_param_clr
-		ActiveCore::_accum_param $cmd
-		ActiveCore::_accum_param $param
-		__mlip_pipe_mcopipe_req $mcopipeif_name
-	}
-
-	proc mcopipe_wrreq {mcopipeif_name param} {
-		mcopipe_req $mcopipeif_name 1 $param
-	}
-
-	proc mcopipe_rdreq {mcopipeif_name param} {
-		mcopipe_req $mcopipeif_name 0 $param
-	}
-
-	proc mcopipe_resp {mcopipeif_name} {
-		__mlip_pipe_mcopipe_resp $mcopipeif_name
-	}
-
 	# interface functions
 	proc pstage {pstage_name} {
 		__gplc_acc_param_clr
@@ -138,6 +133,13 @@ namespace eval pipe {
 		__mlip_pipe_call prr
 	}
 
+	proc accum {target source} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_v_wr $target
+		ActiveCore::_accum_param $source
+		__mlip_pipe_call accum
+	}
+
 	proc isactive {pstage_name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $pstage_name
@@ -162,18 +164,23 @@ namespace eval pipe {
 		__mlip_pipe_call issucc
 	}
 
-	proc pproc {name clk rst} {
+	proc mcopipe_req {mcopipeif_name cmd param} {
 		__gplc_acc_param_clr
-		__mlip_rtl_SetPtrs
-		__gplc_acc_param_v_rd $clk
-		__gplc_acc_param_v_rd $rst
-		__mlip_pipe_SetPtrs
-		__gplc_acc_param_string $name
-		__mlip_pipe_call pproc
+		ActiveCore::_accum_param $cmd
+		ActiveCore::_accum_param $param
+		__mlip_pipe_mcopipe_req $mcopipeif_name
 	}
 
-	proc endpproc {} {
-		__mlip_pipe_call endpproc
+	proc mcopipe_wrreq {mcopipeif_name param} {
+		mcopipe_req $mcopipeif_name 1 $param
+	}
+
+	proc mcopipe_rdreq {mcopipeif_name param} {
+		mcopipe_req $mcopipeif_name 0 $param
+	}
+
+	proc mcopipe_resp {mcopipeif_name} {
+		__mlip_pipe_mcopipe_resp $mcopipeif_name
 	}
 
 	proc export {} {

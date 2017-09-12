@@ -38,6 +38,7 @@ namespace pipe
 	int pre_cmd(ac_var * ext_var, ac_var ** int_var);
 	int pwe_cmd(ac_param param, ac_var * ext_var);
 	int prr_cmd(std::string pstage_name, ac_var * remote_var, ac_var ** int_var);
+	int accum_cmd(ac_var * target, ac_param source);
 
 	int isactive_cmd(std::string pstage_name, std::string * int_varname);
 	int isworking_cmd(std::string pstage_name, std::string * int_varname);
