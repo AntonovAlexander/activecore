@@ -62,25 +62,29 @@ namespace eval pipe {
 		__mlip_pipe_call mcopipeif
 	}
 
-	proc mcopipe_export {mcopipeif_name req we ack wdata resp rdata} {
-		__gplc_acc_param_clr
-		__gplc_acc_param_string $mcopipeif_name
-		__mlip_rtl_SetPtrs
-		__gplc_acc_param_v_wr $req
-		__gplc_acc_param_v_wr $we
-		__gplc_acc_param_v_rd $ack
-		__gplc_acc_param_v_wr $wdata
-		__gplc_acc_param_v_rd $resp
-		__gplc_acc_param_v_rd $rdata
-		__mlip_pipe_call mcopipe_export
+	proc mcopipe_export {mcopipeif_name signals} {
+		if { [llength $signals] != 6 } {
+			ActiveCore::ERROR parameters\ incorrect!
+		} else {
+			__gplc_acc_param_clr
+			__gplc_acc_param_string $mcopipeif_name
+			__mlip_rtl_SetPtrs
+			__gplc_acc_param_v_wr [lindex $signals 0]
+			__gplc_acc_param_v_wr [lindex $signals 1]
+			__gplc_acc_param_v_rd [lindex $signals 2]
+			__gplc_acc_param_v_wr [lindex $signals 3]
+			__gplc_acc_param_v_rd [lindex $signals 4]
+			__gplc_acc_param_v_rd [lindex $signals 5]
+			__mlip_pipe_call mcopipe_export
+		}
 	}
 
-	proc copipe_connect {pproc_name mcopipe_name copipe_name} {
+	proc mcopipe_connect {pproc_name mcopipe_name copipe_name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $pproc_name
 		__gplc_acc_param_string $mcopipe_name
 		__gplc_acc_param_string $copipe_name
-		__mlip_pipe_call copipe_connect
+		__mlip_pipe_call mcopipe_connect
 	}
 
 	proc wrfifoif {wrfifoif_name req ack wdata} {
