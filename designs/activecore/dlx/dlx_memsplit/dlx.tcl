@@ -184,21 +184,8 @@ rtl::module dlx
 		pipe::gpvar {0 0}	jump_req_cmd	0
 		pipe::gpvar {31 0} 	jump_vector_cmd	0
 
-		pipe::mcopipeif instr_mem \
-					instr_mcopipe_req 	\
-					instr_mcopipe_we 	\
-					instr_mcopipe_ack 	\
-					instr_mcopipe_wdata	\
-					instr_mcopipe_resp	\
-					instr_mcopipe_rdata
-
-		pipe::mcopipeif data_mem \
-					data_mcopipe_req	\
-					data_mcopipe_we		\
-					data_mcopipe_ack	\
-					data_mcopipe_wdata	\
-					data_mcopipe_resp	\
-					data_mcopipe_rdata
+		pipe::mcopipeif instr_mem {63 0} {31 0}
+		pipe::mcopipeif data_mem {63 0} {31 0}
 
 		pipe::pstage IFETCH
 			
@@ -808,5 +795,28 @@ rtl::module dlx
 			endif
 
 	pipe::endpproc
+
+
+	pipe::copipeif instr_mem {63 0} {31 0}
+	pipe::copipeif data_mem {63 0} {31 0}
+
+	pipe::copipe_connect instrpipe instr_mem instr_mem
+	pipe::copipe_connect instrpipe data_mem data_mem
+
+	pipe::mcopipe_export instr_mem \
+				instr_mcopipe_req 	\
+				instr_mcopipe_we 	\
+				instr_mcopipe_ack 	\
+				instr_mcopipe_wdata	\
+				instr_mcopipe_resp	\
+				instr_mcopipe_rdata
+
+	pipe::mcopipe_export data_mem \
+				data_mcopipe_req	\
+				data_mcopipe_we		\
+				data_mcopipe_ack	\
+				data_mcopipe_wdata	\
+				data_mcopipe_resp	\
+				data_mcopipe_rdata
 
 #endmodule

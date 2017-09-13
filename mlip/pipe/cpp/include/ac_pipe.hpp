@@ -47,7 +47,10 @@ namespace pipe
 	int isbroken_cmd(std::string pstage_name, std::string * int_varname);
 	int isfinished_cmd(std::string pstage_name, std::string * int_varname);
 
-	int mcopipeif_cmd(std::string mcopipeif_name, ac_var * req_var, ac_var * we_var, ac_var * ack_var, ac_var * wdata_var, ac_var * resp_var, ac_var * rdata_var);
+	int mcopipeif_cmd(std::string mcopipeif_name, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
+	int copipeif_cmd(std::string copipeif_name, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
+	int copipe_connect_cmd(std::string pproc_name, std::string mcopipeif_name, std::string copipeif_name);
+	int mcopipe_export_cmd(std::string mcopipeif_name, ac_var * req_var, ac_var * we_var, ac_var * ack_var, ac_var * wdata_var, ac_var * resp_var, ac_var * rdata_var);
 	int mcopipe_req_cmd(std::string mcopipeif_name, std::vector<ac_param> params);
 	int mcopipe_resp_cmd(std::string mcopipeif_name, std::string * resp_varname);
 

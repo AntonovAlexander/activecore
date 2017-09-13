@@ -46,7 +46,23 @@ namespace eval pipe {
 		__mlip_pipe_call rdprev
 	}
 
-	proc mcopipeif {mcopipeif_name req we ack wdata resp rdata} {
+	proc copipeif {name dim_wdata dim_rdata} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $name
+		_acc_index $dim_wdata
+		_acc_index $dim_rdata
+		__mlip_pipe_call copipeif
+	}
+
+	proc mcopipeif {name dim_wdata dim_rdata} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $name
+		_acc_index $dim_wdata
+		_acc_index $dim_rdata
+		__mlip_pipe_call mcopipeif
+	}
+
+	proc mcopipe_export {mcopipeif_name req we ack wdata resp rdata} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $mcopipeif_name
 		__mlip_rtl_SetPtrs
@@ -56,8 +72,15 @@ namespace eval pipe {
 		__gplc_acc_param_v_wr $wdata
 		__gplc_acc_param_v_rd $resp
 		__gplc_acc_param_v_rd $rdata
-		__mlip_pipe_SetPtrs
-		__mlip_pipe_call mcopipeif
+		__mlip_pipe_call mcopipe_export
+	}
+
+	proc copipe_connect {pproc_name mcopipe_name copipe_name} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $pproc_name
+		__gplc_acc_param_string $mcopipe_name
+		__gplc_acc_param_string $copipe_name
+		__mlip_pipe_call copipe_connect
 	}
 
 	proc wrfifoif {wrfifoif_name req ack wdata} {
