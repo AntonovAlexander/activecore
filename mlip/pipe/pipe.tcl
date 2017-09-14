@@ -144,7 +144,7 @@ namespace eval pipe {
 		__mlip_pipe_call pre
 	}
 
-	proc pwe {pipe_signal ext_signal} {
+	proc pwe {ext_signal pipe_signal} {
 		__gplc_acc_param_clr
 		ActiveCore::_accum_param $pipe_signal
 		__mlip_rtl_SetPtrs

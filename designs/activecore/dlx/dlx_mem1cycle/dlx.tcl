@@ -147,6 +147,7 @@ rtl::module dlx
 		pipe::gpvar {31 0} 	regfile			0
 
 		pipe::pstage IFETCH
+			
 			begif [pipe::isactive IDECODE]
 				s= curinstr_addr [pipe::prr IDECODE nextinstr_addr]
 			endif
@@ -156,11 +157,15 @@ rtl::module dlx
 				endif
 			endif
 
-			pipe::pwe 1 instr_mem_req
-			pipe::pwe 0 instr_mem_we
-			pipe::pwe curinstr_addr instr_mem_addr
-			pipe::pwe 0 instr_mem_wdata
-			pipe::pwe 0xf instr_mem_be
+			pipe::pwe instr_mem_req 	1
+			pipe::pwe instr_mem_we 		0
+			pipe::pwe instr_mem_addr 	curinstr_addr
+			pipe::pwe instr_mem_wdata 	0
+			pipe::pwe instr_mem_be 		0xf
+
+			begif [pipe::isstalled IDECODE]
+				pipe::pwe instr_mem_addr [pipe::prr IDECODE curinstr_addr]
+			endif
 
 			s= nextinstr_addr [s+ curinstr_addr 4]
 		
@@ -725,11 +730,11 @@ rtl::module dlx
 		pipe::pstage MEM
 			
 			begif mem_req
-				pipe::pwe 1 data_mem_req
-				pipe::pwe mem_cmd data_mem_we
-				pipe::pwe mem_addr data_mem_addr
-				pipe::pwe mem_wdata data_mem_wdata
-				pipe::pwe 0xf data_mem_be
+				pipe::pwe data_mem_req 		1
+				pipe::pwe data_mem_we 		mem_cmd
+				pipe::pwe data_mem_addr 	mem_addr
+				pipe::pwe data_mem_wdata 	mem_wdata
+				pipe::pwe data_mem_be 		0xf
 			endif
 
 		pipe::pstage WB
