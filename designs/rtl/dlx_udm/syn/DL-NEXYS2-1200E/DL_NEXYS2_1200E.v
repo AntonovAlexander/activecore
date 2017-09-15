@@ -10,6 +10,17 @@ module DL_NEXYS2_1200E
 	output	RsTx
 );
 
+wire clk_generated;
+
+sys_clk sys_clk
+(
+	.CLKIN_IN(clk),
+   .RST_IN(btn[0]),
+   .CLKDV_OUT(),
+   .CLKIN_IBUFG_OUT(),
+   .CLK0_OUT(clk_generated)
+);
+
 dlx_udm
 #(
 	//.mem_data("../../../../activecore/dlx/sw/io_heartbeat/io_heartbeat.hex"),
@@ -17,7 +28,7 @@ dlx_udm
 	.mem_size(1024)
 ) dlx_udm
 (
-	.clk_i(clk),
+	.clk_i(clk_generated),
 	.rst_i(btn[0]),
 	.rx_i(RsRx),
 	.tx_o(RsTx),
