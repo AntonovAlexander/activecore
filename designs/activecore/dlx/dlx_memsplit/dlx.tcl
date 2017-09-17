@@ -178,11 +178,11 @@ rtl::module dlx
 		pipe::pvar {31 0} 	mem_rdata 		0
 		pipe::pvar {0 0} 	mem_rshift		0
 		
-		pipe::gpvar {31 0} 	pc				0
+		pipe::gpvar_sync {31 0} 	pc				0
 		_acc_index {31 0}	
-		pipe::gpvar {31 0} 	regfile			0
-		pipe::gpvar {0 0}	jump_req_cmd	0
-		pipe::gpvar {31 0} 	jump_vector_cmd	0
+		pipe::gpvar_sync {31 0} 	regfile			0
+		pipe::gpvar_sync {0 0}		jump_req_cmd	0
+		pipe::gpvar_sync {31 0} 	jump_vector_cmd	0
 
 		pipe::mcopipeif instr_mem {63 0} {31 0}
 		pipe::mcopipeif data_mem {63 0} {31 0}
@@ -773,8 +773,11 @@ rtl::module dlx
 
 		pipe::pstage MEM
 			
-			begif mem_req
-				pipe::mcopipe_req data_mem mem_cmd [cnct {mem_addr mem_wdata}]
+			begif mem_cmd
+				pipe::mcopipe_wrreq data_mem [cnct {mem_addr mem_wdata}]
+			endif
+			begelse
+				pipe::mcopipe_rdreq data_mem [cnct {mem_addr mem_wdata}]
 			endif
 
 		pipe::pstage WB

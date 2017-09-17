@@ -473,17 +473,23 @@ int GetVarWriteable(std::string op, ac_var** ret_signal)
 	return ret_val;
 }
 
-int AddVarCheckUnique(ac_var* new_var, std::vector<ac_var*> * varlist)
+int VarCheckUnique(ac_var* new_var, std::vector<ac_var*> * varlist)
 {
 	for (unsigned int i = 0; i < varlist->size(); i++)
 	{
-		if ((*varlist)[i]->name == new_var->name)
-		{
-			printf("Failed to deploy var %s: name is previously defined!\n", StringToCharArr(new_var->name));
-			throw 0;
-			return 1;
-		}
+		if ((*varlist)[i]->name == new_var->name) return 1;
 	}
-	(*varlist).push_back(new_var);
 	return 0;
+}
+
+int AddVarCheckUnique(ac_var* new_var, std::vector<ac_var*> * varlist)
+{
+	if (VarCheckUnique(new_var, varlist) != 0) {
+		printf("Failed to deploy var %s: name is previously defined!\n", StringToCharArr(new_var->name));
+		throw 0;
+		return 1;
+	} else {
+		(*varlist).push_back(new_var);
+		return 0;
+	}
 }

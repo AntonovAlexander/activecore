@@ -256,6 +256,7 @@ int SetVarReadable(std::string op, ac_var** ret_signal);
 int SetVarWriteable(std::string op, ac_var** ret_signal);
 int GetVarReadable(std::string op, ac_var** ret_signal);
 int GetVarWriteable(std::string op, ac_var** ret_signal);
+int VarCheckUnique(ac_var* new_var, std::vector<ac_var*> * varlist);
 int AddVarCheckUnique(ac_var* new_var, std::vector<ac_var*> * varlist);
 
 #endif /* AC_CORE_H_ */

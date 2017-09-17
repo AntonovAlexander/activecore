@@ -18,12 +18,6 @@
 
 //// External cmds ////
 // Assignments //
-int expr_assign_cmd_generated(unsigned int * cursor, ac_execode** new_expr, ac_dimensions dimensions, ac_var* target, ac_param param);
-int expr_assign_cmd_generated(ac_execode** new_expr, ac_dimensions dimensions, ac_var* target, ac_param param);
-int expr_assign_cmd_generated(unsigned int * cursor, ac_dimensions dimensions, ac_var* target, ac_param param);
-int expr_assign_cmd_generated(ac_dimensions dimensions, ac_var* target, ac_param param);
-int expr_assign_cmd_generated(unsigned int * cursor, ac_var* target, ac_param param);
-int expr_assign_cmd_generated(ac_var* target, ac_param param);
 int expr_assign_cmd(unsigned int * cursor, ac_dimensions dimensions, ac_var* target, ac_param param);
 int expr_assign_cmd(ac_dimensions dimensions, ac_var* target, ac_param param);
 int expr_assign_cmd(unsigned int * cursor, ac_var* target, ac_param param);

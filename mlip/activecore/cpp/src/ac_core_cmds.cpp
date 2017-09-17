@@ -67,7 +67,7 @@ int expr_assign_cmd(unsigned int * cursor, ac_dimensions dimensions, ac_var* tar
 	if (dimensions.GetDimensionsString(&dimstring) != 0) return 1;
 	if (DEBUG_FLAG == true) printf("expr_assign_var_cmd: dimensions obtained: %s\n", StringToCharArr(dimstring));
 
-	int ret_val;
+	int ret_val = 1;
 
 	unsigned int targetPower;
 	unsigned int targetDePower;
