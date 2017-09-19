@@ -11,6 +11,6 @@ There are two versions of the CPU core: dlx_mem1cycle and dlx_memsplit.
 dlx_mem1cycle is a simplier core that uses strictly 1-cycle memory for instructions and data.
 dlx_memsplit uses split-transfer bus.
 
-Both cores function in hardware (however, exausted testing is in progress).
+Both cores function in hardware (however, exaustive testing is in progress).
 
 Test projects for DLX processor is located at rtl/dlx_udm and rtl/dlx_udm_memsplit. The projects need preliminary build of DLX core using the framework.

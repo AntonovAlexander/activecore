@@ -4,16 +4,24 @@ module dlx_udm
 )
 (
 	input clk_i
-	, input rst_i
+	, input arst_i
 	, input rx_i
 	, output tx_o
 	, input [31:0] gpio_bi
 	, output [31:0] gpio_bo
 );
 
+wire srst;
+reset_cntrl reset_cntrl
+(
+	.clk_i(clk_i),
+	.arst_i(arst_i),
+	.srst_o(srst)
+);
+
 wire udm_reset;
 wire cpu_reset;
-assign cpu_reset = rst_i | udm_reset;
+assign cpu_reset = srst | udm_reset;
 
 // udm bus //
 wire bus_enb;
@@ -89,7 +97,7 @@ assign dlx_data_rdata = port1_rdata;
 udm udm
 (
 	.clk_i(clk_i)
-	, .rst_i(rst_i)
+	, .rst_i(srst)
 	, .rx_i(rx_i)
 	, .tx_o(tx_o)
 	, .rst_o(udm_reset)
@@ -130,7 +138,7 @@ bus_unit
 (
 	
 	.clk_i(clk_i)
-	, .rst_i(rst_i)
+	, .rst_i(srst)
 	
 	, .port0_req(port0_req)
 	, .port0_we(port0_we)

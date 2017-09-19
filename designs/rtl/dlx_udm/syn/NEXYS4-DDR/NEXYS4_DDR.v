@@ -18,7 +18,7 @@ dlx_udm
 ) dlx_udm
 (
 	.clk_i(CLK100MHZ)
-	, .rst_i(!CPU_RESETN)
+	, .arst_i(!CPU_RESETN)
 	, .rx_i(UART_TXD_IN)
 	, .tx_o(UART_RXD_OUT)
 	, .gpio_bi({8'h0, SW, 8'h0})

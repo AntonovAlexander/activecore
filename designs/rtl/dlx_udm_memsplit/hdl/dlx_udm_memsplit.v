@@ -4,16 +4,24 @@ module dlx_udm_memsplit
 )
 (
 	input clk_i
-	, input rst_i
+	, input arst_i
 	, input rx_i
 	, output tx_o
 	, input [31:0] gpio_bi
 	, output [31:0] gpio_bo
 );
 
+wire srst;
+reset_cntrl reset_cntrl
+(
+	.clk_i(clk_i),
+	.arst_i(arst_i),
+	.srst_o(srst)
+);
+
 wire udm_reset;
 wire cpu_reset;
-assign cpu_reset = rst_i | udm_reset;
+assign cpu_reset = srst | udm_reset;
 
 wire [0:0] cpu_instr_req;
 wire [0:0] cpu_instr_we;
@@ -74,7 +82,7 @@ assign cpu_instr_rdata = bu0_rdata;
 reg cpu_rd_inprogress, udm_rd_inprogress;
 always @(posedge clk_i)
 	begin
-	if (rst_i)
+	if (srst)
 		begin
 		cpu_rd_inprogress <= 1'b0;
 		udm_rd_inprogress <= 1'b0;
@@ -139,7 +147,7 @@ always @*
 udm_memsplit udm_memsplit
 (
 	.clk_i(clk_i)
-	, .rst_i(rst_i)
+	, .rst_i(srst)
 
 	, .rx_i(rx_i)
 	, .tx_o(tx_o)
@@ -186,7 +194,7 @@ bus_unit_memsplit
 (
 	
 	.clk_i(clk_i)
-	, .rst_i(rst_i)
+	, .rst_i(srst)
 	
 	, .bus0_req_i(bu0_req)
 	, .bus0_we_i(bu0_we)

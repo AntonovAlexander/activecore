@@ -1,7 +1,8 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/clk_i
-add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/rst_i
+add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/arst_i
+add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/srst
 add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/rx_i
 add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/tx_o
 add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/cpu_reset
@@ -262,7 +263,7 @@ add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -expand -group {DLX data resp bus} -radix hexadecimal /dlx_tb/dlx_udm/dlx_test_wrapper/dlx/data_mcopipe_resp
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -expand -group {DLX data resp bus} -radix hexadecimal /dlx_tb/dlx_udm/dlx_test_wrapper/dlx/data_mcopipe_rdata
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {1956151 ps} 0}
+WaveRestoreCursors {{Cursor 1} {1097218 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 745
 configure wave -valuecolwidth 100

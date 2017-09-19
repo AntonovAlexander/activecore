@@ -29,7 +29,7 @@ dlx_udm
 ) dlx_udm
 (
 	.clk_i(clk_generated),
-	.rst_i(btn[0]),
+	.arst_i(btn[0]),
 	.rx_i(RsRx),
 	.tx_o(RsTx),
 	.gpio_bi({8'h0, sw, 16'h0}),

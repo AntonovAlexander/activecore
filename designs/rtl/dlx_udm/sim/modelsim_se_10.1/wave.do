@@ -1,7 +1,8 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/clk_i
-add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/rst_i
+add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/arst_i
+add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/srst
 add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/rx_i
 add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/tx_o
 add wave -noupdate -radix hexadecimal /dlx_tb/dlx_udm/cpu_reset
@@ -238,7 +239,7 @@ add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_rd_source
 add wave -noupdate -expand -group {DLX instrpipe combs} -expand -group {WB combs} -radix hexadecimal /dlx_tb/dlx_udm/dlx/genpproc_instrpipe_genpstage_WB_mem_req
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {916605660 ps} 0}
+WaveRestoreCursors {{Cursor 1} {1383284782 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 745
 configure wave -valuecolwidth 100
@@ -254,4 +255,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {2467416280 ps}
+WaveRestoreZoom {0 ps} {4934832560 ps}

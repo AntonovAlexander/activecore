@@ -68,7 +68,7 @@ dlx_udm
 ) dlx_udm
 (
 	.clk_i(CLK_50MHZ)
-	, .rst_i(RST)
+	, .arst_i(RST)
 	, .rx_i(rx)
 	//, .tx_o()
 	, .gpio_bi(SW)
