@@ -144,7 +144,7 @@ rtl::module dlx
 		pipe::pvar {0 0} 	mem_rshift		0
 
 		_acc_index {31 0}
-		pipe::gpvar {31 0} 	regfile			0
+		pipe::gpvar_sync {31 0} 	regfile			0
 
 		pipe::pstage IFETCH
 			
