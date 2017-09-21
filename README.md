@@ -13,4 +13,6 @@ dlx_memsplit uses split-transfer bus.
 
 Both cores function in hardware (however, exaustive testing is in progress).
 
+At the moment, I use Eclipse IDE to build the C++ shared library. Shell-based build flow will be provided later.
+
 Test projects for DLX processor is located at rtl/dlx_udm and rtl/dlx_udm_memsplit. The projects need preliminary build of DLX core using the framework.
