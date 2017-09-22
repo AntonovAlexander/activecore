@@ -107,7 +107,9 @@ int expr_initval_cmd_string(std::string width, std::string * respvarname, std::s
 	int conv_val = conv_string_to_int(width);
 
 	ac_var * resp_var;
-	int ret_stat = expr_initval_cmd(conv_val, &resp_var, value);
+
+	int ret_stat = 0;
+	//int ret_stat = expr_initval_cmd(conv_val, &resp_var, value);
 
 	if (cproc_gen == true) rtl::endcproc_cmd();
 

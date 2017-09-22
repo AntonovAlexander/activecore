@@ -398,13 +398,18 @@ void ac_execode::AddWrVarWithStack(ac_var* new_op)
 	}
 }
 
-void ac_execode::AddGenVarWithStack(ac_var* new_op)
+void AddGenVarToStack(ac_var* new_op)
 {
-	AddGenVar(new_op);
 	for (unsigned int i = 0; i < ExeStack.size(); i++)
 	{
 		ExeStack[i]->AddGenVar(new_op);
 	}
+}
+
+void ac_execode::AddGenVarWithStack(ac_var* new_op)
+{
+	AddGenVar(new_op);
+	AddGenVarToStack(new_op);
 }
 
 void ac_execode::AddRdParamWithStack(ac_param new_param)

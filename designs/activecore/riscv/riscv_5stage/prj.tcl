@@ -7,7 +7,7 @@ source [file join $MLIP_PATH activecore activecore.tcl]
 #ActiveCore::debug_set
 ActiveCore_Reset
 
-source dlx.tcl
+source riscv.tcl
 
 set filename riscv.v
 

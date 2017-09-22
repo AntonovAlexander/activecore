@@ -7,6 +7,7 @@
  */
 
 #include "ac_utils.hpp"
+#include "ac_core_cmds.hpp"
 #include "ac_core_cmds_tcl.hpp"
 #include "ac_core.hpp"
 #include "ac_core_cmds_string.hpp"
@@ -324,6 +325,39 @@ int TCL_expr_op_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj
 	return TCL_OK;
 }
 
+int TCL_expr_initval_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
+{
+	if (DEBUG_FLAG == true) printf("initval command!\n");
+	if (objc != 1)
+	{
+		printf("Incorrect command!\n");
+		return TCL_ERROR;
+	}
+
+	ac_dimensions_static new_dimensions;
+	for (unsigned int i = 0; i < DimensionsAccumulator.size(); i++)
+	{
+		if (DimensionsAccumulator[i].type != DimType_CC)
+		{
+			printf("Range arguments are incorrect!\n");
+			return TCL_ERROR;
+		}
+		new_dimensions.push_back(*(new dimension_range_static(DimensionsAccumulator[i].msb_int, DimensionsAccumulator[i].lsb_int)));
+	}
+
+	if (ParamAccumulator.size() != 1)
+	{
+		printf("Params are incorrect!\n");
+		return TCL_ERROR;
+	}
+
+	ac_var * genvar;
+	if (expr_initval_cmd(&genvar, new_dimensions, ParamAccumulator[0]) != 0) return TCL_ERROR;
+	Tcl_SetResult(interp, StringToCharArr(genvar->name), TCL_VOLATILE);
+	ParamAccumulator.clear();
+	return TCL_OK;
+}
+
 int TCL_expr_zeroext_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
 {
 	if (DEBUG_FLAG == true) printf("zeroext command!\n");
@@ -458,6 +492,7 @@ int TCL_core_InitCmds(Tcl_Interp *interp)
 	Tcl_CreateObjCommand(interp, "__gplc_acc_range_vv", TCL_accum_range_vv_cmd, NULL, NULL);
 
 	Tcl_CreateObjCommand(interp, "__gplc_assign", TCL_expr_assign_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_initval", TCL_expr_initval_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_op", TCL_expr_op_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_zeroext", TCL_expr_zeroext_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_signext", TCL_expr_signext_cmd, NULL, NULL);

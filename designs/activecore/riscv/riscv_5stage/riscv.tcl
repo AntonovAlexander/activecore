@@ -5,22 +5,22 @@ namespace eval riscv {
 
 	# base opcodes
 	set opcode_LOAD			0x03
-	set opcode_LOAD-FP		0x07
-	set opcode_MISC-MEM		0x0f
-	set opcode_OP-IMM		0x13
+	set opcode_LOAD_FP		0x07
+	set opcode_MISC_MEM		0x0f
+	set opcode_OP_IMM		0x13
 	set opcode_AUIPC		0x17
-	set opcode_OP-IMM-32	0x1b
+	set opcode_OP_IMM_32	0x1b
 	set opcode_STORE		0x23
-	set opcode_STORE-FP		0x27
+	set opcode_STORE_FP		0x27
 	set opcode_AMO			0x2f
 	set opcode_OP			0x33
 	set opcode_LUI			0x37
-	set opcode_OP-32		0x3b
+	set opcode_OP_32		0x3b
 	set opcode_MADD			0x43
 	set opcode_MSUB			0x47
 	set opcode_NMSUB		0x4b
 	set opcode_NMADD		0x4f
-	set opcode_OP-FP		0x53
+	set opcode_OP_FP		0x53
 	set opcode_BRANCH		0x63
 	set opcode_JALR			0x67
 	set opcode_JAL			0x6f
@@ -91,7 +91,7 @@ rtl::module riscv
 	rtl::comb 	{0 0} 	data_mcopipe_req		0
 	rtl::comb 	{0 0} 	data_mcopipe_we		0
 	rtl::comb 	{0 0} 	data_mcopipe_ack		0
-	rtl::comb 	{63 0} 	data_mcopipe_wdata	0
+	rtl::comb 	{67 0} 	data_mcopipe_wdata	0
 	rtl::comb	{0 0}	data_mcopipe_resp	0
 	rtl::comb 	{31 0}	data_mcopipe_rdata	0
 
@@ -107,9 +107,9 @@ rtl::module riscv
 	s= data_mem_req data_mcopipe_req
 	s= data_mem_we data_mcopipe_we
 	s= data_mcopipe_ack data_mem_ack
-	s= data_mem_addr [indexed data_mcopipe_wdata {63 32}]
+	s= data_mem_addr [indexed data_mcopipe_wdata {67 36}]
+	s= data_mem_be [indexed data_mcopipe_wdata {35 32}]
 	s= data_mem_wdata [indexed data_mcopipe_wdata {31 0}]
-	s= data_mem_be 0xf
 	s= data_mcopipe_resp data_mem_resp
 	s= data_mcopipe_rdata data_mem_rdata
 
@@ -122,12 +122,12 @@ rtl::module riscv
 		pipe::pvar {31 0} 	instr_code		0
 
 		# opcode signals
-		pipe::pvar {6 0}	opcode 			$dlx::ALU_ADD
+		pipe::pvar {6 0}	opcode 			$riscv::aluop_ADD
 
 		# control transfer signlas
 		pipe::pvar {0 0} 	jump_req		0
 		pipe::pvar {0 0} 	jump_req_cond	0
-		pipe::pvar {0 0}	jump_src		$dlx::JMP_SRC_OP1
+		pipe::pvar {0 0}	jump_src		$riscv::JMP_SRC_OP1
 		pipe::pvar {31 0} 	jump_vector		0
 
 		# regfile control signals
@@ -159,9 +159,9 @@ rtl::module riscv
 
 		pipe::pvar {0 0}	csrreq			0
 
-		pipe::pvar {0 0}	op1_source		$dlx::OP1_SRC_REG
-		pipe::pvar {0 0}	op2_source		$dlx::OP2_SRC_REG
-		pipe::pvar {2 0} 	rd_source		$dlx::RD_ALU_RES
+		pipe::pvar {0 0}	op1_source		$riscv::OP1_SRC_REG
+		pipe::pvar {0 0}	op2_source		$riscv::OP2_SRC_REG
+		pipe::pvar {2 0} 	rd_source		$riscv::RD_ALU
 
 		# ALU control
 		pipe::pvar {0 0} 	alu_req			0
@@ -171,6 +171,7 @@ rtl::module riscv
 		pipe::pvar {32 0}	alu_op2_wide	0
 		pipe::pvar {2 0}	alu_opcode		0
 		pipe::pvar {0 0} 	alu_signed		0
+		pipe::pvar {0 0} 	alu_arlog		0
 		pipe::pvar {32 0}	alu_result_wide 0
 		pipe::pvar {31 0}	alu_result 		0
 		pipe::pvar {0 0} 	alu_CF			0
@@ -182,6 +183,7 @@ rtl::module riscv
 		pipe::pvar {0 0} 	mem_req 		0
 		pipe::pvar {0 0} 	mem_cmd			0
 		pipe::pvar {31 0} 	mem_addr		0
+		pipe::pvar {3 0}	mem_be 			0
 		pipe::pvar {31 0}	mem_wdata		0
 		pipe::pvar {31 0} 	mem_rdata 		0
 		pipe::pvar {0 0} 	mem_rshift		0
@@ -193,7 +195,8 @@ rtl::module riscv
 		pipe::gpvar_sync {31 0} 	jump_vector_cmd	0
 
 		pipe::mcopipeif instr_mem {63 0} {31 0}
-		pipe::mcopipeif data_mem {63 0} {31 0}
+		pipe::mcopipeif data_mem {67 0} {31 0}
+
 
 		pipe::pstage IFETCH
 			
@@ -209,7 +212,7 @@ rtl::module riscv
 			s= nextinstr_addr [s+ curinstr_addr 4]
 
 			s= pc nextinstr_addr
-		
+
 		pipe::pstage IDECODE
 
 			s= instr_code [pipe::mcopipe_resp instr_mem]
@@ -220,25 +223,34 @@ rtl::module riscv
 			s= rs2_addr [indexed instr_code {24 20}]
 			s= rd_addr  [indexed instr_code {11 7}]
 
-			immediate_I		indexed instr_code {31 20}
-			immediate_S		[cnct {	[indexed instr_code {31 25}] \
-									[indexed instr_code {11 7}] \
-								}]
-			immediate_B		[cnct {	[indexed instr_code 31] \
-									[indexed instr_code 7] \
-									[indexed instr_code {30 25}] \
-									[indexed instr_code {11 8}] \
-									[initval {0 0} 0] \
-								}]
-			immediate_U		[cnct {	[indexed instr_code {31 12}] \
-									[initval {11 0} 0] \
-								}]
-			immediate_J		[cnct {	[indexed instr_code 31] \
-									[indexed instr_code {19 12}] \
-									[indexed instr_code 20] \
-									[indexed instr_code {30 21}] \
-									[initval {0 0} 0] \
-								}]
+			s= funct3	[indexed instr_code {14 12}]
+			s= funct7	[indexed instr_code {31 25}]
+			s= shamt 	[indexed instr_code {24 20}]
+			s= pred 	[indexed instr_code {27 24}]
+			s= succ		[indexed instr_code {23 20}]
+			s= csr 		[indexed instr_code {31 20}]
+			s= zimm		[indexed instr_code {19 15}]
+			s= alu_arlog [indexed instr_code 30]
+
+			s= immediate_I	[indexed instr_code {31 20}]
+			s= immediate_S	[cnct [list	[indexed instr_code {31 25}] \
+										[indexed instr_code {11 7}] \
+								]]
+			s= immediate_B	[cnct [list	[indexed instr_code 31] \
+										[indexed instr_code 7] \
+										[indexed instr_code {30 25}] \
+										[indexed instr_code {11 8}] \
+										[initval {0 0} 0] \
+								]]
+			s= immediate_U	[cnct [list	[indexed instr_code {31 12}] \
+										[initval {11 0} 0] \
+								]]
+			s= immediate_J	[cnct [list	[indexed instr_code 31] \
+										[indexed instr_code {19 12}] \
+										[indexed instr_code 20] \
+										[indexed instr_code {30 21}] \
+										[initval {0 0} 0] \
+								]]
 
 			begif [s== opcode $riscv::opcode_LUI]
 				s= rd_req 		1
@@ -250,7 +262,7 @@ rtl::module riscv
 				s= op1_source	$riscv::OP1_SRC_PC
 				s= op2_source	$riscv::OP2_SRC_IMM
 				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_ADD
+				s= alu_opcode 	$riscv::aluop_ADD
 				s= rd_req		1
 				s= rd_source	$riscv::RD_ALU
 
@@ -258,10 +270,10 @@ rtl::module riscv
 			endif
 
 			begif [s== opcode $riscv::opcode_JAL]
-				s= op1_source 	$dlx::OP1_SRC_PC
-				s= op2_source 	$dlx::OP2_SRC_IMM
+				s= op1_source 	$riscv::OP1_SRC_PC
+				s= op2_source 	$riscv::OP2_SRC_IMM
 				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_ADD
+				s= alu_opcode 	$riscv::aluop_ADD
 				s= rd_req		1
 				s= rd_source	$riscv::RD_PC_INC
 				s= jump_req 	1
@@ -271,10 +283,10 @@ rtl::module riscv
 
 			begif [s== opcode $riscv::opcode_JALR]
 				s= rs1_req		1
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
+				s= op1_source 	$riscv::OP1_SRC_REG
+				s= op2_source 	$riscv::OP2_SRC_IMM
 				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_ADD
+				s= alu_opcode 	$riscv::aluop_ADD
 				s= rd_req		1
 				s= rd_source	$riscv::RD_PC_INC
 				s= jump_req 	1
@@ -286,392 +298,96 @@ rtl::module riscv
 				s= rs1_req		1
 				s= rs2_req		1
 				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SUB
+				s= alu_opcode 	$riscv::aluop_SUB
 				s= jump_req_cond 1
 				s= jump_src		$riscv::JMP_SRC_ALU
 				s= immediate immediate_B
 
-				begif [s|| [s== funct3 0x4] [s== funct3 5]
+				begif [s|| [s== funct3 0x4] [s== funct3 5]]
 					s= alu_signed 1
 				endif
 
 			endif
 
-
-
-
-
-
-			begif [s== opcode $dlx::opcode_ADD]
+			begif [s== opcode $riscv::opcode_LOAD]
 				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		1
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_ADD
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
-			endif
-
-			begif [s== opcode $dlx::opcode_ADDI]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_ADD
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_AND]
-				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		1
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_AND
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
-			endif
-
-			begif [s== opcode $dlx::opcode_ANDI]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_AND
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_BEQZ]
-				s= jump_req 		1
-				s= jump_cond 		1
-				s= jump_cond_eqz 	1
-				s= jump_src			$dlx::JMP_SRC_ALU
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		0
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_ADD
-				s= op1_source 	$dlx::OP1_SRC_PC
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_BNEZ]
-				s= jump_req 		1
-				s= jump_cond 		1
-				s= jump_cond_eqz 	0
-				s= jump_src			$dlx::JMP_SRC_ALU
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		0
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_ADD
-				s= op1_source 	$dlx::OP1_SRC_PC
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_J]
-				s= jump_req 	1
-				s= jump_src		$dlx::JMP_SRC_ALU
-				s= rs2_req 		0
-				s= rd_req 		0
-				s= rd_source	$dlx::RD_PC_INC
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_ADD
-				s= op1_source 	$dlx::OP1_SRC_PC
-				s= op2_source 	$dlx::OP2_SRC_IMM
-				s= immediate [signext [indexed instr_code {25 0}] 32]
-			endif
-
-			begif [s== opcode $dlx::opcode_JAL]
-				s= jump_req 	1
-				s= jump_src		$dlx::JMP_SRC_ALU
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_source 	$dlx::RD_PC_INC
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_ADD
-				s= op1_source 	$dlx::OP1_SRC_PC
-				s= op2_source 	$dlx::OP2_SRC_IMM
-				s= rd_addr 31
-				s= immediate [signext [indexed instr_code {25 0}] 32]
-			endif
-
-			begif [s== opcode $dlx::opcode_JALR]
-				s= jump_req 		1
-				s= jump_src			$dlx::JMP_SRC_OP1
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_source 	$dlx::RD_PC_INC
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		0
-				s= rd_addr 31
-			endif
-
-			begif [s== opcode $dlx::opcode_JR]
-				s= jump_req 		1
-				s= jump_src			$dlx::JMP_SRC_OP1
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		0
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		0
-			endif
-
-			begif [s== opcode $dlx::opcode_LHI]
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_source 	$dlx::RD_LHI
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		0
-			endif
-
-			begif [s== opcode $dlx::opcode_LW]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_source 	$dlx::RD_MEM
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_ADD
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
+				s= op1_source 	$riscv::OP1_SRC_REG
+				s= op2_source 	$riscv::OP2_SRC_IMM
+				s= rd_req		1
+				s= rd_source	$riscv::RD_MEM
 				s= mem_req 		1
-				s= mem_cmd 		0
+				s= mem_cmd		0
+
+				begif [s|| [s== funct3 0x0] [s== funct3 0x4] ]
+					s= mem_be 0x1
+				endif
+				begif [s|| [s== funct3 0x1] [s== funct3 0x5] ]
+					s= mem_be 0x3
+				endif
+				begif [s== funct3 0x2]
+					s= mem_be 0xf
+				endif
+
+				s= immediate immediate_I
 			endif
 
-			begif [s== opcode $dlx::opcode_OR]
+			begif [s== opcode $riscv::opcode_STORE]
 				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		1
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_OR
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
-			endif
-
-			begif [s== opcode $dlx::opcode_ORI]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_OR
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_SEQ]
-				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		1
-				s= rd_source 	$dlx::RD_ZF_COND
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SUB
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
-			endif
-
-			begif [s== opcode $dlx::opcode_SEQI]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_source 	$dlx::RD_ZF_COND
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SUB
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_SLE]
-				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		1
-				s= rd_source 	$dlx::RD_CF_COND
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SUB
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
-			endif
-
-			begif [s== opcode $dlx::opcode_SLEI]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_source 	$dlx::RD_CF_COND
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SUB
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_SLL]
-				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		1
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SLL
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
-			endif
-
-			begif [s== opcode $dlx::opcode_SLLI]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SLL
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_SLT]
-				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		1
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SUB
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
-			endif
-
-			begif [s== opcode $dlx::opcode_SLTI]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SUB
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_SNE]
-				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		1
-				s= rd_source 	$dlx::RD_nZF_COND
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SUB
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
-			endif
-
-			begif [s== opcode $dlx::opcode_SNEI]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_source 	$dlx::RD_nZF_COND
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SUB
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_SRA]
-				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		1
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SRA
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
-			endif
-
-			begif [s== opcode $dlx::opcode_SRAI]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SRA
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_SRL]
-				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		1
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SRL
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
-			endif
-
-			begif [s== opcode $dlx::opcode_SRLI]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SRL
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_SUB]
-				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		1
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SUB
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
-			endif
-
-			begif [s== opcode $dlx::opcode_SUBI]
-				s= rs1_req 		1
-				s= rs2_req 		0
-				s= rd_req 		1
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_SUB
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
-			endif
-
-			begif [s== opcode $dlx::opcode_SW]
-				s= rs1_req 		1
-				s= rs2_req 		1
-				s= rd_req 		0
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_ADD
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
+				s= op1_source 	$riscv::OP1_SRC_REG
+				s= op2_source 	$riscv::OP2_SRC_IMM
+				s= rd_req		1
+				s= rd_source	$riscv::RD_MEM
 				s= mem_req 		1
-				s= mem_cmd 		1
+				s= mem_cmd		1
+
+				begif [s== funct3 0x0]
+					s= mem_be 0x1
+				endif
+
+				begif [s== funct3 0x1]
+					s= mem_be 0x3
+				endif
+
+				begif [s== funct3 0x2]
+					s= mem_be 0xf
+				endif
+
+				s= immediate immediate_S
 			endif
 
-			begif [s== opcode $dlx::opcode_XOR]
+			begif [s== opcode $riscv::opcode_OP_IMM]
 				s= rs1_req 		1
-				s= rs2_req 		1
+				s= op1_source 	$riscv::OP1_SRC_REG
+				s= op2_source 	$riscv::OP2_SRC_IMM
 				s= rd_req 		1
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_XOR
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_REG
+				s= rd_source 	$riscv::RD_ALU
+
+				s= immediate 	immediate_I
+				begif [s== funct3 0x1]
+					s= immediate [indexed instr_code {24 20}]
+				endif
+				begif [s== funct3 0x5]
+					s= immediate [indexed instr_code {24 20}]
+				endif
+				
 			endif
 
-			begif [s== opcode $dlx::opcode_XORI]
+			begif [s== opcode $riscv::opcode_OP]
 				s= rs1_req 		1
-				s= rs2_req 		0
+				s= op1_source 	$riscv::OP1_SRC_REG
+				s= op2_source 	$riscv::OP2_SRC_REG
 				s= rd_req 		1
-				s= rd_addr  [indexed instr_code {20 16}]
-				s= alu_req		1
-				s= alu_opcode 	$dlx::ALU_XOR
-				s= op1_source 	$dlx::OP1_SRC_REG
-				s= op2_source 	$dlx::OP2_SRC_IMM
+				s= rd_source 	$riscv::RD_ALU
 			endif
+
+			begif [s== opcode $riscv::opcode_MISC_MEM]
+				# TODO: FENCE, FENCE.I
+			endif
+
+			begif [s== opcode $riscv::opcode_SYSTEM]
+				# TODO: ECALL, EBREAK, CSRx
+			endif
+
 
 			#### data fetching - reading regfile ##
 			
@@ -750,68 +466,68 @@ rtl::module riscv
 
 			## ALU processing ##
 			# acquiring data
-			begif [s== op1_source $dlx::OP1_SRC_REG]
+			begif [s== op1_source $riscv::OP1_SRC_REG]
 				s= alu_op1 rs1_rdata
 			endif
 
-			begif [s== op1_source $dlx::OP1_SRC_PC]
+			begif [s== op1_source $riscv::OP1_SRC_PC]
 				s= alu_op1 nextinstr_addr
 			endif
 
-			begif [s== op2_source $dlx::OP2_SRC_REG]
+			begif [s== op2_source $riscv::OP2_SRC_REG]
 				s= alu_op2 rs2_rdata
 			endif
 
-			begif [s== op2_source $dlx::OP2_SRC_IMM]
+			begif [s== op2_source $riscv::OP2_SRC_IMM]
 				s= alu_op2 immediate
 			endif
 
 			# acquiring wide operandes
 			begif alu_signed
-				s= alu_op1_wide [cnct [indexed alu_op1 31] alu_op1]
-				s= alu_op2_wide [cnct [indexed alu_op2 31] alu_op2]
+				s= alu_op1_wide [cnct [list [indexed alu_op1 31] alu_op1]]
+				s= alu_op2_wide [cnct [list [indexed alu_op2 31] alu_op2]]
 			endif
 			begelse
-				s= alu_op1_wide [cnct [initval 1 0] alu_op1]
-				s= alu_op2_wide [cnct [initval 1 0] alu_op2]
+				s= alu_op1_wide [cnct [list [initval {0 0} 0] alu_op1]]
+				s= alu_op2_wide [cnct [list [initval {0 0} 0] alu_op2]]
 			endif
 
 			# computing
-			begif [s== alu_opcode $dlx::ALU_ADD]
+			begif [s== alu_opcode $riscv::aluop_ADD]
 				s= alu_result_wide [s+ alu_op1_wide alu_op2_wide]
 			endif
 
-			begif [s== alu_opcode $dlx::ALU_SUB]
+			begif [s== alu_opcode $riscv::aluop_SUB]
 				s= alu_result_wide [s- alu_op1_wide alu_op2_wide]
 			endif
 
-			begif [s== alu_opcode $dlx::ALU_AND]
+			begif [s== alu_opcode $riscv::aluop_AND]
 				s= alu_result_wide [s& alu_op1 alu_op2]
 			endif
 
-			begif [s== alu_opcode $dlx::ALU_OR]
+			begif [s== alu_opcode $riscv::aluop_OR]
 				s= alu_result_wide [s| alu_op1 alu_op2]
 			endif
 
-			begif [s== alu_opcode $dlx::ALU_XOR]
+			begif [s== alu_opcode $riscv::aluop_XOR]
 				s= alu_result_wide [s^ alu_op1 alu_op2]
 			endif
 
-			begif [s== alu_opcode $dlx::ALU_SRL]
+			begif [s== alu_opcode $riscv::aluop_SRL]
 				s= alu_result_wide [s>> alu_op1 alu_op2]
 			endif
 
-			begif [s== alu_opcode $dlx::ALU_SRA]
+			begif [s== alu_opcode $riscv::aluop_SRA]
 				s= alu_result_wide [s>>> alu_op1 alu_op2]
 			endif
 
-			begif [s== alu_opcode $dlx::ALU_SLL]
+			begif [s== alu_opcode $riscv::aluop_SLL]
 				s= alu_result_wide [s<< alu_op1 alu_op2]
 			endif
 
 			s= alu_result [indexed alu_result_wide {31 0}]
-			s= alu_CF [indexed alu_result_wide {32}]
-			s= alu_SF [indexed alu_result_wide {31}]
+			s= alu_CF [indexed alu_result_wide 32]
+			s= alu_SF [indexed alu_result_wide 31]
 			begif [s== alu_result_wide 0]
 				s= alu_ZF 1
 			endif
@@ -821,38 +537,38 @@ rtl::module riscv
 			endif
 
 			# rd wdata processing
-			begif [s== rd_source $dlx::RD_ALU_RES]
+			begif [s== rd_source $riscv::RD_ALU]
 				s= rd_wdata alu_result
 			endif
 
-			begif [s== rd_source $dlx::RD_PC_INC]
+			begif [s== rd_source $riscv::RD_PC_INC]
 				s= rd_wdata nextinstr_addr
 			endif
 
-			begif [s== rd_source $dlx::RD_LHI]
+			begif [s== rd_source $riscv::RD_LUI]
 				s= rd_wdata [s<< immediate 16]
 			endif
 
-			begif [s== rd_source $dlx::RD_ZF_COND]
+			begif [s== rd_source $riscv::RD_ZF_COND]
 				s= rd_wdata alu_ZF
 			endif
 
-			begif [s== rd_source $dlx::RD_nZF_COND]
+			begif [s== rd_source $riscv::RD_nZF_COND]
 				s= rd_wdata [s! alu_ZF]
 			endif
 
-			begif [s== rd_source $dlx::RD_CF_COND]
+			begif [s== rd_source $riscv::RD_CF_COND]
 				s= rd_wdata alu_CF
 			endif
 
 
 			## jump vector processing
 
-			begif [s== jump_src $dlx::JMP_SRC_OP1]
+			begif [s== jump_src $riscv::JMP_SRC_OP1]
 				s= jump_vector alu_op1
 			endif
 
-			begif [s== jump_src $dlx::JMP_SRC_ALU]
+			begif [s== jump_src $riscv::JMP_SRC_ALU]
 				s= jump_vector alu_result
 			endif
 
@@ -925,10 +641,10 @@ rtl::module riscv
 		pipe::pstage MEM
 			
 			begif mem_cmd
-				pipe::mcopipe_wrreq data_mem [cnct {mem_addr mem_wdata}]
+				pipe::mcopipe_wrreq data_mem [cnct {mem_addr mem_be mem_wdata}]
 			endif
 			begelse
-				pipe::mcopipe_rdreq data_mem [cnct {mem_addr mem_wdata}]
+				pipe::mcopipe_rdreq data_mem [cnct {mem_addr mem_be mem_wdata}]
 			endif
 
 		pipe::pstage WB
@@ -939,7 +655,7 @@ rtl::module riscv
 				endif
 			endif
 
-			begif [s== rd_source $dlx::RD_MEM]
+			begif [s== rd_source $riscv::RD_MEM]
 				s= rd_wdata mem_rdata
 			endif
 
@@ -952,7 +668,7 @@ rtl::module riscv
 
 
 	pipe::copipeif instr_mem {63 0} {31 0}
-	pipe::copipeif data_mem {63 0} {31 0}
+	pipe::copipeif data_mem {67 0} {31 0}
 
 	pipe::mcopipe_connect instrpipe instr_mem instr_mem
 	pipe::mcopipe_connect instrpipe data_mem data_mem

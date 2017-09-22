@@ -37,7 +37,7 @@ int expr_zeroext_cmd(unsigned int * cursor, unsigned int target_width, ac_var** 
 int expr_zeroext_cmd(unsigned int target_width, ac_var** respvar, ac_param param);
 int expr_signext_cmd(unsigned int * cursor, unsigned int target_width, ac_var** respvar, ac_param param);
 int expr_signext_cmd(unsigned int target_width, ac_var** respvar, ac_param param);
-int expr_initval_cmd(unsigned int width, ac_var** respvar, std::string value);
+int expr_initval_cmd(ac_var** respvar, ac_dimensions_static dimensions, ac_param param);
 
 int expr_begif_cmd(ac_var* cond_op);
 int expr_begifnot_cmd(ac_var* cond_op);

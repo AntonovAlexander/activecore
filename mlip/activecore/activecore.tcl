@@ -116,6 +116,12 @@ proc _acc_index {index} {
 	}
 }
 
+proc initval {dimensions value} {
+	_acc_index $dimensions
+	ActiveCore::_accum_param $value
+	__gplc_initval
+}
+
 proc s= {target source} {
 	if {[ActiveCore::isnumeric $target] == 1} {
 		ActiveCore::ERROR Target\ $target\ is\ numeric!

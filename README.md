@@ -9,7 +9,8 @@ MLIP-based codes for DLX CPU core are located at activecore/dlx.
 There are two versions of the CPU core: dlx_mem1cycle and dlx_memsplit.
 
 dlx_mem1cycle is a simplier core that uses strictly 1-cycle memory for instructions and data.
-dlx_memsplit uses split-transfer bus.
+
+dlx_memsplit uses split-transfer bus and the new "mcopipe" interaction/synchronization primitive.
 
 Both cores function in hardware (however, exaustive testing is in progress).
 

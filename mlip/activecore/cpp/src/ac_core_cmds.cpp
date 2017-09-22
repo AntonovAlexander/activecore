@@ -551,16 +551,12 @@ int expr_signext_cmd(unsigned int target_width, ac_var** respvar, ac_param param
 	return expr_signext_cmd(&cursor, target_width, respvar, param);
 }
 
-int expr_initval_cmd(unsigned int width, ac_var** respvar, std::string value)
+int expr_initval_cmd(ac_var** respvar, ac_dimensions_static dimensions, ac_param param)
 {
-	ac_dimensions_static new_dimension;
-	dimension_range_static new_range(width-1, 0);
-	new_dimension.push_back(new_range);
+	ac_var* gen_var = new ac_var(DEFAULT_TYPEVAR, GetGenName("var"), dimensions, "0");
+	AddGenVarToStack(gen_var);
 
-	ac_var* gen_var = new ac_var(DEFAULT_TYPEVAR, GetGenName("var"), new_dimension, "0");
-
-	ac_execode* new_expr = new ac_execode("initval");
-	// TODO: initval command
+	if (expr_assign_cmd(gen_var, param) != 0) return 1;
 	*respvar = gen_var;
 	return 0;
 }
