@@ -217,7 +217,9 @@ namespace eval pipe {
 		mcopipe_req $mcopipeif_name 0 $param
 	}
 
-	proc mcopipe_resp {mcopipeif_name} {
+	proc mcopipe_resp {mcopipeif_name target} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_v_wr $target
 		__mlip_pipe_mcopipe_resp $mcopipeif_name
 	}
 

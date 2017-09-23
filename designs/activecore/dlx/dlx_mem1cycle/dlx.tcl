@@ -6,12 +6,12 @@ namespace eval dlx {
 	# opcodes
 	set ALU_ADD		0
 	set ALU_SUB		1
-	set ALU_AND		3
-	set ALU_OR		4
-	set ALU_SRA		5
-	set ALU_SLL		6
-	set ALU_SRL		7
-	set ALU_XOR		8
+	set ALU_AND		2
+	set ALU_OR		3
+	set ALU_SRA		4
+	set ALU_SLL		5
+	set ALU_SRL		6
+	set ALU_XOR		7
 
 	# op1 sources
 	set OP1_SRC_REG 0

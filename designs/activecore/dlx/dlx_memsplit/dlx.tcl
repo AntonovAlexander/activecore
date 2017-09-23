@@ -6,12 +6,12 @@ namespace eval dlx {
 	# opcodes
 	set ALU_ADD		0
 	set ALU_SUB		1
-	set ALU_AND		3
-	set ALU_OR		4
-	set ALU_SRA		5
-	set ALU_SLL		6
-	set ALU_SRL		7
-	set ALU_XOR		8
+	set ALU_AND		2
+	set ALU_OR		3
+	set ALU_SRA		4
+	set ALU_SLL		5
+	set ALU_SRL		6
+	set ALU_XOR		7
 
 	# op1 sources
 	set OP1_SRC_REG 0
@@ -204,7 +204,7 @@ rtl::module dlx
 		
 		pipe::pstage IDECODE
 
-			s= instr_code [pipe::mcopipe_resp instr_mem]
+			pipe::mcopipe_resp instr_mem instr_code
 
 			s= opcode [indexed instr_code {31 26}]
 			begif [s== opcode 0]
@@ -784,7 +784,7 @@ rtl::module dlx
 			
 			begif mem_req
 				begif [s! mem_cmd]
-					s= mem_rdata [pipe::mcopipe_resp data_mem]
+					pipe::mcopipe_resp data_mem mem_rdata
 				endif
 			endif
 
