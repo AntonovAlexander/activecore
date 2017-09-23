@@ -189,6 +189,7 @@ rtl::module riscv
 		pipe::pvar {0 0} 	alu_SF			0
 		pipe::pvar {0 0} 	alu_ZF			0
 		pipe::pvar {0 0} 	alu_OF			0
+		pipe::pvar {0 0} 	alu_overflow	0
 
 		# data memory control
 		pipe::pvar {0 0} 	mem_req 		0
@@ -715,7 +716,7 @@ rtl::module riscv
 
 			begif alu_req
 
-				# computing
+				# computing result
 				begif [s== alu_opcode $riscv::aluop_ADD]
 					s= alu_result_wide [s+ alu_op1_wide alu_op2_wide]
 				endif
@@ -752,18 +753,29 @@ rtl::module riscv
 					s= alu_result_wide [s& alu_op1 [s~ alu_op2]]
 				endif
 
+				# formation of result and flags
+				s= alu_result [indexed alu_result_wide {31 0}]
+				
+				s= alu_CF [indexed alu_result_wide 32]
+				
+				s= alu_SF [indexed alu_result_wide 31]
+				begif [s== alu_result_wide 0]
+					s= alu_ZF 1
+				endif
+				
+				begif [s|| [s== [indexed alu_result_wide {32 31}] 0x2] [s== [indexed alu_result_wide {32 31}] 0x1]]
+					s= alu_OF 1
+				endif
+
+				begif alu_unsigned
+					s= alu_overflow alu_CF
+				endif
+				begelse
+					s= alu_overflow alu_OF
+				endif
+
 			endif
 
-			s= alu_result [indexed alu_result_wide {31 0}]
-			s= alu_CF [indexed alu_result_wide 32]
-			s= alu_SF [indexed alu_result_wide 31]
-			begif [s== alu_result_wide 0]
-				s= alu_ZF 1
-			endif
-			
-			begif [s|| [s== [indexed alu_result_wide {32 31}] 0x2] [s== [indexed alu_result_wide {32 31}] 0x1]]
-				s= alu_OF 1
-			endif
 
 			# rd wdata processing
 			begif [s== rd_source $riscv::RD_LUI]
@@ -824,33 +836,17 @@ rtl::module riscv
 					endif
 				endif
 
-				# BLT
-				begif [s== funct3 0x4]
-					begif alu_OF
-						s= jump_req 1
-						s= jump_vector [s+ nextinstr_addr immediate]
-					endif
-				endif
-
-				# BGE
-				begif [s== funct3 0x5]
-					begif [s! alu_OF]
-						s= jump_req 1
-						s= jump_vector [s+ nextinstr_addr immediate]
-					endif
-				endif
-
-				# BLTU
-				begif [s== funct3 0x6]
+				# BLT, BLTU
+				begif [s|| [s== funct3 0x4] [s== funct3 0x6]]
 					begif alu_CF
 						s= jump_req 1
 						s= jump_vector [s+ nextinstr_addr immediate]
 					endif
 				endif
 
-				# BGEU
-				begif [s== funct3 0x7]
-					begif [s! alu_CF]
+				# BGE, BGEU
+				begif [s|| [s== funct3 0x5] [s== funct3 0x7]]
+					begif [s! [alu_CF | alu_ZF]]
 						s= jump_req 1
 						s= jump_vector [s+ nextinstr_addr immediate]
 					endif
