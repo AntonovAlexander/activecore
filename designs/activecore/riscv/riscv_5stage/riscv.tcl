@@ -761,7 +761,7 @@ rtl::module riscv
 				s= alu_ZF 1
 			endif
 			
-			begif [s== [indexed alu_result_wide {32 31}] 0x1]
+			begif [s|| [s== [indexed alu_result_wide {32 31}] 0x2] [s== [indexed alu_result_wide {32 31}] 0x1]]
 				s= alu_OF 1
 			endif
 
