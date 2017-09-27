@@ -691,7 +691,7 @@ rtl::module riscv
 			endif
 
 			begif [s== op1_source $riscv::OP1_SRC_PC]
-				s= alu_op1 nextinstr_addr
+				s= alu_op1 curinstr_addr
 			endif
 
 			begif [s== op2_source $riscv::OP2_SRC_RS2]
