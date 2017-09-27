@@ -3,6 +3,8 @@
 try {namespace delete riscv} on error {} {}
 namespace eval riscv {
 
+	set START_ADDR			512
+
 	# base opcodes
 	set opcode_LOAD			0x03
 	set opcode_LOAD_FP		0x07
@@ -148,13 +150,15 @@ rtl::module riscv
 		pipe::pvar {31 0}	rd_wdata 		0
 		pipe::pvar {0 0}	rd_rdy 			0
 
-		pipe::pvar {31 0}	immediate		0
-
 		pipe::pvar {31 0}	immediate_I		0
 		pipe::pvar {31 0}	immediate_S		0
 		pipe::pvar {31 0}	immediate_B		0
 		pipe::pvar {31 0}	immediate_U		0
 		pipe::pvar {31 0}	immediate_J		0
+
+		pipe::pvar {31 0}	immediate		0
+
+		pipe::pvar {31 0}	nextinstraddr_imm	0
 
 		pipe::pvar {2 0}	funct3			0
 		pipe::pvar {6 0}	funct7			0
@@ -200,7 +204,7 @@ rtl::module riscv
 		pipe::pvar {31 0} 	mem_rdata 		0
 		pipe::pvar {0 0} 	mem_rshift		0
 		
-		pipe::gpvar_sync {31 0} 	pc				0
+		pipe::gpvar_sync {31 0} 	pc				$riscv::START_ADDR
 		_acc_index {31 0}	
 		pipe::gpvar_sync {31 0} 	regfile			0
 		pipe::gpvar_sync {0 0}		jump_req_cmd	0
@@ -818,13 +822,15 @@ rtl::module riscv
 				s= jump_vector alu_result
 			endif
 
+			s= nextinstraddr_imm [s+ nextinstr_addr immediate]
+
 			begif jump_req_cond
 
 				# BEQ
 				begif [s== funct3 0x0]
 					begif alu_ZF
 						s= jump_req 1
-						s= jump_vector [s+ nextinstr_addr immediate]
+						s= jump_vector nextinstraddr_imm
 					endif
 				endif
 
@@ -832,7 +838,7 @@ rtl::module riscv
 				begif [s== funct3 0x1]
 					begif [s! alu_ZF]
 						s= jump_req 1
-						s= jump_vector [s+ nextinstr_addr immediate]
+						s= jump_vector nextinstraddr_imm
 					endif
 				endif
 
@@ -840,15 +846,15 @@ rtl::module riscv
 				begif [s|| [s== funct3 0x4] [s== funct3 0x6]]
 					begif alu_CF
 						s= jump_req 1
-						s= jump_vector [s+ nextinstr_addr immediate]
+						s= jump_vector nextinstraddr_imm
 					endif
 				endif
 
 				# BGE, BGEU
 				begif [s|| [s== funct3 0x5] [s== funct3 0x7]]
-					begif [s! [alu_CF | alu_ZF]]
+					begif [s! [s| alu_CF alu_ZF]]
 						s= jump_req 1
-						s= jump_vector [s+ nextinstr_addr immediate]
+						s= jump_vector nextinstraddr_imm
 					endif
 				endif
 
