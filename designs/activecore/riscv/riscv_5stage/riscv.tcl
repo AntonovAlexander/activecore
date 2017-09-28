@@ -333,6 +333,9 @@ rtl::module riscv
 				s= op2_source 	$riscv::OP2_SRC_IMM
 				s= rd_req		1
 				s= rd_source	$riscv::RD_MEM
+
+				s= alu_req		1
+
 				s= mem_req 		1
 				s= mem_cmd		0
 
@@ -355,6 +358,9 @@ rtl::module riscv
 				s= op2_source 	$riscv::OP2_SRC_IMM
 				s= rd_req		1
 				s= rd_source	$riscv::RD_MEM
+
+				s= alu_req		1
+				
 				s= mem_req 		1
 				s= mem_cmd		1
 
@@ -380,6 +386,8 @@ rtl::module riscv
 				s= rd_req 		1
 
 				s= immediate 	immediate_I
+
+				s= alu_req		1
 
 				# ADDI
 				begif [s== funct3 0x0]
@@ -447,6 +455,8 @@ rtl::module riscv
 				s= op2_source 	$riscv::OP2_SRC_RS2
 				s= rd_req 		1
 				s= rd_source 	$riscv::RD_ALU
+
+				s= alu_req		1
 
 				# ADD
 				begif [s== funct3 0x0]
