@@ -3,6 +3,8 @@
 try {namespace delete riscv} on error {} {}
 namespace eval riscv {
 
+	set START_ADDR			512
+
 	# base opcodes
 	set opcode_LOAD			0x03
 	set opcode_LOAD_FP		0x07
@@ -148,13 +150,15 @@ rtl::module riscv
 		pipe::pvar {31 0}	rd_wdata 		0
 		pipe::pvar {0 0}	rd_rdy 			0
 
-		pipe::pvar {31 0}	immediate		0
-
 		pipe::pvar {31 0}	immediate_I		0
 		pipe::pvar {31 0}	immediate_S		0
 		pipe::pvar {31 0}	immediate_B		0
 		pipe::pvar {31 0}	immediate_U		0
 		pipe::pvar {31 0}	immediate_J		0
+
+		pipe::pvar {31 0}	immediate		0
+
+		pipe::pvar {31 0}	nextinstraddr_imm	0
 
 		pipe::pvar {2 0}	funct3			0
 		pipe::pvar {6 0}	funct7			0
@@ -200,7 +204,7 @@ rtl::module riscv
 		pipe::pvar {31 0} 	mem_rdata 		0
 		pipe::pvar {0 0} 	mem_rshift		0
 		
-		pipe::gpvar_sync {31 0} 	pc				0
+		pipe::gpvar_sync {31 0} 	pc				$riscv::START_ADDR
 		_acc_index {31 0}	
 		pipe::gpvar_sync {31 0} 	regfile			0
 		pipe::gpvar_sync {0 0}		jump_req_cmd	0
@@ -267,6 +271,7 @@ rtl::module riscv
 								]] 32]
 
 			begif [s== opcode $riscv::opcode_LUI]
+				s= op1_source $riscv::OP1_SRC_IMM
 				s= rd_req 		1
 				s= rd_source	$riscv::RD_LUI
 				s= immediate immediate_U
@@ -329,6 +334,9 @@ rtl::module riscv
 				s= op2_source 	$riscv::OP2_SRC_IMM
 				s= rd_req		1
 				s= rd_source	$riscv::RD_MEM
+
+				s= alu_req		1
+
 				s= mem_req 		1
 				s= mem_cmd		0
 
@@ -351,6 +359,9 @@ rtl::module riscv
 				s= op2_source 	$riscv::OP2_SRC_IMM
 				s= rd_req		1
 				s= rd_source	$riscv::RD_MEM
+
+				s= alu_req		1
+				
 				s= mem_req 		1
 				s= mem_cmd		1
 
@@ -376,6 +387,8 @@ rtl::module riscv
 				s= rd_req 		1
 
 				s= immediate 	immediate_I
+
+				s= alu_req		1
 
 				# ADDI
 				begif [s== funct3 0x0]
@@ -443,6 +456,8 @@ rtl::module riscv
 				s= op2_source 	$riscv::OP2_SRC_RS2
 				s= rd_req 		1
 				s= rd_source 	$riscv::RD_ALU
+
+				s= alu_req		1
 
 				# ADD
 				begif [s== funct3 0x0]
@@ -687,7 +702,7 @@ rtl::module riscv
 			endif
 
 			begif [s== op1_source $riscv::OP1_SRC_PC]
-				s= alu_op1 nextinstr_addr
+				s= alu_op1 curinstr_addr
 			endif
 
 			begif [s== op2_source $riscv::OP2_SRC_RS2]
@@ -754,6 +769,7 @@ rtl::module riscv
 				endif
 
 				# formation of result and flags
+
 				s= alu_result [indexed alu_result_wide {31 0}]
 				
 				s= alu_CF [indexed alu_result_wide 32]
@@ -776,10 +792,9 @@ rtl::module riscv
 
 			endif
 
-
 			# rd wdata processing
 			begif [s== rd_source $riscv::RD_LUI]
-				s= rd_wdata [s<< immediate 16]
+				s= rd_wdata immediate
 				s= rd_rdy	1
 			endif
 
@@ -818,13 +833,15 @@ rtl::module riscv
 				s= jump_vector alu_result
 			endif
 
+			s= nextinstraddr_imm [s+ nextinstr_addr immediate]
+
 			begif jump_req_cond
 
 				# BEQ
 				begif [s== funct3 0x0]
 					begif alu_ZF
 						s= jump_req 1
-						s= jump_vector [s+ nextinstr_addr immediate]
+						s= jump_vector nextinstraddr_imm
 					endif
 				endif
 
@@ -832,7 +849,7 @@ rtl::module riscv
 				begif [s== funct3 0x1]
 					begif [s! alu_ZF]
 						s= jump_req 1
-						s= jump_vector [s+ nextinstr_addr immediate]
+						s= jump_vector nextinstraddr_imm
 					endif
 				endif
 
@@ -840,15 +857,15 @@ rtl::module riscv
 				begif [s|| [s== funct3 0x4] [s== funct3 0x6]]
 					begif alu_CF
 						s= jump_req 1
-						s= jump_vector [s+ nextinstr_addr immediate]
+						s= jump_vector nextinstraddr_imm
 					endif
 				endif
 
 				# BGE, BGEU
 				begif [s|| [s== funct3 0x5] [s== funct3 0x7]]
-					begif [s! [alu_CF | alu_ZF]]
+					begif [s! [s| alu_CF alu_ZF]]
 						s= jump_req 1
-						s= jump_vector [s+ nextinstr_addr immediate]
+						s= jump_vector nextinstraddr_imm
 					endif
 				endif
 

@@ -355,6 +355,7 @@ int TCL_expr_initval_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tc
 	if (expr_initval_cmd(&genvar, new_dimensions, ParamAccumulator[0]) != 0) return TCL_ERROR;
 	Tcl_SetResult(interp, StringToCharArr(genvar->name), TCL_VOLATILE);
 	ParamAccumulator.clear();
+	DimensionsAccumulator.clear();
 	return TCL_OK;
 }
 

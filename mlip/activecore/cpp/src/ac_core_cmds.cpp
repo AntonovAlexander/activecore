@@ -502,7 +502,7 @@ int expr_signext_cmd(unsigned int * cursor, unsigned int target_width, ac_var** 
 	ac_dimensions_static source_dimensions = param.GetDimensions();
 	unsigned int source_width;
 	if (source_dimensions.size() > 1) {
-		printf("ActiveCore ERROR: zeroext operand dimensions error\n");
+		printf("ActiveCore ERROR: signext operand dimensions error\n");
 		return 1;
 	} else {
 		source_width = source_dimensions[0].GetWidth();
@@ -519,7 +519,7 @@ int expr_signext_cmd(unsigned int * cursor, unsigned int target_width, ac_var** 
 
 		std::vector<ac_param> inter_params;
 		inter_params.push_back(param);
-		ac_imm * sign_imm = new ac_imm(NumberToString(source_width-1));
+		ac_imm * sign_imm = new ac_imm(NumberToString(source_dimensions[0].msb));
 		inter_params.push_back(ac_param(sign_imm));
 		if (expr_op_cmd(cursor, "indexed", &signvar, inter_params) != 0) return 1;
 
