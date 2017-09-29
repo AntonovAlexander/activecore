@@ -271,6 +271,7 @@ rtl::module riscv
 								]] 32]
 
 			begif [s== opcode $riscv::opcode_LUI]
+				s= op1_source $riscv::OP1_SRC_IMM
 				s= rd_req 		1
 				s= rd_source	$riscv::RD_LUI
 				s= immediate immediate_U
@@ -768,6 +769,7 @@ rtl::module riscv
 				endif
 
 				# formation of result and flags
+
 				s= alu_result [indexed alu_result_wide {31 0}]
 				
 				s= alu_CF [indexed alu_result_wide 32]
@@ -790,10 +792,9 @@ rtl::module riscv
 
 			endif
 
-
 			# rd wdata processing
 			begif [s== rd_source $riscv::RD_LUI]
-				s= rd_wdata [s<< immediate 16]
+				s= rd_wdata immediate
 				s= rd_rdy	1
 			endif
 
