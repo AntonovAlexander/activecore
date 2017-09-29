@@ -1,0 +1,75 @@
+#
+##-- Synplicity, Inc.
+##-- Project file H:/git_projects/activecore/designs/rtl/riscv_udm_memsplit/syn/DL-NEXYS2-1200E/DL_NEXYS2_1200E.prj.
+##-- Generated using ISE.
+
+#implementation: "DL_NEXYS2_1200E"
+impl -add "DL_NEXYS2_1200E"
+
+##utility procedures
+proc findmatch {spec args} {  set lArglist [join $args " "];  set nIndex [lsearch -glob $lArglist $spec];  if {$nIndex != -1} {  return [lindex $lArglist $nIndex];  } else {  return $spec;  }  }
+         
+proc findpackage {spec} { findmatch $spec [partdata -package [part]]}
+proc findgrade {spec} { findmatch $spec [partdata -grade   [part]]}
+
+##device options
+set_option -technology SPARTAN3E
+set_option -part xc3s1200e
+set_option -package [findpackage {fg320}]
+set_option -speed_grade [findgrade {-5}]
+
+##add_file to library options
+
+##add_file options
+add_file -verilog {D:/Synopsys/fpga_E2010091/bin/mbin/../lib/xilinx/unisim.v}
+add_file {../../../udm/hdl/udm_controller.v}
+add_file {../../../udm/hdl/uart_tx.v}
+add_file {../../../udm/hdl/uart_rx.v}
+add_file {../../../ram/ram_dual.v}
+add_file {../../../udm/hdl/udm.v}
+add_file {../../../ram/ram_dual_memsplit.v}
+add_file {../../../udm/hdl/udm_memsplit.v}
+add_file {../../hdl/bus_unit_memsplit.v}
+add_file {../../../reset_cntrl/reset_cntrl.v}
+add_file {../../../../activecore/riscv/riscv_5stage/riscv.v}
+add_file {sys_clk.v}
+add_file {../../hdl/riscv_udm_memsplit.v}
+add_file {DL_NEXYS2_1200E.v}
+
+##compilation/mapping options
+set_option -resource_sharing 1
+set_option -default_enum_encoding default
+set_option -top_module DL_NEXYS2_1200E
+set_option -use_fsm_explorer 0
+
+##map options
+set_option -frequency auto
+set_option -fanout_limit 100
+set_option -disable_io_insertion 0
+set_option -pipe 1
+set_option -retiming 0
+
+##sequential_optimizations options
+set_option -symbolic_fsm_compiler 1
+
+##simulation options
+set_option -write_verilog 0
+set_option -write_vhdl 0
+
+##automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+
+##implementation attributes
+set_option -num_critical_paths 0
+set_option -num_startend_points 0
+
+##other options
+
+set_option -vlog_std v2001
+set_option -compiler_compatible 1
+
+##set result format/file last
+project -result_file {H:/git_projects/activecore/designs/rtl/riscv_udm_memsplit/syn/DL-NEXYS2-1200E/DL_NEXYS2_1200E.edn}
+
+##constraint file
+add_file -constraint {H:/git_projects/activecore/designs/rtl/riscv_udm_memsplit/syn/DL-NEXYS2-1200E/DL_NEXYS2_1200E.sdc}
