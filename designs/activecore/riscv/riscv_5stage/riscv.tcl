@@ -355,10 +355,9 @@ rtl::module riscv
 
 			begif [s== opcode $riscv::opcode_STORE]
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= op1_source 	$riscv::OP1_SRC_RS1
 				s= op2_source 	$riscv::OP2_SRC_IMM
-				s= rd_req		1
-				s= rd_source	$riscv::RD_MEM
 
 				s= alu_req		1
 				
