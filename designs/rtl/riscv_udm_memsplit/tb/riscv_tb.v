@@ -62,9 +62,9 @@ wire [31:0] LED;
 	
 riscv_udm_memsplit
 #(
-	//.mem_data("../../../../activecore/dlx/sw/io_heartbeat/io_heartbeat.hex"),
-	.mem_data("../../../../activecore/dlx/sw/io_heartbeat_variable/io_heartbeat_variable.hex"),
-	.mem_size(1024)
+	.mem_data("../../../../activecore/riscv/sw/benchmarks/heartbeat_variable.riscv.hex"),
+	//.mem_data("../../../../activecore/riscv/sw/benchmarks/median.riscv.hex"),
+	.mem_size(2048)
 ) riscv_udm
 (
 	.clk_i(CLK_50MHZ)

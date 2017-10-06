@@ -164,7 +164,8 @@ udm_memsplit udm_memsplit
 	, .bus_rdata_bi(udm_rdata)
 );
 
-riscv_test_wrapper riscv_test_wrapper (
+riscv riscv (
+//riscv_test_wrapper riscv_test_wrapper (
 	.clk_i(clk_i)
 	, .rst_i(cpu_reset)
 	
