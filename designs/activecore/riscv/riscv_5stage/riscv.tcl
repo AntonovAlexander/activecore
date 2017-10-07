@@ -158,7 +158,7 @@ rtl::module riscv
 
 		pipe::pvar {31 0}	immediate		0
 
-		pipe::pvar {31 0}	nextinstraddr_imm	0
+		pipe::pvar {31 0}	curinstraddr_imm	0
 
 		pipe::pvar {2 0}	funct3			0
 		pipe::pvar {6 0}	funct7			0
@@ -836,7 +836,7 @@ rtl::module riscv
 				s= jump_vector alu_result
 			endif
 
-			s= nextinstraddr_imm [s+ nextinstr_addr immediate]
+			s= curinstraddr_imm [s+ curinstr_addr immediate]
 
 			begif jump_req_cond
 
@@ -844,7 +844,7 @@ rtl::module riscv
 				begif [s== funct3 0x0]
 					begif alu_ZF
 						s= jump_req 1
-						s= jump_vector nextinstraddr_imm
+						s= jump_vector curinstraddr_imm
 					endif
 				endif
 
@@ -852,7 +852,7 @@ rtl::module riscv
 				begif [s== funct3 0x1]
 					begif [s! alu_ZF]
 						s= jump_req 1
-						s= jump_vector nextinstraddr_imm
+						s= jump_vector curinstraddr_imm
 					endif
 				endif
 
@@ -860,7 +860,7 @@ rtl::module riscv
 				begif [s|| [s== funct3 0x4] [s== funct3 0x6]]
 					begif alu_CF
 						s= jump_req 1
-						s= jump_vector nextinstraddr_imm
+						s= jump_vector curinstraddr_imm
 					endif
 				endif
 
@@ -868,7 +868,7 @@ rtl::module riscv
 				begif [s|| [s== funct3 0x5] [s== funct3 0x7]]
 					begif [s! [s| alu_CF alu_ZF]]
 						s= jump_req 1
-						s= jump_vector nextinstraddr_imm
+						s= jump_vector curinstraddr_imm
 					endif
 				endif
 
