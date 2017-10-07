@@ -62,9 +62,9 @@ wire [31:0] LED;
 	
 riscv_udm_memsplit
 #(
-	.mem_data("../../../../activecore/riscv/sw/benchmarks/heartbeat_variable.riscv.hex"),
-	//.mem_data("../../../../activecore/riscv/sw/benchmarks/median.riscv.hex"),
-	.mem_size(2048)
+	//.mem_data("../../../../activecore/riscv/sw/benchmarks/heartbeat_variable.riscv.hex"),
+	.mem_data("../../../../activecore/riscv/sw/benchmarks/median.riscv.hex"),
+	.mem_size(65536)
 ) riscv_udm
 (
 	.clk_i(CLK_50MHZ)
@@ -280,7 +280,10 @@ begin
 	WAIT(50000);
 	UART_SEND(`SYNC_BYTE);
 	UART_SEND(`IDCODE_CMD);
-	udm_hreset();
+	
+	udm_rst();
+	udm_wr_single(32'h80000000, 32'h0);
+	udm_nrst();
 	
 	udm_rd_single(32'h00000000);
 	udm_wr_single(32'h00000000, 32'h123455aa);
