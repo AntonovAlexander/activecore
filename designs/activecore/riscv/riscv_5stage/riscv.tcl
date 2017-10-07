@@ -158,7 +158,7 @@ rtl::module riscv
 
 		pipe::pvar {31 0}	immediate		0
 
-		pipe::pvar {31 0}	nextinstraddr_imm	0
+		pipe::pvar {31 0}	curinstraddr_imm	0
 
 		pipe::pvar {2 0}	funct3			0
 		pipe::pvar {6 0}	funct7			0
@@ -355,10 +355,9 @@ rtl::module riscv
 
 			begif [s== opcode $riscv::opcode_STORE]
 				s= rs1_req 		1
+				s= rs2_req 		1
 				s= op1_source 	$riscv::OP1_SRC_RS1
 				s= op2_source 	$riscv::OP2_SRC_IMM
-				s= rd_req		1
-				s= rd_source	$riscv::RD_MEM
 
 				s= alu_req		1
 				
@@ -651,42 +650,46 @@ rtl::module riscv
 
 			# pipeline WB forwarding
 			begif [pipe::isworking WB]
-				begif [pipe::issucc WB]
-					begif [s== [pipe::prr WB rd_addr] rs1_addr]
-						pipe::accum rs1_rdata [pipe::prr WB rd_wdata]
+				begif [pipe::prr WB rd_req]
+					begif [pipe::issucc WB]
+						begif [s== [pipe::prr WB rd_addr] rs1_addr]
+							pipe::accum rs1_rdata [pipe::prr WB rd_wdata]
+						endif
+						begif [s== [pipe::prr WB rd_addr] rs2_addr]
+							pipe::accum rs2_rdata [pipe::prr WB rd_wdata]
+						endif
 					endif
-					begif [s== [pipe::prr WB rd_addr] rs2_addr]
-						pipe::accum rs2_rdata [pipe::prr WB rd_wdata]
+					begelse
+						pipe::pstall
 					endif
-				endif
-				begelse
-					pipe::pstall
 				endif
 			endif
 
 
 			# pipeline MEM forwarding
 			begif [pipe::isworking MEM]
-				begif [pipe::issucc MEM]
-					begif [s== [pipe::prr MEM rd_addr] rs1_addr]
-						begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
-							pipe::pstall
+				begif [pipe::prr MEM rd_req]
+					begif [pipe::issucc MEM]
+						begif [s== [pipe::prr MEM rd_addr] rs1_addr]
+							begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
+								pipe::pstall
+							endif
+							begelse
+								pipe::accum rs1_rdata [pipe::prr MEM rd_wdata]
+							endif
 						endif
-						begelse
-							pipe::accum rs1_rdata [pipe::prr MEM rd_wdata]
+						begif [s== [pipe::prr MEM rd_addr] rs2_addr]
+							begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
+								pipe::pstall
+							endif
+							begelse
+								pipe::accum rs2_rdata [pipe::prr MEM rd_wdata]
+							endif
 						endif
 					endif
-					begif [s== [pipe::prr MEM rd_addr] rs2_addr]
-						begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
-							pipe::pstall
-						endif
-						begelse
-							pipe::accum rs2_rdata [pipe::prr MEM rd_wdata]
-						endif
+					begelse
+						pipe::pstall
 					endif
-				endif
-				begelse
-					pipe::pstall
 				endif
 			endif
 			
@@ -833,7 +836,7 @@ rtl::module riscv
 				s= jump_vector alu_result
 			endif
 
-			s= nextinstraddr_imm [s+ nextinstr_addr immediate]
+			s= curinstraddr_imm [s+ curinstr_addr immediate]
 
 			begif jump_req_cond
 
@@ -841,7 +844,7 @@ rtl::module riscv
 				begif [s== funct3 0x0]
 					begif alu_ZF
 						s= jump_req 1
-						s= jump_vector nextinstraddr_imm
+						s= jump_vector curinstraddr_imm
 					endif
 				endif
 
@@ -849,7 +852,7 @@ rtl::module riscv
 				begif [s== funct3 0x1]
 					begif [s! alu_ZF]
 						s= jump_req 1
-						s= jump_vector nextinstraddr_imm
+						s= jump_vector curinstraddr_imm
 					endif
 				endif
 
@@ -857,7 +860,7 @@ rtl::module riscv
 				begif [s|| [s== funct3 0x4] [s== funct3 0x6]]
 					begif alu_CF
 						s= jump_req 1
-						s= jump_vector nextinstraddr_imm
+						s= jump_vector curinstraddr_imm
 					endif
 				endif
 
@@ -865,7 +868,7 @@ rtl::module riscv
 				begif [s|| [s== funct3 0x5] [s== funct3 0x7]]
 					begif [s! [s| alu_CF alu_ZF]]
 						s= jump_req 1
-						s= jump_vector nextinstraddr_imm
+						s= jump_vector curinstraddr_imm
 					endif
 				endif
 

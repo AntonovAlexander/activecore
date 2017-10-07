@@ -623,42 +623,46 @@ rtl::module dlx
 
 			# pipeline WB forwarding
 			begif [pipe::isworking WB]
-				begif [pipe::issucc WB]
-					begif [s== [pipe::prr WB rd_addr] rs1_addr]
-						pipe::accum rs1_rdata [pipe::prr WB rd_wdata]
+				begif [pipe::prr WB rd_req]
+					begif [pipe::issucc WB]
+						begif [s== [pipe::prr WB rd_addr] rs1_addr]
+							pipe::accum rs1_rdata [pipe::prr WB rd_wdata]
+						endif
+						begif [s== [pipe::prr WB rd_addr] rs2_addr]
+							pipe::accum rs2_rdata [pipe::prr WB rd_wdata]
+						endif
 					endif
-					begif [s== [pipe::prr WB rd_addr] rs2_addr]
-						pipe::accum rs2_rdata [pipe::prr WB rd_wdata]
+					begelse
+						pipe::pstall
 					endif
-				endif
-				begelse
-					pipe::pstall
 				endif
 			endif
 
 
 			# pipeline MEM forwarding
 			begif [pipe::isworking MEM]
-				begif [pipe::issucc MEM]
-					begif [s== [pipe::prr MEM rd_addr] rs1_addr]
-						begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
-							pipe::pstall
+				begif [pipe::prr MEM rd_req]
+					begif [pipe::issucc MEM]
+						begif [s== [pipe::prr MEM rd_addr] rs1_addr]
+							begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
+								pipe::pstall
+							endif
+							begelse
+								pipe::accum rs1_rdata [pipe::prr MEM rd_wdata]
+							endif
 						endif
-						begelse
-							pipe::accum rs1_rdata [pipe::prr MEM rd_wdata]
+						begif [s== [pipe::prr MEM rd_addr] rs2_addr]
+							begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
+								pipe::pstall
+							endif
+							begelse
+								pipe::accum rs2_rdata [pipe::prr MEM rd_wdata]
+							endif
 						endif
 					endif
-					begif [s== [pipe::prr MEM rd_addr] rs2_addr]
-						begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
-							pipe::pstall
-						endif
-						begelse
-							pipe::accum rs2_rdata [pipe::prr MEM rd_wdata]
-						endif
+					begelse
+						pipe::pstall
 					endif
-				endif
-				begelse
-					pipe::pstall
 				endif
 			endif
 
