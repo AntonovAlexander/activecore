@@ -12,10 +12,10 @@ module NEXYS4_DDR
 
 pss_memsplit
 #(
-	.CPU("dlx")
-	, .delay_test_flag(0)
-	, .mem_data("io_heartbeat_variable.hex")
-	, .mem_size(1024)
+	.CPU("riscv"),
+	.delay_test_flag(0),
+	.mem_data("../../activecore/riscv/sw/benchmarks/heartbeat_variable.riscv.hex"),
+	.mem_size(8192)
 ) dlx_udm
 (
 	.clk_i(CLK100MHZ)
