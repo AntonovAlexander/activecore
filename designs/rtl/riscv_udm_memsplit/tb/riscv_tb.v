@@ -66,7 +66,7 @@ pss_memsplit
 	.delay_test_flag(0),
 	//.mem_data("../../../../activecore/riscv/sw/benchmarks/heartbeat_variable.riscv.hex"),
 	.mem_data("../../../../activecore/riscv/sw/benchmarks/median.riscv.hex"),
-	.mem_size(65536)
+	.mem_size(8192)
 ) riscv_udm
 (
 	.clk_i(CLK_50MHZ)
