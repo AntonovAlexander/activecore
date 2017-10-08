@@ -64,7 +64,7 @@ module ram_dual_memsplit
 
     , .dat1_i(bus1_wdata_bi)
     , .adr1_i(bus1_addr_bi)
-    , .we1_i(bus1_req_i & bus0_we_i)
+    , .we1_i(bus1_req_i & bus1_we_i)
     , .dat1_o(bus1_rdata_bo)
   );
 
