@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2015 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="5" Path="D:/Research/Computer_Science/Projects/Personal/activecore/designs/rtl/dlx_udm_memsplit/syn/NEXYS4-DDR/NEXYS4_DDR.xpr">
+<Project Version="7" Minor="5" Path="D:/Research/Computer_Science/Projects/Personal/activecore/designs/rtl/riscv_udm_memsplit/syn/NEXYS4-DDR/NEXYS4_DDR.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="dbe4f722851248e3976cc912f1a3ff99"/>
@@ -60,14 +60,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../activecore/dlx/dlx_memsplit/dlx.v">
+      <File Path="$PPRDIR/../../../pss_memsplit/cpu_stub.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../pss_memsplit/cpu_stub.v">
+      <File Path="$PPRDIR/../../../../activecore/riscv/riscv_5stage/riscv.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -121,12 +121,6 @@
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../activecore/dlx/sw/io_heartbeat_variable/io_heartbeat_variable.hex">
-        <FileInfo SFType="MIF">
-          <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>

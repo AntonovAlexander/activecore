@@ -248,6 +248,6 @@ proc udm_wrfile_be {address filename} {
 
 proc udm_loadbin {filename} {
     udm_rst
-    udm_wrfile_be 0x00000000 $filename
+    udm_wrfile_le 0x00000000 $filename
     udm_nrst
 }
