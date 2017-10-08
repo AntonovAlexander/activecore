@@ -24,7 +24,7 @@ riscv_udm_memsplit
 #(
 	.mem_data("../../../../activecore/riscv/sw/benchmarks/heartbeat_variable.riscv.hex"),
 	//.mem_data("../../../../activecore/riscv/sw/benchmarks/median.riscv.hex"),
-	.mem_size(1024)
+	.mem_size(8192)
 ) riscv_udm
 (
 	.clk_i(clk_generated),
