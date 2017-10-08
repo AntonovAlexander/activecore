@@ -20,8 +20,10 @@ sys_clk sys_clk(
 	.CLK0_OUT()
 );
 
-riscv_udm_memsplit
+pss_memsplit
 #(
+	.CPU("riscv"),
+	.delay_test_flag(0),
 	.mem_data("../../../../activecore/riscv/sw/benchmarks/heartbeat_variable.riscv.hex"),
 	//.mem_data("../../../../activecore/riscv/sw/benchmarks/median.riscv.hex"),
 	.mem_size(8192)
