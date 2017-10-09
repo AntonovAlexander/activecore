@@ -16,7 +16,7 @@ proc udm_connect {com_num baudrate} {
 
     set com [open $com_num: r+]
     fconfigure $com -mode $baudrate,$parity,$databits,$stopbits \
-        -blocking 1 -translation binary -buffering none -buffersize 16 -timeout 1000
+        -blocking 1 -translation binary -buffering none -timeout 20
 }
 
 
