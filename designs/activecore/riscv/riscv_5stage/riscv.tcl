@@ -866,7 +866,7 @@ rtl::module riscv
 
 				# BGE, BGEU
 				begif [s|| [s== funct3 0x5] [s== funct3 0x7]]
-					begif [s! [s| alu_CF alu_ZF]]
+					begif [s! alu_CF]
 						s= jump_req 1
 						s= jump_vector curinstraddr_imm
 					endif

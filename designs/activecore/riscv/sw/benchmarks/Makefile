@@ -19,8 +19,8 @@ instbasedir = $(UCB_VLSI_HOME)/install
 
 bmarks = \
 	heartbeat_variable \
-	median
-	#qsort \
+	median \
+	qsort 
 	#rsort \
 	#dhrystone 
 	#towers \
@@ -38,7 +38,7 @@ bmarks = \
 
 RISCV_PREFIX ?= riscv$(XLEN)-unknown-elf-
 RISCV_GCC ?= $(RISCV_PREFIX)gcc
-RISCV_GCC_OPTS ?= -DPREALLOCATE=1 -mcmodel=medany -static -std=gnu99 -O2 -march=rv32i -mabi=ilp32
+RISCV_GCC_OPTS ?= -mcmodel=medany -static -std=gnu99 -O2 -march=rv32i -mabi=ilp32
 RISCV_LINK ?= $(RISCV_GCC) -T $(src_dir)/common/test.ld $(incs)
 RISCV_LINK_OPTS ?= -static -nostdlib -nostartfiles -lgcc -T $(src_dir)/common/test.ld
 RISCV_OBJDUMP ?= $(RISCV_PREFIX)objdump --disassemble-all --disassemble-zeroes
