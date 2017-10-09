@@ -48,7 +48,7 @@ proc median_test {median_binfilename} {
 }
 
 
-udm_cc com6 921600
+udm_cc com5 921600
 
 median_test ../median.riscv
 

@@ -3,7 +3,7 @@ from __future__ import division
 
 import struct
 import serial
-
+import os
 
 class udm:
     
@@ -104,20 +104,62 @@ class udm:
         rdataword = rdata[0] + (rdata[1] << 8) + (rdata[2] << 16) + (rdata[3] << 24)
         return rdataword    
     
-    def rdarr(self, address, length):
+    def rdarr32(self, address, length):
         self.ser.flush()
         self.sendbyte(self.sync_byte)
         self.sendbyte(self.rd_cmd)
         self.sendword(address)
-        self.sendword(length)
-        count = length >> 2
+        self.sendword(length << 2)
         rdatawords = []
-        for i in range(count):
+        for i in range(length):
             rdata = self.ser.read(4)
             rdata = struct.unpack("BBBB", rdata)
             rdataword = rdata[0] + (rdata[1] << 8) + (rdata[2] << 16) + (rdata[3] << 24)
             rdatawords.append(rdataword)
         return rdatawords
+    
+    def wrfile_le(self, address, filename):
+        f = open(filename, "rb")
+        self.sendbyte(self.sync_byte)
+        self.sendbyte(self.wr_cmd)
+        # address
+        self.sendword(address)
+        #length
+        length = os.path.getsize(filename)
+        self.sendword(length)
+        try:
+            while True:            
+                dbuf0 = f.read(1)
+                dbuf1 = f.read(1)
+                dbuf2 = f.read(1)
+                dbuf3 = f.read(1)
+                if dbuf0:
+                    dbuf0 = struct.unpack("B", dbuf0)
+                    self.sendbyte(dbuf0[0])
+                else:
+                    break
+                if dbuf1:
+                    dbuf1 = struct.unpack("B", dbuf1)                    
+                    self.sendbyte(dbuf1[0])
+                else:
+                    break
+                if dbuf2:
+                    dbuf2 = struct.unpack("B", dbuf2)                    
+                    self.sendbyte(dbuf2[0])
+                else:
+                    break
+                if dbuf3:
+                    dbuf3 = struct.unpack("B", dbuf3)
+                    self.sendbyte(dbuf3[0])
+                else:
+                    break      
+        finally:
+            f.close()
+    
+    def loadbin(self, filename):
+        self.rst()
+        self.wrfile_le(0x0, filename)
+        self.nrst()
     
     
 udm = udm()
