@@ -15,10 +15,7 @@ class udm:
     wr_cmd          = 0x81
     rd_cmd          = 0x82
     wr_cmd_noinc    = 0x83
-    rd_cmd_noinc    = 0x84    
-    
-    def getval(self):
-        return 0x12345    
+    rd_cmd_noinc    = 0x84
     
     def connect(self, com_num, baudrate):
         self.ser = serial.Serial(com_num, baudrate, 8)   
