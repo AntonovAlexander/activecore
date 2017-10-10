@@ -245,6 +245,30 @@ generate
 			, .data_mem_be(cpu_data_be)
 		);
 
+	else if (CPU == "riscv_7stage")
+	
+		riscv_7stage riscv (
+			.clk_i(clk_i)
+			, .rst_i(cpu_reset)
+			
+			, .instr_mem_ack(cpu_instr_ack)
+			, .instr_mem_resp(cpu_instr_resp)
+			, .instr_mem_rdata(cpu_instr_rdata)
+			, .data_mem_ack(cpu_data_ack)
+			, .data_mem_resp(cpu_data_resp)
+			, .data_mem_rdata(cpu_data_rdata)
+			, .instr_mem_req(cpu_instr_req)
+			, .instr_mem_we(cpu_instr_we)
+			, .instr_mem_addr(cpu_instr_addr)
+			, .instr_mem_wdata(cpu_instr_wdata)
+			, .instr_mem_be(cpu_instr_be)
+			, .data_mem_req(cpu_data_req)
+			, .data_mem_we(cpu_data_we)
+			, .data_mem_addr(cpu_data_addr)
+			, .data_mem_wdata(cpu_data_wdata)
+			, .data_mem_be(cpu_data_be)
+		);
+
 	else
 
 		cpu_stub cpu_stub (
