@@ -275,6 +275,7 @@ add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB com
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_WB_rd_wdata
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_WB_rd_source
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_WB_mem_req
+add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_WB_mem_cmd
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_WB_mem_rdata
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_WB_genmcopipe_data_mem_genvar_req_done
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_WB_genmcopipe_data_mem_genvar_rdreq_pending
@@ -350,10 +351,10 @@ add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm
 add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6207]}
 add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6208]}
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {6990057524 ps} 0}
+WaveRestoreCursors {{Cursor 1} {5742444292 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 491
-configure wave -valuecolwidth 286
+configure wave -namecolwidth 527
+configure wave -valuecolwidth 104
 configure wave -justifyvalue left
 configure wave -signalnamewidth 0
 configure wave -snapdistance 10
@@ -366,4 +367,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {6278193925 ps} {9175742425 ps}
+WaveRestoreZoom {5742150978 ps} {5742849212 ps}
