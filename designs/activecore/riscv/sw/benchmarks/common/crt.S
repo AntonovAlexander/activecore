@@ -56,7 +56,7 @@ _start:
   la  tp, _end + 63
   and tp, tp, -64
 
-  # give each core 128KB of stack + TLS
+  # stack offset: 16KB
 #define STKSHIFT 14
   sll a2, a0, STKSHIFT
   add tp, tp, a2
