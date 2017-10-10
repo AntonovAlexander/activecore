@@ -123,9 +123,9 @@ generate
 			, .data_mem_be(cpu_data_be)
 		);
 
-	else if (CPU == "riscv")
+	else if (CPU == "riscv_5stage")
 	
-		riscv riscv (
+		riscv_5stage riscv (
 			.clk_i(clk_i)
 			, .rst_i(rst_i)
 			

@@ -4,11 +4,12 @@ from __future__ import division
 import sys
 sys.path.append('../../../../../rtl/udm/sw')
 
-#from udm import *
 import udm
 from udm import *
 
 def test_median(median_filename):
+    print("#### MEDIAN TEST STARTED ####");
+    
     DATA_SIZE = 400
     verify_data = [
         0, 454, 454, 564, 335, 187, 187, 749, 749, 365, 365, 350, 132, 132, 153, 584, 216, 584, 216, 621,
@@ -33,18 +34,27 @@ def test_median(median_filename):
       153, 381, 121, 651, 412, 825, 412, 356, 236, 148, 148, 148, 423, 140, 216, 216, 621, 621, 361,   0
     ]
     
+    print("Loading test program...")
     udm.loadbin(median_filename)
+    print("Test program written!")
 
+    print("Reading data buffer...")
     rdarr = udm.rdarr32(0x6000, DATA_SIZE)
+    print("Data buffer read!")
 
     test_succ_flag = 1
     for i in range(DATA_SIZE):
         if (verify_data[i] != rdarr[i]):
             test_succ_flag = 0
-            print("Test failed on data ", i, "! Expected: 0x", hex(verify_data[i]), ", received: 0x", hex(rdarr[i]))
+            print("Test failed on data ", i, "! Expected: ", hex(verify_data[i]), ", received: ", hex(rdarr[i]))
     
     if (test_succ_flag):
-        print("Median test successful!");
+        print("#### MEDIAN TEST PASSED! ####")
+    else:
+        print("#### MEDIAN TEST FAILED! ####")
+    
+    return test_succ_flag
+                  
 
 
 udm.cc('COM5', 921600)
