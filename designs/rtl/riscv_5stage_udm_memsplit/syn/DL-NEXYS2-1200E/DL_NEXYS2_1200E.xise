@@ -55,7 +55,7 @@
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="15"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="10"/>
     </file>
-    <file xil_pn:name="../../../../activecore/riscv/riscv_5stage/riscv.v" xil_pn:type="FILE_VERILOG">
+    <file xil_pn:name="../../../../activecore/riscv/riscv_5stage/riscv_5stage.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="81"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="8"/>
     </file>

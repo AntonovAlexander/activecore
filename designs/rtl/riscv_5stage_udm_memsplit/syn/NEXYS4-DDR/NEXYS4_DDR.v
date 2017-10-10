@@ -26,7 +26,7 @@ assign pss_arst = !(CPU_RESETN & pll_locked);
 
 pss_memsplit
 #(
-	.CPU("riscv")
+	.CPU("riscv_5stage")
 	, .delay_test_flag(0)
 	, .mem_data("../../activecore/riscv/sw/benchmarks/heartbeat_variable.riscv.hex")
 	, .mem_size(8192)

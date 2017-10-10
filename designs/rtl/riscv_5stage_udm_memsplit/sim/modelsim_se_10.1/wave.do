@@ -285,73 +285,73 @@ add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB com
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB combs} -expand -group {riscv data resp bus} -radix hexadecimal -childformat {{{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[31]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[30]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[29]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[28]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[27]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[26]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[25]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[24]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[23]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[22]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[21]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[20]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[19]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[18]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[17]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[16]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[15]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[14]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[13]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[12]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[11]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[10]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[9]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[8]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[7]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[6]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[5]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[4]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[3]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[2]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[1]} -radix hexadecimal} {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[0]} -radix hexadecimal}} -subitemconfig {{/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[31]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[30]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[29]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[28]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[27]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[26]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[25]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[24]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[23]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[22]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[21]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[20]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[19]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[18]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[17]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[16]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[15]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[14]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[13]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[12]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[11]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[10]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[9]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[8]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[7]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[6]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[5]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[4]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[3]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[2]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[1]} {-height 15 -radix hexadecimal} {/riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata[0]} {-height 15 -radix hexadecimal}} /riscv_tb/riscv_udm/genblk1/riscv/data_mem_rdata
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB combs} -expand -group {riscv data resp bus} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/data_mcopipe_resp
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {WB combs} -expand -group {riscv data resp bus} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/data_mcopipe_rdata
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6144]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6145]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6146]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6147]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6148]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6149]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6150]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6151]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6152]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6153]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6154]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6155]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6156]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6157]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6158]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6159]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6160]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6161]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6162]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6163]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6164]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6165]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6166]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6167]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6168]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6169]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6170]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6171]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6172]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6173]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6174]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6175]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6176]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6177]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6178]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6179]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6180]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6181]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6182]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6183]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6184]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6185]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6186]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6187]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6188]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6189]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6190]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6191]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6192]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6193]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6194]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6195]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6196]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6197]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6198]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6199]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6200]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6201]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6202]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6203]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6204]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6205]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6206]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6207]}
-add wave -noupdate -expand -group io_buf -radix hexadecimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6208]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6144]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6145]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6146]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6147]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6148]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6149]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6150]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6151]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6152]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6153]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6154]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6155]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6156]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6157]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6158]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6159]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6160]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6161]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6162]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6163]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6164]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6165]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6166]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6167]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6168]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6169]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6170]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6171]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6172]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6173]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6174]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6175]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6176]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6177]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6178]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6179]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6180]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6181]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6182]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6183]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6184]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6185]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6186]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6187]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6188]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6189]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6190]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6191]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6192]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6193]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6194]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6195]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6196]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6197]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6198]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6199]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6200]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6201]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6202]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6203]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6204]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6205]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6206]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6207]}
+add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6208]}
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {5742444292 ps} 0}
+WaveRestoreCursors {{Cursor 1} {214216867 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 527
 configure wave -valuecolwidth 104
@@ -367,4 +367,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {5742150978 ps} {5742849212 ps}
+WaveRestoreZoom {0 ps} {1050 us}
