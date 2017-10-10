@@ -7,9 +7,9 @@ source [file join $MLIP_PATH activecore activecore.tcl]
 #ActiveCore::debug_set
 ActiveCore_Reset
 
-source riscv_5stage.tcl
+source riscv_7stage.tcl
 
-set filename riscv_5stage.v
+set filename riscv_7stage.v
 
 rtl::monitor debug_rtl.txt
 pipe::monitor debug_pipe.txt

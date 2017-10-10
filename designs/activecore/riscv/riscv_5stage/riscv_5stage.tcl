@@ -63,7 +63,7 @@ namespace eval riscv {
 }
 
 
-rtl::module riscv
+rtl::module riscv_5stage
 
 	rtl::input 	{0 0} 	clk_i
 	rtl::input 	{0 0} 	rst_i
@@ -625,15 +625,14 @@ rtl::module riscv
 			## optimized for synthesis
 			s= rs1_rdata [indexed [pipe::rdprev regfile] rs1_addr]
 			s= rs2_rdata [indexed [pipe::rdprev regfile] rs2_addr]
+			
 			# pipeline WB forwarding
-			begif [pipe::issucc WB]
-				begif [pipe::prr WB rd_req]
-					begif [s== [pipe::prr WB rd_addr] rs1_addr]
-						s= rs1_rdata [pipe::prr WB rd_wdata]
-					endif
-					begif [s== [pipe::prr WB rd_addr] rs2_addr]
-						s= rs2_rdata [pipe::prr WB rd_wdata]
-					endif
+			begif [s&& [pipe::issucc WB] [pipe::prr WB rd_req]]
+				begif [s== [pipe::prr WB rd_addr] rs1_addr]
+					s= rs1_rdata [pipe::prr WB rd_wdata]
+				endif
+				begif [s== [pipe::prr WB rd_addr] rs2_addr]
+					s= rs2_rdata [pipe::prr WB rd_wdata]
 				endif
 			endif
 			##
@@ -649,50 +648,44 @@ rtl::module riscv
 		pipe::pstage EXEC
 
 			# pipeline WB forwarding
-			begif [pipe::isworking WB]
-				begif [pipe::prr WB rd_req]
-					begif [pipe::issucc WB]
-						begif [s== [pipe::prr WB rd_addr] rs1_addr]
-							pipe::accum rs1_rdata [pipe::prr WB rd_wdata]
-						endif
-						begif [s== [pipe::prr WB rd_addr] rs2_addr]
-							pipe::accum rs2_rdata [pipe::prr WB rd_wdata]
-						endif
+			begif [s&& [pipe::isworking WB] [pipe::prr WB rd_req]]
+				begif [s== [pipe::prr WB rd_addr] rs1_addr]
+					begif [s&& [pipe::issucc WB] [pipe::prr WB rd_rdy]]
+						pipe::accum rs1_rdata [pipe::prr WB rd_wdata]
+					endif
+					begelse
+						pipe::pstall
+					endif
+				endif
+				begif [s== [pipe::prr WB rd_addr] rs2_addr]
+					begif [s&& [pipe::issucc WB] [pipe::prr WB rd_rdy]]
+						pipe::accum rs2_rdata [pipe::prr WB rd_wdata]
 					endif
 					begelse
 						pipe::pstall
 					endif
 				endif
 			endif
-
 
 			# pipeline MEM forwarding
-			begif [pipe::isworking MEM]
-				begif [pipe::prr MEM rd_req]
-					begif [pipe::issucc MEM]
-						begif [s== [pipe::prr MEM rd_addr] rs1_addr]
-							begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
-								pipe::pstall
-							endif
-							begelse
-								pipe::accum rs1_rdata [pipe::prr MEM rd_wdata]
-							endif
-						endif
-						begif [s== [pipe::prr MEM rd_addr] rs2_addr]
-							begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
-								pipe::pstall
-							endif
-							begelse
-								pipe::accum rs2_rdata [pipe::prr MEM rd_wdata]
-							endif
-						endif
+			begif [s&& [pipe::isworking MEM] [pipe::prr MEM rd_req]]
+				begif [s== [pipe::prr MEM rd_addr] rs1_addr]
+					begif [s&& [pipe::issucc MEM] [pipe::prr MEM rd_rdy]]
+						pipe::accum rs1_rdata [pipe::prr MEM rd_wdata]
+					endif
+					begelse
+						pipe::pstall
+					endif
+				endif
+				begif [s== [pipe::prr MEM rd_addr] rs2_addr]
+					begif [s&& [pipe::issucc MEM] [pipe::prr MEM rd_rdy]]
+						pipe::accum rs2_rdata [pipe::prr MEM rd_wdata]
 					endif
 					begelse
 						pipe::pstall
 					endif
 				endif
 			endif
-			
 
 			## ALU processing ##
 			# acquiring data
