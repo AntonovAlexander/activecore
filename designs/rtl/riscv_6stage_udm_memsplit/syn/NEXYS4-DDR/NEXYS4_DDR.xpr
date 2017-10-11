@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2015 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="5" Path="D:/Research/Computer_Science/Projects/Personal/activecore/designs/rtl/riscv_5stage_udm_memsplit/syn/NEXYS4-DDR/NEXYS4_DDR.xpr">
+<Project Version="7" Minor="5" Path="D:/Research/Computer_Science/Projects/Personal/activecore/designs/rtl/riscv_6stage_udm_memsplit/syn/NEXYS4-DDR/NEXYS4_DDR.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="dbe4f722851248e3976cc912f1a3ff99"/>
@@ -67,7 +67,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../activecore/riscv/riscv_5stage/riscv_5stage.v">
+      <File Path="$PPRDIR/../../../../activecore/riscv/riscv_6stage/riscv_6stage.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
