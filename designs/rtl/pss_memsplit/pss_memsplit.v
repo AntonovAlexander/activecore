@@ -245,9 +245,9 @@ generate
 			, .data_mem_be(cpu_data_be)
 		);
 
-	else if (CPU == "riscv_7stage")
+	else if (CPU == "riscv_6stage")
 	
-		riscv_7stage riscv (
+		riscv_6stage riscv (
 			.clk_i(clk_i)
 			, .rst_i(cpu_reset)
 			
