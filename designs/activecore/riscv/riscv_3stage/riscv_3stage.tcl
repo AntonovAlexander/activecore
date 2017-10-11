@@ -231,7 +231,7 @@ rtl::module riscv_3stage
 
 			s= pc nextinstr_addr
 
-		pipe::pstage IDECODE
+		pipe::pstage EXEC
 
 			pipe::mcopipe_resp instr_mem instr_code
 
