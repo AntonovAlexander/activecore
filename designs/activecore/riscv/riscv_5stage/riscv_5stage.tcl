@@ -867,15 +867,6 @@ rtl::module riscv_5stage
 
 			endif
 
-
-			# branch control
-			s= jump_req_cmd jump_req
-			s= jump_vector_cmd jump_vector
-			begif jump_req
-				pipe::pflush
-			endif
-
-
 			# mem addr processing
 			s= mem_addr alu_result
 			s= mem_wdata rs2_rdata
@@ -883,6 +874,14 @@ rtl::module riscv_5stage
 
 		pipe::pstage MEM
 			
+			# branch control
+			s= jump_req_cmd jump_req
+			s= jump_vector_cmd jump_vector
+			begif jump_req
+				pipe::pflush
+			endif
+
+			# memory access
 			begif mem_cmd
 				pipe::mcopipe_wrreq data_mem [cnct {mem_addr mem_be mem_wdata}]
 			endif
