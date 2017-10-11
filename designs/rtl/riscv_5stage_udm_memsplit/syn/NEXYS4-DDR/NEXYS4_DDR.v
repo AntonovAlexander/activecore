@@ -10,14 +10,14 @@ module NEXYS4_DDR
     , output  UART_RXD_OUT
 );
 
-wire CLK_80MHZ;
+wire clk_gen;
 wire pll_locked;
 
 sys_clk sys_clk
 (
     .clk_in1(CLK100MHZ)
     , .reset(!CPU_RESETN)
-    , .clk_out1(CLK_80MHZ)
+    , .clk_out1(clk_gen)
     , .locked(pll_locked)
 );
 
@@ -32,7 +32,7 @@ pss_memsplit
 	, .mem_size(8192)
 ) riscv_udm
 (
-	.clk_i(CLK_80MHZ)
+	.clk_i(clk_gen)
 	, .arst_i(pss_arst)
 	, .rx_i(UART_TXD_IN)
 	, .tx_o(UART_RXD_OUT)
