@@ -63,7 +63,7 @@ namespace eval riscv {
 }
 
 
-rtl::module riscv_5stage
+rtl::module riscv_3stage
 
 	rtl::input 	{0 0} 	clk_i
 	rtl::input 	{0 0} 	rst_i
@@ -625,17 +625,27 @@ rtl::module riscv_5stage
 			## optimized for synthesis
 			s= rs1_rdata [indexed [pipe::rdprev regfile] rs1_addr]
 			s= rs2_rdata [indexed [pipe::rdprev regfile] rs2_addr]
-			
-			# pipeline WB forwarding
-			begif [s&& [pipe::issucc WB] [pipe::prr WB rd_req]]
-				begif [s== [pipe::prr WB rd_addr] rs1_addr]
-					s= rs1_rdata [pipe::prr WB rd_wdata]
+
+			# pipeline MEMWB forwarding
+			begif [s&& [pipe::isworking MEMWB] [pipe::prr MEMWB rd_req]]
+				begif [s== [pipe::prr MEMWB rd_addr] rs1_addr]
+					begif [pipe::prr MEMWB rd_rdy]
+						pipe::accum rs1_rdata [pipe::prr MEMWB rd_wdata]
+					endif
+					begelse
+						pipe::pstall
+					endif
 				endif
-				begif [s== [pipe::prr WB rd_addr] rs2_addr]
-					s= rs2_rdata [pipe::prr WB rd_wdata]
+				begif [s== [pipe::prr MEMWB rd_addr] rs2_addr]
+					begif [pipe::prr MEMWB rd_rdy]
+						pipe::accum rs2_rdata [pipe::prr MEMWB rd_wdata]
+					endif
+					begelse
+						pipe::pstall
+					endif
 				endif
 			endif
-			##
+
 
 			begif [s== rs1_addr 0]
 				s= rs1_rdata 0
@@ -643,48 +653,6 @@ rtl::module riscv_5stage
 
 			begif [s== rs2_addr 0]
 				s= rs2_rdata 0
-			endif
-
-		pipe::pstage EXEC
-
-			# pipeline WB forwarding
-			begif [s&& [pipe::isworking WB] [pipe::prr WB rd_req]]
-				begif [s== [pipe::prr WB rd_addr] rs1_addr]
-					begif [pipe::prr WB rd_rdy]
-						pipe::accum rs1_rdata [pipe::prr WB rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-				begif [s== [pipe::prr WB rd_addr] rs2_addr]
-					begif [pipe::prr WB rd_rdy]
-						pipe::accum rs2_rdata [pipe::prr WB rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-			endif
-
-			# pipeline MEM forwarding
-			begif [s&& [pipe::isworking MEM] [pipe::prr MEM rd_req]]
-				begif [s== [pipe::prr MEM rd_addr] rs1_addr]
-					begif [pipe::prr MEM rd_rdy]
-						pipe::accum rs1_rdata [pipe::prr MEM rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-				begif [s== [pipe::prr MEM rd_addr] rs2_addr]
-					begif [pipe::prr MEM rd_rdy]
-						pipe::accum rs2_rdata [pipe::prr MEM rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
 			endif
 
 			## ALU processing ##
@@ -872,7 +840,7 @@ rtl::module riscv_5stage
 			s= mem_wdata rs2_rdata
 
 
-		pipe::pstage MEM
+		pipe::pstage MEMWB
 			
 			# branch control
 			s= jump_req_cmd jump_req
@@ -883,22 +851,17 @@ rtl::module riscv_5stage
 
 			# memory access
 			begif mem_req
+			
 				begif mem_cmd
 					pipe::mcopipe_wrreq data_mem [cnct {mem_addr mem_be mem_wdata}]
 				endif
 				begelse
 					pipe::mcopipe_rdreq data_mem [cnct {mem_addr mem_be mem_wdata}]
-				endif
-			endif
-
-		pipe::pstage WB
-			
-			begif mem_req
-				begif [s! mem_cmd]
 					begif [pipe::mcopipe_resp data_mem mem_rdata]
 						s= rd_rdy	1
 					endif
 				endif
+
 			endif
 
 			begif [s== rd_source $riscv::RD_MEM]
