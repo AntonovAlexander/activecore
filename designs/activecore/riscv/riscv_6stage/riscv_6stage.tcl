@@ -63,7 +63,7 @@ namespace eval riscv {
 }
 
 
-rtl::module riscv_5stage
+rtl::module riscv_6stage
 
 	rtl::input 	{0 0} 	clk_i
 	rtl::input 	{0 0} 	rst_i
@@ -216,7 +216,7 @@ rtl::module riscv_5stage
 		pipe::mcopipeif data_mem {67 0} {31 0}
 
 
-		pipe::pstage IFETCH
+		pipe::pstage IADDR
 			
 			s= curinstr_addr pc
 
@@ -225,11 +225,13 @@ rtl::module riscv_5stage
 			endif
 			s= jump_req_cmd 0
 
-			pipe::mcopipe_rdreq instr_mem [cnct {curinstr_addr curinstr_addr}]
-
 			s= nextinstr_addr [s+ curinstr_addr 4]
 
 			s= pc nextinstr_addr
+
+		pipe::pstage IFETCH
+
+			pipe::mcopipe_rdreq instr_mem [cnct {curinstr_addr curinstr_addr}]
 
 		pipe::pstage IDECODE
 
