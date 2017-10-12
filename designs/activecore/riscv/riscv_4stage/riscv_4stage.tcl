@@ -2,7 +2,7 @@
 
 source ../riscv_pipe.tcl
 
-rtl::module riscv_6stage
+rtl::module riscv_4stage
 
 	riscv_pipe::declare_wrapper_ports
 
@@ -11,15 +11,12 @@ rtl::module riscv_6stage
 		riscv_pipe::declare_pcontext
 
 
-		pipe::pstage IADDR
-
-			riscv_pipe::process_pc
-
 		pipe::pstage IFETCH
 
+			riscv_pipe::process_pc
 			pipe::mcopipe_rdreq instr_mem [cnct {curinstr_addr curinstr_addr}]
 
-		pipe::pstage IDECODE
+		pipe::pstage EXEC
 
 			pipe::mcopipe_resp instr_mem instr_code
 			riscv_pipe::process_decode
@@ -35,28 +32,6 @@ rtl::module riscv_6stage
 				endif
 			endif
 			##
-
-		pipe::pstage EXEC
-
-			# pipeline WB forwarding
-			begif [s&& [pipe::isworking WB] [pipe::prr WB rd_req]]
-				begif [s== [pipe::prr WB rd_addr] rs1_addr]
-					begif [pipe::prr WB rd_rdy]
-						pipe::accum rs1_rdata [pipe::prr WB rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-				begif [s== [pipe::prr WB rd_addr] rs2_addr]
-					begif [pipe::prr WB rd_rdy]
-						pipe::accum rs2_rdata [pipe::prr WB rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-			endif
 
 			# pipeline MEM forwarding
 			begif [s&& [pipe::isworking MEM] [pipe::prr MEM rd_req]]
@@ -83,9 +58,10 @@ rtl::module riscv_6stage
 			riscv_pipe::process_jump_op
 			riscv_pipe::process_mem_reqdata
 
-			riscv_pipe::process_branch
 
 		pipe::pstage MEM
+			
+			riscv_pipe::process_branch
 
 			# memory access
 			begif mem_req

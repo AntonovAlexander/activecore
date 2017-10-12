@@ -1,5 +1,6 @@
 ## See LICENSE file for license details
 
+source ../riscv_pipe.tcl
 
 rtl::module riscv_1stage
 
@@ -8,7 +9,7 @@ rtl::module riscv_1stage
 	pipe::pproc instrpipe clk_i rst_i
 
 		riscv_pipe::declare_pcontext
-		
+
 
 		pipe::pstage EXEC
 			

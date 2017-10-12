@@ -2,7 +2,7 @@
 
 source ../riscv_pipe.tcl
 
-rtl::module riscv_3stage
+rtl::module riscv_2stage
 
 	riscv_pipe::declare_wrapper_ports
 
@@ -22,33 +22,10 @@ rtl::module riscv_3stage
 			riscv_pipe::process_decode
 			riscv_pipe::process_regfetch
 
-			# pipeline MEMWB forwarding
-			begif [s&& [pipe::isworking MEMWB] [pipe::prr MEMWB rd_req]]
-				begif [s== [pipe::prr MEMWB rd_addr] rs1_addr]
-					begif [pipe::prr MEMWB rd_rdy]
-						pipe::accum rs1_rdata [pipe::prr MEMWB rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-				begif [s== [pipe::prr MEMWB rd_addr] rs2_addr]
-					begif [pipe::prr MEMWB rd_rdy]
-						pipe::accum rs2_rdata [pipe::prr MEMWB rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-			endif
-
 			riscv_pipe::process_alu
 			riscv_pipe::process_rd_csr_prev
 			riscv_pipe::process_jump_op
 			riscv_pipe::process_mem_reqdata
-
-
-		pipe::pstage MEMWB
 			
 			riscv_pipe::process_branch
 

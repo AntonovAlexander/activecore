@@ -1,5 +1,6 @@
 ## See LICENSE file for license details
 
+source ../riscv_pipe.tcl
 
 rtl::module riscv_5stage
 
