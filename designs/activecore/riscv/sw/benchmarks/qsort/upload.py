@@ -72,7 +72,7 @@ def test_qsort(qsort_filename):
     udm.loadbin(qsort_filename)
     print("Test program written!")
 
-    time.sleep(3)
+    time.sleep(1)
 
     print("Reading data buffer...")
     rdarr = udm.rdarr32(0x6000, DATA_SIZE)
