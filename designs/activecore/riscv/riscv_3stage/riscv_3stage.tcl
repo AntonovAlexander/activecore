@@ -26,18 +26,12 @@ rtl::module riscv_3stage
 			begif [s&& [pipe::isworking MEMWB] [pipe::prr MEMWB rd_req]]
 				begif [s== [pipe::prr MEMWB rd_addr] rs1_addr]
 					begif [pipe::prr MEMWB rd_rdy]
-						pipe::accum rs1_rdata [pipe::prr MEMWB rd_wdata]
-					endif
-					begelse
-						pipe::pstall
+						s= rs1_rdata [pipe::prr MEMWB rd_wdata]
 					endif
 				endif
 				begif [s== [pipe::prr MEMWB rd_addr] rs2_addr]
 					begif [pipe::prr MEMWB rd_rdy]
-						pipe::accum rs2_rdata [pipe::prr MEMWB rd_wdata]
-					endif
-					begelse
-						pipe::pstall
+						s= rs2_rdata [pipe::prr MEMWB rd_wdata]
 					endif
 				endif
 			endif
