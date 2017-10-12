@@ -34,7 +34,6 @@ rtl::module riscv_6stage
 					s= rs2_rdata [pipe::prr WB rd_wdata]
 				endif
 			endif
-			##
 
 			# pipeline MEM forwarding
 			begif [s&& [pipe::isworking MEM] [pipe::prr MEM rd_req]]
