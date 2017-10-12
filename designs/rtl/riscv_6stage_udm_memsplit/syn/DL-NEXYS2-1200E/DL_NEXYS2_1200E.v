@@ -15,9 +15,9 @@ wire clk_generated;
 sys_clk sys_clk(
 	.CLKIN_IN(clk), 
 	.RST_IN(btn[0]), 
-	.CLKDV_OUT(clk_generated),
+	.CLKDV_OUT(),
 	.CLKIN_IBUFG_OUT(), 	
-	.CLK0_OUT()
+	.CLK0_OUT(clk_generated)
 );
 
 pss_memsplit
