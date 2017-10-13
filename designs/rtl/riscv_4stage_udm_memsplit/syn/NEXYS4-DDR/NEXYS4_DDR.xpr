@@ -160,6 +160,19 @@
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk_clk_wiz.v"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk.veo"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk.xml"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk.xdc"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk_board.xdc"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="doc/clk_wiz_v5_1_changelog.txt"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk_ooc.xdc"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk.v"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk.dcp"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk_funcsim.vhdl"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk_stub.v"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk_stub.vhdl"/>
+        <CompFileExtendedInfo CompFileName="sys_clk.xci" FileRelPathName="sys_clk_funcsim.v"/>
       </File>
       <Config>
         <Option Name="TopModule" Val="sys_clk"/>
