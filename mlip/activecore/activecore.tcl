@@ -210,6 +210,10 @@ proc begif {condition} {
 	__gplc_begif $condition
 }
 
+proc begnif {condition} {
+	__gplc_begif [s! $condition]
+}
+
 proc begelsif {condition} {
 	__gplc_begelsif $condition
 }
