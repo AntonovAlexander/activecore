@@ -72,10 +72,7 @@ def hw_test_qsort(qsort_filename):
     udm.loadbin(qsort_filename)
     print("Test program written!")
 
-    time.sleep(1)
-
     print("Reading data buffer...")
-    udm.wr(0x6000, 0x55aa55aa)
     rdarr = udm.rdarr32(0x6000, DATA_SIZE)
     print("Data buffer read!")
 
