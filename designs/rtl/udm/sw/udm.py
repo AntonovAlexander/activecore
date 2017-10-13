@@ -90,6 +90,14 @@ class udm:
         for i in range(count):
             self.sendword(datawords[i])
     
+    def clr(self, address, size):
+        self.sendbyte(self.sync_byte)
+        self.sendbyte(self.wr_cmd)
+        self.sendword(address)
+        self.sendword(size)
+        for i in range(size):
+            self.sendbyte(0x00)
+    
     def rd(self, address):
         self.ser.flush()
         self.sendbyte(self.sync_byte)
