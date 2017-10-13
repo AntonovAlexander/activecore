@@ -38,9 +38,9 @@ rtl::module riscv_3stage
 
 		pipe::pstage EXECMEMWB
 
-			set ST_EXEC		1
-			set ST_MEM		0
-			pipe::pvar {0 0} exestate		1
+			set ST_EXEC		0
+			set ST_MEM		1
+			pipe::pvar {0 0} exestate		$ST_EXEC
 
 			begif [s== exestate $ST_EXEC]
 				riscv_pipe::process_alu
