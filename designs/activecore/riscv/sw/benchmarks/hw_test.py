@@ -40,6 +40,6 @@ if (hw_test_rsort('rsort.riscv') == 1):
 else:
     test_fail_counter = test_fail_counter + 1
 
-print("Total tests passed: ", test_succ_counter, ", total test failed: ", test_fail_counter)
+print("Total tests PASSED: ", test_succ_counter, ", total test FAILED: ", test_fail_counter)
 
 udm.discon()
