@@ -9,7 +9,7 @@ import time
 import udm
 from udm import *
 
-def test_qsort(qsort_filename):
+def hw_test_qsort(qsort_filename):
     print("#### QSORT TEST STARTED ####");
     
     DATA_SIZE = 1024
@@ -75,6 +75,7 @@ def test_qsort(qsort_filename):
     time.sleep(1)
 
     print("Reading data buffer...")
+    udm.wr(0x6000, 0x55aa55aa)
     rdarr = udm.rdarr32(0x6000, DATA_SIZE)
     print("Data buffer read!")
 
@@ -89,11 +90,5 @@ def test_qsort(qsort_filename):
     else:
         print("#### QSORT TEST FAILED! ####")
     
+    print("")    
     return test_succ_flag
-
-
-udm.cc('COM5', 921600)
-
-test_qsort('../qsort.riscv')
-
-udm.discon()

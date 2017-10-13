@@ -9,7 +9,7 @@ import time
 import udm
 from udm import *
 
-def test_rsort(qsort_filename):
+def hw_test_rsort(rsort_filename):
     print("#### RSORT TEST STARTED ####");
     
     DATA_SIZE = 1024
@@ -69,7 +69,7 @@ def test_rsort(qsort_filename):
 	]
     
     print("Loading test program...")
-    udm.loadbin(qsort_filename)
+    udm.loadbin(rsort_filename)
     print("Test program written!")
 
     time.sleep(1)
@@ -89,11 +89,5 @@ def test_rsort(qsort_filename):
     else:
         print("#### RSORT TEST FAILED! ####")
     
+    print("")    
     return test_succ_flag
-
-
-udm.cc('COM5', 921600)
-
-test_rsort('../rsort.riscv')
-
-udm.discon()
