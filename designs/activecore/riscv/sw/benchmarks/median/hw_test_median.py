@@ -7,7 +7,7 @@ sys.path.append('../../../../../rtl/udm/sw')
 import udm
 from udm import *
 
-def test_median(median_filename):
+def hw_test_median(median_filename):
     print("#### MEDIAN TEST STARTED ####");
     
     DATA_SIZE = 400
@@ -53,12 +53,5 @@ def test_median(median_filename):
     else:
         print("#### MEDIAN TEST FAILED! ####")
     
+    print("")
     return test_succ_flag
-                  
-
-
-udm.cc('COM5', 921600)
-
-test_median('../median.riscv')
-
-udm.discon()

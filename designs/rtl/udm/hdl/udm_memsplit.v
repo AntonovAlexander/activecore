@@ -64,7 +64,7 @@ always @(posedge clk_i)
 	if (rst_i) rd_inprogress_reg <= 1'b0;
 	else
 		begin
-		if ((bus_req_internal == 1'b1) && (bus_we_o == 1'b0)) rd_inprogress_reg <= 1'b1;
+		if ((rd_inprogress_reg == 1'b0) && (bus_req_internal == 1'b1) && (bus_we_o == 1'b0)) rd_inprogress_reg <= 1'b1;
 		else if (bus_resp_i == 1'b1) rd_inprogress_reg <= 1'b0;
 		end
 	end
