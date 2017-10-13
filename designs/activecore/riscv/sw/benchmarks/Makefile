@@ -20,8 +20,8 @@ instbasedir = $(UCB_VLSI_HOME)/install
 bmarks = \
 	heartbeat_variable \
 	median \
-	qsort 
-	#rsort \
+	qsort \
+	rsort
 	#dhrystone 
 	#towers \
 	#vvadd \
