@@ -22,19 +22,19 @@ rtl::module riscv_4stage
 			riscv_pipe::process_decode
 			riscv_pipe::process_regfetch
 
-			# pipeline MEM forwarding
-			begif [s&& [pipe::isworking MEM] [pipe::prr MEM rd_req]]
-				begif [s== [pipe::prr MEM rd_addr] rs1_addr]
-					begif [pipe::prr MEM rd_rdy]
-						s= rs1_rdata [pipe::prr MEM rd_wdata]
+			# pipeline MEMWB forwarding
+			begif [s&& [pipe::isworking MEMWB] [pipe::prr MEMWB rd_req]]
+				begif [s== [pipe::prr MEMWB rd_addr] rs1_addr]
+					begif [pipe::prr MEMWB rd_rdy]
+						s= rs1_rdata [pipe::prr MEMWB rd_wdata]
 					endif
 					begelse
 						pipe::pstall
 					endif
 				endif
-				begif [s== [pipe::prr MEM rd_addr] rs2_addr]
-					begif [pipe::prr MEM rd_rdy]
-						s= rs2_rdata [pipe::prr MEM rd_wdata]
+				begif [s== [pipe::prr MEMWB rd_addr] rs2_addr]
+					begif [pipe::prr MEMWB rd_rdy]
+						s= rs2_rdata [pipe::prr MEMWB rd_wdata]
 					endif
 					begelse
 						pipe::pstall
@@ -69,7 +69,7 @@ rtl::module riscv_4stage
 			riscv_pipe::process_jump_op
 			riscv_pipe::process_mem_reqdata
 
-		pipe::pstage MEM
+		pipe::pstage MEMWB
 			
 			riscv_pipe::process_branch
 
