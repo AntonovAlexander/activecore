@@ -822,7 +822,7 @@ namespace eval riscv_pipe {
 	}
 
 	# mem addr processing
-	proc process_mem_reqdata {} {
+	proc process_setup_mem_reqdata {} {
 		s= mem_addr alu_result
 		s= mem_wdata rs2_rdata
 	}

@@ -79,12 +79,12 @@ rtl::module riscv_6stage
 
 			riscv_pipe::process_alu
 			riscv_pipe::process_rd_csr_prev
-			riscv_pipe::process_jump_op
-			riscv_pipe::process_mem_reqdata
-
-			riscv_pipe::process_branch
 
 		pipe::pstage MEM
+
+			riscv_pipe::process_setup_mem_reqdata
+			riscv_pipe::process_jump_op
+			riscv_pipe::process_branch
 
 			# memory access
 			begif mem_req
