@@ -4,6 +4,8 @@ from __future__ import division
 import sys
 sys.path.append('../../../../../rtl/udm/sw')
 
+import time
+
 import udm
 from udm import *
 
@@ -37,6 +39,8 @@ def hw_test_median(median_filename):
     print("Loading test program...")
     udm.loadbin(median_filename)
     print("Test program written!")
+
+    time.sleep(1)
 
     print("Reading data buffer...")
     rdarr = udm.rdarr32(0x6000, DATA_SIZE)
