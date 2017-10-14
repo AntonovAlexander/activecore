@@ -36,7 +36,7 @@
 
 `timescale 1ns / 1ps
 
-`define HALF_PERIOD			10						//external 50 MHZ
+`define HALF_PERIOD			5						//external 100 MHZ
 `define DIVIDER_115200		32'd8680
 `define DIVIDER_19200		32'd52083
 `define DIVIDER_9600		32'd104166
@@ -56,7 +56,7 @@
 
 module riscv_tb ();
 //
-reg CLK_50MHZ, RST, rx;
+reg CLK_100MHZ, RST, rx;
 reg [31:0] SW;
 wire [31:0] LED;
 	
@@ -67,11 +67,11 @@ pss_memsplit
 	//.mem_data("../../../../activecore/riscv/sw/benchmarks/heartbeat_variable.riscv.hex"),
 	.mem_data("../../../../activecore/riscv/sw/benchmarks/median.riscv.hex"),
 	//.mem_data("../../../../activecore/riscv/sw/benchmarks/qsort.riscv.hex"),
-	//.mem_data("../../../../activecore/riscv/sw/benchmarks/кsort.riscv.hex"),
+	//.mem_data("../../../../activecore/riscv/sw/benchmarks/rsort.riscv.hex"),
 	.mem_size(8192)
 ) riscv_udm
 (
-	.clk_i(CLK_50MHZ)
+	.clk_i(CLK_100MHZ)
 	, .arst_i(RST)
 	, .rx_i(rx)
 	//, .tx_o()
@@ -107,7 +107,7 @@ endtask
 ////reset all////
 task RESET_ALL ();
 begin
-	CLK_50MHZ = 1'b0;
+	CLK_100MHZ = 1'b0;
 	RST = 1'b1;
 	rx = 1'b1;
 	#(`HALF_PERIOD/2);
@@ -315,7 +315,7 @@ begin
 	$stop;
 end
 //
-always #`HALF_PERIOD CLK_50MHZ = ~CLK_50MHZ;
+always #`HALF_PERIOD CLK_100MHZ = ~CLK_100MHZ;
 
 always #1000 SW = SW + 8'h1;
 //
