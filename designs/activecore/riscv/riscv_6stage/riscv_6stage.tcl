@@ -25,55 +25,9 @@ rtl::module riscv_6stage
 			riscv_pipe::process_decode
 			riscv_pipe::process_regfetch
 			
-			# pipeline WB forwarding
-			begif [s&& [pipe::issucc WB] [pipe::prr WB rd_req]]
-				begif [s== [pipe::prr WB rd_addr] rs1_addr]
-					s= rs1_rdata [pipe::prr WB rd_wdata]
-				endif
-				begif [s== [pipe::prr WB rd_addr] rs2_addr]
-					s= rs2_rdata [pipe::prr WB rd_wdata]
-				endif
-			endif
-
-			# pipeline MEM forwarding
-			begif [s&& [pipe::isworking MEM] [pipe::prr MEM rd_req]]
-				begif [s== [pipe::prr MEM rd_addr] rs1_addr]
-					begif [pipe::prr MEM rd_rdy]
-						s= rs1_rdata [pipe::prr MEM rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-				begif [s== [pipe::prr MEM rd_addr] rs2_addr]
-					begif [pipe::prr MEM rd_rdy]
-						s= rs2_rdata [pipe::prr MEM rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-			endif
-
-			# pipeline EXEC forwarding
-			begif [s&& [pipe::isworking EXEC] [pipe::prr EXEC rd_req]]
-				begif [s== [pipe::prr EXEC rd_addr] rs1_addr]
-					begif [pipe::prr EXEC rd_rdy]
-						s= rs1_rdata [pipe::prr EXEC rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-				begif [s== [pipe::prr EXEC rd_addr] rs2_addr]
-					begif [pipe::prr EXEC rd_rdy]
-						s= rs2_rdata [pipe::prr EXEC rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-			endif
+			riscv_pipe::forward_blocking WB
+			riscv_pipe::forward_blocking MEM
+			riscv_pipe::forward_blocking EXEC
 
 		pipe::pstage EXEC
 
@@ -83,7 +37,8 @@ rtl::module riscv_6stage
 		pipe::pstage MEM
 
 			riscv_pipe::process_setup_mem_reqdata
-			riscv_pipe::process_jump_op
+			riscv_pipe::process_curinstraddr_imm
+			riscv_pipe::process_jump
 			riscv_pipe::process_branch
 
 			# memory access

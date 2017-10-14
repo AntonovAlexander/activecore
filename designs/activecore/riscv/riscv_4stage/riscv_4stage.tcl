@@ -23,54 +23,20 @@ rtl::module riscv_4stage
 			riscv_pipe::process_regfetch
 
 			# pipeline MEMWB forwarding
-			begif [s&& [pipe::isworking MEMWB] [pipe::prr MEMWB rd_req]]
-				begif [s== [pipe::prr MEMWB rd_addr] rs1_addr]
-					begif [pipe::prr MEMWB rd_rdy]
-						s= rs1_rdata [pipe::prr MEMWB rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-				begif [s== [pipe::prr MEMWB rd_addr] rs2_addr]
-					begif [pipe::prr MEMWB rd_rdy]
-						s= rs2_rdata [pipe::prr MEMWB rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-			endif
-
-			# pipeline EXEC forwarding
-			begif [s&& [pipe::isworking EXEC] [pipe::prr EXEC rd_req]]
-				begif [s== [pipe::prr EXEC rd_addr] rs1_addr]
-					begif [pipe::prr EXEC rd_rdy]
-						s= rs1_rdata [pipe::prr EXEC rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-				begif [s== [pipe::prr EXEC rd_addr] rs2_addr]
-					begif [pipe::prr EXEC rd_rdy]
-						s= rs2_rdata [pipe::prr EXEC rd_wdata]
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-			endif
+			riscv_pipe::forward_unblocking MEMWB
 
 		pipe::pstage EXEC
 
+			riscv_pipe::forward_accum_blocking MEMWB	
+
 			riscv_pipe::process_alu
 			riscv_pipe::process_rd_csr_prev
-			riscv_pipe::process_jump_op
-			riscv_pipe::process_setup_mem_reqdata
+			riscv_pipe::process_curinstraddr_imm
 
 		pipe::pstage MEMWB
 			
+			riscv_pipe::process_jump
+			riscv_pipe::process_setup_mem_reqdata
 			riscv_pipe::process_branch
 
 			# memory access

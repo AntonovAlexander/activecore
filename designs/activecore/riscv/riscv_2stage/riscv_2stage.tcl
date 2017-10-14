@@ -24,7 +24,8 @@ rtl::module riscv_2stage
 
 			riscv_pipe::process_alu
 			riscv_pipe::process_rd_csr_prev
-			riscv_pipe::process_jump_op
+			riscv_pipe::process_curinstraddr_imm
+			riscv_pipe::process_jump
 			riscv_pipe::process_setup_mem_reqdata
 			
 			riscv_pipe::process_branch

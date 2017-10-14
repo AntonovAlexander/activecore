@@ -635,6 +635,65 @@ namespace eval riscv_pipe {
 		endif
 	}
 
+	## unblocking forwarding
+	proc forward_unblocking {pstage} {
+		begif [s&& [pipe::isworking $pstage] [pipe::prr $pstage rd_req]]
+			begif [s== [pipe::prr $pstage rd_addr] rs1_addr]
+				begif [pipe::prr $pstage rd_rdy]
+					s= rs1_rdata [pipe::prr $pstage rd_wdata]
+				endif
+			endif
+			begif [s== [pipe::prr $pstage rd_addr] rs2_addr]
+				begif [pipe::prr $pstage rd_rdy]
+					s= rs2_rdata [pipe::prr $pstage rd_wdata]
+				endif
+			endif
+		endif
+	}
+
+	## blocking forwarding with accumulation
+	proc forward_accum_blocking {pstage} {
+		begif [s&& [pipe::isworking $pstage] [pipe::prr $pstage rd_req]]
+			begif [s== [pipe::prr $pstage rd_addr] rs1_addr]
+				begif [pipe::prr $pstage rd_rdy]
+					pipe::accum rs1_rdata [pipe::prr $pstage rd_wdata]
+				endif
+				begelse
+					pipe::pstall
+				endif
+			endif
+			begif [s== [pipe::prr $pstage rd_addr] rs2_addr]
+				begif [pipe::prr $pstage rd_rdy]
+					pipe::accum rs2_rdata [pipe::prr $pstage rd_wdata]
+				endif
+				begelse
+					pipe::pstall
+				endif
+			endif
+		endif
+	}
+
+	proc forward_blocking {pstage} {
+		begif [s&& [pipe::isworking $pstage] [pipe::prr $pstage rd_req]]
+			begif [s== [pipe::prr $pstage rd_addr] rs1_addr]
+				begif [pipe::prr $pstage rd_rdy]
+					s= rs1_rdata [pipe::prr $pstage rd_wdata]
+				endif
+				begelse
+					pipe::pstall
+				endif
+			endif
+			begif [s== [pipe::prr $pstage rd_addr] rs2_addr]
+				begif [pipe::prr $pstage rd_rdy]
+					s= rs2_rdata [pipe::prr $pstage rd_wdata]
+				endif
+				begelse
+					pipe::pstall
+				endif
+			endif
+		endif
+	}
+
 	## ALU processing ##
 	proc process_alu {} {
 		
@@ -771,9 +830,11 @@ namespace eval riscv_pipe {
 		#endif
 	}
 
-	proc process_jump_op {} {
-		## jump vector processing
+	proc process_curinstraddr_imm {} {
+		s= curinstraddr_imm [s+ curinstr_addr immediate]
+	}
 
+	proc process_jump {} {
 		begif [s== jump_src $riscv_pipe::JMP_SRC_OP1]
 			s= jump_vector alu_op1
 		endif
@@ -781,8 +842,6 @@ namespace eval riscv_pipe {
 		begif [s== jump_src $riscv_pipe::JMP_SRC_ALU]
 			s= jump_vector alu_result
 		endif
-
-		s= curinstraddr_imm [s+ curinstr_addr immediate]
 
 		begif jump_req_cond
 

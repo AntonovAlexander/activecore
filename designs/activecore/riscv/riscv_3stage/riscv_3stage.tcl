@@ -21,20 +21,7 @@ rtl::module riscv_3stage
 			pipe::mcopipe_resp instr_mem instr_code
 			riscv_pipe::process_decode
 			riscv_pipe::process_regfetch
-
-			# pipeline EXECMEMWB forwarding
-			begif [s&& [pipe::isworking EXECMEMWB] [pipe::prr EXECMEMWB rd_req]]
-				begif [s== [pipe::prr EXECMEMWB rd_addr] rs1_addr]
-					begif [pipe::prr EXECMEMWB rd_rdy]
-						s= rs1_rdata [pipe::prr EXECMEMWB rd_wdata]
-					endif
-				endif
-				begif [s== [pipe::prr EXECMEMWB rd_addr] rs2_addr]
-					begif [pipe::prr EXECMEMWB rd_rdy]
-						s= rs2_rdata [pipe::prr EXECMEMWB rd_wdata]
-					endif
-				endif
-			endif
+			riscv_pipe::forward_unblocking EXECMEMWB
 
 		pipe::pstage EXECMEMWB
 
@@ -45,7 +32,8 @@ rtl::module riscv_3stage
 			begif [s== exestate $ST_EXEC]
 				riscv_pipe::process_alu
 				riscv_pipe::process_rd_csr_prev
-				riscv_pipe::process_jump_op
+				riscv_pipe::process_curinstraddr_imm
+				riscv_pipe::process_jump
 				riscv_pipe::process_setup_mem_reqdata
 				riscv_pipe::process_branch
 
