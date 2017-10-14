@@ -25,7 +25,7 @@ rtl::module riscv_6stage
 			riscv_pipe::process_decode
 			riscv_pipe::process_regfetch
 			
-			riscv_pipe::forward_blocking WB
+			riscv_pipe::forward_unblocking_succ WB
 			riscv_pipe::forward_blocking MEM
 			riscv_pipe::forward_blocking EXEC
 
