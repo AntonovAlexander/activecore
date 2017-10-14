@@ -204,13 +204,13 @@ add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC c
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_alu_overflow
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_jump_req
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_jump_req_cond
-add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_jump_vector
+add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_MEM_jump_vector
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_jump_src
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_funct3
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_mem_req
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_mem_cmd
-add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_mem_addr
-add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_mem_wdata
+add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_MEM_mem_addr
+add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_MEM_mem_wdata
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/clk_i
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/rst_i
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_MEM_genpctrl_initiated
