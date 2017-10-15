@@ -651,7 +651,7 @@ namespace eval riscv_pipe {
 		endif
 	}
 
-	## unblocking forwarding for succ transfers only (for stages with guaranteed data availability)
+	## unblocking forwarding from stages with guaranteed data availability (for succ transfers only, no rdy checked)
 	proc forward_unblocking_succ {pstage} {
 		begif [s&& [pipe::issucc $pstage] [pipe::prr $pstage rd_req]]
 			begif [s== [pipe::prr $pstage rd_addr] rs1_addr]
