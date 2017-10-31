@@ -79,7 +79,7 @@ int expr_assign_cmd(unsigned int * cursor, ac_dimensions dimensions, ac_var* tar
 
 	if ((param.type == PARAM_TYPE_VAR) && (targetDePowered != param.GetDimensions().size()))
 	{
-		printf("ERROR: dimensions do not match!\n");
+		printf("ERROR: dimensions do not match for target %s, param: %s!\n", StringToCharArr(target->name), StringToCharArr(param.GetString()));
 		return 1;
 	}
 	else if (targetDePowered == 1) ret_val = expr_assign_cmd_generated(cursor, dimensions, target, param);

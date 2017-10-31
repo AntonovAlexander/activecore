@@ -29,7 +29,7 @@ namespace eval pipe {
 		__mlip_pipe_call pvar
 	}
 
-	proc gpvar_sync {dimensions name defval} {
+	proc gpvar {dimensions name defval} {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ gpvar\ $name\ is\ not\ a\ number!
 		}
@@ -37,24 +37,22 @@ namespace eval pipe {
 		_acc_index $dimensions
 		__gplc_acc_param_string $name
 		__gplc_acc_param_string $defval
-		__mlip_pipe_call gpvar_sync
-	}
-
-	proc gpvar_async {dimensions name defval} {
-		if {[ActiveCore::isnumeric $defval] == 0} {
-			ActiveCore::ERROR default\ value\ of\ gpvar\ $name\ is\ not\ a\ number!
-		}
-		__gplc_acc_param_clr
-		_acc_index $dimensions
-		__gplc_acc_param_string $name
-		__gplc_acc_param_string $defval
-		__mlip_pipe_call gpvar_async
+		__mlip_pipe_call gpvar
 	}
 
 	proc rdprev {name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $name
 		__mlip_pipe_call rdprev
+	}
+
+	proc s<= {target source} {
+		if {[ActiveCore::isnumeric $target] == 1} {
+			ActiveCore::ERROR Target\ $target\ is\ numeric!
+		}
+		ActiveCore::_accum_param $source
+		__gplc_acc_param_string $target
+		__mlip_pipe_call assign_unblocking
 	}
 
 	proc copipeif {name dim_wdata dim_rdata} {

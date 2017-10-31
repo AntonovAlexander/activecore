@@ -28,9 +28,9 @@ namespace pipe
 	int pproc_cmd(std::string pproc_name, ac_var * clk_var, ac_var * rst_var);
 	int endpproc_cmd();
 	int pvar_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
-	int gpvar_sync_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
-	int gpvar_async_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
+	int gpvar_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
 	int rdprev_cmd(std::string gpvar_name, std::string * respvar_name);
+	int assign_unblocking_cmd(ac_dimensions dimensions, std::string target, ac_param param);
 	int pstage_cmd(std::string pstage_name);
 	int pbreak_cmd();
 	int pstall_cmd();

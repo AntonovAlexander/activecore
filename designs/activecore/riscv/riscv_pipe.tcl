@@ -203,11 +203,11 @@ namespace eval riscv_pipe {
 		pipe::pvar {31 0} 	mem_rdata 		0
 		pipe::pvar {0 0} 	mem_rshift		0
 		
-		pipe::gpvar_sync {31 0} 	pc				$riscv_pipe::START_ADDR
-		_acc_index {31 0}	
-		pipe::gpvar_sync {31 0} 	regfile			0
-		pipe::gpvar_sync {0 0}		jump_req_cmd	0
-		pipe::gpvar_sync {31 0} 	jump_vector_cmd	0
+		pipe::gpvar	{31 0} 	pc				$riscv_pipe::START_ADDR
+		_acc_index 	{31 0}	
+		pipe::gpvar {31 0} 	regfile			0
+		pipe::gpvar {0 0}	jump_req_cmd	0
+		pipe::gpvar {31 0} 	jump_vector_cmd	0
 
 		# TODO: CSRs
 
@@ -222,11 +222,11 @@ namespace eval riscv_pipe {
 		begif jump_req_cmd
 			s= curinstr_addr jump_vector_cmd
 		endif
-		s= jump_req_cmd 0
+		pipe::s<= jump_req_cmd 0
 
 		s= nextinstr_addr [s+ curinstr_addr 4]
 
-		s= pc nextinstr_addr
+		pipe::s<= pc nextinstr_addr
 	}
 
 	proc process_decode {} {
@@ -900,8 +900,8 @@ namespace eval riscv_pipe {
 
 	# branch control
 	proc process_branch {} {
-		s= jump_req_cmd jump_req
-		s= jump_vector_cmd jump_vector
+		pipe::s<= jump_req_cmd jump_req
+		pipe::s<= jump_vector_cmd jump_vector
 		begif jump_req
 			pipe::pflush
 		endif
@@ -916,7 +916,7 @@ namespace eval riscv_pipe {
 	proc process_wb {} {
 		begif rd_req
 			_acc_index rd_addr
-			s= regfile rd_wdata
+			pipe::s<= regfile rd_wdata
 		endif
 	}
 
