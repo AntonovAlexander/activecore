@@ -38,6 +38,7 @@ namespace pipe
 	int pflush_cmd();
 	int pre_cmd(ac_var * ext_var, ac_var ** int_var);
 	int pwe_cmd(ac_param param, ac_var * ext_var);
+	int pwe_unblocking_cmd(ac_param param, ac_var * ext_var);
 	int prr_cmd(std::string pstage_name, ac_var * remote_var, ac_var ** int_var);
 	int accum_cmd(ac_var * target, ac_param source);
 

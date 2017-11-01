@@ -163,7 +163,7 @@ int TCL_accum_index_c_cmd(ClientData clientData, Tcl_Interp *interp, int objc, T
 	int msb = conv_string_to_int(std::string(Tcl_GetString(objv[1])));
 
 	dimension_range new_range(msb);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }
@@ -182,7 +182,7 @@ int TCL_accum_index_v_cmd(ClientData clientData, Tcl_Interp *interp, int objc, T
 	if (SetVarReadable(msb, &msb_var) != 0) return TCL_ERROR;
 
 	dimension_range new_range(msb_var);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }
@@ -200,7 +200,7 @@ int TCL_accum_range_cc_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	int lsb = conv_string_to_int(std::string(Tcl_GetString(objv[2])));
 
 	dimension_range new_range(msb, lsb);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }
@@ -221,7 +221,7 @@ int TCL_accum_range_cv_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	if (SetVarReadable(lsb, &lsb_var) != 0) return TCL_ERROR;
 
 	dimension_range new_range(msb, lsb_var);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }
@@ -242,7 +242,7 @@ int TCL_accum_range_vc_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	int lsb = conv_string_to_int(std::string(Tcl_GetString(objv[2])));
 
 	dimension_range new_range(msb_var, lsb);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }
@@ -265,7 +265,7 @@ int TCL_accum_range_vv_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	if (SetVarReadable(lsb, &lsb_var) != 0) return TCL_ERROR;
 
 	dimension_range new_range(msb_var, lsb_var);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }

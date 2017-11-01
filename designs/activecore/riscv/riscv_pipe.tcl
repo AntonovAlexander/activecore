@@ -119,7 +119,6 @@ namespace eval riscv_pipe {
 
 	## transaction context
 	proc declare_pcontext {} {
-		
 		pipe::pvar {0 0} 	reset_active	0
 		pipe::pvar {31 0} 	curinstr_addr	0
 		pipe::pvar {31 0} 	nextinstr_addr	0
@@ -204,15 +203,20 @@ namespace eval riscv_pipe {
 		pipe::pvar {0 0} 	mem_rshift		0
 		
 		pipe::gpvar	{31 0} 	pc				$riscv_pipe::START_ADDR
-		_acc_index 	{31 0}	
+		_acc_index 	{31 1}	
 		pipe::gpvar {31 0} 	regfile			0
 		pipe::gpvar {0 0}	jump_req_cmd	0
 		pipe::gpvar {31 0} 	jump_vector_cmd	0
 
 		# TODO: CSRs
 
-		pipe::mcopipeif instr_mem {63 0} {31 0}
-		pipe::mcopipeif data_mem {67 0} {31 0}
+		pipe::_acc_index_wdata {63 0}
+		pipe::_acc_index_rdata {31 0}
+		pipe::mcopipeif instr_mem
+
+		pipe::_acc_index_wdata {67 0}
+		pipe::_acc_index_rdata {31 0}
+		pipe::mcopipeif data_mem
 	}
 
 	# RISC-V pipeline macro-operations
@@ -921,8 +925,13 @@ namespace eval riscv_pipe {
 	}
 
 	proc connect_copipes {} {
-		pipe::copipeif instr_mem {63 0} {31 0}
-		pipe::copipeif data_mem {67 0} {31 0}
+		pipe::_acc_index_wdata {63 0}
+		pipe::_acc_index_rdata {31 0}
+		pipe::copipeif instr_mem
+
+		pipe::_acc_index_wdata {67 0}
+		pipe::_acc_index_rdata {31 0}
+		pipe::copipeif data_mem
 
 		pipe::mcopipe_connect instrpipe instr_mem instr_mem
 		pipe::mcopipe_connect instrpipe data_mem data_mem

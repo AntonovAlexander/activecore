@@ -87,7 +87,7 @@ int expr_assign_cmd(unsigned int * cursor, ac_dimensions dimensions, ac_var* tar
 	{
 		for (unsigned int i = 0; i < target->dimensions[targetDePowered-1].GetWidth(); i++)
 		{
-			dimension_range * new_range = new dimension_range(i);
+			dimension_range * new_range = new dimension_range(i + target->dimensions[targetDePowered-1].lsb);
 			dimensions.push_front(*new_range);
 			dimension_range_static * new_range_static = new dimension_range_static(i-1, 0);
 			ac_dimensions_static gen_dimensions;
@@ -96,7 +96,7 @@ int expr_assign_cmd(unsigned int * cursor, ac_dimensions dimensions, ac_var* tar
 
 			std::vector<ac_param> ac_params_new;
 			ac_params_new.push_back(param);
-			ac_imm * new_imm = new ac_imm(NumToString(i));
+			ac_imm * new_imm = new ac_imm(NumToString(i + target->dimensions[targetDePowered-1].lsb));
 			ac_param * new_param = new ac_param(new_imm);
 			ac_params_new.push_back(*new_param);
 
@@ -256,7 +256,7 @@ int expr_2op_gen_dimensions(std::string opcode, ac_dimensions_static op1_dimensi
 	} else if (opcode == "indexed") {
 		if (op2_dimensions.size() > 1) return 1;
 		if (op1_dimensions.size() > 1) {
-			for (int i = 1; i < op1_dimensions.size(); i++)
+			for (int i = 0; i < (op1_dimensions.size() - 1); i++)
 			{
 				(*gen_dimensions)->push_back(op1_dimensions[i]);
 			}
