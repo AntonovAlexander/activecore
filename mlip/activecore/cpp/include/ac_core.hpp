@@ -210,6 +210,8 @@ public:
 	std::string opcode;
 	std::vector<ac_param> params;
 	std::vector<std::string> string_params;
+	std::vector<int> int_params;
+	std::vector<unsigned int> uint_params;
 	std::deque<ac_execode*> expressions;
 
 	ac_dimensions dimensions;
@@ -247,6 +249,8 @@ extern std::vector<std::vector<ac_var*>* > SignalsWriteable;
 extern ac_dimensions DimensionsAccumulator;
 extern std::vector<ac_param> ParamAccumulator;
 extern std::vector<std::string> StringParamAccumulator;
+extern std::vector<int> IntParamAccumulator;
+extern std::vector<unsigned int> UIntParamAccumulator;
 
 // Service functions
 void GenReset();

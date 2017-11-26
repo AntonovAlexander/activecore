@@ -20,6 +20,7 @@
 
 char * StringToCharArr(std::string string_in);
 int conv_string_to_int(std::string string_in);
+unsigned int conv_string_to_uint(std::string string_in);
 
 template<typename T> std::string toString(const T& value)
 {

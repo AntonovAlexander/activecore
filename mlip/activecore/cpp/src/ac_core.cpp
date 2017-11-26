@@ -27,6 +27,8 @@ std::vector<std::vector<ac_var*>* > SignalsWriteable;
 ac_dimensions DimensionsAccumulator;
 std::vector<ac_param> ParamAccumulator;
 std::vector<std::string> StringParamAccumulator;
+std::vector<int> IntParamAccumulator;
+std::vector<unsigned int> UIntParamAccumulator;
 
 char DEFAULT_TYPEVAR[] = "GENERATED";
 

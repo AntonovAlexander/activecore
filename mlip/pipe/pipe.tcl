@@ -100,19 +100,21 @@ namespace eval pipe {
 		}
 	}
 
-	proc copipeif {name} {
+	proc copipeif {width name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $name
+		__gplc_acc_param_uint $width
 		__mlip_pipe_call copipeif
 	}
 
-	proc mcopipeif {name} {
+	proc mcopipeif {width name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $name
+		__gplc_acc_param_uint $width
 		__mlip_pipe_call mcopipeif
 	}
 
-	proc mcopipe_export {mcopipeif_name signals} {
+	proc mcopipe_export {mcopipeif_name chnum signals} {
 		if { [llength $signals] != 6 } {
 			ActiveCore::ERROR parameters\ incorrect!
 		} else {
@@ -125,6 +127,7 @@ namespace eval pipe {
 			__gplc_acc_param_v_wr [lindex $signals 3]
 			__gplc_acc_param_v_rd [lindex $signals 4]
 			__gplc_acc_param_v_rd [lindex $signals 5]
+			__gplc_acc_param_uint $chnum
 			__mlip_pipe_call mcopipe_export
 		}
 	}
@@ -250,19 +253,20 @@ namespace eval pipe {
 		__mlip_pipe_call issucc
 	}
 
-	proc mcopipe_req {mcopipeif_name cmd param} {
+	proc mcopipe_req {mcopipeif_name chnum cmd param} {
 		__gplc_acc_param_clr
 		ActiveCore::_accum_param $cmd
 		ActiveCore::_accum_param $param
+		__gplc_acc_param_uint $chnum
 		__mlip_pipe_mcopipe_req $mcopipeif_name
 	}
 
-	proc mcopipe_wrreq {mcopipeif_name param} {
-		mcopipe_req $mcopipeif_name 1 $param
+	proc mcopipe_wrreq {mcopipeif_name chnum param} {
+		mcopipe_req $mcopipeif_name $chnum 1 $param
 	}
 
-	proc mcopipe_rdreq {mcopipeif_name param} {
-		mcopipe_req $mcopipeif_name 0 $param
+	proc mcopipe_rdreq {mcopipeif_name chnum param} {
+		mcopipe_req $mcopipeif_name $chnum 0 $param
 	}
 
 	proc mcopipe_resp {mcopipeif_name target} {
