@@ -9,7 +9,6 @@ namespace eval pipe {
 		__mlip_rtl_SetPtrs
 		__gplc_acc_param_v_rd $clk
 		__gplc_acc_param_v_rd $rst
-		__mlip_pipe_SetPtrs
 		__gplc_acc_param_string $name
 		__mlip_pipe_call pproc
 	}
@@ -29,7 +28,7 @@ namespace eval pipe {
 		__mlip_pipe_call pvar
 	}
 
-	proc gpvar_sync {dimensions name defval} {
+	proc gpvar {dimensions name defval} {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ gpvar\ $name\ is\ not\ a\ number!
 		}
@@ -37,18 +36,7 @@ namespace eval pipe {
 		_acc_index $dimensions
 		__gplc_acc_param_string $name
 		__gplc_acc_param_string $defval
-		__mlip_pipe_call gpvar_sync
-	}
-
-	proc gpvar_async {dimensions name defval} {
-		if {[ActiveCore::isnumeric $defval] == 0} {
-			ActiveCore::ERROR default\ value\ of\ gpvar\ $name\ is\ not\ a\ number!
-		}
-		__gplc_acc_param_clr
-		_acc_index $dimensions
-		__gplc_acc_param_string $name
-		__gplc_acc_param_string $defval
-		__mlip_pipe_call gpvar_async
+		__mlip_pipe_call gpvar
 	}
 
 	proc rdprev {name} {
@@ -57,23 +45,76 @@ namespace eval pipe {
 		__mlip_pipe_call rdprev
 	}
 
-	proc copipeif {name dim_wdata dim_rdata} {
+	proc s<= {target source} {
+		if {[ActiveCore::isnumeric $target] == 1} {
+			ActiveCore::ERROR Target\ $target\ is\ numeric!
+		}
+		ActiveCore::_accum_param $source
+		__gplc_acc_param_string $target
+		__mlip_pipe_call assign_unblocking
+	}
+
+	proc _acc_index_wdata {index} {
+		if {[llength $index] > 2} {
+			ActiveCore::ERROR Range\ is\ incorrect!
+		}
+		if {[llength $index] == 1} {
+			if {[ActiveCore::isnumeric [lindex $index 0]] == 1} {
+				__mlip_pipe_acc_copipe_wr_index_c [lindex $index 0]
+			} else {
+				ActiveCore::ERROR index\ $index\ incorrect!
+			}
+		} else {
+			if {[ActiveCore::isnumeric [lindex $index 0]] == 1} {
+				if {[ActiveCore::isnumeric [lindex $index 1]] == 1} {
+					__mlip_pipe_acc_copipe_wr_range_cc [lindex $index 0] [lindex $index 1]
+				} else {
+					ActiveCore::ERROR index\ $index\ incorrect!
+				}
+			} else {
+				ActiveCore::ERROR index\ $index\ incorrect!
+			}
+		}
+	}
+
+	proc _acc_index_rdata {index} {
+		if {[llength $index] > 2} {
+			ActiveCore::ERROR Range\ is\ incorrect!
+		}
+		if {[llength $index] == 1} {
+			if {[ActiveCore::isnumeric [lindex $index 0]] == 1} {
+				__mlip_pipe_acc_copipe_rd_index_c [lindex $index 0]
+			} else {
+				ActiveCore::ERROR index\ $index\ incorrect!
+			}
+		} else {
+			if {[ActiveCore::isnumeric [lindex $index 0]] == 1} {
+				if {[ActiveCore::isnumeric [lindex $index 1]] == 1} {
+					__mlip_pipe_acc_copipe_rd_range_cc [lindex $index 0] [lindex $index 1]
+				} else {
+					ActiveCore::ERROR index\ $index\ incorrect!
+				}
+			} else {
+				ActiveCore::ERROR index\ $index\ incorrect!
+			}
+		}
+	}
+
+	proc copipeif {width name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $name
-		_acc_index $dim_wdata
-		_acc_index $dim_rdata
+		__gplc_acc_param_uint $width
 		__mlip_pipe_call copipeif
 	}
 
-	proc mcopipeif {name dim_wdata dim_rdata} {
+	proc mcopipeif {width name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $name
-		_acc_index $dim_wdata
-		_acc_index $dim_rdata
+		__gplc_acc_param_uint $width
 		__mlip_pipe_call mcopipeif
 	}
 
-	proc mcopipe_export {mcopipeif_name signals} {
+	proc mcopipe_export {mcopipeif_name chnum signals} {
 		if { [llength $signals] != 6 } {
 			ActiveCore::ERROR parameters\ incorrect!
 		} else {
@@ -86,6 +127,7 @@ namespace eval pipe {
 			__gplc_acc_param_v_wr [lindex $signals 3]
 			__gplc_acc_param_v_rd [lindex $signals 4]
 			__gplc_acc_param_v_rd [lindex $signals 5]
+			__gplc_acc_param_uint $chnum
 			__mlip_pipe_call mcopipe_export
 		}
 	}
@@ -164,6 +206,15 @@ namespace eval pipe {
 		__mlip_pipe_call pwe
 	}
 
+	proc pwe<= {ext_signal pipe_signal} {
+		__gplc_acc_param_clr
+		ActiveCore::_accum_param $pipe_signal
+		__mlip_rtl_SetPtrs
+		__gplc_acc_param_v_wr $ext_signal
+		__mlip_pipe_SetPtrs
+		__mlip_pipe_call pwe<=
+	}
+
 	proc prr {pstage_name pipe_signal} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $pstage_name
@@ -202,19 +253,20 @@ namespace eval pipe {
 		__mlip_pipe_call issucc
 	}
 
-	proc mcopipe_req {mcopipeif_name cmd param} {
+	proc mcopipe_req {mcopipeif_name chnum cmd param} {
 		__gplc_acc_param_clr
 		ActiveCore::_accum_param $cmd
 		ActiveCore::_accum_param $param
+		__gplc_acc_param_uint $chnum
 		__mlip_pipe_mcopipe_req $mcopipeif_name
 	}
 
-	proc mcopipe_wrreq {mcopipeif_name param} {
-		mcopipe_req $mcopipeif_name 1 $param
+	proc mcopipe_wrreq {mcopipeif_name chnum param} {
+		mcopipe_req $mcopipeif_name $chnum 1 $param
 	}
 
-	proc mcopipe_rdreq {mcopipeif_name param} {
-		mcopipe_req $mcopipeif_name 0 $param
+	proc mcopipe_rdreq {mcopipeif_name chnum param} {
+		mcopipe_req $mcopipeif_name $chnum 0 $param
 	}
 
 	proc mcopipe_resp {mcopipeif_name target} {

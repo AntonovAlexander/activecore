@@ -14,7 +14,7 @@ rtl::module riscv_3stage
 		pipe::pstage IFETCH
 			
 			riscv_pipe::process_pc
-			pipe::mcopipe_rdreq instr_mem [cnct {curinstr_addr curinstr_addr}]
+			pipe::mcopipe_rdreq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
 
 		pipe::pstage EXEC
 
@@ -51,10 +51,10 @@ rtl::module riscv_3stage
 
 			begelse
 				begif mem_cmd
-					pipe::mcopipe_wrreq data_mem [cnct {mem_addr mem_be mem_wdata}]
+					pipe::mcopipe_wrreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
 				endif
 				begelse
-					pipe::mcopipe_rdreq data_mem [cnct {mem_addr mem_be mem_wdata}]
+					pipe::mcopipe_rdreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
 					begif [pipe::mcopipe_resp data_mem mem_rdata]
 						s= rd_rdy	1
 					endif
@@ -67,4 +67,4 @@ rtl::module riscv_3stage
 
 	riscv_pipe::connect_copipes
 
-#endmodule
+rtl::endmodule

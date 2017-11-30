@@ -24,3 +24,12 @@ int conv_string_to_int(std::string string_in)
 		conv_val = 0;//if that fails set Result to 0
 	return conv_val;
 }
+
+unsigned int conv_string_to_uint(std::string string_in)
+{
+	unsigned int conv_val;
+	std::stringstream convert(string_in); // stringstream used for the conversion initialized with the contents of Text
+	if ( !(convert >> conv_val) )//give the value to Result using the characters in the string
+		conv_val = 0;//if that fails set Result to 0
+	return conv_val;
+}

@@ -28,9 +28,9 @@ namespace pipe
 	int pproc_cmd(std::string pproc_name, ac_var * clk_var, ac_var * rst_var);
 	int endpproc_cmd();
 	int pvar_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
-	int gpvar_sync_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
-	int gpvar_async_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
+	int gpvar_cmd(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
 	int rdprev_cmd(std::string gpvar_name, std::string * respvar_name);
+	int assign_unblocking_cmd(ac_dimensions dimensions, std::string target, ac_param param);
 	int pstage_cmd(std::string pstage_name);
 	int pbreak_cmd();
 	int pstall_cmd();
@@ -38,6 +38,7 @@ namespace pipe
 	int pflush_cmd();
 	int pre_cmd(ac_var * ext_var, ac_var ** int_var);
 	int pwe_cmd(ac_param param, ac_var * ext_var);
+	int pwe_unblocking_cmd(ac_param param, ac_var * ext_var);
 	int prr_cmd(std::string pstage_name, ac_var * remote_var, ac_var ** int_var);
 	int accum_cmd(ac_var * target, ac_param source);
 
@@ -48,11 +49,11 @@ namespace pipe
 	int isbroken_cmd(std::string pstage_name, std::string * int_varname);
 	int isfinished_cmd(std::string pstage_name, std::string * int_varname);
 
-	int mcopipeif_cmd(std::string mcopipeif_name, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
-	int copipeif_cmd(std::string copipeif_name, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
+	int mcopipeif_cmd(std::string mcopipeif_name, unsigned int width, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
+	int copipeif_cmd(std::string copipeif_name, unsigned int width, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
 	int mcopipe_connect_cmd(std::string pproc_name, std::string mcopipeif_name, std::string copipeif_name);
-	int mcopipe_export_cmd(std::string mcopipeif_name, ac_var * req_var, ac_var * we_var, ac_var * ack_var, ac_var * wdata_var, ac_var * resp_var, ac_var * rdata_var);
-	int mcopipe_req_cmd(std::string mcopipeif_name, ac_var ** rdy_var, ac_param cmd_param, ac_param wdata_param);
+	int mcopipe_export_cmd(std::string mcopipeif_name, unsigned int chnum, ac_var * req_var, ac_var * we_var, ac_var * ack_var, ac_var * wdata_var, ac_var * resp_var, ac_var * rdata_var);
+	int mcopipe_req_cmd(std::string mcopipeif_name, unsigned int chnum, ac_var ** rdy_var, ac_param cmd_param, ac_param wdata_param);
 	int mcopipe_resp_cmd(std::string mcopipeif_name, ac_var ** rdy_var, ac_var * rdata_var);
 
 	int wrfifoif_cmd(std::string wrfifoif_name, ac_var * req_var, ac_var * ack_var, ac_var * wdata_var);

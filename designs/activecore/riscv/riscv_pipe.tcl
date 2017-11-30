@@ -119,7 +119,6 @@ namespace eval riscv_pipe {
 
 	## transaction context
 	proc declare_pcontext {} {
-		
 		pipe::pvar {0 0} 	reset_active	0
 		pipe::pvar {31 0} 	curinstr_addr	0
 		pipe::pvar {31 0} 	nextinstr_addr	0
@@ -203,16 +202,21 @@ namespace eval riscv_pipe {
 		pipe::pvar {31 0} 	mem_rdata 		0
 		pipe::pvar {0 0} 	mem_rshift		0
 		
-		pipe::gpvar_sync {31 0} 	pc				$riscv_pipe::START_ADDR
-		_acc_index {31 0}	
-		pipe::gpvar_sync {31 0} 	regfile			0
-		pipe::gpvar_sync {0 0}		jump_req_cmd	0
-		pipe::gpvar_sync {31 0} 	jump_vector_cmd	0
+		pipe::gpvar	{31 0} 	pc				$riscv_pipe::START_ADDR
+		_acc_index 	{31 1}	
+		pipe::gpvar {31 0} 	regfile			0
+		pipe::gpvar {0 0}	jump_req_cmd	0
+		pipe::gpvar {31 0} 	jump_vector_cmd	0
 
 		# TODO: CSRs
 
-		pipe::mcopipeif instr_mem {63 0} {31 0}
-		pipe::mcopipeif data_mem {67 0} {31 0}
+		pipe::_acc_index_wdata {63 0}
+		pipe::_acc_index_rdata {31 0}
+		pipe::mcopipeif 1 instr_mem
+
+		pipe::_acc_index_wdata {67 0}
+		pipe::_acc_index_rdata {31 0}
+		pipe::mcopipeif 1 data_mem
 	}
 
 	# RISC-V pipeline macro-operations
@@ -222,11 +226,11 @@ namespace eval riscv_pipe {
 		begif jump_req_cmd
 			s= curinstr_addr jump_vector_cmd
 		endif
-		s= jump_req_cmd 0
+		pipe::s<= jump_req_cmd 0
 
 		s= nextinstr_addr [s+ curinstr_addr 4]
 
-		s= pc nextinstr_addr
+		pipe::s<= pc nextinstr_addr
 	}
 
 	proc process_decode {} {
@@ -651,7 +655,7 @@ namespace eval riscv_pipe {
 		endif
 	}
 
-	## unblocking forwarding for succ transfers only (for stages with guaranteed data availability)
+	## unblocking forwarding from stages with guaranteed data availability (for succ transfers only, no rdy checked)
 	proc forward_unblocking_succ {pstage} {
 		begif [s&& [pipe::issucc $pstage] [pipe::prr $pstage rd_req]]
 			begif [s== [pipe::prr $pstage rd_addr] rs1_addr]
@@ -900,8 +904,8 @@ namespace eval riscv_pipe {
 
 	# branch control
 	proc process_branch {} {
-		s= jump_req_cmd jump_req
-		s= jump_vector_cmd jump_vector
+		pipe::s<= jump_req_cmd jump_req
+		pipe::s<= jump_vector_cmd jump_vector
 		begif jump_req
 			pipe::pflush
 		endif
@@ -916,18 +920,23 @@ namespace eval riscv_pipe {
 	proc process_wb {} {
 		begif rd_req
 			_acc_index rd_addr
-			s= regfile rd_wdata
+			pipe::s<= regfile rd_wdata
 		endif
 	}
 
 	proc connect_copipes {} {
-		pipe::copipeif instr_mem {63 0} {31 0}
-		pipe::copipeif data_mem {67 0} {31 0}
+		pipe::_acc_index_wdata {63 0}
+		pipe::_acc_index_rdata {31 0}
+		pipe::copipeif 1 instr_mem
+
+		pipe::_acc_index_wdata {67 0}
+		pipe::_acc_index_rdata {31 0}
+		pipe::copipeif 1 data_mem
 
 		pipe::mcopipe_connect instrpipe instr_mem instr_mem
 		pipe::mcopipe_connect instrpipe data_mem data_mem
 
-		pipe::mcopipe_export instr_mem  { \
+		pipe::mcopipe_export instr_mem 0 { \
 					instr_mcopipe_req 	\
 					instr_mcopipe_we 	\
 					instr_mcopipe_ack 	\
@@ -936,7 +945,7 @@ namespace eval riscv_pipe {
 					instr_mcopipe_rdata	\
 				}
 
-		pipe::mcopipe_export data_mem { \
+		pipe::mcopipe_export data_mem 0 { \
 					data_mcopipe_req	\
 					data_mcopipe_we		\
 					data_mcopipe_ack	\

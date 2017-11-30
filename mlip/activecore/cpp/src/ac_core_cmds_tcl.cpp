@@ -28,6 +28,8 @@ int TCL_gplc_reset_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_
 	DimensionsAccumulator.clear();
 	ParamAccumulator.clear();
 	StringParamAccumulator.clear();
+	IntParamAccumulator.clear();
+	UIntParamAccumulator.clear();
 	return TCL_OK;
 }
 
@@ -65,6 +67,34 @@ int TCL_accum_param_clr_cmd(ClientData clientData, Tcl_Interp *interp, int objc,
 	}
 	ParamAccumulator.clear();
 	StringParamAccumulator.clear();
+	IntParamAccumulator.clear();
+	UIntParamAccumulator.clear();
+	return TCL_OK;
+}
+
+int TCL_accum_param_int_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
+{
+	if (DEBUG_FLAG == true) printf("Param clr command!\n");
+	if (objc != 2)
+	{
+		printf("Incorrect command!\n");
+		return TCL_ERROR;
+	}
+	std::string param = std::string(Tcl_GetString(objv[1]));
+	IntParamAccumulator.push_back(conv_string_to_int(param));
+	return TCL_OK;
+}
+
+int TCL_accum_param_uint_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
+{
+	if (DEBUG_FLAG == true) printf("Param clr command!\n");
+	if (objc != 2)
+	{
+		printf("Incorrect command!\n");
+		return TCL_ERROR;
+	}
+	std::string param = std::string(Tcl_GetString(objv[1]));
+	UIntParamAccumulator.push_back(conv_string_to_uint(param));
 	return TCL_OK;
 }
 
@@ -163,7 +193,7 @@ int TCL_accum_index_c_cmd(ClientData clientData, Tcl_Interp *interp, int objc, T
 	int msb = conv_string_to_int(std::string(Tcl_GetString(objv[1])));
 
 	dimension_range new_range(msb);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }
@@ -182,7 +212,7 @@ int TCL_accum_index_v_cmd(ClientData clientData, Tcl_Interp *interp, int objc, T
 	if (SetVarReadable(msb, &msb_var) != 0) return TCL_ERROR;
 
 	dimension_range new_range(msb_var);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }
@@ -200,7 +230,7 @@ int TCL_accum_range_cc_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	int lsb = conv_string_to_int(std::string(Tcl_GetString(objv[2])));
 
 	dimension_range new_range(msb, lsb);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }
@@ -221,7 +251,7 @@ int TCL_accum_range_cv_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	if (SetVarReadable(lsb, &lsb_var) != 0) return TCL_ERROR;
 
 	dimension_range new_range(msb, lsb_var);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }
@@ -242,7 +272,7 @@ int TCL_accum_range_vc_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	int lsb = conv_string_to_int(std::string(Tcl_GetString(objv[2])));
 
 	dimension_range new_range(msb_var, lsb);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }
@@ -265,7 +295,7 @@ int TCL_accum_range_vv_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	if (SetVarReadable(lsb, &lsb_var) != 0) return TCL_ERROR;
 
 	dimension_range new_range(msb_var, lsb_var);
-	DimensionsAccumulator.push_back(new_range);
+	DimensionsAccumulator.push_front(new_range);
 
 	return TCL_OK;
 }
@@ -480,6 +510,8 @@ int TCL_core_InitCmds(Tcl_Interp *interp)
 
 	Tcl_CreateObjCommand(interp, "__gplc_acc_param_clr", TCL_accum_param_clr_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_acc_param_string", TCL_accum_param_string_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_param_int", TCL_accum_param_int_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_param_uint", TCL_accum_param_uint_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_acc_param_c", TCL_accum_param_c_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_acc_param_v_rd", TCL_accum_param_v_rd_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_acc_param_v_wr", TCL_accum_param_v_wr_cmd, NULL, NULL);

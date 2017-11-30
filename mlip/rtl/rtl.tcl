@@ -265,6 +265,10 @@ namespace eval rtl {
 		__mlip_rtl_call module
 	}
 
+	proc endmodule {} {
+		puts endmodule\ is\ currently\ a\ stub!
+	}
+
 	proc cproc {} {
 		__mlip_rtl_call cproc
 	}
