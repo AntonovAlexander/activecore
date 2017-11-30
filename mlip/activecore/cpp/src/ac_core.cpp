@@ -194,6 +194,17 @@ void ac_dimensions_static::PrintDimensions()
 	}
 }
 
+int ac_dimensions_static::GetPower(unsigned int * power)
+{
+	*power = 0;
+	for (unsigned int i = 0; i < size(); i++)
+	{
+		if (at(i).msb != at(i).lsb) continue;
+		else (*power)++;
+	}
+	return 0;
+}
+
 int getdimstring(dimension_range_static * in_range, std::string * ret_val)
 {
 	*ret_val = ("[" + toString(in_range->msb) + ":" + toString(in_range->lsb) + "]");

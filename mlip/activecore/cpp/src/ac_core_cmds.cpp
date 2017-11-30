@@ -74,8 +74,18 @@ int expr_assign_cmd(unsigned int * cursor, ac_dimensions dimensions, ac_var* tar
 	unsigned int targetDePowered;
 
 	targetPower = target->dimensions.size();
+	//if (target->dimensions.GetPower(&targetPower) != 0) return 1;
 	if (dimensions.GetPower(&targetDePower) != 0) return 1;
 	targetDePowered = targetPower - targetDePower;
+	if (targetDePowered == 0) targetDePowered = 1;		// for 1-bit signals
+
+	if (DEBUG_FLAG == true)
+	{
+		printf("targetPower: %d\n", targetPower);
+		printf("targetDePower: %d\n", targetDePower);
+		printf("targetDePowered: %d\n", targetDePowered);
+		printf("param dimensions power: %d\n", param.GetDimensions().size());
+	}
 
 	if ((param.type == PARAM_TYPE_VAR) && (targetDePowered != param.GetDimensions().size()))
 	{

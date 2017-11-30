@@ -29,6 +29,7 @@ class ac_dimensions_static : public std::deque<dimension_range_static>
 {
 public:
 	void PrintDimensions();
+	int GetPower(unsigned int * power);
 };
 
 class ac_imm

@@ -212,11 +212,11 @@ namespace eval riscv_pipe {
 
 		pipe::_acc_index_wdata {63 0}
 		pipe::_acc_index_rdata {31 0}
-		pipe::mcopipeif 1 instr_mem
+		pipe::mcopipeif {0 0} instr_mem
 
 		pipe::_acc_index_wdata {67 0}
 		pipe::_acc_index_rdata {31 0}
-		pipe::mcopipeif 1 data_mem
+		pipe::mcopipeif {0 0} data_mem
 	}
 
 	# RISC-V pipeline macro-operations
@@ -927,11 +927,11 @@ namespace eval riscv_pipe {
 	proc connect_copipes {} {
 		pipe::_acc_index_wdata {63 0}
 		pipe::_acc_index_rdata {31 0}
-		pipe::copipeif 1 instr_mem
+		pipe::copipeif {0 0} instr_mem
 
 		pipe::_acc_index_wdata {67 0}
 		pipe::_acc_index_rdata {31 0}
-		pipe::copipeif 1 data_mem
+		pipe::copipeif {0 0} data_mem
 
 		pipe::mcopipe_connect instrpipe instr_mem instr_mem
 		pipe::mcopipe_connect instrpipe data_mem data_mem

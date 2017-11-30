@@ -100,18 +100,24 @@ namespace eval pipe {
 		}
 	}
 
-	proc copipeif {width name} {
+	proc copipeif {dimensions name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $name
-		__gplc_acc_param_uint $width
+		_acc_index $dimensions
 		__mlip_pipe_call copipeif
 	}
 
-	proc mcopipeif {width name} {
+	proc mcopipeif {dimensions name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $name
-		__gplc_acc_param_uint $width
+		_acc_index $dimensions
 		__mlip_pipe_call mcopipeif
+	}
+
+	proc scopipeif {name} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $name
+		__mlip_pipe_call scopipeif
 	}
 
 	proc mcopipe_export {mcopipeif_name chnum signals} {
@@ -253,26 +259,41 @@ namespace eval pipe {
 		__mlip_pipe_call issucc
 	}
 
-	proc mcopipe_req {mcopipeif_name chnum cmd param} {
+	proc mcopipe_req {mcopipeif_name dimension cmd param} {
 		__gplc_acc_param_clr
 		ActiveCore::_accum_param $cmd
 		ActiveCore::_accum_param $param
-		__gplc_acc_param_uint $chnum
+		_acc_index $dimension
 		__mlip_pipe_mcopipe_req $mcopipeif_name
 	}
 
-	proc mcopipe_wrreq {mcopipeif_name chnum param} {
-		mcopipe_req $mcopipeif_name $chnum 1 $param
+	proc mcopipe_wrreq {mcopipeif_name dimension param} {
+		mcopipe_req $mcopipeif_name $dimension 1 $param
 	}
 
-	proc mcopipe_rdreq {mcopipeif_name chnum param} {
-		mcopipe_req $mcopipeif_name $chnum 0 $param
+	proc mcopipe_rdreq {mcopipeif_name dimension param} {
+		mcopipe_req $mcopipeif_name $dimension 0 $param
 	}
 
 	proc mcopipe_resp {mcopipeif_name target} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_v_wr $target
 		__mlip_pipe_mcopipe_resp $mcopipeif_name
+	}
+
+	proc scopipe_rdreq {mcopipeif_name we data} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_v_wr $we
+		__gplc_acc_param_v_wr $data
+		__gplc_acc_param_string $mcopipeif_name
+		__mlip_pipe_call scopipe_rdreq
+	}
+
+	proc scopipe_resp {mcopipeif_name data} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_v_rd $data
+		__gplc_acc_param_string $mcopipeif_name
+		__mlip_pipe_call scopipe_resp
 	}
 
 	proc export {} {
