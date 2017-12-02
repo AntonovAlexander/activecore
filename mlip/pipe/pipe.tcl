@@ -100,51 +100,111 @@ namespace eval pipe {
 		}
 	}
 
-	proc copipeif {dimensions name} {
-		__gplc_acc_param_clr
-		__gplc_acc_param_string $name
-		_acc_index $dimensions
-		__mlip_pipe_call copipeif
-	}
+	try {namespace delete copipe} on error {} {}
+	namespace eval copipe {
 
-	proc mcopipeif {dimensions name} {
-		__gplc_acc_param_clr
-		__gplc_acc_param_string $name
-		_acc_index $dimensions
-		__mlip_pipe_call mcopipeif
-	}
-
-	proc scopipeif {name} {
-		__gplc_acc_param_clr
-		__gplc_acc_param_string $name
-		__mlip_pipe_call scopipeif
-	}
-
-	proc mcopipe_export {mcopipeif_name chnum signals} {
-		if { [llength $signals] != 6 } {
-			ActiveCore::ERROR parameters\ incorrect!
-		} else {
+		proc declare {dimensions name} {
 			__gplc_acc_param_clr
-			__gplc_acc_param_string $mcopipeif_name
-			__mlip_rtl_SetPtrs
-			__gplc_acc_param_v_wr [lindex $signals 0]
-			__gplc_acc_param_v_wr [lindex $signals 1]
-			__gplc_acc_param_v_rd [lindex $signals 2]
-			__gplc_acc_param_v_wr [lindex $signals 3]
-			__gplc_acc_param_v_rd [lindex $signals 4]
-			__gplc_acc_param_v_rd [lindex $signals 5]
-			__gplc_acc_param_uint $chnum
-			__mlip_pipe_call mcopipe_export
+			__gplc_acc_param_string $name
+			_acc_index $dimensions
+			__mlip_pipe_call copipeif
+		}
+
+	}
+
+	try {namespace delete mcopipe} on error {} {}
+	namespace eval mcopipe {
+
+		proc declare {dimensions name} {
+			__gplc_acc_param_clr
+			__gplc_acc_param_string $name
+			_acc_index $dimensions
+			__mlip_pipe_call mcopipeif
+		}
+
+		proc export {mcopipeif_name chnum signals} {
+			if { [llength $signals] != 6 } {
+				ActiveCore::ERROR parameters\ incorrect!
+			} else {
+				__gplc_acc_param_clr
+				__gplc_acc_param_string $mcopipeif_name
+				__mlip_rtl_SetPtrs
+				__gplc_acc_param_v_wr [lindex $signals 0]
+				__gplc_acc_param_v_wr [lindex $signals 1]
+				__gplc_acc_param_v_rd [lindex $signals 2]
+				__gplc_acc_param_v_wr [lindex $signals 3]
+				__gplc_acc_param_v_rd [lindex $signals 4]
+				__gplc_acc_param_v_rd [lindex $signals 5]
+				__gplc_acc_param_uint $chnum
+				__mlip_pipe_call mcopipe_export
+			}
+		}
+
+		proc connect {pproc_name mcopipe_name copipe_name} {
+			__gplc_acc_param_clr
+			__gplc_acc_param_string $pproc_name
+			__gplc_acc_param_string $mcopipe_name
+			__gplc_acc_param_string $copipe_name
+			__mlip_pipe_call mcopipe_connect
+		}
+
+		proc req {mcopipeif_name dimension cmd param} {
+			__gplc_acc_param_clr
+			ActiveCore::_accum_param $cmd
+			ActiveCore::_accum_param $param
+			_acc_index $dimension
+			__mlip_pipe_mcopipe_req $mcopipeif_name
+		}
+
+		proc wrreq {mcopipeif_name dimension param} {
+			req $mcopipeif_name $dimension 1 $param
+		}
+
+		proc rdreq {mcopipeif_name dimension param} {
+			req $mcopipeif_name $dimension 0 $param
+		}
+
+		proc resp {mcopipeif_name target} {
+			__gplc_acc_param_clr
+			__gplc_acc_param_v_wr $target
+			__mlip_pipe_mcopipe_resp $mcopipeif_name
 		}
 	}
 
-	proc mcopipe_connect {pproc_name mcopipe_name copipe_name} {
-		__gplc_acc_param_clr
-		__gplc_acc_param_string $pproc_name
-		__gplc_acc_param_string $mcopipe_name
-		__gplc_acc_param_string $copipe_name
-		__mlip_pipe_call mcopipe_connect
+
+	try {namespace delete scopipe} on error {} {}
+	namespace eval scopipe {
+
+		proc declare {name} {
+			__gplc_acc_param_clr
+			__gplc_acc_param_string $name
+			__mlip_pipe_call scopipeif
+		}
+
+		proc rdreq {mcopipeif_name we data} {
+			__gplc_acc_param_clr
+			__gplc_acc_param_v_wr $we
+			__gplc_acc_param_v_wr $data
+			__gplc_acc_param_string $mcopipeif_name
+			__mlip_pipe_call scopipe_rdreq
+		}
+
+		proc resp {mcopipeif_name data} {
+			__gplc_acc_param_clr
+			__gplc_acc_param_v_rd $data
+			__gplc_acc_param_string $mcopipeif_name
+			__mlip_pipe_call scopipe_resp
+		}
 	}
+	
+
+	
+
+	
+
+	
+
+	
 
 	proc wrfifoif {wrfifoif_name req ack wdata} {
 		__gplc_acc_param_clr
@@ -257,43 +317,6 @@ namespace eval pipe {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $pstage_name
 		__mlip_pipe_call issucc
-	}
-
-	proc mcopipe_req {mcopipeif_name dimension cmd param} {
-		__gplc_acc_param_clr
-		ActiveCore::_accum_param $cmd
-		ActiveCore::_accum_param $param
-		_acc_index $dimension
-		__mlip_pipe_mcopipe_req $mcopipeif_name
-	}
-
-	proc mcopipe_wrreq {mcopipeif_name dimension param} {
-		mcopipe_req $mcopipeif_name $dimension 1 $param
-	}
-
-	proc mcopipe_rdreq {mcopipeif_name dimension param} {
-		mcopipe_req $mcopipeif_name $dimension 0 $param
-	}
-
-	proc mcopipe_resp {mcopipeif_name target} {
-		__gplc_acc_param_clr
-		__gplc_acc_param_v_wr $target
-		__mlip_pipe_mcopipe_resp $mcopipeif_name
-	}
-
-	proc scopipe_rdreq {mcopipeif_name we data} {
-		__gplc_acc_param_clr
-		__gplc_acc_param_v_wr $we
-		__gplc_acc_param_v_wr $data
-		__gplc_acc_param_string $mcopipeif_name
-		__mlip_pipe_call scopipe_rdreq
-	}
-
-	proc scopipe_resp {mcopipeif_name data} {
-		__gplc_acc_param_clr
-		__gplc_acc_param_v_rd $data
-		__gplc_acc_param_string $mcopipeif_name
-		__mlip_pipe_call scopipe_resp
 	}
 
 	proc export {} {

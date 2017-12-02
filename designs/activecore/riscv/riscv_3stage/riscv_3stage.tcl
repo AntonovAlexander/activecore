@@ -14,11 +14,11 @@ rtl::module riscv_3stage
 		pipe::pstage IFETCH
 			
 			riscv_pipe::process_pc
-			pipe::mcopipe_rdreq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
+			pipe::mcopipe::rdreq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
 
 		pipe::pstage EXEC
 
-			pipe::mcopipe_resp instr_mem instr_code
+			pipe::mcopipe::resp instr_mem instr_code
 			riscv_pipe::process_decode
 			riscv_pipe::process_regfetch
 			riscv_pipe::forward_unblocking EXECMEMWB
@@ -51,11 +51,11 @@ rtl::module riscv_3stage
 
 			begelse
 				begif mem_cmd
-					pipe::mcopipe_wrreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
+					pipe::mcopipe::wrreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
 				endif
 				begelse
-					pipe::mcopipe_rdreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-					begif [pipe::mcopipe_resp data_mem mem_rdata]
+					pipe::mcopipe::rdreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
+					begif [pipe::mcopipe::resp data_mem mem_rdata]
 						s= rd_rdy	1
 					endif
 				endif
