@@ -4,11 +4,11 @@
 try {namespace delete pipe} on error {} {}
 namespace eval pipe {
 
-	proc pproc {name clk rst} {
+	proc pproc {name} {
 		__gplc_acc_param_clr
 		__mlip_rtl_SetPtrs
-		__gplc_acc_param_v_rd $clk
-		__gplc_acc_param_v_rd $rst
+		__gplc_acc_param_v_rd $rtl::clk_domain
+		__gplc_acc_param_v_rd $rtl::rst_domain
 		__gplc_acc_param_string $name
 		__mlip_pipe_call pproc
 	}
@@ -39,10 +39,10 @@ namespace eval pipe {
 		__mlip_pipe_call gpvar
 	}
 
-	proc rdprev {name} {
+	proc rdbuf {name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $name
-		__mlip_pipe_call rdprev
+		__mlip_pipe_call rdbuf
 	}
 
 	proc s<= {target source} {

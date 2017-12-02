@@ -10,6 +10,17 @@ namespace eval rtl {
 		set rtl::interface_instances [list]
 	}
 
+	set clk_domain undef
+	set rst_domain undef
+
+	proc setclk {signame} {
+		set rtl::clk_domain $signame
+	}
+
+	proc setrst {signame} {
+		set rtl::rst_domain $signame
+	}
+
 	proc input {dimension name} {
 		_port in $dimension $name
 	}
@@ -243,20 +254,30 @@ namespace eval rtl {
 		_mem_addreset $mem_name async $signal $posneg $source
 	}
 
-	proc ffvar {dimensions name defval clk rst} {
+	proc buffered {dimensions name defval} {
 		__gplc_acc_param_clr
 		_acc_index $dimensions
 		__gplc_acc_param_string $name
 		__gplc_acc_param_string $defval
-		__gplc_acc_param_v_rd $clk
-		__gplc_acc_param_v_rd $rst
-		__mlip_rtl_call ffvar
+		__gplc_acc_param_v_rd $rtl::clk_domain
+		__gplc_acc_param_v_rd $rtl::rst_domain
+		__mlip_rtl_call buffered
 	}
 
-	proc rdprev {name} {
+	proc sticky {dimensions name defval} {
+		__gplc_acc_param_clr
+		_acc_index $dimensions
+		__gplc_acc_param_string $name
+		__gplc_acc_param_string $defval
+		__gplc_acc_param_v_rd $rtl::clk_domain
+		__gplc_acc_param_v_rd $rtl::rst_domain
+		__mlip_rtl_call sticky
+	}
+
+	proc rdbuf {name} {
 		__gplc_acc_param_clr
 		__gplc_acc_param_string $name
-		__mlip_rtl_call rdprev
+		__mlip_rtl_call rdbuf
 	}
 
 	proc module {name} {

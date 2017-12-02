@@ -6,7 +6,7 @@ rtl::module riscv_1stage
 
 	riscv_pipe::declare_wrapper_ports
 
-	pipe::pproc instrpipe clk_i rst_i
+	pipe::pproc instrpipe
 
 		riscv_pipe::declare_pcontext
 

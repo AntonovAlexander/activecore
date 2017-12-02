@@ -65,6 +65,10 @@ namespace eval riscv_pipe {
 	proc declare_wrapper_ports {} {
 		rtl::input 	{0 0} 	clk_i
 		rtl::input 	{0 0} 	rst_i
+
+		rtl::setclk clk_i
+		rtl::setrst rst_i
+		
 		
 		rtl::output {0 0} 	instr_mem_req
 		rtl::output {0 0} 	instr_mem_we
@@ -83,6 +87,7 @@ namespace eval riscv_pipe {
 		rtl::output	{3 0}	data_mem_be
 		rtl::input 	{0 0}	data_mem_resp
 		rtl::input 	{31 0}	data_mem_rdata
+
 
 		rtl::comb 	{0 0} 	instr_mcopipe_req 	0
 		rtl::comb 	{0 0} 	instr_mcopipe_we 	0
@@ -627,8 +632,8 @@ namespace eval riscv_pipe {
 		##
 		
 		## optimized for synthesis
-		s= rs1_rdata [indexed [pipe::rdprev regfile] rs1_addr]
-		s= rs2_rdata [indexed [pipe::rdprev regfile] rs2_addr]
+		s= rs1_rdata [indexed [pipe::rdbuf regfile] rs1_addr]
+		s= rs2_rdata [indexed [pipe::rdbuf regfile] rs2_addr]
 
 		begif [s== rs1_addr 0]
 			s= rs1_rdata 0

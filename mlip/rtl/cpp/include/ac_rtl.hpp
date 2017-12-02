@@ -25,6 +25,8 @@ namespace rtl
 	extern char COMB_STRING[];
 	extern char MEM_STRING[];
 	extern char PORT_STRING[];
+	extern char BUFFERED_STRING[];
+	extern char STICKY_STRING[];
 
 	class ac_mem_source
 	{
@@ -74,10 +76,10 @@ namespace rtl
 		ac_comb(std::string name_in, unsigned int msb, unsigned int lsb, std::string defval_in) : ac_var(COMB_STRING, name_in, msb, lsb, defval_in) {};
 	};
 
-	class ac_ffvar : public ac_var
+	class ac_syncbuf : public ac_var
 	{
 	public:
-		ac_ffvar(std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in, ac_var * clk, ac_var * rst);
+		ac_syncbuf(char* TYPE_STRING, std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in, ac_var * clk, ac_var * rst);
 
 		ac_mem * mem;
 	};
@@ -85,7 +87,7 @@ namespace rtl
 	extern std::string ModuleName;
 	extern std::vector<ac_comb*> Combs;
 	extern std::vector<ac_mem*> Mems;
-	extern std::vector<ac_ffvar*> Ffvars;
+	extern std::vector<ac_syncbuf*> SyncBufs;
 	extern std::vector<ac_port*> Ports_in;
 	extern std::vector<ac_port*> Ports_out;
 	extern std::vector<ac_port*> Ports_inout;
@@ -98,9 +100,11 @@ namespace rtl
 	int mem_cmd(ac_mem** new_mem, std::string name_in, unsigned int msb, unsigned int lsb, bool sync_levedge_in);
 	int mem_cmd(ac_mem** new_mem, std::string name_in, ac_dimensions_static dimensions_in, bool sync_levedge_in);
 
-	int ffvar_cmd(ac_ffvar** new_ffvar, std::string name, ac_dimensions_static dimensions_in, std::string defval, ac_var* clk, ac_var* rst);
-	int ffvar_cmd(ac_ffvar** new_ffvar, std::string name, unsigned int msb, unsigned int lsb, std::string defval, ac_var* clk, ac_var* rst);
-	int rdprev_cmd(std::string ffvar_name, std::string * respvar_name);
+	int buffered_cmd(ac_syncbuf** new_syncbuf, std::string name, ac_dimensions_static dimensions_in, std::string defval, ac_var* clk, ac_var* rst);
+	int buffered_cmd(ac_syncbuf** new_syncbuf, std::string name, unsigned int msb, unsigned int lsb, std::string defval, ac_var* clk, ac_var* rst);
+	int sticky_cmd(ac_syncbuf** new_syncbuf, std::string name, ac_dimensions_static dimensions_in, std::string defval, ac_var* clk, ac_var* rst);
+	int sticky_cmd(ac_syncbuf** new_syncbuf, std::string name, unsigned int msb, unsigned int lsb, std::string defval, ac_var* clk, ac_var* rst);
+	int rdbuf_cmd(std::string sticky_name, std::string * respvar_name);
 
 	int cproc_cmd();
 	int endcproc_cmd();
