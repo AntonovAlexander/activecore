@@ -207,11 +207,11 @@ namespace eval riscv_pipe {
 		pipe::pvar {31 0} 	mem_rdata 		0
 		pipe::pvar {0 0} 	mem_rshift		0
 		
-		pipe::gpvar	{31 0} 	pc				$riscv_pipe::START_ADDR
+		pipe::psticky_glbl	{31 0} 	pc				$riscv_pipe::START_ADDR
 		_acc_index 	{31 1}	
-		pipe::gpvar {31 0} 	regfile			0
-		pipe::gpvar {0 0}	jump_req_cmd	0
-		pipe::gpvar {31 0} 	jump_vector_cmd	0
+		pipe::psticky_glbl {31 0} 	regfile			0
+		pipe::psticky_glbl {0 0}	jump_req_cmd	0
+		pipe::psticky_glbl {31 0} 	jump_vector_cmd	0
 
 		# TODO: CSRs
 
