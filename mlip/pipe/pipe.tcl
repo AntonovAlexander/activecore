@@ -28,6 +28,17 @@ namespace eval pipe {
 		__mlip_pipe_call pvar
 	}
 
+	proc psticky {dimensions name defval} {
+		if {[ActiveCore::isnumeric $defval] == 0} {
+			ActiveCore::ERROR default\ value\ of\ psticky\ $name\ is\ not\ a\ number!
+		}
+		__gplc_acc_param_clr
+		_acc_index $dimensions
+		__gplc_acc_param_string $name
+		__gplc_acc_param_string $defval
+		__mlip_pipe_call psticky
+	}
+
 	proc psticky_glbl {dimensions name defval} {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ psticky_glbl\ $name\ is\ not\ a\ number!
