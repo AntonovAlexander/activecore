@@ -164,7 +164,8 @@ namespace eval pipe {
 			ActiveCore::_accum_param $cmd
 			ActiveCore::_accum_param $param
 			_acc_index $dimension
-			__mlip_pipe_mcopipe_req $mcopipeif_name
+			__gplc_acc_param_string $mcopipeif_name
+			__mlip_pipe_call mcopipe_req
 		}
 
 		proc wrreq {mcopipeif_name dimension param} {
@@ -178,7 +179,8 @@ namespace eval pipe {
 		proc resp {mcopipeif_name target} {
 			__gplc_acc_param_clr
 			__gplc_acc_param_v_wr $target
-			__mlip_pipe_mcopipe_resp $mcopipeif_name
+			__gplc_acc_param_string $mcopipeif_name
+			__mlip_pipe_call mcopipe_resp
 		}
 	}
 
@@ -192,12 +194,12 @@ namespace eval pipe {
 			__mlip_pipe_call scopipeif
 		}
 
-		proc rdreq {mcopipeif_name we data} {
+		proc req {mcopipeif_name we data} {
 			__gplc_acc_param_clr
 			__gplc_acc_param_v_wr $we
 			__gplc_acc_param_v_wr $data
 			__gplc_acc_param_string $mcopipeif_name
-			__mlip_pipe_call scopipe_rdreq
+			__mlip_pipe_call scopipe_req
 		}
 
 		proc resp {mcopipeif_name data} {

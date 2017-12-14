@@ -51,13 +51,17 @@ namespace pipe
 	int isbroken_cmd(std::string pstage_name, std::string * int_varname);
 	int isfinished_cmd(std::string pstage_name, std::string * int_varname);
 
-	int mcopipeif_cmd(std::string mcopipeif_name, ac_dimensions_static dimensions, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
-	int scopipeif_cmd(std::string scopipeif_name, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
 	int copipeif_cmd(std::string copipeif_name, ac_dimensions_static dimensions, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
-	int mcopipe_connect_cmd(std::string pproc_name, std::string mcopipeif_name, std::string copipeif_name);
-	int mcopipe_export_cmd(std::string mcopipeif_name, unsigned int chnum, ac_var * req_var, ac_var * we_var, ac_var * ack_var, ac_var * wdata_var, ac_var * resp_var, ac_var * rdata_var);
+
+	int mcopipeif_cmd(std::string mcopipeif_name, ac_dimensions_static dimensions, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
 	int mcopipe_req_cmd(std::string mcopipeif_name, ac_dimensions dimensions, ac_var ** rdy_var, ac_param cmd_param, ac_param wdata_param);
 	int mcopipe_resp_cmd(std::string mcopipeif_name, ac_var ** rdy_var, ac_var * rdata_var);
+	int mcopipe_connect_cmd(std::string pproc_name, std::string mcopipeif_name, std::string copipeif_name);
+	int mcopipe_export_cmd(std::string mcopipeif_name, unsigned int chnum, ac_var * req_var, ac_var * we_var, ac_var * ack_var, ac_var * wdata_var, ac_var * resp_var, ac_var * rdata_var);
+
+	int scopipeif_cmd(std::string scopipeif_name, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
+	int scopipe_req_cmd(std::string scopipeif_name, ac_dimensions dimensions, ac_var ** rdy_var, ac_var * cmd_var, ac_var * rdata_var);
+	int scopipe_resp_cmd(std::string scopipeif_name, ac_var ** rdy_var, ac_param wdata_param);
 
 	int wrfifoif_cmd(std::string wrfifoif_name, ac_var * req_var, ac_var * ack_var, ac_var * wdata_var);
 	int wrfiforeq_cmd(std::string wrfifoif_name, std::vector<ac_param> params);
