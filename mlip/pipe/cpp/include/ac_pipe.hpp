@@ -62,6 +62,7 @@ namespace pipe
 	int scopipeif_cmd(std::string scopipeif_name, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
 	int scopipe_req_cmd(std::string scopipeif_name, ac_dimensions dimensions, ac_var ** rdy_var, ac_var * cmd_var, ac_var * rdata_var);
 	int scopipe_resp_cmd(std::string scopipeif_name, ac_var ** rdy_var, ac_param wdata_param);
+	int scopipe_connect_cmd(std::string copipeif_name, unsigned int chnum, std::string pproc_name, std::string scopipeif_name);
 
 	int wrfifoif_cmd(std::string wrfifoif_name, ac_var * req_var, ac_var * ack_var, ac_var * wdata_var);
 	int wrfiforeq_cmd(std::string wrfifoif_name, std::vector<ac_param> params);
