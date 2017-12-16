@@ -14,6 +14,50 @@
 template<typename T> std::string toString(const T& value);
 template<typename T> std::string NumberToString ( T Number );
 
+//// GPLC AST ISA ////
+extern char OP1_ASSIGN[];
+extern char OP1_COMPLEMENT[];
+
+extern char OP2_ARITH_ADD[];
+extern char OP2_ARITH_SUB[];
+extern char OP2_ARITH_MUL[];
+extern char OP2_ARITH_DIV[];
+extern char OP2_ARITH_SHL[];
+extern char OP2_ARITH_SHR[];
+extern char OP2_ARITH_SRA[];
+
+extern char OP1_LOGICAL_NOT[];
+extern char OP2_LOGICAL_AND[];
+extern char OP2_LOGICAL_OR[];
+extern char OP2_LOGICAL_G[];
+extern char OP2_LOGICAL_L[];
+extern char OP2_LOGICAL_GEQ[];
+extern char OP2_LOGICAL_LEQ[];
+extern char OP2_LOGICAL_EQ2[];
+extern char OP2_LOGICAL_NEQ2[];
+extern char OP2_LOGICAL_EQ4[];
+extern char OP2_LOGICAL_NEQ4[];
+
+extern char OP1_BITWISE_NOT[];
+extern char OP2_BITWISE_AND[];
+extern char OP2_BITWISE_OR[];
+extern char OP2_BITWISE_XOR[];
+extern char OP2_BITWISE_XNOR[];
+
+extern char OP1_REDUCT_AND[];
+extern char OP1_REDUCT_NAND[];
+extern char OP1_REDUCT_OR[];
+extern char OP1_REDUCT_NOR[];
+extern char OP1_REDUCT_XOR[];
+extern char OP1_REDUCT_XNOR[];
+
+extern char OP2_INDEXED[];
+extern char OP3_RANGED[];
+extern char OPS_CNCT[];
+extern char OP1_IF[];
+extern char OP1_WHILE[];
+
+
 struct dimension_range;
 struct dimension_range_static;
 
@@ -208,7 +252,7 @@ int getdimstring(dimension_range_static * in_range, std::string * ret_val);
 class ac_execode
 {
 public:
-	std::string opcode;
+	char * opcode;
 	std::vector<ac_param> params;
 	std::vector<std::string> string_params;
 	std::vector<int> int_params;
@@ -223,7 +267,7 @@ public:
 	std::vector<ac_var*> iftargets;
 
 	ac_execode();
-	ac_execode(std::string opcode_in);
+	ac_execode(char * opcode_in);
 
 	void AddExpr(ac_execode* new_expr);
 	void AddExpr(unsigned int * cursor, ac_execode* new_expr);

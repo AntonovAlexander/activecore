@@ -65,14 +65,16 @@ namespace eval ActiveCore {
 	proc expr_1op {opcode op} {
 		__gplc_acc_param_clr
 		_accum_param $op
-		__gplc_op $opcode
+		__gplc_acc_param_string $opcode
+		__gplc_call op
 	}
 
 	proc expr_2op {opcode op1 op2} {
 		__gplc_acc_param_clr
 		_accum_param $op1
 		_accum_param $op2
-		__gplc_op $opcode
+		__gplc_acc_param_string $opcode
+		__gplc_call op
 	}
 
 	proc expr_3op {opcode op1 op2 op3} {
@@ -80,7 +82,8 @@ namespace eval ActiveCore {
 		_accum_param $op1
 		_accum_param $op2
 		_accum_param $op3
-		__gplc_op $opcode
+		__gplc_acc_param_string $opcode
+		__gplc_call op
 	}
 
 	proc export {language filename} {
@@ -130,68 +133,100 @@ proc s= {target source} {
 	__gplc_assign $target
 }
 
-proc s~ {op} {
-	ActiveCore::expr_1op "~" $op
+proc c- {op} {
+	ActiveCore::expr_1op "c-" $op
 }
 
 proc s+ {op1 op2} {
-	ActiveCore::expr_2op "+" $op1 $op2
+	ActiveCore::expr_2op "s+" $op1 $op2
 }
 
 proc s- {op1 op2} {
-	ActiveCore::expr_2op "-" $op1 $op2
+	ActiveCore::expr_2op "s-" $op1 $op2
 }
 
 proc sx {op1 op2} {
-	ActiveCore::expr_2op "x" $op1 $op2
+	ActiveCore::expr_2op "sx" $op1 $op2
 }
 
 proc s/ {op1 op2} {
-	ActiveCore::expr_2op "/" $op1 $op2
-}
-
-proc s& {op1 op2} {
-	ActiveCore::expr_2op "&" $op1 $op2
-}
-
-proc s| {op1 op2} {
-	ActiveCore::expr_2op "|" $op1 $op2
-}
-
-proc s^ {op1 op2} {
-	ActiveCore::expr_2op "^" $op1 $op2
+	ActiveCore::expr_2op "s/" $op1 $op2
 }
 
 proc s>> {op1 op2} {
-	ActiveCore::expr_2op ">>" $op1 $op2
+	ActiveCore::expr_2op "s>>" $op1 $op2
 }
 
 proc s>>> {op1 op2} {
-	ActiveCore::expr_2op ">>>" $op1 $op2
+	ActiveCore::expr_2op "s>>>" $op1 $op2
 }
 
 proc s<< {op1 op2} {
-	ActiveCore::expr_2op "<<" $op1 $op2
+	ActiveCore::expr_2op "s<<" $op1 $op2
 }
 
 proc s! {op} {
-	ActiveCore::expr_1op "!" $op
+	ActiveCore::expr_1op "s!" $op
 }
 
 proc s&& {op1 op2} {
-	ActiveCore::expr_2op "&&" $op1 $op2
+	ActiveCore::expr_2op "s&&" $op1 $op2
 }
 
 proc s|| {op1 op2} {
-	ActiveCore::expr_2op "||" $op1 $op2
+	ActiveCore::expr_2op "s||" $op1 $op2
+}
+
+proc s> {op1 op2} {
+	ActiveCore::expr_2op "s>" $op1 $op2
+}
+
+proc s< {op1 op2} {
+	ActiveCore::expr_2op "s<" $op1 $op2
+}
+
+proc s>= {op1 op2} {
+	ActiveCore::expr_2op "s>=" $op1 $op2
+}
+
+proc s<= {op1 op2} {
+	ActiveCore::expr_2op "s<=" $op1 $op2
 }
 
 proc s== {op1 op2} {
-	ActiveCore::expr_2op "==" $op1 $op2
+	ActiveCore::expr_2op "s==" $op1 $op2
 }
 
 proc s!= {op1 op2} {
-	ActiveCore::expr_2op "!=" $op1 $op2
+	ActiveCore::expr_2op "s!=" $op1 $op2
+}
+
+proc s=== {op1 op2} {
+	ActiveCore::expr_2op "s===" $op1 $op2
+}
+
+proc s!== {op1 op2} {
+	ActiveCore::expr_2op "s!==" $op1 $op2
+}
+
+proc s~ {op} {
+	ActiveCore::expr_1op "s~" $op
+}
+
+proc s& {op1 op2} {
+	ActiveCore::expr_2op "s&" $op1 $op2
+}
+
+proc s| {op1 op2} {
+	ActiveCore::expr_2op "s|" $op1 $op2
+}
+
+proc s^ {op1 op2} {
+	ActiveCore::expr_2op "s^" $op1 $op2
+}
+
+proc s^~ {op1 op2} {
+	ActiveCore::expr_2op "s^~" $op1 $op2
 }
 
 proc indexed {op index} {
@@ -207,31 +242,37 @@ proc indexed {op index} {
 }
 
 proc begif {condition} {
-	__gplc_begif $condition
+	__gplc_acc_param_clr
+	ActiveCore::_accum_param $condition
+	__gplc_call begif
 }
 
 proc begnif {condition} {
-	__gplc_begif [s! $condition]
+	begif [s! $condition]
 }
 
 proc begelsif {condition} {
-	__gplc_begelsif $condition
+	__gplc_acc_param_clr
+	ActiveCore::_accum_param $condition
+	__gplc_call begelsif
 }
 
 proc begelse {} {
-	__gplc_begelse
+	__gplc_call begelse
 }
 
 proc endif {} {
-	__gplc_endif
+	__gplc_call endif
 }
 
 proc begwhile {condition} {
-	__gplc_begwhile $condition
+	__gplc_acc_param_clr
+	ActiveCore::_accum_param $condition
+	__gplc_call begwhile
 }
 
 proc endwhile {} {
-	__gplc_endwhile
+	__gplc_call endwhile
 }
 
 proc cnct {ops} {
@@ -239,7 +280,8 @@ proc cnct {ops} {
 	foreach op $ops {
 		ActiveCore::_accum_param $op
 	}
-	__gplc_op "cnct"
+	__gplc_acc_param_string "cnct"
+	__gplc_call op
 }
 
 proc zeroext {op size} {
@@ -266,5 +308,3 @@ proc ActiveCore_Reset {} {
 }
 
 source [file join $MLIP_PATH activecore config.tcl]
-
-#ActiveCore::debug_set

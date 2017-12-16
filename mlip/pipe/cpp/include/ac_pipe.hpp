@@ -15,6 +15,36 @@
 
 namespace pipe
 {
+	extern char PIPE_OP_PPROC[];
+	extern char PIPE_OP_PSTAGE[];
+
+	extern char PIPE_OP_ASSIGN_ACTIVE[];
+	extern char PIPE_OP_ASSIGN_SUCC[];
+
+	extern char PIPE_OP_PBREAK[];
+	extern char PIPE_OP_PSTALL[];
+	extern char PIPE_OP_PREPEAT[];
+	extern char PIPE_OP_PFLUSH[];
+
+	extern char PIPE_OP_PRE[];
+	extern char PIPE_OP_PWE[];
+	extern char PIPE_OP_PWE_SUCC[];
+	extern char PIPE_OP_PRR[];
+	extern char PIPE_OP_ACCUM[];
+
+	extern char PIPE_OP_ISACTIVE[];
+	extern char PIPE_OP_ISWORKING[];
+	extern char PIPE_OP_ISSTALLED[];
+	extern char PIPE_OP_ISSUCC[];
+	extern char PIPE_OP_ISBROKEN[];
+	extern char PIPE_OP_ISFINISHED[];
+
+	extern char PIPE_OP_MCOPIPE_REQ[];
+	extern char PIPE_OP_MCOPIPE_RESP[];
+	extern char PIPE_OP_SCOPIPE_REQ[];
+	extern char PIPE_OP_SCOPIPE_RESP[];
+
+
 	class mcopipe_if;
 	class wrfifo_if;
 	class rdfifo_if;

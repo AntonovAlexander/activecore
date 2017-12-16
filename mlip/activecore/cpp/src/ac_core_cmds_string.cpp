@@ -29,24 +29,6 @@ int expr_assign_cmd_string(std::string target, ac_param param)
 	return ret_val;
 }
 
-int expr_op_cmd_string(std::string opcode, std::string * respvarname, std::vector<ac_param> params)
-{
-	bool cproc_gen = false;
-	if (ExeStack.size() == 0) cproc_gen = true;
-	if (cproc_gen == true) rtl::cproc_cmd();
-
-	ac_var* resp_var;
-	if (expr_op_cmd(opcode, &resp_var, params) != 0)
-	{
-		printf("expr_op_cmd_string: ERROR\n");
-		return 1;
-	}
-
-	(*respvarname) = resp_var->name;
-	if (cproc_gen == true) rtl::endcproc_cmd();
-	return 0;
-}
-
 int expr_zeroext_cmd_string(std::string size, std::string * respvarname, std::vector<ac_param> params)
 {
 	if (params.size() != 1)
@@ -115,61 +97,4 @@ int expr_initval_cmd_string(std::string width, std::string * respvarname, std::s
 
 	*respvarname = resp_var->name;
 	return ret_stat;
-}
-
-int expr_begif_cmd_string(std::string cond_op)
-{
-	if (ExeStack.size() == 0) return 1;
-
-	ac_var* cond_op_var;
-	if (SetVarReadable(cond_op, &cond_op_var) != 0) return 1;
-	int ret_val = expr_begif_cmd(cond_op_var);
-
-	return ret_val;
-}
-
-int expr_begelsif_cmd_string(std::string cond_op)
-{
-	if (ExeStack.size() == 0) return 1;
-
-	ac_var* cond_op_var;
-	if (SetVarReadable(cond_op, &cond_op_var) != 0) return 1;
-	int ret_val = expr_begelsif_cmd(cond_op_var);
-
-	return ret_val;
-}
-
-int expr_begelse_cmd_string()
-{
-	if (ExeStack.size() == 0) return 1;
-	return expr_begelse_cmd();
-}
-
-int expr_endif_cmd_string()
-{
-	if (ExeStack.size() == 0) return 1;
-
-	int ret_val = expr_endif_cmd();
-
-	return ret_val;
-}
-
-int expr_begwhile_cmd_string(std::string cond_op)
-{
-	if (ExeStack.size() == 0) return 1;
-
-	ac_var* cond_op_var;
-	if (SetVarReadable(cond_op, &cond_op_var) != 0) return 1;
-	int ret_val = expr_begwhile_cmd(cond_op_var);
-
-	return ret_val;
-}
-
-int expr_endwhile_cmd_string()
-{
-	if (ExeStack.size() == 0) return 1;
-
-	int ret_val = expr_endwhile_cmd();
-
-	return ret_val;
 }

@@ -19,6 +19,50 @@ template<typename T> std::string NumberToString ( T Number )
 
 bool DEBUG_FLAG = false;
 
+//// GPLC AST ISA ////
+char OP1_ASSIGN[] = "s=";
+char OP1_COMPLEMENT[] = "c-";
+
+char OP2_ARITH_ADD[] = "s+";
+char OP2_ARITH_SUB[] = "s-";
+char OP2_ARITH_MUL[] = "sx";
+char OP2_ARITH_DIV[] = "s/";
+char OP2_ARITH_SHL[] = "s<<";
+char OP2_ARITH_SHR[] = "s>>";
+char OP2_ARITH_SRA[] = "s>>>";
+
+char OP1_LOGICAL_NOT[] = "s!";
+char OP2_LOGICAL_AND[] = "s&&";
+char OP2_LOGICAL_OR[] = "s||";
+char OP2_LOGICAL_G[] = "s>";
+char OP2_LOGICAL_L[] = "s<";
+char OP2_LOGICAL_GEQ[] = "s>=";
+char OP2_LOGICAL_LEQ[] = "s<=";
+char OP2_LOGICAL_EQ2[] = "s==";
+char OP2_LOGICAL_NEQ2[] = "s!=";
+char OP2_LOGICAL_EQ4[] = "s===";
+char OP2_LOGICAL_NEQ4[] = "s!===";
+
+char OP1_BITWISE_NOT[] = "s~";
+char OP2_BITWISE_AND[] = "s&";
+char OP2_BITWISE_OR[] = "s|";
+char OP2_BITWISE_XOR[] = "s^";
+char OP2_BITWISE_XNOR[] = "s^~";
+
+char OP1_REDUCT_AND[] = "r&";
+char OP1_REDUCT_NAND[] = "r~&";
+char OP1_REDUCT_OR[] = "r|";
+char OP1_REDUCT_NOR[] = "r~|";
+char OP1_REDUCT_XOR[] = "r^";
+char OP1_REDUCT_XNOR[] = "r^~";
+
+char OP2_INDEXED[] = "indexed";
+char OP3_RANGED[] = "ranged";
+char OPS_CNCT[] = "cnct";
+char OP1_IF[] = "if";
+char OP1_WHILE[] = "while";
+
+
 // AST state
 int GenCounter = 0;
 std::deque<ac_execode*> ExeStack;
@@ -358,7 +402,7 @@ bool ac_execode::AddIfTargetVar(ac_var* new_iftvar)
 	return signal_is_new;
 }
 
-ac_execode::ac_execode(std::string opcode_in)
+ac_execode::ac_execode(char * opcode_in)
 {
 	opcode = opcode_in;
 }

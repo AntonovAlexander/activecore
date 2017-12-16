@@ -23,15 +23,15 @@ int expr_assign_cmd(ac_dimensions dimensions, ac_var* target, ac_param param);
 int expr_assign_cmd(unsigned int * cursor, ac_var* target, ac_param param);
 int expr_assign_cmd(ac_var* target, ac_param param);
 
-int expr_op_cmd_generated(unsigned int * cursor, ac_execode** new_expr, std::string opcode, ac_var * target, std::vector<ac_param> params);
-int expr_op_cmd_generated(ac_execode** new_expr, std::string opcode, ac_var * target, std::vector<ac_param> params);
-int expr_op_cmd(unsigned int * cursor, std::string opcode, ac_var** respvar, std::vector<ac_param> params);
-int expr_op_cmd(std::string opcode, ac_var** respvar, std::vector<ac_param> params);
+int expr_op_cmd_generated(unsigned int * cursor, ac_execode** new_expr, char * opcode, ac_var * target, std::vector<ac_param> params);
+int expr_op_cmd_generated(ac_execode** new_expr, char * opcode, ac_var * target, std::vector<ac_param> params);
+int expr_op_cmd(unsigned int * cursor, char * opcode, ac_var** respvar, std::vector<ac_param> params);
+int expr_op_cmd(char * opcode, ac_var** respvar, std::vector<ac_param> params);
 
-int expr_1op_cmd(std::string opcode, ac_var** respvar, ac_param param);
-int expr_2op_cmd(std::string opcode, ac_var** respvar, ac_param param0, ac_param param1);
-int expr_1op_cmd_generated(std::string opcode, ac_var* target, ac_param param);
-int expr_2op_cmd_generated(std::string opcode, ac_var* target, ac_param param0, ac_param param1);
+int expr_1op_cmd(char * opcode, ac_var** respvar, ac_param param);
+int expr_2op_cmd(char * opcode, ac_var** respvar, ac_param param0, ac_param param1);
+int expr_1op_cmd_generated(char * opcode, ac_var* target, ac_param param);
+int expr_2op_cmd_generated(char * opcode, ac_var* target, ac_param param0, ac_param param1);
 
 int expr_zeroext_cmd(unsigned int * cursor, unsigned int target_width, ac_var** respvar, ac_param param);
 int expr_zeroext_cmd(unsigned int target_width, ac_var** respvar, ac_param param);
@@ -39,13 +39,17 @@ int expr_signext_cmd(unsigned int * cursor, unsigned int target_width, ac_var** 
 int expr_signext_cmd(unsigned int target_width, ac_var** respvar, ac_param param);
 int expr_initval_cmd(ac_var** respvar, ac_dimensions_static dimensions, ac_param param);
 
-int expr_begif_cmd(ac_var* cond_op);
-int expr_begifnot_cmd(ac_var* cond_op);
-int expr_begelsif_cmd(ac_var* cond_op);
+int expr_begif_cmd(ac_param cond);
+int expr_begif_cmd(ac_var * cond);
+int expr_begifnot_cmd(ac_param cond);
+int expr_begifnot_cmd(ac_var * cond);
+int expr_begelsif_cmd(ac_param cond);
+int expr_begelsif_cmd(ac_var * cond);
 int expr_begelse_cmd();
 int expr_endif_cmd();
 
-int expr_begwhile_cmd(ac_var* cond_op);
+int expr_begwhile_cmd(ac_param cond);
+int expr_begwhile_cmd(ac_var * cond);
 int expr_endwhile_cmd();
 
 #endif /* AC_CORE_CMDS_H_ */
