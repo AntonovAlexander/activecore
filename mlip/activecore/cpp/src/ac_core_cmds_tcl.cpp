@@ -10,7 +10,6 @@
 #include "ac_core_cmds.hpp"
 #include "ac_core_cmds_tcl.hpp"
 #include "ac_core.hpp"
-#include "ac_core_cmds_string.hpp"
 #include "ac_rtl.hpp"
 
 
@@ -457,113 +456,101 @@ int TCL_gplc_call_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_O
 		if (ExeStack.size() == 0) return 1;
 		if (expr_endwhile_cmd() != 0) return TCL_ERROR;
 
+
+	} else if (opcode == "assign") {
+		if (ParamAccumulator.size() != 2)
+		{
+			printf("ActiveCore ERROR: incorrect params!\n");
+			return TCL_ERROR;
+		}
+		if (DEBUG_FLAG == true)
+		{
+			printf("--ParamAccumulator size: %d\n", ParamAccumulator.size());
+			for (unsigned int i = 0; i < ParamAccumulator.size(); i++)
+			{
+				printf("---Param %d:, %s\n", i, StringToCharArr(ParamAccumulator[i].GetString()));
+			}
+		}
+
+		bool cproc_gen = false;
+		if (ExeStack.size() == 0) cproc_gen = true;
+		if (cproc_gen == true) rtl::cproc_cmd();
+
+		if (expr_assign_cmd(DimensionsAccumulator, ParamAccumulator[1].var, ParamAccumulator[0]) != 0) return TCL_ERROR;
+
+		if (cproc_gen == true) rtl::endcproc_cmd();
+
+	} else if (opcode == "initval") {
+		ac_dimensions_static new_dimensions;
+		for (unsigned int i = 0; i < DimensionsAccumulator.size(); i++)
+		{
+			if (DimensionsAccumulator[i].type != DimType_CC)
+			{
+				printf("Range arguments are incorrect!\n");
+				return TCL_ERROR;
+			}
+			new_dimensions.push_back(*(new dimension_range_static(DimensionsAccumulator[i].msb_int, DimensionsAccumulator[i].lsb_int)));
+		}
+
+		if (ParamAccumulator.size() != 1)
+		{
+			printf("Params are incorrect!\n");
+			return TCL_ERROR;
+		}
+
+		ac_var * genvar;
+		if (expr_initval_cmd(&genvar, new_dimensions, ParamAccumulator[0]) != 0) return TCL_ERROR;
+		Tcl_SetResult(interp, StringToCharArr(genvar->name), TCL_VOLATILE);
+
+	} else if (opcode == "zeroext") {
+		if ((ParamAccumulator.size() != 1) || (UIntParamAccumulator.size() != 1))
+		{
+			printf("ActiveCore ERROR: incorrect params!\n");
+			return TCL_ERROR;
+		}
+		ac_var * genvar;
+
+		bool cproc_gen = false;
+		if (ExeStack.size() == 0) cproc_gen = true;
+		if (cproc_gen == true) rtl::cproc_cmd();
+
+		if (expr_zeroext_cmd(UIntParamAccumulator[0], &genvar, ParamAccumulator[0]) != 0)
+		{
+			printf("expr_zeroext_cmd: ERROR\n");
+			return 1;
+		}
+		if (cproc_gen == true) rtl::endcproc_cmd();
+
+		Tcl_SetResult(interp, StringToCharArr(genvar->name), TCL_VOLATILE);
+
+	} else if (opcode == "signext") {
+		if ((ParamAccumulator.size() != 1) || (UIntParamAccumulator.size() != 1))
+		{
+			printf("ActiveCore ERROR: incorrect params!\n");
+			return TCL_ERROR;
+		}
+		ac_var * genvar;
+
+		bool cproc_gen = false;
+		if (ExeStack.size() == 0) cproc_gen = true;
+		if (cproc_gen == true) rtl::cproc_cmd();
+
+		if (expr_signext_cmd(UIntParamAccumulator[0], &genvar, ParamAccumulator[0]) != 0)
+		{
+			printf("expr_signext_cmd: ERROR\n");
+			return 1;
+		}
+		if (cproc_gen == true) rtl::endcproc_cmd();
+
+		Tcl_SetResult(interp, StringToCharArr(genvar->name), TCL_VOLATILE);
+
 	} else {
-		printf("Command unknown!\n");
+		printf("Command %s unknown!\n", StringToCharArr(opcode));
 		return TCL_ERROR;
 	}
 
 	DimensionsAccumulator.clear();
 	StringParamAccumulator.clear();
-	ParamAccumulator.clear();
-	return TCL_OK;
-}
-
-int TCL_expr_assign_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
-{
-	if (DEBUG_FLAG == true) printf("Assign command!\n");
-	if (objc != 2)
-	{
-		printf("Incorrect command!\n");
-		return TCL_ERROR;
-	}
-	std::string target = std::string(Tcl_GetString(objv[1]));
-	if (DEBUG_FLAG == true) printf("target: %s\n", StringToCharArr(target));
-	if (ParamAccumulator.size() != 1)
-	{
-		printf("ActiveCore ERROR: incorrect params!\n");
-		return TCL_ERROR;
-	}
-	if (DEBUG_FLAG == true)
-	{
-		printf("--ParamAccumulator size: %d\n", ParamAccumulator.size());
-		for (unsigned int i = 0; i < ParamAccumulator.size(); i++)
-		{
-			printf("---Param %d:, %s\n", i, StringToCharArr(ParamAccumulator[i].GetString()));
-		}
-	}
-	if (expr_assign_cmd_string(target, ParamAccumulator[0]) != 0) return TCL_ERROR;
-	ParamAccumulator.clear();
-	DimensionsAccumulator.clear();
-	if (DEBUG_FLAG == true) printf("Assign command complete!\n");
-	return TCL_OK;
-}
-
-int TCL_expr_initval_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
-{
-	if (DEBUG_FLAG == true) printf("initval command!\n");
-	if (objc != 1)
-	{
-		printf("Incorrect command!\n");
-		return TCL_ERROR;
-	}
-
-	ac_dimensions_static new_dimensions;
-	for (unsigned int i = 0; i < DimensionsAccumulator.size(); i++)
-	{
-		if (DimensionsAccumulator[i].type != DimType_CC)
-		{
-			printf("Range arguments are incorrect!\n");
-			return TCL_ERROR;
-		}
-		new_dimensions.push_back(*(new dimension_range_static(DimensionsAccumulator[i].msb_int, DimensionsAccumulator[i].lsb_int)));
-	}
-
-	if (ParamAccumulator.size() != 1)
-	{
-		printf("Params are incorrect!\n");
-		return TCL_ERROR;
-	}
-
-	ac_var * genvar;
-	if (expr_initval_cmd(&genvar, new_dimensions, ParamAccumulator[0]) != 0) return TCL_ERROR;
-	Tcl_SetResult(interp, StringToCharArr(genvar->name), TCL_VOLATILE);
-	ParamAccumulator.clear();
-	DimensionsAccumulator.clear();
-	return TCL_OK;
-}
-
-int TCL_expr_zeroext_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
-{
-	if (DEBUG_FLAG == true) printf("zeroext command!\n");
-	if (objc != 2)
-	{
-		printf("Incorrect command!\n");
-		return TCL_ERROR;
-	}
-
-	std::string size = std::string(Tcl_GetString(objv[1]));
-	std::string genvar_name;
-
-	if (expr_zeroext_cmd_string(size, &genvar_name, ParamAccumulator) != 0) return TCL_ERROR;
-	Tcl_SetResult(interp, StringToCharArr(genvar_name), TCL_VOLATILE);
-	ParamAccumulator.clear();
-	return TCL_OK;
-}
-
-int TCL_expr_signext_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
-{
-	if (DEBUG_FLAG == true) printf("signext command!\n");
-	if (objc != 2)
-	{
-		printf("Incorrect command!\n");
-		return TCL_ERROR;
-	}
-
-	std::string size = std::string(Tcl_GetString(objv[1]));
-	std::string genvar_name;
-
-	if (expr_signext_cmd_string(size, &genvar_name, ParamAccumulator) != 0) return TCL_ERROR;
-	Tcl_SetResult(interp, StringToCharArr(genvar_name), TCL_VOLATILE);
 	ParamAccumulator.clear();
 	return TCL_OK;
 }
@@ -591,9 +578,4 @@ int TCL_core_InitCmds(Tcl_Interp *interp)
 	Tcl_CreateObjCommand(interp, "__gplc_acc_range_cv", TCL_accum_range_cv_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_acc_range_vc", TCL_accum_range_vc_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_acc_range_vv", TCL_accum_range_vv_cmd, NULL, NULL);
-
-	Tcl_CreateObjCommand(interp, "__gplc_assign", TCL_expr_assign_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__gplc_initval", TCL_expr_initval_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__gplc_zeroext", TCL_expr_zeroext_cmd, NULL, NULL);
-	Tcl_CreateObjCommand(interp, "__gplc_signext", TCL_expr_signext_cmd, NULL, NULL);
 }

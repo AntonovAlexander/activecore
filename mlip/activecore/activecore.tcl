@@ -62,6 +62,12 @@ namespace eval ActiveCore {
     	}
 	}
 
+	proc verif_nogen {name} {
+		if {[regexp {gen} $name]} {
+			ERROR No\ gen\ in\ user\ names\ allowed!
+		}
+	}
+
 	proc expr_1op {opcode op} {
 		__gplc_acc_param_clr
 		_accum_param $op
@@ -122,7 +128,7 @@ proc _acc_index {index} {
 proc initval {dimensions value} {
 	_acc_index $dimensions
 	ActiveCore::_accum_param $value
-	__gplc_initval
+	__gplc_call initval
 }
 
 proc s= {target source} {
@@ -130,7 +136,8 @@ proc s= {target source} {
 		ActiveCore::ERROR Target\ $target\ is\ numeric!
 	}
 	ActiveCore::_accum_param $source
-	__gplc_assign $target
+	__gplc_acc_param_v_wr $target
+	__gplc_call assign
 }
 
 proc c- {op} {
@@ -290,7 +297,8 @@ proc zeroext {op size} {
 	}
 	__gplc_acc_param_clr
 	ActiveCore::_accum_param $op
-	__gplc_zeroext $size
+	__gplc_acc_param_uint $size
+	__gplc_call zeroext 
 }
 
 proc signext {op size} {
@@ -299,7 +307,8 @@ proc signext {op size} {
 	}
 	__gplc_acc_param_clr
 	ActiveCore::_accum_param $op
-	__gplc_signext $size
+	__gplc_acc_param_uint $size
+	__gplc_call signext 
 }
 
 proc ActiveCore_Reset {} {
