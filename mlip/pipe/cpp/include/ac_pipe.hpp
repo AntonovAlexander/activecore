@@ -15,6 +15,36 @@
 
 namespace pipe
 {
+	extern char PIPE_OP_PPROC[];
+	extern char PIPE_OP_PSTAGE[];
+
+	extern char PIPE_OP_ASSIGN_ACTIVE[];
+	extern char PIPE_OP_ASSIGN_SUCC[];
+
+	extern char PIPE_OP_PBREAK[];
+	extern char PIPE_OP_PSTALL[];
+	extern char PIPE_OP_PREPEAT[];
+	extern char PIPE_OP_PFLUSH[];
+
+	extern char PIPE_OP_PRE[];
+	extern char PIPE_OP_PWE[];
+	extern char PIPE_OP_PWE_SUCC[];
+	extern char PIPE_OP_PRR[];
+	extern char PIPE_OP_ACCUM[];
+
+	extern char PIPE_OP_ISACTIVE[];
+	extern char PIPE_OP_ISWORKING[];
+	extern char PIPE_OP_ISSTALLED[];
+	extern char PIPE_OP_ISSUCC[];
+	extern char PIPE_OP_ISBROKEN[];
+	extern char PIPE_OP_ISFINISHED[];
+
+	extern char PIPE_OP_MCOPIPE_REQ[];
+	extern char PIPE_OP_MCOPIPE_RESP[];
+	extern char PIPE_OP_SCOPIPE_REQ[];
+	extern char PIPE_OP_SCOPIPE_RESP[];
+
+
 	class mcopipe_if;
 	class wrfifo_if;
 	class rdfifo_if;
@@ -63,6 +93,7 @@ namespace pipe
 	int scopipeif_cmd(std::string scopipeif_name, ac_dimensions_static wdata_dimensions, ac_dimensions_static rdata_dimensions);
 	int scopipe_req_cmd(std::string scopipeif_name, ac_dimensions dimensions, ac_var ** rdy_var, ac_var * cmd_var, ac_var * rdata_var);
 	int scopipe_resp_cmd(std::string scopipeif_name, ac_var ** rdy_var, ac_param wdata_param);
+	int scopipe_connect_cmd(std::string copipeif_name, unsigned int chnum, std::string pproc_name, std::string scopipeif_name);
 
 	int wrfifoif_cmd(std::string wrfifoif_name, ac_var * req_var, ac_var * ack_var, ac_var * wdata_var);
 	int wrfiforeq_cmd(std::string wrfifoif_name, std::vector<ac_param> params);
