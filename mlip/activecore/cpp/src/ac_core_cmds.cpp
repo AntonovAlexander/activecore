@@ -123,7 +123,7 @@ int expr_assign_cmd(unsigned int * cursor, ac_dimensions dimensions, ac_var* tar
 		{
 			for (unsigned int i = 0; i < target->dimensions[targetDePowered-1].GetWidth(); i++)
 			{
-				dimensions.push_front(*(new dimension_range(i)));
+				dimensions.push_front(*(new dimension_range(i + target->dimensions[targetDePowered-1].lsb)));
 				ret_val = expr_assign_cmd(cursor, dimensions, target, param);
 				dimensions.pop_front();
 			}
