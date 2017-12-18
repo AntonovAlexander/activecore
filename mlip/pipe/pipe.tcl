@@ -56,13 +56,22 @@ namespace eval pipe {
 		__mlip_pipe_call rdbuf
 	}
 
-	proc s<= {target source} {
+	proc p!= {target source} {
+		if {[ActiveCore::isnumeric $target] == 1} {
+			ActiveCore::ERROR Target\ $target\ is\ numeric!
+		}
+		ActiveCore::_accum_param $source
+		__gplc_acc_param_v_wr $target
+		__mlip_pipe_call p!=
+	}
+
+	proc p<= {target source} {
 		if {[ActiveCore::isnumeric $target] == 1} {
 			ActiveCore::ERROR Target\ $target\ is\ numeric!
 		}
 		ActiveCore::_accum_param $source
 		__gplc_acc_param_string $target
-		__mlip_pipe_call assign_unblocking
+		__mlip_pipe_call p<=
 	}
 
 	proc _acc_index_wdata {index} {

@@ -231,11 +231,11 @@ namespace eval riscv_pipe {
 		begif jump_req_cmd
 			s= curinstr_addr jump_vector_cmd
 		endif
-		pipe::s<= jump_req_cmd 0
+		pipe::p<= jump_req_cmd 0
 
 		s= nextinstr_addr [s+ curinstr_addr 4]
 
-		pipe::s<= pc nextinstr_addr
+		pipe::p<= pc nextinstr_addr
 	}
 
 	proc process_decode {} {
@@ -909,8 +909,8 @@ namespace eval riscv_pipe {
 
 	# branch control
 	proc process_branch {} {
-		pipe::s<= jump_req_cmd jump_req
-		pipe::s<= jump_vector_cmd jump_vector
+		pipe::p<= jump_req_cmd jump_req
+		pipe::p<= jump_vector_cmd jump_vector
 		begif jump_req
 			pipe::pflush
 		endif
@@ -925,7 +925,7 @@ namespace eval riscv_pipe {
 	proc process_wb {} {
 		begif rd_req
 			_acc_index rd_addr
-			pipe::s<= regfile rd_wdata
+			pipe::p<= regfile rd_wdata
 		endif
 	}
 
