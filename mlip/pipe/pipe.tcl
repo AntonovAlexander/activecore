@@ -70,7 +70,7 @@ namespace eval pipe {
 			ActiveCore::ERROR Target\ $target\ is\ numeric!
 		}
 		ActiveCore::_accum_param $source
-		__gplc_acc_param_string $target
+		__gplc_acc_param_v_wr $target
 		__mlip_pipe_call p<=
 	}
 
