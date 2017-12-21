@@ -228,28 +228,6 @@ namespace eval pipe {
 		}
 	}
 
-	proc wrfifoif {wrfifoif_name req ack wdata} {
-		__gplc_acc_param_clr
-		__gplc_acc_param_string $wrfifoif_name
-		__mlip_rtl_SetPtrs
-		__gplc_acc_param_v_wr $req
-		__gplc_acc_param_v_rd $ack
-		__gplc_acc_param_v_wr $wdata
-		__mlip_pipe_SetPtrs
-		__mlip_pipe_call wrfifoif
-	}
-
-	proc rdfifoif {rdfifoif_name req ack rdata} {
-		__gplc_acc_param_clr
-		__gplc_acc_param_string $rdfifoif_name
-		__mlip_rtl_SetPtrs
-		__gplc_acc_param_v_wr $req
-		__gplc_acc_param_v_rd $ack
-		__gplc_acc_param_v_rd $rdata
-		__mlip_pipe_SetPtrs
-		__mlip_pipe_call rdfifoif
-	}
-
 	# interface functions
 	proc pstage {pstage_name} {
 		__gplc_acc_param_clr
