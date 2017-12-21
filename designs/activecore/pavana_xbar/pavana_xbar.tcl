@@ -46,7 +46,7 @@ rtl::module pavana_xbar
 	for {set mnum_idx 0} {$mnum_idx < $mnum} {incr mnum_idx} {
 
 		pipe::pproc m$mnum_idx\_pipe
-			
+
 			pipe::pvar {1 0}	snum 		0
 			pipe::pvar {31 0} 	address		0
 			pipe::pvar {0 0} 	we			0
@@ -112,7 +112,6 @@ rtl::module pavana_xbar
 			pipe::pvar {1 0}	mnum 		0
 			pipe::pvar {31 0}	rdata 		0
 
-			# update by <= copmmand
 			pipe::psticky	{1 0} 	rr_arbiter	0
 
 			pipe::pstage ARBITER
@@ -121,7 +120,13 @@ rtl::module pavana_xbar
 					begif [pipe::pre m$mnum_idx\_s$snum_idx\_req]
 						s= mnum $mnum_idx
 						pipe::pwe<= m$mnum_idx\_s$snum_idx\_ack 	1
-						#pipe::pwe<= rr_arbiter 1
+						
+						begif [s== rr_arbiter [expr $mnum - 1]]
+							pipe::p<= rr_arbiter 0
+						endif
+						begelse
+							pipe::p<= rr_arbiter [s+ rr_arbiter 1]
+						endif
 					endif
 				}
 
