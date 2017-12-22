@@ -59,7 +59,10 @@ rtl::module pavana_xbar
 					pipe::pstall
 				endif
 
-				s= address [pipe::pre m$mnum_idx\_req]
+				s= address [pipe::pre m$mnum_idx\_addr]
+				s= we [pipe::pre m$mnum_idx\_we]
+				s= wdata [pipe::pre m$mnum_idx\_wdata]
+
 				s= snum [indexed address {31 30}]
 
 				pipe::pwe<= m$mnum_idx\_ack 1
@@ -81,16 +84,20 @@ rtl::module pavana_xbar
 					}
 				endif
 
+				begelse
+					pipe::pstall
+				endif
+
 			pipe::pstage MRESP
 
-				begnif we
+				begif we
 					pipe::pbreak
 				endif
 
 				for {set snum_idx 0} {$snum_idx < $snum} {incr snum_idx} {
 					begif [s== snum $snum_idx]
 						s= rdata [pipe::pre m$mnum_idx\_s$snum_idx\_rdata]
-						begnif [pipe::pre m$mnum_idx\_s$snum_idx\_ack]
+						begnif [pipe::pre m$mnum_idx\_s$snum_idx\_resp]
 							pipe::pstall
 						endif
 					endif
@@ -112,47 +119,202 @@ rtl::module pavana_xbar
 			pipe::pvar {1 0}	mnum 		0
 			pipe::pvar {31 0}	rdata 		0
 
-			pipe::psticky	{1 0} 	rr_arbiter	0
+			pipe::psticky_glbl	{1 0} 	rr_arbiter	0
 
 			pipe::pstage ARBITER
 
-				for {set mnum_idx 0} {$mnum_idx < $mnum} {incr mnum_idx} {
-					begif [pipe::pre m$mnum_idx\_s$snum_idx\_req]
-						s= mnum $mnum_idx
-						pipe::pwe<= m$mnum_idx\_s$snum_idx\_ack 	1
-						
-						begif [s== rr_arbiter [expr $mnum - 1]]
-							pipe::p<= rr_arbiter 0
-						endif
-						begelse
-							pipe::p<= rr_arbiter [s+ rr_arbiter 1]
-						endif
+				begif [s== rr_arbiter 0]
+					begif [pipe::pre m0_s$snum_idx\_req]
+						s= mnum 0
+						s= address 	[pipe::pre m0_s$snum_idx\_addr]
+						s= we 		[pipe::pre m0_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m0_s$snum_idx\_wdata]
+						pipe::pwe<= m0_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 1
 					endif
-				}
+
+					begelsif [pipe::pre m1_s$snum_idx\_req]
+						s= mnum 1
+						s= address 	[pipe::pre m1_s$snum_idx\_addr]
+						s= we 		[pipe::pre m1_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m1_s$snum_idx\_wdata]
+						pipe::pwe<= m1_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 2
+					endif
+
+					begelsif [pipe::pre m2_s$snum_idx\_req]
+						s= mnum 2
+						s= address 	[pipe::pre m2_s$snum_idx\_addr]
+						s= we 		[pipe::pre m2_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m2_s$snum_idx\_wdata]
+						pipe::pwe<= m2_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 3
+					endif
+
+					begelsif [pipe::pre m3_s$snum_idx\_req]
+						s= mnum 3
+						s= address 	[pipe::pre m3_s$snum_idx\_addr]
+						s= we 		[pipe::pre m3_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m3_s$snum_idx\_wdata]
+						pipe::pwe<= m3_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 0
+					endif
+
+					begelse
+						pipe::pstall
+					endif
+				endif
+
+				begif [s== rr_arbiter 1]
+					begif [pipe::pre m1_s$snum_idx\_req]
+						s= mnum 1
+						s= address 	[pipe::pre m1_s$snum_idx\_addr]
+						s= we 		[pipe::pre m1_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m1_s$snum_idx\_wdata]
+						pipe::pwe<= m1_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 2
+					endif
+
+					begelsif [pipe::pre m2_s$snum_idx\_req]
+						s= mnum 2
+						s= address 	[pipe::pre m2_s$snum_idx\_addr]
+						s= we 		[pipe::pre m2_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m2_s$snum_idx\_wdata]
+						pipe::pwe<= m2_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 3
+					endif
+
+					begelsif [pipe::pre m3_s$snum_idx\_req]
+						s= mnum 3
+						s= address 	[pipe::pre m3_s$snum_idx\_addr]
+						s= we 		[pipe::pre m3_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m3_s$snum_idx\_wdata]
+						pipe::pwe<= m3_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 0
+					endif
+
+					begelsif [pipe::pre m0_s$snum_idx\_req]
+						s= mnum 0
+						s= address 	[pipe::pre m0_s$snum_idx\_addr]
+						s= we 		[pipe::pre m0_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m0_s$snum_idx\_wdata]
+						pipe::pwe<= m0_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 1
+					endif
+
+					begelse
+						pipe::pstall
+					endif
+				endif
+
+				begif [s== rr_arbiter 2]
+					begif [pipe::pre m2_s$snum_idx\_req]
+						s= mnum 2
+						s= address 	[pipe::pre m2_s$snum_idx\_addr]
+						s= we 		[pipe::pre m2_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m2_s$snum_idx\_wdata]
+						pipe::pwe<= m2_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 3
+					endif
+
+					begelsif [pipe::pre m3_s$snum_idx\_req]
+						s= mnum 3
+						s= address 	[pipe::pre m3_s$snum_idx\_addr]
+						s= we 		[pipe::pre m3_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m3_s$snum_idx\_wdata]
+						pipe::pwe<= m3_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 0
+					endif
+
+					begelsif [pipe::pre m0_s$snum_idx\_req]
+						s= mnum 0
+						s= address 	[pipe::pre m0_s$snum_idx\_addr]
+						s= we 		[pipe::pre m0_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m0_s$snum_idx\_wdata]
+						pipe::pwe<= m0_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 1
+					endif
+
+					begelsif [pipe::pre m1_s$snum_idx\_req]
+						s= mnum 1
+						s= address 	[pipe::pre m1_s$snum_idx\_addr]
+						s= we 		[pipe::pre m1_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m1_s$snum_idx\_wdata]
+						pipe::pwe<= m1_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 2
+					endif
+
+					begelse
+						pipe::pstall
+					endif
+				endif
+
+				begif [s== rr_arbiter 3]
+					begif [pipe::pre m3_s$snum_idx\_req]
+						s= mnum 3
+						s= address 	[pipe::pre m3_s$snum_idx\_addr]
+						s= we 		[pipe::pre m3_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m3_s$snum_idx\_wdata]
+						pipe::pwe<= m3_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 0
+					endif
+
+					begelsif [pipe::pre m0_s$snum_idx\_req]
+						s= mnum 0
+						s= address 	[pipe::pre m0_s$snum_idx\_addr]
+						s= we 		[pipe::pre m0_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m0_s$snum_idx\_wdata]
+						pipe::pwe<= m0_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 1
+					endif
+
+					begelsif [pipe::pre m1_s$snum_idx\_req]
+						s= mnum 1
+						s= address 	[pipe::pre m1_s$snum_idx\_addr]
+						s= we 		[pipe::pre m1_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m1_s$snum_idx\_wdata]
+						pipe::pwe<= m1_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 2
+					endif
+
+					begelsif [pipe::pre m2_s$snum_idx\_req]
+						s= mnum 2
+						s= address 	[pipe::pre m2_s$snum_idx\_addr]
+						s= we 		[pipe::pre m2_s$snum_idx\_we]
+						s= wdata 	[pipe::pre m2_s$snum_idx\_wdata]
+						pipe::pwe<= m2_s$snum_idx\_ack 1
+						pipe::p<= rr_arbiter 3
+					endif
+
+					begelse
+						pipe::pstall
+					endif
+				endif
+
+			pipe::pstage SREQ
+
+				begnif [pipe::isstalled SRESP]
+					pipe::pwe s$snum_idx\_req 		1
+					pipe::pwe s$snum_idx\_addr 		address
+					pipe::pwe s$snum_idx\_we 		we
+					pipe::pwe s$snum_idx\_wdata 	wdata
+					
+					begnif [pipe::pre s$snum_idx\_ack]
+						pipe::pstall
+					endif
+				endif
 
 				begelse
 					pipe::pstall
 				endif
 
-			pipe::pstage SREQ
-
-				pipe::pwe s$snum_idx\_req 		1
-				pipe::pwe s$snum_idx\_addr 		address
-				pipe::pwe s$snum_idx\_we 		we
-				pipe::pwe s$snum_idx\_wdata 	wdata
-				
-				begnif [s== [pipe::pre s$snum_idx\_ack] 1]
-					pipe::pstall
-				endif
-
 			pipe::pstage SRESP
 
-				begnif we
+				begif we
 					pipe::pbreak
 				endif
 
 				s= rdata [pipe::pre s$snum_idx\_rdata]
-
 				begnif [pipe::pre s$snum_idx\_resp]
 					pipe::pstall
 				endif
