@@ -259,6 +259,8 @@ public:
 	std::vector<unsigned int> uint_params;
 	std::deque<ac_execode*> expressions;
 
+	std::vector<ac_param> priority_conditions;
+
 	ac_dimensions dimensions;
 
 	std::vector<ac_var*> wrvars;

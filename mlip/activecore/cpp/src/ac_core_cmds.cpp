@@ -615,6 +615,9 @@ int expr_begif_cmd(ac_param cond)
 	ac_execode* new_expr = new ac_execode(OP1_IF);
 	new_expr->AddRdParam(cond);
 
+	ExeStack[ExeStack.size()-1]->priority_conditions.clear();
+	ExeStack[ExeStack.size()-1]->priority_conditions.push_back(cond);
+
 	ExeStack[ExeStack.size()-1]->AddExpr(new_expr);
 	ExeStack.push_back(new_expr);
 
@@ -640,43 +643,26 @@ int expr_begifnot_cmd(ac_var* cond)
 
 int expr_begelsif_cmd(ac_param cond)
 {
-	bool preif_found = false;
-	ac_var* preif_cond;
-	for (int i = (ExeStack[ExeStack.size()-1]->expressions.size() - 1); i > (-1); i--)
+	ac_var* curif_cond = new ac_var(DEFAULT_TYPEVAR, GetGenName("var"), 0, 0, "0");
+
+	// summing previous conditions - some of previous occurred
+	if (expr_assign_cmd(curif_cond, ac_param(1, "0")) != 0) return 1;
+	for (unsigned int i = 0; i < ExeStack[ExeStack.size()-1]->priority_conditions.size(); i++)
 	{
-		if (ExeStack[ExeStack.size()-1]->expressions[i]->opcode == OP1_IF)
-		{
-			preif_found = true;
-			preif_cond = ExeStack[ExeStack.size()-1]->expressions[i]->rdvars[0];
-			break;
-		}
+		if (expr_2op_cmd_generated(OP2_LOGICAL_OR, curif_cond, ac_param(curif_cond), ExeStack[ExeStack.size()-1]->priority_conditions[i]) != 0) return 1;
 	}
 
-	if (preif_found == false)
-	{
-		printf("ActiveCore ERROR: begelsif not preceded by begif!");
-		return 1;
-	}
+	// inverting - none of previous occurred
+	if (expr_1op_cmd_generated(OP1_LOGICAL_NOT, curif_cond, curif_cond) != 0) return 1;
 
-	ac_var* preif_ncond;
-	std::vector<ac_param> preif_cond_params;
-	preif_cond_params.push_back(ac_param(preif_cond));
-	if (expr_op_cmd(OP1_LOGICAL_NOT, &preif_ncond, preif_cond_params) != 0) return 1;
-
-	ac_var* curif_cond;
-	std::vector<ac_param> curif_cond_params;
-	curif_cond_params.push_back(ac_param(preif_ncond));
-	curif_cond_params.push_back(cond);
-	if (expr_op_cmd(OP2_LOGICAL_AND, &curif_cond, curif_cond_params) != 0) return 1;
+	// final condition
+	if (expr_2op_cmd_generated(OP2_LOGICAL_AND, curif_cond, ac_param(curif_cond), cond) != 0) return 1;
 
 	ac_execode* new_expr = new ac_execode(OP1_IF);
 	new_expr->AddRdParam(ac_param(curif_cond));
+	new_expr->AddGenVarWithStack(curif_cond);
 
-	for (unsigned int i = 0; i < ExeStack[ExeStack.size()-1]->wrvars.size(); i++)
-	{
-		AddIfTargetVarToStack(ExeStack[ExeStack.size()-1]->wrvars[i]);
-	}
-
+	ExeStack[ExeStack.size()-1]->priority_conditions.push_back(curif_cond);
 	ExeStack[ExeStack.size()-1]->AddExpr(new_expr);
 	ExeStack.push_back(new_expr);
 
@@ -690,37 +676,23 @@ int expr_begelsif_cmd(ac_var* cond)
 
 int expr_begelse_cmd()
 {
-	bool preif_found = false;
-	ac_var* preif_cond;
-	for (int i = (ExeStack[ExeStack.size()-1]->expressions.size() - 1); i > (-1); i--)
+	ac_var* curif_cond = new ac_var(DEFAULT_TYPEVAR, GetGenName("var"), 0, 0, "0");
+
+	// summing previous conditions - some of previous occurred
+	if (expr_assign_cmd(curif_cond, ac_param(1, "0")) != 0) return 1;
+	for (unsigned int i = 0; i < ExeStack[ExeStack.size()-1]->priority_conditions.size(); i++)
 	{
-		if (ExeStack[ExeStack.size()-1]->expressions[i]->opcode == OP1_IF)
-		{
-			preif_found = true;
-			preif_cond = ExeStack[ExeStack.size()-1]->expressions[i]->rdvars[0];
-			break;
-		}
+		if (expr_2op_cmd_generated(OP2_LOGICAL_OR, curif_cond, ac_param(curif_cond), ExeStack[ExeStack.size()-1]->priority_conditions[i]) != 0) return 1;
 	}
 
-	if (preif_found == false)
-	{
-		printf("ActiveCore ERROR: begelse not preceded by begif!\n");
-		return 1;
-	}
-
-	ac_var* preif_ncond;
-	std::vector<ac_param> preif_ncond_params;
-	preif_ncond_params.push_back(ac_param(preif_cond));
-	if (expr_op_cmd(OP1_LOGICAL_NOT, &preif_ncond, preif_ncond_params) != 0) return 1;
+	// inverting - none of previous occurred
+	if (expr_1op_cmd_generated(OP1_LOGICAL_NOT, curif_cond, curif_cond) != 0) return 1;
 
 	ac_execode* new_expr = new ac_execode(OP1_IF);
-	new_expr->AddRdParam(preif_ncond);
+	new_expr->AddRdParam(ac_param(curif_cond));
+	new_expr->AddGenVarWithStack(curif_cond);
 
-	for (unsigned int i = 0; i < ExeStack[ExeStack.size()-1]->wrvars.size(); i++)
-	{
-		AddIfTargetVarToStack(ExeStack[ExeStack.size()-1]->wrvars[i]);
-	}
-
+	ExeStack[ExeStack.size()-1]->priority_conditions.clear();
 	ExeStack[ExeStack.size()-1]->AddExpr(new_expr);
 	ExeStack.push_back(new_expr);
 
