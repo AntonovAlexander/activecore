@@ -148,8 +148,16 @@ proc s+ {op1 op2} {
 	ActiveCore::expr_2op "s+" $op1 $op2
 }
 
+proc s++ {op1} {
+	ActiveCore::expr_2op "s+" $op1 1
+}
+
 proc s- {op1 op2} {
 	ActiveCore::expr_2op "s-" $op1 $op2
+}
+
+proc s-- {op1} {
+	ActiveCore::expr_2op "s-" $op1 1
 }
 
 proc sx {op1 op2} {
@@ -246,6 +254,11 @@ proc indexed {op index} {
 			ActiveCore::expr_3op "ranged" $op [lindex $index 0] [lindex $index 1]
 		}
 	}	
+}
+
+proc clrif {} {
+	__gplc_acc_param_clr
+	__gplc_call clrif
 }
 
 proc begif {condition} {

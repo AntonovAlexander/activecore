@@ -610,6 +610,12 @@ int expr_initval_cmd(ac_var** respvar, ac_dimensions_static dimensions, ac_param
 	return 0;
 }
 
+int expr_clrif_cmd()
+{
+	ExeStack[ExeStack.size()-1]->priority_conditions.clear();
+	return 0;
+}
+
 int expr_begif_cmd(ac_param cond)
 {
 	ac_execode* new_expr = new ac_execode(OP1_IF);

@@ -417,6 +417,9 @@ int TCL_gplc_call_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_O
 		if (DEBUG_FLAG == true) printf("generated var dimsize: %d\n", genvar->dimensions.size());
 		Tcl_SetResult(interp, StringToCharArr(genvar->name), TCL_VOLATILE);
 
+	} else if (opcode == "clrif") {
+		if (expr_clrif_cmd() != 0) return TCL_ERROR;
+
 	} else if (opcode == "begif") {
 		if (ParamAccumulator.size() != 1)
 		{
