@@ -39,6 +39,7 @@ int expr_signext_cmd(unsigned int * cursor, unsigned int target_width, ac_var** 
 int expr_signext_cmd(unsigned int target_width, ac_var** respvar, ac_param param);
 int expr_initval_cmd(ac_var** respvar, ac_dimensions_static dimensions, ac_param param);
 
+int expr_clrif_cmd();
 int expr_begif_cmd(ac_param cond);
 int expr_begif_cmd(ac_var * cond);
 int expr_begifnot_cmd(ac_param cond);
