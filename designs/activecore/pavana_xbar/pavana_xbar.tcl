@@ -44,15 +44,21 @@ rtl::module pavana_xbar
 	rtl::setclk clk_i
 	rtl::setrst rst_i
 
+	set mnum_width [ActiveCore::getimmlength [expr $mnum - 1]]
+	set mnum_indices [list [expr $mnum_width - 1] 0]
+
+	set snum_width [ActiveCore::getimmlength [expr $snum - 1]]
+	set snum_indices [list [expr $snum_width - 1] 0]
+
 	for {set mnum_idx 0} {$mnum_idx < $mnum} {incr mnum_idx} {
 
 		pipe::pproc m$mnum_idx\_pipe
 
-			pipe::pvar {1 0}	snum 		0
-			pipe::pvar {31 0} 	address		0
-			pipe::pvar {0 0} 	we			0
-			pipe::pvar {31 0}	wdata 		0
-			pipe::pvar {31 0}	rdata 		0
+			pipe::pvar $snum_indices	snum 		0
+			pipe::pvar {31 0} 			address		0
+			pipe::pvar {0 0} 			we			0
+			pipe::pvar {31 0}			wdata 		0
+			pipe::pvar {31 0}			rdata 		0
 
 			pipe::pstage DECODE
 
@@ -115,11 +121,11 @@ rtl::module pavana_xbar
 
 		pipe::pproc s$snum_idx\_pipe
 
-			pipe::pvar {31 0} 	address		0
-			pipe::pvar {0 0} 	we			0
-			pipe::pvar {31 0} 	wdata		0
-			pipe::pvar {1 0}	mnum 		0
-			pipe::pvar {31 0}	rdata 		0
+			pipe::pvar {31 0} 			address		0
+			pipe::pvar {0 0} 			we			0
+			pipe::pvar {31 0} 			wdata		0
+			pipe::pvar $mnum_indices	mnum 		0
+			pipe::pvar {31 0}			rdata 		0
 
 			pipe::psticky_glbl	{1 0} 	rr_arbiter	0
 
