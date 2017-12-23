@@ -31,13 +31,14 @@ rtl::module pavana_xbar
 	for {set mnum_idx 0} {$mnum_idx < $mnum} {incr mnum_idx} {
 		for {set snum_idx 0} {$snum_idx < $snum} {incr snum_idx} {
 			rtl::comb {0 0} 	m$mnum_idx\_s$snum_idx\_req		0
-			rtl::comb {31 0} 	m$mnum_idx\_s$snum_idx\_addr	0
-			rtl::comb {0 0} 	m$mnum_idx\_s$snum_idx\_we		0
-			rtl::comb {31 0} 	m$mnum_idx\_s$snum_idx\_wdata	0
 			rtl::comb {0 0} 	m$mnum_idx\_s$snum_idx\_ack		0
 			rtl::comb {31 0} 	m$mnum_idx\_s$snum_idx\_rdata	0
 			rtl::comb {0 0} 	m$mnum_idx\_s$snum_idx\_resp	0
 		}
+
+		rtl::comb {31 0} 	m$mnum_idx\_s_addr		0
+		rtl::comb {0 0} 	m$mnum_idx\_s_we		0
+		rtl::comb {31 0} 	m$mnum_idx\_s_wdata		0
 	}
 
 	rtl::setclk clk_i
@@ -69,13 +70,14 @@ rtl::module pavana_xbar
 
 			pipe::pstage SEND
 
+				pipe::pwe m$mnum_idx\_s_addr 	address
+				pipe::pwe m$mnum_idx\_s_we 		we
+				pipe::pwe m$mnum_idx\_s_wdata 	wdata
+
 				begnif [pipe::isstalled MRESP]
 					for {set snum_idx 0} {$snum_idx < $snum} {incr snum_idx} {
 						begif [s== snum $snum_idx]
 							pipe::pwe m$mnum_idx\_s$snum_idx\_req 		1
-							pipe::pwe m$mnum_idx\_s$snum_idx\_addr 		address
-							pipe::pwe m$mnum_idx\_s$snum_idx\_we 		we
-							pipe::pwe m$mnum_idx\_s$snum_idx\_wdata 	wdata
 
 							begnif [pipe::pre m$mnum_idx\_s$snum_idx\_ack]
 								pipe::pstall
@@ -133,9 +135,9 @@ rtl::module pavana_xbar
 
 							begelsif [pipe::pre m$mnum_idx2\_s$snum_idx\_req]
 								s= mnum $mnum_idx2
-								s= address 	[pipe::pre m$mnum_idx2\_s$snum_idx\_addr]
-								s= we 		[pipe::pre m$mnum_idx2\_s$snum_idx\_we]
-								s= wdata 	[pipe::pre m$mnum_idx2\_s$snum_idx\_wdata]
+								s= address 	[pipe::pre m$mnum_idx2\_s_addr]
+								s= we 		[pipe::pre m$mnum_idx2\_s_we]
+								s= wdata 	[pipe::pre m$mnum_idx2\_s_wdata]
 								pipe::pwe<= m$mnum_idx2\_s$snum_idx\_ack 1
 
 
