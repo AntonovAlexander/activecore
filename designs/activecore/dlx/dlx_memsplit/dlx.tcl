@@ -759,13 +759,10 @@ rtl::module dlx
 				pipe::pflush
 			endif
 
-			puts p
-
 			begif mem_req
 				begif mem_cmd
 					pipe::mcopipe::wrreq data_mem 0 [cnct {mem_addr mem_wdata}]
 				endif
-				puts ppp
 				begelse
 					pipe::mcopipe::rdreq data_mem 0 [cnct {mem_addr mem_wdata}]
 				endif
