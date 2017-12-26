@@ -68,11 +68,34 @@ namespace eval dlx {
 	set opcode_XORI	0x0E
 }
 
+proc forward_blocking {pstage} {
+	begif [s&& [pipe::isworking $pstage] [pipe::prr $pstage rd_req]]
+		begif [s== [pipe::prr $pstage rd_addr] rs1_addr]
+			begif [pipe::prr $pstage rd_rdy]
+				s= rs1_rdata [pipe::prr $pstage rd_wdata]
+			endif
+			begelse
+				pipe::pstall
+			endif
+		endif
+		begif [s== [pipe::prr $pstage rd_addr] rs2_addr]
+			begif [pipe::prr $pstage rd_rdy]
+				s= rs2_rdata [pipe::prr $pstage rd_wdata]
+			endif
+			begelse
+				pipe::pstall
+			endif
+		endif
+	endif
+}
 
 rtl::module dlx
 
 	rtl::input 	{0 0} 	clk_i
 	rtl::input 	{0 0} 	rst_i
+
+	rtl::setclk clk_i
+	rtl::setrst rst_i
 	
 	rtl::output {0 0} 	instr_mem_req
 	rtl::output {0 0} 	instr_mem_we
@@ -99,9 +122,9 @@ rtl::module dlx
 	rtl::comb	{0 0}	instr_mcopipe_resp	0
 	rtl::comb 	{31 0}	instr_mcopipe_rdata	0
 
-	rtl::comb 	{0 0} 	data_mcopipe_req		0
+	rtl::comb 	{0 0} 	data_mcopipe_req	0
 	rtl::comb 	{0 0} 	data_mcopipe_we		0
-	rtl::comb 	{0 0} 	data_mcopipe_ack		0
+	rtl::comb 	{0 0} 	data_mcopipe_ack	0
 	rtl::comb 	{63 0} 	data_mcopipe_wdata	0
 	rtl::comb	{0 0}	data_mcopipe_resp	0
 	rtl::comb 	{31 0}	data_mcopipe_rdata	0
@@ -124,7 +147,7 @@ rtl::module dlx
 	s= data_mcopipe_resp data_mem_resp
 	s= data_mcopipe_rdata data_mem_rdata
 
-	pipe::pproc instrpipe clk_i rst_i
+	pipe::pproc instrpipe
 
 		# transaction context
 		pipe::pvar {0 0} 	reset_active	0
@@ -152,6 +175,7 @@ rtl::module dlx
 		pipe::pvar {0 0}	rd_req 			0
 		pipe::pvar {4 0} 	rd_addr			0
 		pipe::pvar {31 0}	rd_wdata 		0
+		pipe::pvar {0 0}	rd_rdy 			0
 
 		pipe::pvar {31 0}	immediate		0
 
@@ -178,14 +202,19 @@ rtl::module dlx
 		pipe::pvar {31 0} 	mem_rdata 		0
 		pipe::pvar {0 0} 	mem_rshift		0
 		
-		pipe::gpvar_sync {31 0} 	pc				0
+		pipe::psticky_glbl {31 0} 	pc					0
 		_acc_index {31 0}	
-		pipe::gpvar_sync {31 0} 	regfile			0
-		pipe::gpvar_sync {0 0}		jump_req_cmd	0
-		pipe::gpvar_sync {31 0} 	jump_vector_cmd	0
+		pipe::psticky_glbl {31 0} 	regfile				0
+		pipe::psticky_glbl {0 0}	jump_req_cmd		0
+		pipe::psticky_glbl {31 0} 	jump_vector_cmd		0
 
-		pipe::mcopipeif instr_mem {63 0} {31 0}
-		pipe::mcopipeif data_mem {63 0} {31 0}
+		pipe::_acc_index_wdata {63 0}
+		pipe::_acc_index_rdata {31 0}
+		pipe::mcopipe::declare {0 0} instr_mem
+
+		pipe::_acc_index_wdata {63 0}
+		pipe::_acc_index_rdata {31 0}
+		pipe::mcopipe::declare {0 0} data_mem
 
 		pipe::pstage IFETCH
 			
@@ -194,17 +223,17 @@ rtl::module dlx
 			begif jump_req_cmd
 				s= curinstr_addr jump_vector_cmd
 			endif
-			s= jump_req_cmd 0
+			pipe::p<= jump_req_cmd 0
 
-			pipe::mcopipe_rdreq instr_mem [cnct {curinstr_addr curinstr_addr}]
+			pipe::mcopipe::rdreq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
 
 			s= nextinstr_addr [s+ curinstr_addr 4]
 
-			s= pc nextinstr_addr
+			pipe::p<= pc nextinstr_addr
 		
 		pipe::pstage IDECODE
 
-			pipe::mcopipe_resp instr_mem instr_code
+			pipe::mcopipe::resp instr_mem instr_code
 
 			s= opcode [indexed instr_code {31 26}]
 			begif [s== opcode 0]
@@ -596,20 +625,12 @@ rtl::module dlx
 			##
 			
 			## optimized for synthesis
-			s= rs1_rdata [indexed [pipe::rdprev regfile] rs1_addr]
-			s= rs2_rdata [indexed [pipe::rdprev regfile] rs2_addr]
-			# pipeline WB forwarding
-			begif [pipe::issucc WB]
-				begif [pipe::prr WB rd_req]
-					begif [s== [pipe::prr WB rd_addr] rs1_addr]
-						s= rs1_rdata [pipe::prr WB rd_wdata]
-					endif
-					begif [s== [pipe::prr WB rd_addr] rs2_addr]
-						s= rs2_rdata [pipe::prr WB rd_wdata]
-					endif
-				endif
-			endif
-			##
+			s= rs1_rdata [indexed [pipe::rdbuf regfile] rs1_addr]
+			s= rs2_rdata [indexed [pipe::rdbuf regfile] rs2_addr]
+
+			forward_blocking WB
+			forward_blocking MEM
+			forward_blocking EXEC
 
 			begif [s== rs1_addr 0]
 				s= rs1_rdata 0
@@ -620,51 +641,6 @@ rtl::module dlx
 			endif
 
 		pipe::pstage EXEC
-
-			# pipeline WB forwarding
-			begif [pipe::isworking WB]
-				begif [pipe::prr WB rd_req]
-					begif [pipe::issucc WB]
-						begif [s== [pipe::prr WB rd_addr] rs1_addr]
-							pipe::accum rs1_rdata [pipe::prr WB rd_wdata]
-						endif
-						begif [s== [pipe::prr WB rd_addr] rs2_addr]
-							pipe::accum rs2_rdata [pipe::prr WB rd_wdata]
-						endif
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-			endif
-
-
-			# pipeline MEM forwarding
-			begif [pipe::isworking MEM]
-				begif [pipe::prr MEM rd_req]
-					begif [pipe::issucc MEM]
-						begif [s== [pipe::prr MEM rd_addr] rs1_addr]
-							begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
-								pipe::pstall
-							endif
-							begelse
-								pipe::accum rs1_rdata [pipe::prr MEM rd_wdata]
-							endif
-						endif
-						begif [s== [pipe::prr MEM rd_addr] rs2_addr]
-							begif [s&& [pipe::prr MEM mem_req] [s~ [pipe::prr MEM mem_cmd]]]
-								pipe::pstall
-							endif
-							begelse
-								pipe::accum rs2_rdata [pipe::prr MEM rd_wdata]
-							endif
-						endif
-					endif
-					begelse
-						pipe::pstall
-					endif
-				endif
-			endif
 
 			# ALU processing
 			begif [s== op1_source $dlx::OP1_SRC_REG]
@@ -725,26 +701,32 @@ rtl::module dlx
 			# rd wdata processing
 			begif [s== rd_source $dlx::RD_ALU_RES]
 				s= rd_wdata alu_result
+				s= rd_rdy 1
 			endif
 
 			begif [s== rd_source $dlx::RD_PC_INC]
 				s= rd_wdata nextinstr_addr
+				s= rd_rdy 1
 			endif
 
 			begif [s== rd_source $dlx::RD_LHI]
 				s= rd_wdata [s<< immediate 16]
+				s= rd_rdy 1
 			endif
 
 			begif [s== rd_source $dlx::RD_ZF_COND]
 				s= rd_wdata alu_ZF
+				s= rd_rdy 1
 			endif
 
 			begif [s== rd_source $dlx::RD_nZF_COND]
 				s= rd_wdata [s! alu_ZF]
+				s= rd_rdy 1
 			endif
 
 			begif [s== rd_source $dlx::RD_CF_COND]
 				s= rd_wdata alu_CF
+				s= rd_rdy 1
 			endif
 
 			# jump vector processing
@@ -767,50 +749,60 @@ rtl::module dlx
 
 			begif [s== jump_src $dlx::JMP_SRC_ALU]
 				s= jump_vector alu_result
-			endif
+			endif	
 
-			s= jump_req_cmd jump_req
-			s= jump_vector_cmd jump_vector
+		pipe::pstage MEM
+
+			pipe::p<= jump_req_cmd jump_req
+			pipe::p<= jump_vector_cmd jump_vector
 			begif jump_req
 				pipe::pflush
 			endif
 
-		pipe::pstage MEM
-			
-			begif mem_cmd
-				pipe::mcopipe_wrreq data_mem [cnct {mem_addr mem_wdata}]
-			endif
-			begelse
-				pipe::mcopipe_rdreq data_mem [cnct {mem_addr mem_wdata}]
-			endif
+			puts p
 
-		pipe::pstage WB
-			
 			begif mem_req
-				begif [s! mem_cmd]
-					pipe::mcopipe_resp data_mem mem_rdata
+				begif mem_cmd
+					pipe::mcopipe::wrreq data_mem 0 [cnct {mem_addr mem_wdata}]
+				endif
+				puts ppp
+				begelse
+					pipe::mcopipe::rdreq data_mem 0 [cnct {mem_addr mem_wdata}]
 				endif
 			endif
 
-			begif [s== rd_source $dlx::RD_MEM]
-				s= rd_wdata mem_rdata
+		pipe::pstage WB
+
+			begif mem_req
+				begif [s! mem_cmd]
+					begif [pipe::mcopipe::resp data_mem mem_rdata]
+						begif [s== rd_source $dlx::RD_MEM]
+							s= rd_wdata mem_rdata
+							s= rd_rdy	1
+						endif
+					endif
+				endif
 			endif
 
 			begif rd_req
 				_acc_index rd_addr
-				s= regfile rd_wdata
+				pipe::p<= regfile rd_wdata
 			endif
 
 	pipe::endpproc
 
+	pipe::_acc_index_wdata {63 0}
+	pipe::_acc_index_rdata {31 0}
+	pipe::copipe::declare {0 0} instr_mem
 
-	pipe::copipeif instr_mem {63 0} {31 0}
-	pipe::copipeif data_mem {63 0} {31 0}
+	pipe::_acc_index_wdata {63 0}
+	pipe::_acc_index_rdata {31 0}
+	pipe::copipe::declare {0 0} data_mem
 
-	pipe::mcopipe_connect instrpipe instr_mem instr_mem
-	pipe::mcopipe_connect instrpipe data_mem data_mem
+	pipe::mcopipe::connect instrpipe instr_mem instr_mem
+	pipe::mcopipe::connect instrpipe data_mem data_mem
 
-	pipe::mcopipe_export instr_mem  { \
+	pipe::mcopipe::export instr_mem 0  { \
 				instr_mcopipe_req 	\
 				instr_mcopipe_we 	\
 				instr_mcopipe_ack 	\
@@ -819,7 +811,7 @@ rtl::module dlx
 				instr_mcopipe_rdata	\
 			}
 
-	pipe::mcopipe_export data_mem { \
+	pipe::mcopipe::export data_mem 0 { \
 				data_mcopipe_req	\
 				data_mcopipe_we		\
 				data_mcopipe_ack	\
