@@ -197,7 +197,7 @@ master_rd_monitor
 	.rdreq_fifo_full(rdreq3_fifo_full)
 );
 
-pavana_xbar DUV
+xbar_nobuf DUV
 (
 	.clk_i(clk),
 	.rst_i(rst),
