@@ -54,6 +54,7 @@ namespace eval xbar_nobuf {
 				rtl::input 	{0 0} 	m$mnum_idx\_req
 				rtl::input 	{31 0} 	m$mnum_idx\_addr
 				rtl::input 	{0 0} 	m$mnum_idx\_we
+				rtl::input 	{3 0} 	m$mnum_idx\_be
 				rtl::input 	{31 0} 	m$mnum_idx\_wdata
 				rtl::output {0 0} 	m$mnum_idx\_ack
 				rtl::output {31 0} 	m$mnum_idx\_rdata
@@ -64,6 +65,7 @@ namespace eval xbar_nobuf {
 				rtl::output {0 0} 	s$snum_idx\_req
 				rtl::output {31 0} 	s$snum_idx\_addr
 				rtl::output {0 0} 	s$snum_idx\_we
+				rtl::output {3 0} 	s$snum_idx\_be
 				rtl::output {31 0} 	s$snum_idx\_wdata
 				rtl::input 	{0 0} 	s$snum_idx\_ack
 				rtl::input 	{31 0} 	s$snum_idx\_rdata
@@ -80,6 +82,7 @@ namespace eval xbar_nobuf {
 
 				rtl::comb {31 0} 	m$mnum_idx\_s_addr		0
 				rtl::comb {0 0} 	m$mnum_idx\_s_we		0
+				rtl::comb {3 0} 	m$mnum_idx\_s_be		0
 				rtl::comb {31 0} 	m$mnum_idx\_s_wdata		0
 			}
 
@@ -99,6 +102,7 @@ namespace eval xbar_nobuf {
 					pipe::pvar $snum_indices	snum 		0
 					pipe::pvar {31 0} 			address		0
 					pipe::pvar {0 0} 			we			0
+					pipe::pvar {3 0} 			be			0
 					pipe::pvar {31 0}			wdata 		0
 					pipe::pvar {31 0}			rdata 		0
 
@@ -110,6 +114,7 @@ namespace eval xbar_nobuf {
 
 						s= address [pipe::pre m$mnum_idx\_addr]
 						s= we [pipe::pre m$mnum_idx\_we]
+						s= be [pipe::pre m$mnum_idx\_be]
 						s= wdata [pipe::pre m$mnum_idx\_wdata]
 
 						for {set snum_idx 0} {$snum_idx < $snum} {incr snum_idx} {
@@ -124,6 +129,7 @@ namespace eval xbar_nobuf {
 
 						pipe::pwe m$mnum_idx\_s_addr 	address
 						pipe::pwe m$mnum_idx\_s_we 		we
+						pipe::pwe m$mnum_idx\_s_be 		be
 						pipe::pwe m$mnum_idx\_s_wdata 	wdata
 
 						begnif [pipe::isstalled MRESP]
@@ -169,6 +175,7 @@ namespace eval xbar_nobuf {
 
 					pipe::pvar {31 0} 			address		0
 					pipe::pvar {0 0} 			we			0
+					pipe::pvar {3 0} 			be			0
 					pipe::pvar {31 0} 			wdata		0
 					pipe::pvar $mnum_indices	mnum 		0
 					pipe::pvar {31 0}			rdata 		0
@@ -189,6 +196,7 @@ namespace eval xbar_nobuf {
 										s= mnum $mnum_idx2
 										s= address 	[pipe::pre m$mnum_idx2\_s_addr]
 										s= we 		[pipe::pre m$mnum_idx2\_s_we]
+										s= be 		[pipe::pre m$mnum_idx2\_s_be]
 										s= wdata 	[pipe::pre m$mnum_idx2\_s_wdata]
 										pipe::pwe<= m$mnum_idx2\_s$snum_idx\_ack 1
 
@@ -219,6 +227,7 @@ namespace eval xbar_nobuf {
 							pipe::pwe s$snum_idx\_req 		1
 							pipe::pwe s$snum_idx\_addr 		address
 							pipe::pwe s$snum_idx\_we 		we
+							pipe::pwe s$snum_idx\_be 		be
 							pipe::pwe s$snum_idx\_wdata 	wdata
 							
 							begnif [pipe::pre s$snum_idx\_ack]
