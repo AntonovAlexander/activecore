@@ -1,7 +1,7 @@
 ## See LICENSE file for license details
 
-try {namespace delete pavana_xbar} on error {} {}
-namespace eval pavana_xbar {
+try {namespace delete xbar_nobuf} on error {} {}
+namespace eval xbar_nobuf {
 
 	set mnum 0
 	set snum 0
@@ -9,43 +9,43 @@ namespace eval pavana_xbar {
 	set addr_map []
 
 	proc reset {} {
-		set pavana_xbar::mnum 0
-		set pavana_xbar::snum 0
+		set xbar_nobuf::mnum 0
+		set xbar_nobuf::snum 0
 
-		set pavana_xbar::addr_map []
+		set xbar_nobuf::addr_map []
 	}
 
 	proc set_mnum {mnum_i} {
-		set pavana_xbar::mnum $mnum_i
+		set xbar_nobuf::mnum $mnum_i
 	}
 
 	proc set_snum {snum_i} {
-		set pavana_xbar::snum $snum_i
+		set xbar_nobuf::snum $snum_i
 	}
 
 	proc add_slave {addr size} {
-		lappend pavana_xbar::addr_map [list $addr $size]
+		lappend xbar_nobuf::addr_map [list $addr $size]
 	}
 
 	proc generate {} {
 
-		if {$pavana_xbar::mnum < 1} {
+		if {$xbar_nobuf::mnum < 1} {
 			error mnum\ param\ incorrect!
 		}
 
-		if {$pavana_xbar::snum < 1} {
+		if {$xbar_nobuf::snum < 1} {
 			error snum\ param\ incorrect!
 		}
 
-		if {[llength $pavana_xbar::addr_map] != $pavana_xbar::snum} {
+		if {[llength $xbar_nobuf::addr_map] != $xbar_nobuf::snum} {
 			error addr_map\ param\ incorrect!
 		}
 
-		set mnum $pavana_xbar::mnum
-		set snum $pavana_xbar::snum
-		set addr_map $pavana_xbar::addr_map
+		set mnum $xbar_nobuf::mnum
+		set snum $xbar_nobuf::snum
+		set addr_map $xbar_nobuf::addr_map
 
-		rtl::module pavana_xbar
+		rtl::module xbar_nobuf
 
 			rtl::input 	{0 0} 	clk_i
 			rtl::input 	{0 0} 	rst_i
