@@ -356,8 +356,9 @@ module mpss
 	);
 	
 	mpss_tile #(
-		.mem_data(mem_data),
-		.mem_size(mem_size)
+		.corenum(0)
+		, .mem_data(mem_data)
+		, .mem_size(mem_size)
 	) tile0 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
@@ -379,13 +380,12 @@ module mpss
 		, .xbus_mem_ack		(m0_ack)
 		, .xbus_mem_resp	(m0_resp)
 		, .xbus_mem_rdata	(m0_rdata)
-		
-		, .corenum(0)
 	);
 	
 	mpss_tile #(
-		.mem_data(mem_data),
-		.mem_size(mem_size)
+		.corenum(1)
+		, .mem_data(mem_data)
+		, .mem_size(mem_size)
 	) tile1 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
@@ -407,13 +407,12 @@ module mpss
 		, .xbus_mem_ack		(m1_ack)
 		, .xbus_mem_resp	(m1_resp)
 		, .xbus_mem_rdata	(m1_rdata)
-		
-		, .corenum(1)
 	);
 	
 	mpss_tile #(
-		.mem_data(mem_data),
-		.mem_size(mem_size)
+		.corenum(2)
+		, .mem_data(mem_data)
+		, .mem_size(mem_size)
 	) tile2 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
@@ -435,13 +434,12 @@ module mpss
 		, .xbus_mem_ack		(m2_ack)
 		, .xbus_mem_resp	(m2_resp)
 		, .xbus_mem_rdata	(m2_rdata)
-		
-		, .corenum(2)
 	);
 	
 	mpss_tile #(
-		.mem_data(mem_data),
-		.mem_size(mem_size)
+		.corenum(3)
+		, .mem_data(mem_data)
+		, .mem_size(mem_size)
 	) tile3 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
@@ -463,13 +461,12 @@ module mpss
 		, .xbus_mem_ack		(m3_ack)
 		, .xbus_mem_resp	(m3_resp)
 		, .xbus_mem_rdata	(m3_rdata)
-		
-		, .corenum(3)
 	);
 	
 	mpss_tile #(
-		.mem_data(mem_data),
-		.mem_size(mem_size)
+		.corenum(4)
+		, .mem_data(mem_data)
+		, .mem_size(mem_size)
 	) tile4 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
@@ -491,13 +488,12 @@ module mpss
 		, .xbus_mem_ack		(m4_ack)
 		, .xbus_mem_resp	(m4_resp)
 		, .xbus_mem_rdata	(m4_rdata)
-		
-		, .corenum(4)
 	);
 	
 	mpss_tile #(
-		.mem_data(mem_data),
-		.mem_size(mem_size)
+		.corenum(5)
+		, .mem_data(mem_data)
+		, .mem_size(mem_size)
 	) tile5 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
@@ -519,13 +515,12 @@ module mpss
 		, .xbus_mem_ack		(m5_ack)
 		, .xbus_mem_resp	(m5_resp)
 		, .xbus_mem_rdata	(m5_rdata)
-		
-		, .corenum(5)
 	);
 	
 	mpss_tile #(
-		.mem_data(mem_data),
-		.mem_size(mem_size)
+		.corenum(6)
+		, .mem_data(mem_data)
+		, .mem_size(mem_size)
 	) tile6 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
@@ -547,13 +542,12 @@ module mpss
 		, .xbus_mem_ack		(m6_ack)
 		, .xbus_mem_resp	(m6_resp)
 		, .xbus_mem_rdata	(m6_rdata)
-		
-		, .corenum(6)
 	);
 	
 	mpss_tile #(
-		.mem_data(mem_data),
-		.mem_size(mem_size)
+		.corenum(7)
+		, .mem_data(mem_data)
+		, .mem_size(mem_size)
 	) tile7 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
@@ -575,8 +569,6 @@ module mpss
 		, .xbus_mem_ack		(m7_ack)
 		, .xbus_mem_resp	(m7_resp)
 		, .xbus_mem_rdata	(m7_rdata)
-		
-		, .corenum(7)
 	);
 	
 	udm_memsplit udm_memsplit
@@ -612,6 +604,9 @@ module mpss
 		, .bus_ack	(s8_ack)
 		, .bus_resp	(s8_resp)
 		, .bus_rdata(s8_rdata)
+
+		, .gpio_bi(gpio_bi)
+		, .gpio_bo(gpio_bo)
 	);
 
 

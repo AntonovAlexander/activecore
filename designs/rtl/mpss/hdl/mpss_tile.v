@@ -1,6 +1,6 @@
 module mpss_tile
 #(
-	parameter mem_data="data.hex", mem_size=1024
+	parameter corenum=0, mem_data="data.hex", mem_size=1024
 )
 (
 	input [0:0] clk_i
@@ -23,8 +23,6 @@ module mpss_tile
 	, input  [0:0] 	xbus_mem_ack
 	, input  [0:0] 	xbus_mem_resp
 	, input  [31:0] xbus_mem_rdata
-	
-	, input  [31:0] corenum
 );
 
 	wire [0:0] 	cpu_instr_req;
@@ -118,6 +116,11 @@ module mpss_tile
 	wire [0:0] 	internal_resp;
 	wire [31:0] internal_rdata;
 	
+	// HPI temporarily disabled
+	assign hpi_mem_ack = 1'b0;
+	assign hpi_mem_resp = 1'b0;
+	assign hpi_mem_rdata = 32'h0;
+
 	arb_l1 arb_l1
 	(
 		.clk_i		(clk_i)
@@ -132,14 +135,19 @@ module mpss_tile
 		, .m0_resp	(cpu_internal_resp)
 		, .m0_rdata	(cpu_internal_rdata)
 		
-		, .m1_req	(hpi_mem_req)
-		, .m1_we	(hpi_mem_we)
-		, .m1_addr	(hpi_mem_addr)
-		, .m1_be	(hpi_mem_be)
-		, .m1_wdata	(hpi_mem_wdata)
-		, .m1_ack	(hpi_mem_ack)
-		, .m1_resp	(hpi_mem_resp)
-		, .m1_rdata	(hpi_mem_rdata)
+		, .m1_req	(1'b0)
+		, .m1_we	(1'b0)
+		, .m1_addr	(32'h0)
+		, .m1_be	(4'h0)
+		, .m1_wdata	(32'h0)
+		//, .m1_req	(hpi_mem_req)
+		//, .m1_we	(hpi_mem_we)
+		//, .m1_addr	(hpi_mem_addr)
+		//, .m1_be	(hpi_mem_be)
+		//, .m1_wdata	(hpi_mem_wdata)
+		//, .m1_ack	(hpi_mem_ack)
+		//, .m1_resp	(hpi_mem_resp)
+		//, .m1_rdata	(hpi_mem_rdata)
 		
 		, .s_req	(internal_req)
 		, .s_we		(internal_we)
@@ -213,7 +221,7 @@ module mpss_tile
 
 		, .bus0_req_i	(cpu_instr_req)
 		, .bus0_we_i	(cpu_instr_we)
-		, .bus0_addr_bi	(cpu_instr_addr)
+		, .bus0_addr_bi	(cpu_instr_addr[31:2])
 		, .bus0_be_bi	(cpu_instr_be)
 		, .bus0_wdata_bi(cpu_instr_wdata)
 		, .bus0_ack_o	(cpu_instr_ack)
@@ -223,7 +231,7 @@ module mpss_tile
 
 		, .bus1_req_i	(dmem_data_req)
 		, .bus1_we_i	(dmem_data_we)
-		, .bus1_addr_bi	(dmem_data_addr)
+		, .bus1_addr_bi	(dmem_data_addr[31:2])
 		, .bus1_be_bi	(dmem_data_be)
 		, .bus1_wdata_bi(dmem_data_wdata)
 		, .bus1_ack_o	(dmem_data_ack)
@@ -232,8 +240,9 @@ module mpss_tile
 		, .bus1_rdata_bo(dmem_data_rdata)
 	);
 	
-	sfr sfr
-	(
+	sfr #(
+		.corenum(corenum)
+	) sfr(
 		.clk_i		(clk_i)
 		, .rst_i	(rst_i)
 		
@@ -245,8 +254,6 @@ module mpss_tile
 		, .bus_ack	(sfr_ack)
 		, .bus_resp	(sfr_resp)
 		, .bus_rdata(sfr_rdata)
-		
-		, .corenum	(corenum)
 	);
 	
 
