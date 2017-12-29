@@ -187,7 +187,7 @@ module mpss
 	wire [0:0] 	s8_resp;
 	wire [31:0] s8_rdata;
 	
-	xbar_nobuf xbar
+	xbar_buffered xbar
 	(
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
