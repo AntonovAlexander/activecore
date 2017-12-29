@@ -240,6 +240,11 @@ namespace eval pipe {
 		__mlip_pipe_call pbreak
 	}
 
+	proc pactivate {} {
+		__gplc_acc_param_clr
+		__mlip_pipe_call pactivate
+	}
+
 	proc pstall {} {
 		__gplc_acc_param_clr
 		__mlip_pipe_call pstall
