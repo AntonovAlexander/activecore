@@ -140,6 +140,11 @@ proc s= {target source} {
 	__gplc_call assign
 }
 
+proc si= {target indices source} {
+	_acc_index $indices
+	s= $target $source
+}
+
 proc c- {op} {
 	ActiveCore::expr_1op "c-" $op
 }
