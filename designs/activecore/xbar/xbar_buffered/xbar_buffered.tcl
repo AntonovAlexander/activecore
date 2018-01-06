@@ -8,11 +8,19 @@ namespace eval xbar_buffered {
 
 	set addr_map []
 
+	set master_bufsize	0
+	set slave_bufsize	0
+	set master_seqsize	0
+
 	proc reset {} {
 		set xbar_buffered::mnum 0
 		set xbar_buffered::snum 0
 
 		set xbar_buffered::addr_map []
+
+		set xbar_buffered::master_bufsize	4
+		set xbar_buffered::slave_bufsize	4
+		set xbar_buffered::master_seqsize	4
 	}
 
 	proc set_mnum {mnum_i} {
@@ -45,9 +53,9 @@ namespace eval xbar_buffered {
 		set snum $xbar_buffered::snum
 		set addr_map $xbar_buffered::addr_map
 
-		set master_bufsize	8
-		set slave_bufsize	8
-		set master_seqsize	8
+		set master_bufsize	$xbar_buffered::master_bufsize
+		set slave_bufsize	$xbar_buffered::slave_bufsize
+		set master_seqsize	$xbar_buffered::master_seqsize
 
 		rtl::module xbar_buffered
 
@@ -299,7 +307,7 @@ namespace eval xbar_buffered {
 					pipe::pvar $mnum_indices	mnum 		0
 					pipe::pvar {31 0}			rdata 		0
 
-					pipe::psticky_glbl	{1 0} 	rr_arbiter	0
+					pipe::psticky_glbl	$mnum_indices 	rr_arbiter	0
 
 					# router fifo signals
 					_acc_index $slave_bufsize_indices
