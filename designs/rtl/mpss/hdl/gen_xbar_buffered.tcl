@@ -4,8 +4,8 @@ set MLIP_PATH /home/alexander/work/activecore/mlip
 load [file join $MLIP_PATH activecore/cpp/Release/libactivecore.so]
 source [file join $MLIP_PATH activecore activecore.tcl]
 
-set MNUM 		9
-set TILE_NUM 	8
+set TILE_NUM 	4
+set MNUM 		[expr $TILE_NUM + 1]
 set SNUM 		[expr $TILE_NUM + 1]
 
 set TILE_ADDR 0x80000000

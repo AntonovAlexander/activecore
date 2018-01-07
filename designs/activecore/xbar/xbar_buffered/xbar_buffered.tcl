@@ -8,11 +8,19 @@ namespace eval xbar_buffered {
 
 	set addr_map []
 
+	set master_bufsize	0
+	set slave_bufsize	0
+	set master_seqsize	0
+
 	proc reset {} {
 		set xbar_buffered::mnum 0
 		set xbar_buffered::snum 0
 
 		set xbar_buffered::addr_map []
+
+		set xbar_buffered::master_bufsize	4
+		set xbar_buffered::slave_bufsize	4
+		set xbar_buffered::master_seqsize	4
 	}
 
 	proc set_mnum {mnum_i} {
@@ -45,8 +53,9 @@ namespace eval xbar_buffered {
 		set snum $xbar_buffered::snum
 		set addr_map $xbar_buffered::addr_map
 
-		set master_bufsize	8
-		set slave_bufsize	8
+		set master_bufsize	$xbar_buffered::master_bufsize
+		set slave_bufsize	$xbar_buffered::slave_bufsize
+		set master_seqsize	$xbar_buffered::master_seqsize
 
 		rtl::module xbar_buffered
 
@@ -106,6 +115,10 @@ namespace eval xbar_buffered {
 			set slave_bufsize_ptr_width [ActiveCore::getimmlength [expr $slave_bufsize - 1]]
 			set slave_bufsize_ptr_indices [list [expr $slave_bufsize_ptr_width - 1] 0]
 
+			set master_seqsize_indices [list [expr $master_seqsize - 1] 0]
+			set master_seqsize_ptr_width [ActiveCore::getimmlength [expr $master_seqsize - 1]]
+			set master_seqsize_ptr_indices [list [expr $master_seqsize_ptr_width - 1] 0]
+
 			for {set mnum_idx 0} {$mnum_idx < $mnum} {incr mnum_idx} {
 
 				pipe::pproc m$mnum_idx\_pipe
@@ -117,62 +130,165 @@ namespace eval xbar_buffered {
 					pipe::pvar {31 0}			wdata 		0
 					pipe::pvar {31 0}			rdata 		0
 
+					# mbuf fifo signals
+					_acc_index $master_bufsize_indices
+					pipe::psticky_glbl	$snum_indices 	mbuf_fifo_snum		0
+					_acc_index $master_bufsize_indices
+					pipe::psticky_glbl	{0 0} 	mbuf_fifo_we		0
+					_acc_index $master_bufsize_indices
+					pipe::psticky_glbl	{31 0} 	mbuf_fifo_addr		0
+					_acc_index $master_bufsize_indices
+					pipe::psticky_glbl	{31 0} 	mbuf_fifo_wdata		0
+					pipe::psticky_glbl	$master_bufsize_ptr_indices 	mbuf_fifo_wptr	0
+					pipe::psticky_glbl	$master_bufsize_ptr_indices 	mbuf_fifo_rptr	0
+					pipe::psticky_glbl	{0 0} 	mbuf_fifo_empty	1
+					pipe::psticky_glbl	{0 0} 	mbuf_fifo_full	0
+
+					# sequencer fifo
+					_acc_index $master_seqsize_indices
+					pipe::psticky_glbl	$snum_indices 	seq_fifo_data	0
+					pipe::psticky_glbl	$master_seqsize_ptr_indices 	seq_fifo_wptr	0
+					pipe::psticky_glbl	$master_seqsize_ptr_indices 	seq_fifo_rptr	0
+					pipe::psticky_glbl	{0 0} 	seq_fifo_empty	1
+					pipe::psticky_glbl	{0 0} 	seq_fifo_full	0
+
+					# sequencer data
+					_acc_index $master_seqsize_indices
+					pipe::psticky_glbl	{31 0} 	seq_rdata	0
+					_acc_index $master_seqsize_indices
+					pipe::psticky_glbl	$snum_indices 	seq_snum	0
+					pipe::psticky_glbl	$master_seqsize_ptr_indices 	seq_wptr	0
+
 					pipe::pstage DECODE
 
-						begnif [pipe::pre m$mnum_idx\_req]
+						begif [s|| [pipe::rdbuf mbuf_fifo_full] [s! [pipe::pre m$mnum_idx\_req]]]
 							pipe::pstall
 						endif
+						begelse
 
-						s= address [pipe::pre m$mnum_idx\_addr]
-						s= we [pipe::pre m$mnum_idx\_we]
-						s= be [pipe::pre m$mnum_idx\_be]
-						s= wdata [pipe::pre m$mnum_idx\_wdata]
+							# fetching request
+							s= address [pipe::pre m$mnum_idx\_addr]
+							s= we [pipe::pre m$mnum_idx\_we]
+							s= be [pipe::pre m$mnum_idx\_be]
+							s= wdata [pipe::pre m$mnum_idx\_wdata]
 
-						for {set snum_idx 0} {$snum_idx < $snum} {incr snum_idx} {
-							begif [s&& [s>= address [lindex [lindex $addr_map $snum_idx] 0]] [s< address [expr [lindex [lindex $addr_map $snum_idx] 0] + [lindex [lindex $addr_map $snum_idx] 1]]]]
-								s= snum $snum_idx
+							# decoding address
+							for {set snum_idx 0} {$snum_idx < $snum} {incr snum_idx} {
+								begif [s&& [s>= address [lindex [lindex $addr_map $snum_idx] 0]] [s< address [expr [lindex [lindex $addr_map $snum_idx] 0] + [lindex [lindex $addr_map $snum_idx] 1]]]]
+									s= snum $snum_idx
+								endif
+							}
+
+							# put data in fifo
+							_acc_index mbuf_fifo_wptr
+							s= mbuf_fifo_snum 	snum
+							_acc_index mbuf_fifo_wptr
+							s= mbuf_fifo_we 	we
+							_acc_index mbuf_fifo_wptr
+							s= mbuf_fifo_addr 	address
+							_acc_index mbuf_fifo_wptr
+							s= mbuf_fifo_wdata 	wdata
+							
+							s= mbuf_fifo_wptr [s+ mbuf_fifo_wptr 1]
+							s= mbuf_fifo_empty 0
+							begif [s== mbuf_fifo_wptr mbuf_fifo_rptr]
+								s= mbuf_fifo_full 1
 							endif
-						}
 
-						pipe::pwe<= m$mnum_idx\_ack 1
+							pipe::pwe m$mnum_idx\_ack 1
+							pipe::pbreak
 
-					pipe::pstage SEND
+						endif
+						
+						# req fifo -> resp seq fifo processing
+						pipe::pactivate
+						begif [s&& [s! [pipe::rdbuf seq_fifo_full]] [s! [pipe::rdbuf mbuf_fifo_empty]]]
+							# grab data from fifo
+							s= snum 	[indexed [pipe::rdbuf mbuf_fifo_snum] mbuf_fifo_rptr]
+							s= we 		[indexed [pipe::rdbuf mbuf_fifo_we] mbuf_fifo_rptr]
+							s= address 	[indexed [pipe::rdbuf mbuf_fifo_addr] mbuf_fifo_rptr]
+							s= wdata 	[indexed [pipe::rdbuf mbuf_fifo_wdata] mbuf_fifo_rptr]
 
-						pipe::pwe m$mnum_idx\_s_addr 	address
-						pipe::pwe m$mnum_idx\_s_we 		we
-						pipe::pwe m$mnum_idx\_s_be 		be
-						pipe::pwe m$mnum_idx\_s_wdata 	wdata
+							# sending request
+							pipe::pwe m$mnum_idx\_s_addr 	address
+							pipe::pwe m$mnum_idx\_s_we 		we
+							pipe::pwe m$mnum_idx\_s_be 		be
+							pipe::pwe m$mnum_idx\_s_wdata 	wdata
 
-						begnif [pipe::isstalled MRESP]
 							for {set snum_idx 0} {$snum_idx < $snum} {incr snum_idx} {
 								begif [s== snum $snum_idx]
 									pipe::pwe m$mnum_idx\_s$snum_idx\_req 		1
 
-									begnif [pipe::pre m$mnum_idx\_s$snum_idx\_ack]
-										pipe::pstall
+									begif [pipe::pre m$mnum_idx\_s$snum_idx\_ack]
+										s= mbuf_fifo_rptr [s+ mbuf_fifo_rptr 1]
+										s= mbuf_fifo_full 0
+										begif [s== mbuf_fifo_wptr mbuf_fifo_rptr]
+											s= mbuf_fifo_empty 1
+										endif
+
+										begnif we
+											# placing request in sequencer fifo
+											_acc_index seq_fifo_wptr
+											s= seq_fifo_data snum
+											
+											s= seq_fifo_wptr [s+ seq_fifo_wptr 1]
+											s= seq_fifo_empty 0
+											begif [s== seq_fifo_wptr seq_fifo_rptr]
+												s= seq_fifo_full 1
+											endif
+										endif
 									endif
 								endif
 							}
 						endif
 
-						begelse
-							pipe::pstall
+						# resp seq processing
+						pipe::pactivate
+						# filling sequencer with data
+						for {set snum_idx 0} {$snum_idx < $snum} {incr snum_idx} {
+							begif [pipe::pre m$mnum_idx\_s$snum_idx\_resp]
+								_acc_index seq_wptr
+								s= seq_snum $snum_idx
+								_acc_index seq_wptr
+								s= seq_rdata [pipe::pre m$mnum_idx\_s$snum_idx\_rdata]
+								s= seq_wptr [s+ seq_wptr 1]
+							endif
+						}
+						# checking data from sequencer
+						begnif [pipe::rdbuf seq_fifo_empty]
+							s= snum [indexed [pipe::rdbuf seq_fifo_data] seq_fifo_rptr]
+							clrif
+							for {set seq_idx 0} {$seq_idx < $master_seqsize} {incr seq_idx} {
+								begelsif [s&& [s== snum [indexed [pipe::rdbuf seq_snum] $seq_idx]] [s< $seq_idx [pipe::rdbuf seq_wptr]]]
+									## data present in sequencer
+
+									# reading seq fifo
+									s= seq_fifo_rptr [s+ seq_fifo_rptr 1]
+									s= seq_fifo_full 0
+									begif [s== seq_fifo_wptr seq_fifo_rptr]
+										s= seq_fifo_empty 1
+									endif
+
+									# reading seq rdata
+									s= rdata [indexed [pipe::rdbuf seq_rdata] $seq_idx]
+
+									# freeing sequencer from data
+									for {set squeeze_seq_idx $seq_idx} {$squeeze_seq_idx < [expr $master_seqsize - 1]} {incr squeeze_seq_idx} {
+										si= seq_snum $squeeze_seq_idx [indexed seq_snum [expr $squeeze_seq_idx + 1]]
+										si= seq_rdata $squeeze_seq_idx [indexed seq_rdata [expr $squeeze_seq_idx + 1]]
+									}
+									s= seq_wptr [s- seq_wptr 1]
+								endif
+							}
+							begelse
+								pipe::pbreak
+							endif
 						endif
-
-					pipe::pstage MRESP
-
-						begif we
+						begelse
 							pipe::pbreak
 						endif
 
-						for {set snum_idx 0} {$snum_idx < $snum} {incr snum_idx} {
-							begif [s== snum $snum_idx]
-								s= rdata [pipe::pre m$mnum_idx\_s$snum_idx\_rdata]
-								begnif [pipe::pre m$mnum_idx\_s$snum_idx\_resp]
-									pipe::pstall
-								endif
-							endif
-						}
+					pipe::pstage MRESP
 
 						pipe::pwe<= m$mnum_idx\_resp 1
 						pipe::pwe<= m$mnum_idx\_rdata rdata
@@ -191,7 +307,7 @@ namespace eval xbar_buffered {
 					pipe::pvar $mnum_indices	mnum 		0
 					pipe::pvar {31 0}			rdata 		0
 
-					pipe::psticky_glbl	{1 0} 	rr_arbiter	0
+					pipe::psticky_glbl	$mnum_indices 	rr_arbiter	0
 
 					# router fifo signals
 					_acc_index $slave_bufsize_indices
