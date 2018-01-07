@@ -27,7 +27,7 @@ module NEXYS4_DDR
     mpss #(
         .CPU("dlx")
         , .mem_data("io_heartbeat_variable.hex")
-        , .mem_size(1024)
+        , .mem_size(8096)
     ) mpss (
         .clk_i(clk_gen)
         , .arst_i(mpss_arst)
