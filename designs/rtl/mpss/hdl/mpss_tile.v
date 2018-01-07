@@ -115,11 +115,6 @@ module mpss_tile
 	wire [0:0] 	internal_ack;
 	wire [0:0] 	internal_resp;
 	wire [31:0] internal_rdata;
-	
-	// HPI temporarily disabled
-	assign hpi_mem_ack = 1'b0;
-	assign hpi_mem_resp = 1'b0;
-	assign hpi_mem_rdata = 32'h0;
 
 	arb_l1 arb_l1
 	(
@@ -135,19 +130,14 @@ module mpss_tile
 		, .m0_resp	(cpu_internal_resp)
 		, .m0_rdata	(cpu_internal_rdata)
 		
-		, .m1_req	(1'b0)
-		, .m1_we	(1'b0)
-		, .m1_addr	(32'h0)
-		, .m1_be	(4'h0)
-		, .m1_wdata	(32'h0)
-		//, .m1_req	(hpi_mem_req)
-		//, .m1_we	(hpi_mem_we)
-		//, .m1_addr	(hpi_mem_addr)
-		//, .m1_be	(hpi_mem_be)
-		//, .m1_wdata	(hpi_mem_wdata)
-		//, .m1_ack	(hpi_mem_ack)
-		//, .m1_resp	(hpi_mem_resp)
-		//, .m1_rdata	(hpi_mem_rdata)
+		, .m1_req	(hpi_mem_req)
+		, .m1_we	(hpi_mem_we)
+		, .m1_addr	(hpi_mem_addr)
+		, .m1_be	(hpi_mem_be)
+		, .m1_wdata	(hpi_mem_wdata)
+		, .m1_ack	(hpi_mem_ack)
+		, .m1_resp	(hpi_mem_resp)
+		, .m1_rdata	(hpi_mem_rdata)
 		
 		, .s_req	(internal_req)
 		, .s_we		(internal_we)

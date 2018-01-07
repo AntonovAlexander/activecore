@@ -469,7 +469,7 @@ initial
 	@(posedge memread_grant)
 	forever
 		begin
-		WAIT(100);
+		WAIT(1000);
 		for (mmon = 0; mmon < SLAVE_MEMSIZE32; mmon++)
 			begin
 			if (slave_0_mem_model.mem[mmon] != ((0 << 30) + (mmon << 2)) ) $fatal("MEMORY 0 CORRUPTED! word_num: %d, data: 0x%x", mmon, slave_0_mem_model.mem[mmon]);

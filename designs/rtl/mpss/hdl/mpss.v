@@ -70,42 +70,6 @@ module mpss
 	wire [0:0] 	m4_resp;
 	wire [31:0] m4_rdata;
 	
-	wire [0:0] 	m5_req;
-	wire [0:0] 	m5_we;
-	wire [31:0] m5_addr;
-	wire [3:0] 	m5_be;
-	wire [31:0] m5_wdata;
-	wire [0:0] 	m5_ack;
-	wire [0:0] 	m5_resp;
-	wire [31:0] m5_rdata;
-	
-	wire [0:0] 	m6_req;
-	wire [0:0] 	m6_we;
-	wire [31:0] m6_addr;
-	wire [3:0] 	m6_be;
-	wire [31:0] m6_wdata;
-	wire [0:0] 	m6_ack;
-	wire [0:0] 	m6_resp;
-	wire [31:0] m6_rdata;
-	
-	wire [0:0] 	m7_req;
-	wire [0:0] 	m7_we;
-	wire [31:0] m7_addr;
-	wire [3:0] 	m7_be;
-	wire [31:0] m7_wdata;
-	wire [0:0] 	m7_ack;
-	wire [0:0] 	m7_resp;
-	wire [31:0] m7_rdata;
-	
-	wire [0:0] 	m8_req;
-	wire [0:0] 	m8_we;
-	wire [31:0] m8_addr;
-	wire [3:0] 	m8_be;
-	wire [31:0] m8_wdata;
-	wire [0:0] 	m8_ack;
-	wire [0:0] 	m8_resp;
-	wire [31:0] m8_rdata;
-	
 	wire [0:0] 	s0_req;
 	wire [0:0] 	s0_we;
 	wire [31:0] s0_addr;
@@ -150,42 +114,6 @@ module mpss
 	wire [0:0] 	s4_ack;
 	wire [0:0] 	s4_resp;
 	wire [31:0] s4_rdata;
-	
-	wire [0:0] 	s5_req;
-	wire [0:0] 	s5_we;
-	wire [31:0] s5_addr;
-	wire [3:0] 	s5_be;
-	wire [31:0] s5_wdata;
-	wire [0:0] 	s5_ack;
-	wire [0:0] 	s5_resp;
-	wire [31:0] s5_rdata;
-	
-	wire [0:0] 	s6_req;
-	wire [0:0] 	s6_we;
-	wire [31:0] s6_addr;
-	wire [3:0] 	s6_be;
-	wire [31:0] s6_wdata;
-	wire [0:0] 	s6_ack;
-	wire [0:0] 	s6_resp;
-	wire [31:0] s6_rdata;
-	
-	wire [0:0] 	s7_req;
-	wire [0:0] 	s7_we;
-	wire [31:0] s7_addr;
-	wire [3:0] 	s7_be;
-	wire [31:0] s7_wdata;
-	wire [0:0] 	s7_ack;
-	wire [0:0] 	s7_resp;
-	wire [31:0] s7_rdata;
-	
-	wire [0:0] 	s8_req;
-	wire [0:0] 	s8_we;
-	wire [31:0] s8_addr;
-	wire [3:0] 	s8_be;
-	wire [31:0] s8_wdata;
-	wire [0:0] 	s8_ack;
-	wire [0:0] 	s8_resp;
-	wire [31:0] s8_rdata;
 	
 	xbar_buffered xbar
 	(
@@ -237,42 +165,6 @@ module mpss
 		, .m4_resp	(m4_resp)
 		, .m4_rdata	(m4_rdata)
 		
-		, .m5_req	(m5_req)
-		, .m5_we	(m5_we)
-		, .m5_addr	(m5_addr)
-		, .m5_be	(m5_be)
-		, .m5_wdata	(m5_wdata)
-		, .m5_ack	(m5_ack)
-		, .m5_resp	(m5_resp)
-		, .m5_rdata	(m5_rdata)
-		
-		, .m6_req	(m6_req)
-		, .m6_we	(m6_we)
-		, .m6_addr	(m6_addr)
-		, .m6_be	(m6_be)
-		, .m6_wdata	(m6_wdata)
-		, .m6_ack	(m6_ack)
-		, .m6_resp	(m6_resp)
-		, .m6_rdata	(m6_rdata)
-		
-		, .m7_req	(m7_req)
-		, .m7_we	(m7_we)
-		, .m7_addr	(m7_addr)
-		, .m7_be	(m7_be)
-		, .m7_wdata	(m7_wdata)
-		, .m7_ack	(m7_ack)
-		, .m7_resp	(m7_resp)
-		, .m7_rdata	(m7_rdata)
-		
-		, .m8_req	(m8_req)
-		, .m8_we	(m8_we)
-		, .m8_addr	(m8_addr)
-		, .m8_be	(m8_be)
-		, .m8_wdata	(m8_wdata)
-		, .m8_ack	(m8_ack)
-		, .m8_resp	(m8_resp)
-		, .m8_rdata	(m8_rdata)
-		
 		, .s0_req	(s0_req)
 		, .s0_we	(s0_we)
 		, .s0_addr	(s0_addr)
@@ -317,42 +209,6 @@ module mpss
 		, .s4_ack	(s4_ack)
 		, .s4_resp	(s4_resp)
 		, .s4_rdata	(s4_rdata)
-		
-		, .s5_req	(s5_req)
-		, .s5_we	(s5_we)
-		, .s5_addr	(s5_addr)
-		, .s5_be	(s5_be)
-		, .s5_wdata	(s5_wdata)
-		, .s5_ack	(s5_ack)
-		, .s5_resp	(s5_resp)
-		, .s5_rdata	(s5_rdata)
-		
-		, .s6_req	(s6_req)
-		, .s6_we	(s6_we)
-		, .s6_addr	(s6_addr)
-		, .s6_be	(s6_be)
-		, .s6_wdata	(s6_wdata)
-		, .s6_ack	(s6_ack)
-		, .s6_resp	(s6_resp)
-		, .s6_rdata	(s6_rdata)
-		
-		, .s7_req	(s7_req)
-		, .s7_we	(s7_we)
-		, .s7_addr	(s7_addr)
-		, .s7_be	(s7_be)
-		, .s7_wdata	(s7_wdata)
-		, .s7_ack	(s7_ack)
-		, .s7_resp	(s7_resp)
-		, .s7_rdata	(s7_rdata)
-		
-		, .s8_req	(s8_req)
-		, .s8_we	(s8_we)
-		, .s8_addr	(s8_addr)
-		, .s8_be	(s8_be)
-		, .s8_wdata	(s8_wdata)
-		, .s8_ack	(s8_ack)
-		, .s8_resp	(s8_resp)
-		, .s8_rdata	(s8_rdata)
 	);
 	
 	mpss_tile #(
@@ -463,114 +319,6 @@ module mpss
 		, .xbus_mem_rdata	(m3_rdata)
 	);
 	
-	mpss_tile #(
-		.corenum(4)
-		, .mem_data(mem_data)
-		, .mem_size(mem_size)
-	) tile4 (
-		.clk_i(clk_i)
-		, .rst_i(cpu_reset)
-		
-		, .hpi_mem_req		(s4_req)
-		, .hpi_mem_we		(s4_we)
-		, .hpi_mem_addr		(s4_addr)
-		, .hpi_mem_be		(s4_be)
-		, .hpi_mem_wdata	(s4_wdata)
-		, .hpi_mem_ack		(s4_ack)
-		, .hpi_mem_resp		(s4_resp)
-		, .hpi_mem_rdata	(s4_rdata)
-		
-		, .xbus_mem_req		(m4_req)
-		, .xbus_mem_we		(m4_we)
-		, .xbus_mem_addr	(m4_addr)
-		, .xbus_mem_be		(m4_be)
-		, .xbus_mem_wdata	(m4_wdata)
-		, .xbus_mem_ack		(m4_ack)
-		, .xbus_mem_resp	(m4_resp)
-		, .xbus_mem_rdata	(m4_rdata)
-	);
-	
-	mpss_tile #(
-		.corenum(5)
-		, .mem_data(mem_data)
-		, .mem_size(mem_size)
-	) tile5 (
-		.clk_i(clk_i)
-		, .rst_i(cpu_reset)
-		
-		, .hpi_mem_req		(s5_req)
-		, .hpi_mem_we		(s5_we)
-		, .hpi_mem_addr		(s5_addr)
-		, .hpi_mem_be		(s5_be)
-		, .hpi_mem_wdata	(s5_wdata)
-		, .hpi_mem_ack		(s5_ack)
-		, .hpi_mem_resp		(s5_resp)
-		, .hpi_mem_rdata	(s5_rdata)
-		
-		, .xbus_mem_req		(m5_req)
-		, .xbus_mem_we		(m5_we)
-		, .xbus_mem_addr	(m5_addr)
-		, .xbus_mem_be		(m5_be)
-		, .xbus_mem_wdata	(m5_wdata)
-		, .xbus_mem_ack		(m5_ack)
-		, .xbus_mem_resp	(m5_resp)
-		, .xbus_mem_rdata	(m5_rdata)
-	);
-	
-	mpss_tile #(
-		.corenum(6)
-		, .mem_data(mem_data)
-		, .mem_size(mem_size)
-	) tile6 (
-		.clk_i(clk_i)
-		, .rst_i(cpu_reset)
-		
-		, .hpi_mem_req		(s6_req)
-		, .hpi_mem_we		(s6_we)
-		, .hpi_mem_addr		(s6_addr)
-		, .hpi_mem_be		(s6_be)
-		, .hpi_mem_wdata	(s6_wdata)
-		, .hpi_mem_ack		(s6_ack)
-		, .hpi_mem_resp		(s6_resp)
-		, .hpi_mem_rdata	(s6_rdata)
-		
-		, .xbus_mem_req		(m6_req)
-		, .xbus_mem_we		(m6_we)
-		, .xbus_mem_addr	(m6_addr)
-		, .xbus_mem_be		(m6_be)
-		, .xbus_mem_wdata	(m6_wdata)
-		, .xbus_mem_ack		(m6_ack)
-		, .xbus_mem_resp	(m6_resp)
-		, .xbus_mem_rdata	(m6_rdata)
-	);
-	
-	mpss_tile #(
-		.corenum(7)
-		, .mem_data(mem_data)
-		, .mem_size(mem_size)
-	) tile7 (
-		.clk_i(clk_i)
-		, .rst_i(cpu_reset)
-		
-		, .hpi_mem_req		(s7_req)
-		, .hpi_mem_we		(s7_we)
-		, .hpi_mem_addr		(s7_addr)
-		, .hpi_mem_be		(s7_be)
-		, .hpi_mem_wdata	(s7_wdata)
-		, .hpi_mem_ack		(s7_ack)
-		, .hpi_mem_resp		(s7_resp)
-		, .hpi_mem_rdata	(s7_rdata)
-		
-		, .xbus_mem_req		(m7_req)
-		, .xbus_mem_we		(m7_we)
-		, .xbus_mem_addr	(m7_addr)
-		, .xbus_mem_be		(m7_be)
-		, .xbus_mem_wdata	(m7_wdata)
-		, .xbus_mem_ack		(m7_ack)
-		, .xbus_mem_resp	(m7_resp)
-		, .xbus_mem_rdata	(m7_rdata)
-	);
-	
 	udm_memsplit udm_memsplit
 	(
 		.clk_i(clk_i)
@@ -581,14 +329,14 @@ module mpss
 
 		, .rst_o(udm_reset)
 		
-		, .bus_req_o	(m8_req)
-		, .bus_we_o		(m8_we)
-		, .bus_addr_bo	(m8_addr)
-		, .bus_be_bo	(m8_be)
-		, .bus_wdata_bo	(m8_wdata)
-		, .bus_ack_i	(m8_ack)
-		, .bus_resp_i	(m8_resp)
-		, .bus_rdata_bi	(m8_rdata)
+		, .bus_req_o	(m4_req)
+		, .bus_we_o		(m4_we)
+		, .bus_addr_bo	(m4_addr)
+		, .bus_be_bo	(m4_be)
+		, .bus_wdata_bo	(m4_wdata)
+		, .bus_ack_i	(m4_ack)
+		, .bus_resp_i	(m4_resp)
+		, .bus_rdata_bi	(m4_rdata)
 	);
 	
 	gpio gpio
@@ -596,14 +344,14 @@ module mpss
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		,. bus_req	(s8_req)
-		, .bus_we	(s8_we)
-		, .bus_addr	(s8_addr)
-		, .bus_be	(s8_be)
-		, .bus_wdata(s8_wdata)
-		, .bus_ack	(s8_ack)
-		, .bus_resp	(s8_resp)
-		, .bus_rdata(s8_rdata)
+		,. bus_req	(s4_req)
+		, .bus_we	(s4_we)
+		, .bus_addr	(s4_addr)
+		, .bus_be	(s4_be)
+		, .bus_wdata(s4_wdata)
+		, .bus_ack	(s4_ack)
+		, .bus_resp	(s4_resp)
+		, .bus_rdata(s4_rdata)
 
 		, .gpio_bi(gpio_bi)
 		, .gpio_bo(gpio_bo)
