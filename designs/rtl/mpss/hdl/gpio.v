@@ -13,10 +13,11 @@ module gpio
 	, output reg [31:0]	bus_rdata
 
 	, input  [31:0]	gpio_bi
-	, output reg [31:0]	gpio_bo
+	, output [31:0]	gpio_bo
 );
 
-reg [31:0] regfile [31:0];
+reg [31:0] led_register;
+assign gpio_bo = led_register;
 
 always @(posedge clk_i)
 	begin
@@ -32,8 +33,8 @@ always @(posedge clk_i)
 
 always @(posedge clk_i)
 	begin
-	if (rst_i) gpio_bo <= 32'h0;
-	if (bus_req && bus_we && (bus_addr[7:0] >= 8'h80)) regfile[bus_addr[6:2]] <= bus_wdata;
+	if (rst_i) led_register <= 32'h0;
+	if (bus_req && bus_we && (bus_addr[7:0] >= 8'h80)) led_register[bus_addr[4:0]] <= bus_wdata[0];
 	end
 
 assign bus_ack = bus_req;

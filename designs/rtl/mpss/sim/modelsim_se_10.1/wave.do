@@ -6,7 +6,7 @@ add wave -noupdate -radix hexadecimal /dlx_tb/mpss/rx_i
 add wave -noupdate -radix hexadecimal /dlx_tb/mpss/tx_o
 add wave -noupdate -radix hexadecimal /dlx_tb/mpss/gpio_bi
 add wave -noupdate -radix hexadecimal /dlx_tb/mpss/gpio_bo
-add wave -noupdate -radix hexadecimal /dlx_tb/mpss/gpio/regfile
+add wave -noupdate -radix hexadecimal /dlx_tb/mpss/gpio/led_register
 add wave -noupdate -expand -group {xbar m0 (cpu xbus)} -radix hexadecimal /dlx_tb/mpss/xbar/m0_req
 add wave -noupdate -expand -group {xbar m0 (cpu xbus)} -radix hexadecimal /dlx_tb/mpss/xbar/m0_ack
 add wave -noupdate -expand -group {xbar m0 (cpu xbus)} -radix hexadecimal /dlx_tb/mpss/xbar/m0_addr
@@ -23,22 +23,22 @@ add wave -noupdate -expand -group {xbar s0 (cpu hpi)} -radix hexadecimal /dlx_tb
 add wave -noupdate -expand -group {xbar s0 (cpu hpi)} -radix hexadecimal /dlx_tb/mpss/xbar/s0_wdata
 add wave -noupdate -expand -group {xbar s0 (cpu hpi)} -radix hexadecimal /dlx_tb/mpss/xbar/s0_resp
 add wave -noupdate -expand -group {xbar s0 (cpu hpi)} -radix hexadecimal /dlx_tb/mpss/xbar/s0_rdata
-add wave -noupdate -expand -group {xbar m8 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m8_req
-add wave -noupdate -expand -group {xbar m8 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m8_ack
-add wave -noupdate -expand -group {xbar m8 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m8_addr
-add wave -noupdate -expand -group {xbar m8 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m8_we
-add wave -noupdate -expand -group {xbar m8 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m8_be
-add wave -noupdate -expand -group {xbar m8 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m8_wdata
-add wave -noupdate -expand -group {xbar m8 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m8_resp
-add wave -noupdate -expand -group {xbar m8 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m8_rdata
-add wave -noupdate -expand -group {xbar s8 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s8_req
-add wave -noupdate -expand -group {xbar s8 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s8_ack
-add wave -noupdate -expand -group {xbar s8 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s8_addr
-add wave -noupdate -expand -group {xbar s8 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s8_we
-add wave -noupdate -expand -group {xbar s8 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s8_be
-add wave -noupdate -expand -group {xbar s8 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s8_wdata
-add wave -noupdate -expand -group {xbar s8 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s8_resp
-add wave -noupdate -expand -group {xbar s8 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s8_rdata
+add wave -noupdate -expand -group {xbar m4 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m4_req
+add wave -noupdate -expand -group {xbar m4 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m4_ack
+add wave -noupdate -expand -group {xbar m4 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m4_addr
+add wave -noupdate -expand -group {xbar m4 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m4_we
+add wave -noupdate -expand -group {xbar m4 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m4_be
+add wave -noupdate -expand -group {xbar m4 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m4_wdata
+add wave -noupdate -expand -group {xbar m4 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m4_resp
+add wave -noupdate -expand -group {xbar m4 (udm)} -radix hexadecimal /dlx_tb/mpss/xbar/m4_rdata
+add wave -noupdate -expand -group {xbar s4 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s4_req
+add wave -noupdate -expand -group {xbar s4 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s4_ack
+add wave -noupdate -expand -group {xbar s4 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s4_addr
+add wave -noupdate -expand -group {xbar s4 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s4_we
+add wave -noupdate -expand -group {xbar s4 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s4_be
+add wave -noupdate -expand -group {xbar s4 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s4_wdata
+add wave -noupdate -expand -group {xbar s4 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s4_resp
+add wave -noupdate -expand -group {xbar s4 (gpio)} -radix hexadecimal /dlx_tb/mpss/xbar/s4_rdata
 add wave -noupdate -expand -group {tile0 (cpu)} -radix hexadecimal /dlx_tb/mpss/tile0/clk_i
 add wave -noupdate -expand -group {tile0 (cpu)} -radix hexadecimal /dlx_tb/mpss/tile0/rst_i
 add wave -noupdate -expand -group {tile0 (cpu)} -radix hexadecimal /dlx_tb/mpss/tile0/corenum
