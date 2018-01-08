@@ -118,7 +118,7 @@ module mpss
 	xbar_buffered xbar
 	(
 		.clk_i(clk_i)
-		, .rst_i(cpu_reset)
+		, .rst_i(srst)
 		
 		, .m0_req	(m0_req)
 		, .m0_we	(m0_we)
@@ -342,7 +342,7 @@ module mpss
 	gpio gpio
 	(
 		.clk_i(clk_i)
-		, .rst_i(cpu_reset)
+		, .rst_i(srst)
 		
 		,. bus_req	(s4_req)
 		, .bus_we	(s4_we)
