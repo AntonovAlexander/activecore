@@ -300,7 +300,7 @@ namespace eval riscv_pipe {
 			ac= rd_req		1
 			ac= rd_source	$riscv_pipe::RD_PC_INC
 			ac= jump_req 	1
-			ac= jump_src		$riscv_pipe::JMP_SRC_ALU
+			ac= jump_src	$riscv_pipe::JMP_SRC_ALU
 			ac= immediate immediate_J
 		acif::end
 
@@ -313,7 +313,7 @@ namespace eval riscv_pipe {
 			ac= rd_req		1
 			ac= rd_source	$riscv_pipe::RD_PC_INC
 			ac= jump_req 	1
-			ac= jump_src		$riscv_pipe::JMP_SRC_ALU
+			ac= jump_src	$riscv_pipe::JMP_SRC_ALU
 			ac= immediate immediate_I
 		acif::end
 
@@ -322,7 +322,7 @@ namespace eval riscv_pipe {
 			ac= rs2_req		1
 			ac= alu_req		1
 			ac= alu_opcode 	$riscv_pipe::aluop_SUB
-			ac= jump_req_cond 1
+			ac= jump_req_cond 	1
 			ac= jump_src		$riscv_pipe::JMP_SRC_ALU
 			ac= immediate immediate_B
 
@@ -333,7 +333,7 @@ namespace eval riscv_pipe {
 		acif::end
 
 		acif::begin [ac== opcode $riscv_pipe::opcode_LOAD]
-			ac= rs1_req 		1
+			ac= rs1_req 	1
 			ac= op1_source 	$riscv_pipe::OP1_SRC_RS1
 			ac= op2_source 	$riscv_pipe::OP2_SRC_IMM
 			ac= rd_req		1
@@ -341,7 +341,7 @@ namespace eval riscv_pipe {
 
 			ac= alu_req		1
 
-			ac= mem_req 		1
+			ac= mem_req 	1
 			ac= mem_cmd		0
 
 			acif::begin [ac|| [ac== funct3 0x0] [ac== funct3 0x4] ]
@@ -358,14 +358,14 @@ namespace eval riscv_pipe {
 		acif::end
 
 		acif::begin [ac== opcode $riscv_pipe::opcode_STORE]
-			ac= rs1_req 		1
-			ac= rs2_req 		1
+			ac= rs1_req 	1
+			ac= rs2_req 	1
 			ac= op1_source 	$riscv_pipe::OP1_SRC_RS1
 			ac= op2_source 	$riscv_pipe::OP2_SRC_IMM
 
 			ac= alu_req		1
 			
-			ac= mem_req 		1
+			ac= mem_req 	1
 			ac= mem_cmd		1
 
 			acif::begin [ac== funct3 0x0]
@@ -384,7 +384,7 @@ namespace eval riscv_pipe {
 		acif::end
 
 		acif::begin [ac== opcode $riscv_pipe::opcode_OP_IMM]
-			ac= rs1_req 		1
+			ac= rs1_req 	1
 			ac= op1_source 	$riscv_pipe::OP1_SRC_RS1
 			ac= op2_source 	$riscv_pipe::OP2_SRC_IMM
 			ac= rd_req 		1
@@ -454,7 +454,7 @@ namespace eval riscv_pipe {
 		acif::end
 
 		acif::begin [ac== opcode $riscv_pipe::opcode_OP]
-			ac= rs1_req 		1
+			ac= rs1_req 	1
 			ac= op1_source 	$riscv_pipe::OP1_SRC_RS1
 			ac= op2_source 	$riscv_pipe::OP2_SRC_RS2
 			ac= rd_req 		1
