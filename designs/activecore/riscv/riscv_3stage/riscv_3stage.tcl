@@ -29,7 +29,7 @@ rtl::module riscv_3stage
 			set ST_MEM		1
 			pipe::pvar {0 0} exestate		$ST_EXEC
 
-			begif [s== exestate $ST_EXEC]
+			acif::begin [ac== exestate $ST_EXEC]
 				riscv_pipe::process_alu
 				riscv_pipe::process_rd_csr_prev
 				riscv_pipe::process_curinstraddr_imm
@@ -37,31 +37,31 @@ rtl::module riscv_3stage
 				riscv_pipe::process_setup_mem_reqdata
 				riscv_pipe::process_branch
 
-				begif mem_req
+				acif::begin mem_req
 					pipe::accum mem_addr mem_addr
 					pipe::accum mem_be mem_be
 					pipe::accum mem_wdata mem_wdata
 					pipe::accum exestate $ST_MEM
 					pipe::pstall
-				endif
-				begelse
+				acif::end
+				acif::begelse
 					riscv_pipe::process_wb
-				endif
-			endif
+				acif::end
+			acif::end
 
-			begelse
-				begif mem_cmd
+			acif::begelse
+				acif::begin mem_cmd
 					pipe::mcopipe::wrreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-				endif
-				begelse
+				acif::end
+				acif::begelse
 					pipe::mcopipe::rdreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-					begif [pipe::mcopipe::resp data_mem mem_rdata]
-						s= rd_rdy	1
-					endif
-				endif
+					acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+						ac= rd_rdy	1
+					acif::end
+				acif::end
 				riscv_pipe::process_rd_mem_wdata
 				riscv_pipe::process_wb
-			endif		
+			acif::end		
 
 	pipe::endpproc
 

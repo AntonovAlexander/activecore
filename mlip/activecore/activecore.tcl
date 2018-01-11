@@ -131,7 +131,7 @@ proc initval {dimensions value} {
 	__gplc_call initval
 }
 
-proc s= {target source} {
+proc ac= {target source} {
 	if {[ActiveCore::isnumeric $target] == 1} {
 		ActiveCore::ERROR Target\ $target\ is\ numeric!
 	}
@@ -140,113 +140,137 @@ proc s= {target source} {
 	__gplc_call assign
 }
 
-proc si= {target indices source} {
+proc aci= {target indices source} {
 	_acc_index $indices
-	s= $target $source
+	ac= $target $source
 }
 
-proc c- {op} {
-	ActiveCore::expr_1op "c-" $op
+proc acc- {op} {
+	ActiveCore::expr_1op "acc-" $op
 }
 
-proc s+ {op1 op2} {
-	ActiveCore::expr_2op "s+" $op1 $op2
+proc ac+ {op1 op2} {
+	ActiveCore::expr_2op "ac+" $op1 $op2
 }
 
-proc s++ {op1} {
-	ActiveCore::expr_2op "s+" $op1 1
+proc ac++ {op1} {
+	ActiveCore::expr_2op "ac+" $op1 1
 }
 
-proc s- {op1 op2} {
-	ActiveCore::expr_2op "s-" $op1 $op2
+proc ac- {op1 op2} {
+	ActiveCore::expr_2op "ac-" $op1 $op2
 }
 
-proc s-- {op1} {
-	ActiveCore::expr_2op "s-" $op1 1
+proc ac-- {op1} {
+	ActiveCore::expr_2op "ac-" $op1 1
 }
 
-proc sx {op1 op2} {
-	ActiveCore::expr_2op "sx" $op1 $op2
+proc acx {op1 op2} {
+	ActiveCore::expr_2op "acx" $op1 $op2
 }
 
-proc s/ {op1 op2} {
-	ActiveCore::expr_2op "s/" $op1 $op2
+proc ac/ {op1 op2} {
+	ActiveCore::expr_2op "ac/" $op1 $op2
 }
 
-proc s>> {op1 op2} {
-	ActiveCore::expr_2op "s>>" $op1 $op2
+proc ac>> {op1 op2} {
+	ActiveCore::expr_2op "ac>>" $op1 $op2
 }
 
-proc s>>> {op1 op2} {
-	ActiveCore::expr_2op "s>>>" $op1 $op2
+proc ac>>> {op1 op2} {
+	ActiveCore::expr_2op "ac>>>" $op1 $op2
 }
 
-proc s<< {op1 op2} {
-	ActiveCore::expr_2op "s<<" $op1 $op2
+proc ac<< {op1 op2} {
+	ActiveCore::expr_2op "ac<<" $op1 $op2
 }
 
-proc s! {op} {
-	ActiveCore::expr_1op "s!" $op
+proc ac! {op} {
+	ActiveCore::expr_1op "ac!" $op
 }
 
-proc s&& {op1 op2} {
-	ActiveCore::expr_2op "s&&" $op1 $op2
+proc ac&& {op1 op2} {
+	ActiveCore::expr_2op "ac&&" $op1 $op2
 }
 
-proc s|| {op1 op2} {
-	ActiveCore::expr_2op "s||" $op1 $op2
+proc ac|| {op1 op2} {
+	ActiveCore::expr_2op "ac||" $op1 $op2
 }
 
-proc s> {op1 op2} {
-	ActiveCore::expr_2op "s>" $op1 $op2
+proc ac> {op1 op2} {
+	ActiveCore::expr_2op "ac>" $op1 $op2
 }
 
-proc s< {op1 op2} {
-	ActiveCore::expr_2op "s<" $op1 $op2
+proc ac< {op1 op2} {
+	ActiveCore::expr_2op "ac<" $op1 $op2
 }
 
-proc s>= {op1 op2} {
-	ActiveCore::expr_2op "s>=" $op1 $op2
+proc ac>= {op1 op2} {
+	ActiveCore::expr_2op "ac>=" $op1 $op2
 }
 
-proc s<= {op1 op2} {
-	ActiveCore::expr_2op "s<=" $op1 $op2
+proc ac<= {op1 op2} {
+	ActiveCore::expr_2op "ac<=" $op1 $op2
 }
 
-proc s== {op1 op2} {
-	ActiveCore::expr_2op "s==" $op1 $op2
+proc ac== {op1 op2} {
+	ActiveCore::expr_2op "ac==" $op1 $op2
 }
 
-proc s!= {op1 op2} {
-	ActiveCore::expr_2op "s!=" $op1 $op2
+proc ac!= {op1 op2} {
+	ActiveCore::expr_2op "ac!=" $op1 $op2
 }
 
-proc s=== {op1 op2} {
-	ActiveCore::expr_2op "s===" $op1 $op2
+proc ac=== {op1 op2} {
+	ActiveCore::expr_2op "ac===" $op1 $op2
 }
 
-proc s!== {op1 op2} {
-	ActiveCore::expr_2op "s!==" $op1 $op2
+proc ac!== {op1 op2} {
+	ActiveCore::expr_2op "ac!==" $op1 $op2
 }
 
-proc s~ {op} {
-	ActiveCore::expr_1op "s~" $op
+proc ac~ {op} {
+	ActiveCore::expr_1op "ac~" $op
 }
 
-proc s& {op1 op2} {
-	ActiveCore::expr_2op "s&" $op1 $op2
+proc ac& {op1 op2} {
+	ActiveCore::expr_2op "ac&" $op1 $op2
 }
 
-proc s| {op1 op2} {
-	ActiveCore::expr_2op "s|" $op1 $op2
+proc ac| {op1 op2} {
+	ActiveCore::expr_2op "ac|" $op1 $op2
 }
 
-proc s^ {op1 op2} {
-	ActiveCore::expr_2op "s^" $op1 $op2
+proc ac^ {op1 op2} {
+	ActiveCore::expr_2op "ac^" $op1 $op2
 }
 
-proc s^~ {op1 op2} {
-	ActiveCore::expr_2op "s^~" $op1 $op2
+proc ac^~ {op1 op2} {
+	ActiveCore::expr_2op "ac^~" $op1 $op2
+}
+
+proc acr& {op} {
+	ActiveCore::expr_1op "acr&" $op
+}
+
+proc acr~& {op} {
+	ActiveCore::expr_1op "acr~&" $op
+}
+
+proc acr| {op} {
+	ActiveCore::expr_1op "acr|" $op
+}
+
+proc acr~| {op} {
+	ActiveCore::expr_1op "acr~|" $op
+}
+
+proc acr^ {op} {
+	ActiveCore::expr_1op "acr^" $op
+}
+
+proc acr^~ {op} {
+	ActiveCore::expr_1op "acr^~" $op
 }
 
 proc indexed {op index} {
@@ -261,44 +285,59 @@ proc indexed {op index} {
 	}	
 }
 
-proc clrif {} {
-	__gplc_acc_param_clr
-	__gplc_call clrif
+try {namespace delete acif} on error {} {}
+namespace eval acif {
+
+	proc clr {} {
+		__gplc_acc_param_clr
+		__gplc_call clrif
+	}
+
+	proc begin {condition} {
+		__gplc_acc_param_clr
+		ActiveCore::_accum_param $condition
+		__gplc_call begif
+	}
+
+	proc begnot {condition} {
+		acif::begin [ac! $condition]
+	}
+
+	proc begelsif {condition} {
+		__gplc_acc_param_clr
+		ActiveCore::_accum_param $condition
+		__gplc_call begelsif
+	}
+
+	proc begelse {} {
+		__gplc_call begelse
+	}
+
+	proc end {} {
+		__gplc_call endif
+	}
 }
 
-proc begif {condition} {
-	__gplc_acc_param_clr
-	ActiveCore::_accum_param $condition
-	__gplc_call begif
+
+try {namespace delete acwhile} on error {} {}
+namespace eval acwhile {
+
+	proc begin {condition} {
+		__gplc_acc_param_clr
+		ActiveCore::_accum_param $condition
+		__gplc_call begwhile
+	}
+
+	proc end {} {
+		__gplc_call endwhile
+	}
+
+	proc setcond {} {
+		__gplc_call setcondwhile
+	}
+
 }
 
-proc begnif {condition} {
-	begif [s! $condition]
-}
-
-proc begelsif {condition} {
-	__gplc_acc_param_clr
-	ActiveCore::_accum_param $condition
-	__gplc_call begelsif
-}
-
-proc begelse {} {
-	__gplc_call begelse
-}
-
-proc endif {} {
-	__gplc_call endif
-}
-
-proc begwhile {condition} {
-	__gplc_acc_param_clr
-	ActiveCore::_accum_param $condition
-	__gplc_call begwhile
-}
-
-proc endwhile {} {
-	__gplc_call endwhile
-}
 
 proc cnct {ops} {
 	__gplc_acc_param_clr

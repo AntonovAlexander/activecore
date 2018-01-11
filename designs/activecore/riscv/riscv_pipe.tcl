@@ -103,23 +103,23 @@ namespace eval riscv_pipe {
 		rtl::comb	{0 0}	data_mcopipe_resp	0
 		rtl::comb 	{31 0}	data_mcopipe_rdata	0
 
-		s= instr_mem_req instr_mcopipe_req
-		s= instr_mem_we instr_mcopipe_we
-		s= instr_mcopipe_ack instr_mem_ack
-		s= instr_mem_addr [indexed instr_mcopipe_wdata {63 32}]
-		s= instr_mem_wdata [indexed instr_mcopipe_wdata {31 0}]
-		s= instr_mem_be 0xf
-		s= instr_mcopipe_resp instr_mem_resp
-		s= instr_mcopipe_rdata instr_mem_rdata
+		ac= instr_mem_req instr_mcopipe_req
+		ac= instr_mem_we instr_mcopipe_we
+		ac= instr_mcopipe_ack instr_mem_ack
+		ac= instr_mem_addr [indexed instr_mcopipe_wdata {63 32}]
+		ac= instr_mem_wdata [indexed instr_mcopipe_wdata {31 0}]
+		ac= instr_mem_be 0xf
+		ac= instr_mcopipe_resp instr_mem_resp
+		ac= instr_mcopipe_rdata instr_mem_rdata
 
-		s= data_mem_req data_mcopipe_req
-		s= data_mem_we data_mcopipe_we
-		s= data_mcopipe_ack data_mem_ack
-		s= data_mem_addr [indexed data_mcopipe_wdata {67 36}]
-		s= data_mem_be [indexed data_mcopipe_wdata {35 32}]
-		s= data_mem_wdata [indexed data_mcopipe_wdata {31 0}]
-		s= data_mcopipe_resp data_mem_resp
-		s= data_mcopipe_rdata data_mem_rdata
+		ac= data_mem_req data_mcopipe_req
+		ac= data_mem_we data_mcopipe_we
+		ac= data_mcopipe_ack data_mem_ack
+		ac= data_mem_addr [indexed data_mcopipe_wdata {67 36}]
+		ac= data_mem_be [indexed data_mcopipe_wdata {35 32}]
+		ac= data_mem_wdata [indexed data_mcopipe_wdata {31 0}]
+		ac= data_mcopipe_resp data_mem_resp
+		ac= data_mcopipe_rdata data_mem_rdata
 	}
 
 	## transaction context
@@ -226,707 +226,707 @@ namespace eval riscv_pipe {
 
 	# RISC-V pipeline macro-operations
 	proc process_pc {} {
-		s= curinstr_addr pc
+		ac= curinstr_addr pc
 
-		begif jump_req_cmd
-			s= curinstr_addr jump_vector_cmd
-		endif
+		acif::begin jump_req_cmd
+			ac= curinstr_addr jump_vector_cmd
+		acif::end
 		pipe::p<= jump_req_cmd 0
 
-		s= nextinstr_addr [s+ curinstr_addr 4]
+		ac= nextinstr_addr [ac+ curinstr_addr 4]
 
 		pipe::p<= pc nextinstr_addr
 	}
 
 	proc process_decode {} {
-		s= opcode [indexed instr_code {6 0}]
-		s= alu_unsigned 0
+		ac= opcode [indexed instr_code {6 0}]
+		ac= alu_unsigned 0
 
-		s= rs1_addr [indexed instr_code {19 15}]
-		s= rs2_addr [indexed instr_code {24 20}]
-		s= rd_addr  [indexed instr_code {11 7}]
+		ac= rs1_addr [indexed instr_code {19 15}]
+		ac= rs2_addr [indexed instr_code {24 20}]
+		ac= rd_addr  [indexed instr_code {11 7}]
 
-		s= funct3	[indexed instr_code {14 12}]
-		s= funct7	[indexed instr_code {31 25}]
-		s= shamt 	[indexed instr_code {24 20}]
-		s= pred 	[indexed instr_code {27 24}]
-		s= succ		[indexed instr_code {23 20}]
-		s= csrnum 	[indexed instr_code {31 20}]
-		s= zimm		[indexed instr_code {19 15}]
+		ac= funct3	[indexed instr_code {14 12}]
+		ac= funct7	[indexed instr_code {31 25}]
+		ac= shamt 	[indexed instr_code {24 20}]
+		ac= pred 	[indexed instr_code {27 24}]
+		ac= succ	[indexed instr_code {23 20}]
+		ac= csrnum 	[indexed instr_code {31 20}]
+		ac= zimm	[indexed instr_code {19 15}]
 
-		s= immediate_I	[signext [indexed instr_code {31 20}] 32]
-		s= immediate_S	[signext [cnct [list	[indexed instr_code {31 25}] \
+		ac= immediate_I	[signext [indexed instr_code {31 20}] 32]
+		ac= immediate_S	[signext [cnct [list	[indexed instr_code {31 25}] \
 												[indexed instr_code {11 7}] \
 							]] 32]
-		s= immediate_B	[signext [cnct [list	[indexed instr_code 31] \
+		ac= immediate_B	[signext [cnct [list	[indexed instr_code 31] \
 												[indexed instr_code 7] \
 												[indexed instr_code {30 25}] \
 												[indexed instr_code {11 8}] \
 												[initval {0 0} 0] \
 							]] 32]
-		s= immediate_U	[cnct [list				[indexed instr_code {31 12}] \
+		ac= immediate_U	[cnct [list				[indexed instr_code {31 12}] \
 												[initval {11 0} 0] \
 							]]
-		s= immediate_J	[signext [cnct [list	[indexed instr_code 31] \
+		ac= immediate_J	[signext [cnct [list	[indexed instr_code 31] \
 												[indexed instr_code {19 12}] \
 												[indexed instr_code 20] \
 												[indexed instr_code {30 21}] \
 												[initval {0 0} 0] \
 							]] 32]
 
-		begif [s== opcode $riscv_pipe::opcode_LUI]
-			s= op1_source $riscv_pipe::OP1_SRC_IMM
-			s= rd_req 		1
-			s= rd_source	$riscv_pipe::RD_LUI
-			s= immediate immediate_U
-		endif
+		acif::begin [ac== opcode $riscv_pipe::opcode_LUI]
+			ac= op1_source $riscv_pipe::OP1_SRC_IMM
+			ac= rd_req 		1
+			ac= rd_source	$riscv_pipe::RD_LUI
+			ac= immediate immediate_U
+		acif::end
 
-		begif [s== opcode $riscv_pipe::opcode_AUIPC]
-			s= op1_source	$riscv_pipe::OP1_SRC_PC
-			s= op2_source	$riscv_pipe::OP2_SRC_IMM
-			s= alu_req		1
-			s= alu_opcode 	$riscv_pipe::aluop_ADD
-			s= rd_req		1
-			s= rd_source	$riscv_pipe::RD_ALU
+		acif::begin [ac== opcode $riscv_pipe::opcode_AUIPC]
+			ac= op1_source	$riscv_pipe::OP1_SRC_PC
+			ac= op2_source	$riscv_pipe::OP2_SRC_IMM
+			ac= alu_req		1
+			ac= alu_opcode 	$riscv_pipe::aluop_ADD
+			ac= rd_req		1
+			ac= rd_source	$riscv_pipe::RD_ALU
 
-			s= immediate immediate_U
-		endif
+			ac= immediate immediate_U
+		acif::end
 
-		begif [s== opcode $riscv_pipe::opcode_JAL]
-			s= op1_source 	$riscv_pipe::OP1_SRC_PC
-			s= op2_source 	$riscv_pipe::OP2_SRC_IMM
-			s= alu_req		1
-			s= alu_opcode 	$riscv_pipe::aluop_ADD
-			s= rd_req		1
-			s= rd_source	$riscv_pipe::RD_PC_INC
-			s= jump_req 	1
-			s= jump_src		$riscv_pipe::JMP_SRC_ALU
-			s= immediate immediate_J
-		endif
+		acif::begin [ac== opcode $riscv_pipe::opcode_JAL]
+			ac= op1_source 	$riscv_pipe::OP1_SRC_PC
+			ac= op2_source 	$riscv_pipe::OP2_SRC_IMM
+			ac= alu_req		1
+			ac= alu_opcode 	$riscv_pipe::aluop_ADD
+			ac= rd_req		1
+			ac= rd_source	$riscv_pipe::RD_PC_INC
+			ac= jump_req 	1
+			ac= jump_src		$riscv_pipe::JMP_SRC_ALU
+			ac= immediate immediate_J
+		acif::end
 
-		begif [s== opcode $riscv_pipe::opcode_JALR]
-			s= rs1_req		1
-			s= op1_source 	$riscv_pipe::OP1_SRC_RS1
-			s= op2_source 	$riscv_pipe::OP2_SRC_IMM
-			s= alu_req		1
-			s= alu_opcode 	$riscv_pipe::aluop_ADD
-			s= rd_req		1
-			s= rd_source	$riscv_pipe::RD_PC_INC
-			s= jump_req 	1
-			s= jump_src		$riscv_pipe::JMP_SRC_ALU
-			s= immediate immediate_I
-		endif
+		acif::begin [ac== opcode $riscv_pipe::opcode_JALR]
+			ac= rs1_req		1
+			ac= op1_source 	$riscv_pipe::OP1_SRC_RS1
+			ac= op2_source 	$riscv_pipe::OP2_SRC_IMM
+			ac= alu_req		1
+			ac= alu_opcode 	$riscv_pipe::aluop_ADD
+			ac= rd_req		1
+			ac= rd_source	$riscv_pipe::RD_PC_INC
+			ac= jump_req 	1
+			ac= jump_src		$riscv_pipe::JMP_SRC_ALU
+			ac= immediate immediate_I
+		acif::end
 
-		begif [s== opcode $riscv_pipe::opcode_BRANCH]
-			s= rs1_req		1
-			s= rs2_req		1
-			s= alu_req		1
-			s= alu_opcode 	$riscv_pipe::aluop_SUB
-			s= jump_req_cond 1
-			s= jump_src		$riscv_pipe::JMP_SRC_ALU
-			s= immediate immediate_B
+		acif::begin [ac== opcode $riscv_pipe::opcode_BRANCH]
+			ac= rs1_req		1
+			ac= rs2_req		1
+			ac= alu_req		1
+			ac= alu_opcode 	$riscv_pipe::aluop_SUB
+			ac= jump_req_cond 1
+			ac= jump_src		$riscv_pipe::JMP_SRC_ALU
+			ac= immediate immediate_B
 
-			begif [s|| [s== funct3 0x6] [s== funct3 0x7] ]
-				s= alu_unsigned 1
-			endif
+			acif::begin [ac|| [ac== funct3 0x6] [ac== funct3 0x7] ]
+				ac= alu_unsigned 1
+			acif::end
 
-		endif
+		acif::end
 
-		begif [s== opcode $riscv_pipe::opcode_LOAD]
-			s= rs1_req 		1
-			s= op1_source 	$riscv_pipe::OP1_SRC_RS1
-			s= op2_source 	$riscv_pipe::OP2_SRC_IMM
-			s= rd_req		1
-			s= rd_source	$riscv_pipe::RD_MEM
+		acif::begin [ac== opcode $riscv_pipe::opcode_LOAD]
+			ac= rs1_req 		1
+			ac= op1_source 	$riscv_pipe::OP1_SRC_RS1
+			ac= op2_source 	$riscv_pipe::OP2_SRC_IMM
+			ac= rd_req		1
+			ac= rd_source	$riscv_pipe::RD_MEM
 
-			s= alu_req		1
+			ac= alu_req		1
 
-			s= mem_req 		1
-			s= mem_cmd		0
+			ac= mem_req 		1
+			ac= mem_cmd		0
 
-			begif [s|| [s== funct3 0x0] [s== funct3 0x4] ]
-				s= mem_be 0x1
-			endif
-			begif [s|| [s== funct3 0x1] [s== funct3 0x5] ]
-				s= mem_be 0x3
-			endif
-			begif [s== funct3 0x2]
-				s= mem_be 0xf
-			endif
+			acif::begin [ac|| [ac== funct3 0x0] [ac== funct3 0x4] ]
+				ac= mem_be 0x1
+			acif::end
+			acif::begin [ac|| [ac== funct3 0x1] [ac== funct3 0x5] ]
+				ac= mem_be 0x3
+			acif::end
+			acif::begin [ac== funct3 0x2]
+				ac= mem_be 0xf
+			acif::end
 
-			s= immediate immediate_I
-		endif
+			ac= immediate immediate_I
+		acif::end
 
-		begif [s== opcode $riscv_pipe::opcode_STORE]
-			s= rs1_req 		1
-			s= rs2_req 		1
-			s= op1_source 	$riscv_pipe::OP1_SRC_RS1
-			s= op2_source 	$riscv_pipe::OP2_SRC_IMM
+		acif::begin [ac== opcode $riscv_pipe::opcode_STORE]
+			ac= rs1_req 		1
+			ac= rs2_req 		1
+			ac= op1_source 	$riscv_pipe::OP1_SRC_RS1
+			ac= op2_source 	$riscv_pipe::OP2_SRC_IMM
 
-			s= alu_req		1
+			ac= alu_req		1
 			
-			s= mem_req 		1
-			s= mem_cmd		1
+			ac= mem_req 		1
+			ac= mem_cmd		1
 
-			begif [s== funct3 0x0]
-				s= mem_be 0x1
-			endif
+			acif::begin [ac== funct3 0x0]
+				ac= mem_be 0x1
+			acif::end
 
-			begif [s== funct3 0x1]
-				s= mem_be 0x3
-			endif
+			acif::begin [ac== funct3 0x1]
+				ac= mem_be 0x3
+			acif::end
 
-			begif [s== funct3 0x2]
-				s= mem_be 0xf
-			endif
+			acif::begin [ac== funct3 0x2]
+				ac= mem_be 0xf
+			acif::end
 
-			s= immediate immediate_S
-		endif
+			ac= immediate immediate_S
+		acif::end
 
-		begif [s== opcode $riscv_pipe::opcode_OP_IMM]
-			s= rs1_req 		1
-			s= op1_source 	$riscv_pipe::OP1_SRC_RS1
-			s= op2_source 	$riscv_pipe::OP2_SRC_IMM
-			s= rd_req 		1
+		acif::begin [ac== opcode $riscv_pipe::opcode_OP_IMM]
+			ac= rs1_req 		1
+			ac= op1_source 	$riscv_pipe::OP1_SRC_RS1
+			ac= op2_source 	$riscv_pipe::OP2_SRC_IMM
+			ac= rd_req 		1
 
-			s= immediate 	immediate_I
+			ac= immediate 	immediate_I
 
-			s= alu_req		1
+			ac= alu_req		1
 
 			# ADDI
-			begif [s== funct3 0x0]
-				s= alu_opcode $riscv_pipe::aluop_ADD
-				s= rd_source 	$riscv_pipe::RD_ALU
-			endif
+			acif::begin [ac== funct3 0x0]
+				ac= alu_opcode $riscv_pipe::aluop_ADD
+				ac= rd_source 	$riscv_pipe::RD_ALU
+			acif::end
 
 			# SLTI
-			begif [s== funct3 0x2]
-				s= alu_opcode $riscv_pipe::aluop_SUB
-				s= rd_source $riscv_pipe::RD_OF_COND
-			endif
+			acif::begin [ac== funct3 0x2]
+				ac= alu_opcode $riscv_pipe::aluop_SUB
+				ac= rd_source $riscv_pipe::RD_OF_COND
+			acif::end
 
 			# SLTIU
-			begif [s== funct3 0x3]
-				s= alu_opcode $riscv_pipe::aluop_SUB
-				s= alu_unsigned 1
-				s= rd_source $riscv_pipe::RD_CF_COND
-			endif
+			acif::begin [ac== funct3 0x3]
+				ac= alu_opcode $riscv_pipe::aluop_SUB
+				ac= alu_unsigned 1
+				ac= rd_source $riscv_pipe::RD_CF_COND
+			acif::end
 
 			# XORI
-			begif [s== funct3 0x4]
-				s= alu_opcode $riscv_pipe::aluop_XOR
-				s= rd_source $riscv_pipe::RD_ALU
-			endif
+			acif::begin [ac== funct3 0x4]
+				ac= alu_opcode $riscv_pipe::aluop_XOR
+				ac= rd_source $riscv_pipe::RD_ALU
+			acif::end
 
 			# ORI
-			begif [s== funct3 0x6]
-				s= alu_opcode $riscv_pipe::aluop_OR
-				s= rd_source $riscv_pipe::RD_ALU
-			endif
+			acif::begin [ac== funct3 0x6]
+				ac= alu_opcode $riscv_pipe::aluop_OR
+				ac= rd_source $riscv_pipe::RD_ALU
+			acif::end
 
 			# ANDI
-			begif [s== funct3 0x7]
-				s= alu_opcode $riscv_pipe::aluop_AND
-				s= rd_source $riscv_pipe::RD_ALU
-			endif
+			acif::begin [ac== funct3 0x7]
+				ac= alu_opcode $riscv_pipe::aluop_AND
+				ac= rd_source $riscv_pipe::RD_ALU
+			acif::end
 
 			# SLLI
-			begif [s== funct3 0x1]
-				s= alu_opcode $riscv_pipe::aluop_SLL
-				s= rd_source $riscv_pipe::RD_ALU
-				s= immediate [zeroext [indexed instr_code {24 20}] 32]
-			endif
+			acif::begin [ac== funct3 0x1]
+				ac= alu_opcode $riscv_pipe::aluop_SLL
+				ac= rd_source $riscv_pipe::RD_ALU
+				ac= immediate [zeroext [indexed instr_code {24 20}] 32]
+			acif::end
 
 			# SRLI, SRAI
-			begif [s== funct3 0x5]
+			acif::begin [ac== funct3 0x5]
 				# SRAI
-				begif [indexed instr_code 30]
-					s= alu_opcode $riscv_pipe::aluop_SRA
-				endif
+				acif::begin [indexed instr_code 30]
+					ac= alu_opcode $riscv_pipe::aluop_SRA
+				acif::end
 				# SRLI
-				begelse
-					s= alu_opcode $riscv_pipe::aluop_SRL
-				endif
-				s= rd_source $riscv_pipe::RD_ALU
-				s= immediate [zeroext [indexed instr_code {24 20}] 32]
-			endif
+				acif::begelse
+					ac= alu_opcode $riscv_pipe::aluop_SRL
+				acif::end
+				ac= rd_source $riscv_pipe::RD_ALU
+				ac= immediate [zeroext [indexed instr_code {24 20}] 32]
+			acif::end
 
-		endif
+		acif::end
 
-		begif [s== opcode $riscv_pipe::opcode_OP]
-			s= rs1_req 		1
-			s= op1_source 	$riscv_pipe::OP1_SRC_RS1
-			s= op2_source 	$riscv_pipe::OP2_SRC_RS2
-			s= rd_req 		1
-			s= rd_source 	$riscv_pipe::RD_ALU
+		acif::begin [ac== opcode $riscv_pipe::opcode_OP]
+			ac= rs1_req 		1
+			ac= op1_source 	$riscv_pipe::OP1_SRC_RS1
+			ac= op2_source 	$riscv_pipe::OP2_SRC_RS2
+			ac= rd_req 		1
+			ac= rd_source 	$riscv_pipe::RD_ALU
 
-			s= alu_req		1
+			ac= alu_req		1
 
 			# ADD
-			begif [s== funct3 0x0]
+			acif::begin [ac== funct3 0x0]
 				# SUB
-				begif [indexed instr_code 30]
-					s= alu_opcode $riscv_pipe::aluop_SUB
-				endif
+				acif::begin [indexed instr_code 30]
+					ac= alu_opcode $riscv_pipe::aluop_SUB
+				acif::end
 				# ADD
-				begelse
-					s= alu_opcode $riscv_pipe::aluop_ADD
-				endif
-				s= rd_source 	$riscv_pipe::RD_ALU
-			endif
+				acif::begelse
+					ac= alu_opcode $riscv_pipe::aluop_ADD
+				acif::end
+				ac= rd_source 	$riscv_pipe::RD_ALU
+			acif::end
 
 			# SLL
-			begif [s== funct3 0x1]
-				s= alu_opcode $riscv_pipe::aluop_SLL
-				s= rd_source $riscv_pipe::RD_OF_COND
-			endif
+			acif::begin [ac== funct3 0x1]
+				ac= alu_opcode $riscv_pipe::aluop_SLL
+				ac= rd_source $riscv_pipe::RD_OF_COND
+			acif::end
 
 			# SLT
-			begif [s== funct3 0x2]
-				s= alu_opcode $riscv_pipe::aluop_SUB
-				s= rd_source $riscv_pipe::RD_OF_COND
-			endif
+			acif::begin [ac== funct3 0x2]
+				ac= alu_opcode $riscv_pipe::aluop_SUB
+				ac= rd_source $riscv_pipe::RD_OF_COND
+			acif::end
 
 			# SLTU
-			begif [s== funct3 0x3]
-				s= alu_opcode $riscv_pipe::aluop_SUB
-				s= alu_unsigned 1
-				s= rd_source $riscv_pipe::RD_CF_COND
-			endif
+			acif::begin [ac== funct3 0x3]
+				ac= alu_opcode $riscv_pipe::aluop_SUB
+				ac= alu_unsigned 1
+				ac= rd_source $riscv_pipe::RD_CF_COND
+			acif::end
 
 			# XORI
-			begif [s== funct3 0x4]
-				s= alu_opcode $riscv_pipe::aluop_XOR
-				s= rd_source $riscv_pipe::RD_ALU
-			endif
+			acif::begin [ac== funct3 0x4]
+				ac= alu_opcode $riscv_pipe::aluop_XOR
+				ac= rd_source $riscv_pipe::RD_ALU
+			acif::end
 
 			# SRL, SRA
-			begif [s== funct3 0x5]
+			acif::begin [ac== funct3 0x5]
 				# SRA
-				begif [indexed instr_code 30]
-					s= alu_opcode $riscv_pipe::aluop_SRA
-				endif
+				acif::begin [indexed instr_code 30]
+					ac= alu_opcode $riscv_pipe::aluop_SRA
+				acif::end
 				# SRL
-				begelse
-					s= alu_opcode $riscv_pipe::aluop_SRL
-				endif
-				s= rd_source $riscv_pipe::RD_ALU
-			endif
+				acif::begelse
+					ac= alu_opcode $riscv_pipe::aluop_SRL
+				acif::end
+				ac= rd_source $riscv_pipe::RD_ALU
+			acif::end
 
 			# OR
-			begif [s== funct3 0x6]
-				s= alu_opcode $riscv_pipe::aluop_OR
-				s= rd_source $riscv_pipe::RD_ALU
-			endif
+			acif::begin [ac== funct3 0x6]
+				ac= alu_opcode $riscv_pipe::aluop_OR
+				ac= rd_source $riscv_pipe::RD_ALU
+			acif::end
 
 			# AND
-			begif [s== funct3 0x7]
-				s= alu_opcode $riscv_pipe::aluop_AND
-				s= rd_source $riscv_pipe::RD_ALU
-			endif
+			acif::begin [ac== funct3 0x7]
+				ac= alu_opcode $riscv_pipe::aluop_AND
+				ac= rd_source $riscv_pipe::RD_ALU
+			acif::end
 
-		endif
+		acif::end
 
-		begif [s== opcode $riscv_pipe::opcode_MISC_MEM]
-			s= fencereq 	1
-		endif
+		acif::begin [ac== opcode $riscv_pipe::opcode_MISC_MEM]
+			ac= fencereq 	1
+		acif::end
 
-		begif [s== opcode $riscv_pipe::opcode_SYSTEM]
-			begif [s== funct3 0]
-				begif [indexed instr_code 20]
+		acif::begin [ac== opcode $riscv_pipe::opcode_SYSTEM]
+			acif::begin [ac== funct3 0]
+				acif::begin [indexed instr_code 20]
 					# EBREAK
-					s= ebreakreq 1
-				endif
-				begelse
+					ac= ebreakreq 1
+				acif::end
+				acif::begelse
 					# ECALL
-					s= ecallreq 1
-				endif
-			endif
+					ac= ecallreq 1
+				acif::end
+			acif::end
 			
 			# CSRRW
-			begif [s== funct3 0x1]
-				begif [s!= rs1_addr 0x0]
-					s= csrreq		1
-					s= rs1_req		1
-					s= rd_req		1
-					s= rd_source 	$riscv_pipe::RD_CSR
-					s= op1_source	$riscv_pipe::OP1_SRC_RS1
-					s= op2_source 	$riscv_pipe::OP2_SRC_CSR
-				endif
-			endif
+			acif::begin [ac== funct3 0x1]
+				acif::begin [ac!= rs1_addr 0x0]
+					ac= csrreq		1
+					ac= rs1_req		1
+					ac= rd_req		1
+					ac= rd_source 	$riscv_pipe::RD_CSR
+					ac= op1_source	$riscv_pipe::OP1_SRC_RS1
+					ac= op2_source 	$riscv_pipe::OP2_SRC_CSR
+				acif::end
+			acif::end
 
 			# CSRRS
-			begif [s== funct3 0x2]
-				begif [s!= rs1_addr 0x0]
-					s= csrreq		1
-					s= rs1_req		1
-					s= rd_req		1
-					s= rd_source 	$riscv_pipe::RD_CSR
-					s= alu_req		1
-					s= alu_opcode	$riscv_pipe::aluop_OR
-					s= op1_source	$riscv_pipe::OP1_SRC_RS1
-					s= op2_source 	$riscv_pipe::OP2_SRC_CSR
-				endif
-			endif
+			acif::begin [ac== funct3 0x2]
+				acif::begin [ac!= rs1_addr 0x0]
+					ac= csrreq		1
+					ac= rs1_req		1
+					ac= rd_req		1
+					ac= rd_source 	$riscv_pipe::RD_CSR
+					ac= alu_req		1
+					ac= alu_opcode	$riscv_pipe::aluop_OR
+					ac= op1_source	$riscv_pipe::OP1_SRC_RS1
+					ac= op2_source 	$riscv_pipe::OP2_SRC_CSR
+				acif::end
+			acif::end
 
 			# CSRRC
-			begif [s== funct3 0x3]
-				begif [s!= rs1_addr 0x0]
-					s= csrreq		1
-					s= rs1_req		1
-					s= rd_req		1
-					s= rd_source 	$riscv_pipe::RD_CSR
-					s= alu_req		1
-					s= alu_opcode	$riscv_pipe::aluop_CLRB
-					s= op1_source	$riscv_pipe::OP1_SRC_RS1
-					s= op2_source 	$riscv_pipe::OP2_SRC_CSR
-				endif
-			endif
+			acif::begin [ac== funct3 0x3]
+				acif::begin [ac!= rs1_addr 0x0]
+					ac= csrreq		1
+					ac= rs1_req		1
+					ac= rd_req		1
+					ac= rd_source 	$riscv_pipe::RD_CSR
+					ac= alu_req		1
+					ac= alu_opcode	$riscv_pipe::aluop_CLRB
+					ac= op1_source	$riscv_pipe::OP1_SRC_RS1
+					ac= op2_source 	$riscv_pipe::OP2_SRC_CSR
+				acif::end
+			acif::end
 
 			# CSRRWI
-			begif [s== funct3 0x5]
-				s= csrreq		1
-				s= rd_req		1
-				s= op1_source	$riscv_pipe::OP1_SRC_IMM
-				s= op2_source 	$riscv_pipe::OP2_SRC_CSR
-				s= immediate [zeroext zimm 32]
-			endif
+			acif::begin [ac== funct3 0x5]
+				ac= csrreq		1
+				ac= rd_req		1
+				ac= op1_source	$riscv_pipe::OP1_SRC_IMM
+				ac= op2_source 	$riscv_pipe::OP2_SRC_CSR
+				ac= immediate [zeroext zimm 32]
+			acif::end
 
 			# CSRRSI
-			begif [s== funct3 0x6]
-				s= csrreq		1
-				s= rd_req		1
-				s= rd_source 	$riscv_pipe::RD_CSR
-				s= alu_req		1
-				s= alu_opcode	$riscv_pipe::aluop_CLRB
-				s= op1_source	$riscv_pipe::OP1_SRC_IMM
-				s= op2_source 	$riscv_pipe::OP2_SRC_CSR
-				s= immediate [zeroext zimm 32]
-			endif
+			acif::begin [ac== funct3 0x6]
+				ac= csrreq		1
+				ac= rd_req		1
+				ac= rd_source 	$riscv_pipe::RD_CSR
+				ac= alu_req		1
+				ac= alu_opcode	$riscv_pipe::aluop_CLRB
+				ac= op1_source	$riscv_pipe::OP1_SRC_IMM
+				ac= op2_source 	$riscv_pipe::OP2_SRC_CSR
+				ac= immediate [zeroext zimm 32]
+			acif::end
 
 			# CSRRCI
-			begif [s== funct3 0x7]
-				s= csrreq		1
-				s= rd_req		1
-				s= rd_source 	$riscv_pipe::RD_CSR
-				s= alu_req		1
-				s= alu_opcode	$riscv_pipe::aluop_CLRB
-				s= op1_source	$riscv_pipe::OP1_SRC_IMM
-				s= op2_source 	$riscv_pipe::OP2_SRC_CSR
-				s= immediate [zeroext zimm 32]
-			endif
+			acif::begin [ac== funct3 0x7]
+				ac= csrreq		1
+				ac= rd_req		1
+				ac= rd_source 	$riscv_pipe::RD_CSR
+				ac= alu_req		1
+				ac= alu_opcode	$riscv_pipe::aluop_CLRB
+				ac= op1_source	$riscv_pipe::OP1_SRC_IMM
+				ac= op2_source 	$riscv_pipe::OP2_SRC_CSR
+				ac= immediate [zeroext zimm 32]
+			acif::end
 
-		endif
+		acif::end
 
-		begif [s== rd_addr 0]
-			s= rd_req 0
-		endif
+		acif::begin [ac== rd_addr 0]
+			ac= rd_req 0
+		acif::end
 	}
 
 	#### data fetching - reading regfile ##
 	proc process_regfetch {} {
 		
 		## unoptimized
-		# s= rs1_rdata [indexed regfile rs1_addr]
-		# s= rs2_rdata [indexed regfile rs2_addr]
+		# ac= rs1_rdata [indexed regfile rs1_addr]
+		# ac= rs2_rdata [indexed regfile rs2_addr]
 		##
 		
 		## optimized for synthesis
-		s= rs1_rdata [indexed [pipe::rdbuf regfile] rs1_addr]
-		s= rs2_rdata [indexed [pipe::rdbuf regfile] rs2_addr]
+		ac= rs1_rdata [indexed [pipe::rdbuf regfile] rs1_addr]
+		ac= rs2_rdata [indexed [pipe::rdbuf regfile] rs2_addr]
 
-		begif [s== rs1_addr 0]
-			s= rs1_rdata 0
-		endif
+		acif::begin [ac== rs1_addr 0]
+			ac= rs1_rdata 0
+		acif::end
 
-		begif [s== rs2_addr 0]
-			s= rs2_rdata 0
-		endif
+		acif::begin [ac== rs2_addr 0]
+			ac= rs2_rdata 0
+		acif::end
 	}
 
 	## unblocking forwarding
 	proc forward_unblocking {pstage} {
-		begif [s&& [pipe::isworking $pstage] [pipe::prr $pstage rd_req]]
-			begif [s== [pipe::prr $pstage rd_addr] rs1_addr]
-				begif [pipe::prr $pstage rd_rdy]
-					s= rs1_rdata [pipe::prr $pstage rd_wdata]
-				endif
-			endif
-			begif [s== [pipe::prr $pstage rd_addr] rs2_addr]
-				begif [pipe::prr $pstage rd_rdy]
-					s= rs2_rdata [pipe::prr $pstage rd_wdata]
-				endif
-			endif
-		endif
+		acif::begin [ac&& [pipe::isworking $pstage] [pipe::prr $pstage rd_req]]
+			acif::begin [ac== [pipe::prr $pstage rd_addr] rs1_addr]
+				acif::begin [pipe::prr $pstage rd_rdy]
+					ac= rs1_rdata [pipe::prr $pstage rd_wdata]
+				acif::end
+			acif::end
+			acif::begin [ac== [pipe::prr $pstage rd_addr] rs2_addr]
+				acif::begin [pipe::prr $pstage rd_rdy]
+					ac= rs2_rdata [pipe::prr $pstage rd_wdata]
+				acif::end
+			acif::end
+		acif::end
 	}
 
 	## unblocking forwarding from stages with guaranteed data availability (for succ transfers only, no rdy checked)
 	proc forward_unblocking_succ {pstage} {
-		begif [s&& [pipe::issucc $pstage] [pipe::prr $pstage rd_req]]
-			begif [s== [pipe::prr $pstage rd_addr] rs1_addr]
-				s= rs1_rdata [pipe::prr $pstage rd_wdata]
-			endif
-			begif [s== [pipe::prr $pstage rd_addr] rs2_addr]
-				s= rs2_rdata [pipe::prr $pstage rd_wdata]
-			endif
-		endif
+		acif::begin [ac&& [pipe::issucc $pstage] [pipe::prr $pstage rd_req]]
+			acif::begin [ac== [pipe::prr $pstage rd_addr] rs1_addr]
+				ac= rs1_rdata [pipe::prr $pstage rd_wdata]
+			acif::end
+			acif::begin [ac== [pipe::prr $pstage rd_addr] rs2_addr]
+				ac= rs2_rdata [pipe::prr $pstage rd_wdata]
+			acif::end
+		acif::end
 	}
 
 	## blocking forwarding with accumulation
 	proc forward_accum_blocking {pstage} {
-		begif [s&& [pipe::isworking $pstage] [pipe::prr $pstage rd_req]]
-			begif [s== [pipe::prr $pstage rd_addr] rs1_addr]
-				begif [pipe::prr $pstage rd_rdy]
+		acif::begin [ac&& [pipe::isworking $pstage] [pipe::prr $pstage rd_req]]
+			acif::begin [ac== [pipe::prr $pstage rd_addr] rs1_addr]
+				acif::begin [pipe::prr $pstage rd_rdy]
 					pipe::accum rs1_rdata [pipe::prr $pstage rd_wdata]
-				endif
-				begelse
+				acif::end
+				acif::begelse
 					pipe::pstall
-				endif
-			endif
-			begif [s== [pipe::prr $pstage rd_addr] rs2_addr]
-				begif [pipe::prr $pstage rd_rdy]
+				acif::end
+			acif::end
+			acif::begin [ac== [pipe::prr $pstage rd_addr] rs2_addr]
+				acif::begin [pipe::prr $pstage rd_rdy]
 					pipe::accum rs2_rdata [pipe::prr $pstage rd_wdata]
-				endif
-				begelse
+				acif::end
+				acif::begelse
 					pipe::pstall
-				endif
-			endif
-		endif
+				acif::end
+			acif::end
+		acif::end
 	}
 
 	proc forward_blocking {pstage} {
-		begif [s&& [pipe::isworking $pstage] [pipe::prr $pstage rd_req]]
-			begif [s== [pipe::prr $pstage rd_addr] rs1_addr]
-				begif [pipe::prr $pstage rd_rdy]
-					s= rs1_rdata [pipe::prr $pstage rd_wdata]
-				endif
-				begelse
+		acif::begin [ac&& [pipe::isworking $pstage] [pipe::prr $pstage rd_req]]
+			acif::begin [ac== [pipe::prr $pstage rd_addr] rs1_addr]
+				acif::begin [pipe::prr $pstage rd_rdy]
+					ac= rs1_rdata [pipe::prr $pstage rd_wdata]
+				acif::end
+				acif::begelse
 					pipe::pstall
-				endif
-			endif
-			begif [s== [pipe::prr $pstage rd_addr] rs2_addr]
-				begif [pipe::prr $pstage rd_rdy]
-					s= rs2_rdata [pipe::prr $pstage rd_wdata]
-				endif
-				begelse
+				acif::end
+			acif::end
+			acif::begin [ac== [pipe::prr $pstage rd_addr] rs2_addr]
+				acif::begin [pipe::prr $pstage rd_rdy]
+					ac= rs2_rdata [pipe::prr $pstage rd_wdata]
+				acif::end
+				acif::begelse
 					pipe::pstall
-				endif
-			endif
-		endif
+				acif::end
+			acif::end
+		acif::end
 	}
 
 	## ALU processing ##
 	proc process_alu {} {
 		
 		# acquiring data
-		begif [s== op1_source $riscv_pipe::OP1_SRC_RS1]
-			s= alu_op1 rs1_rdata
-		endif
+		acif::begin [ac== op1_source $riscv_pipe::OP1_SRC_RS1]
+			ac= alu_op1 rs1_rdata
+		acif::end
 
-		begif [s== op1_source $riscv_pipe::OP1_SRC_IMM]
-			s= alu_op1 immediate
-		endif
+		acif::begin [ac== op1_source $riscv_pipe::OP1_SRC_IMM]
+			ac= alu_op1 immediate
+		acif::end
 
-		begif [s== op1_source $riscv_pipe::OP1_SRC_PC]
-			s= alu_op1 curinstr_addr
-		endif
+		acif::begin [ac== op1_source $riscv_pipe::OP1_SRC_PC]
+			ac= alu_op1 curinstr_addr
+		acif::end
 
-		begif [s== op2_source $riscv_pipe::OP2_SRC_RS2]
-			s= alu_op2 rs2_rdata
-		endif
+		acif::begin [ac== op2_source $riscv_pipe::OP2_SRC_RS2]
+			ac= alu_op2 rs2_rdata
+		acif::end
 
-		begif [s== op2_source $riscv_pipe::OP2_SRC_IMM]
-			s= alu_op2 immediate
-		endif
+		acif::begin [ac== op2_source $riscv_pipe::OP2_SRC_IMM]
+			ac= alu_op2 immediate
+		acif::end
 
-		# begif [s== op2_source $riscv_pipe::OP2_SRC_CSR]
+		# acif::begin [ac== op2_source $riscv_pipe::OP2_SRC_CSR]
 			# TODO: reading CSRs
-		# endif
+		# acif::end
 
 		# acquiring wide operandes
-		begif alu_unsigned
-			s= alu_op1_wide [zeroext alu_op1 33]
-			s= alu_op2_wide [zeroext alu_op2 33]
-		endif
-		begelse
-			s= alu_op1_wide [signext alu_op1 33]
-			s= alu_op2_wide [signext alu_op2 33]
-		endif
+		acif::begin alu_unsigned
+			ac= alu_op1_wide [zeroext alu_op1 33]
+			ac= alu_op2_wide [zeroext alu_op2 33]
+		acif::end
+		acif::begelse
+			ac= alu_op1_wide [signext alu_op1 33]
+			ac= alu_op2_wide [signext alu_op2 33]
+		acif::end
 
-		s= alu_result_wide alu_op1_wide
+		ac= alu_result_wide alu_op1_wide
 
-		begif alu_req
+		acif::begin alu_req
 
 			# computing result
-			begif [s== alu_opcode $riscv_pipe::aluop_ADD]
-				s= alu_result_wide [s+ alu_op1_wide alu_op2_wide]
-			endif
+			acif::begin [ac== alu_opcode $riscv_pipe::aluop_ADD]
+				ac= alu_result_wide [ac+ alu_op1_wide alu_op2_wide]
+			acif::end
 
-			begif [s== alu_opcode $riscv_pipe::aluop_SUB]
-				s= alu_result_wide [s- alu_op1_wide alu_op2_wide]
-			endif
+			acif::begin [ac== alu_opcode $riscv_pipe::aluop_SUB]
+				ac= alu_result_wide [ac- alu_op1_wide alu_op2_wide]
+			acif::end
 
-			begif [s== alu_opcode $riscv_pipe::aluop_AND]
-				s= alu_result_wide [s& alu_op1 alu_op2]
-			endif
+			acif::begin [ac== alu_opcode $riscv_pipe::aluop_AND]
+				ac= alu_result_wide [ac& alu_op1 alu_op2]
+			acif::end
 
-			begif [s== alu_opcode $riscv_pipe::aluop_OR]
-				s= alu_result_wide [s| alu_op1 alu_op2]
-			endif
+			acif::begin [ac== alu_opcode $riscv_pipe::aluop_OR]
+				ac= alu_result_wide [ac| alu_op1 alu_op2]
+			acif::end
 
-			begif [s== alu_opcode $riscv_pipe::aluop_XOR]
-				s= alu_result_wide [s^ alu_op1 alu_op2]
-			endif
+			acif::begin [ac== alu_opcode $riscv_pipe::aluop_XOR]
+				ac= alu_result_wide [ac^ alu_op1 alu_op2]
+			acif::end
 
-			begif [s== alu_opcode $riscv_pipe::aluop_SRL]
-				s= alu_result_wide [s>> alu_op1 alu_op2]
-			endif
+			acif::begin [ac== alu_opcode $riscv_pipe::aluop_SRL]
+				ac= alu_result_wide [ac>> alu_op1 alu_op2]
+			acif::end
 
-			begif [s== alu_opcode $riscv_pipe::aluop_SRA]
-				s= alu_result_wide [s>>> alu_op1 alu_op2]
-			endif
+			acif::begin [ac== alu_opcode $riscv_pipe::aluop_SRA]
+				ac= alu_result_wide [ac>>> alu_op1 alu_op2]
+			acif::end
 
-			begif [s== alu_opcode $riscv_pipe::aluop_SLL]
-				s= alu_result_wide [s<< alu_op1 alu_op2]
-			endif
+			acif::begin [ac== alu_opcode $riscv_pipe::aluop_SLL]
+				ac= alu_result_wide [ac<< alu_op1 alu_op2]
+			acif::end
 
-			begif [s== alu_opcode $riscv_pipe::aluop_CLRB]
-				s= alu_result_wide [s& alu_op1 [s~ alu_op2]]
-			endif
+			acif::begin [ac== alu_opcode $riscv_pipe::aluop_CLRB]
+				ac= alu_result_wide [ac& alu_op1 [ac~ alu_op2]]
+			acif::end
 
 			# formation of result and flags
 
-			s= alu_result [indexed alu_result_wide {31 0}]
+			ac= alu_result [indexed alu_result_wide {31 0}]
 			
-			s= alu_CF [indexed alu_result_wide 32]
+			ac= alu_CF [indexed alu_result_wide 32]
 			
-			s= alu_SF [indexed alu_result_wide 31]
-			begif [s== alu_result_wide 0]
-				s= alu_ZF 1
-			endif
+			ac= alu_SF [indexed alu_result_wide 31]
+			acif::begin [ac== alu_result_wide 0]
+				ac= alu_ZF 1
+			acif::end
 			
-			begif [s|| [s== [indexed alu_result_wide {32 31}] 0x2] [s== [indexed alu_result_wide {32 31}] 0x1]]
-				s= alu_OF 1
-			endif
+			acif::begin [ac|| [ac== [indexed alu_result_wide {32 31}] 0x2] [ac== [indexed alu_result_wide {32 31}] 0x1]]
+				ac= alu_OF 1
+			acif::end
 
-			begif alu_unsigned
-				s= alu_overflow alu_CF
-			endif
-			begelse
-				s= alu_overflow alu_OF
-			endif
+			acif::begin alu_unsigned
+				ac= alu_overflow alu_CF
+			acif::end
+			acif::begelse
+				ac= alu_overflow alu_OF
+			acif::end
 
-		endif
+		acif::end
 
 		# rd wdata processing
-		begif [s== rd_source $riscv_pipe::RD_LUI]
-			s= rd_wdata immediate
-			s= rd_rdy	1
-		endif
+		acif::begin [ac== rd_source $riscv_pipe::RD_LUI]
+			ac= rd_wdata immediate
+			ac= rd_rdy	1
+		acif::end
 
-		begif [s== rd_source $riscv_pipe::RD_ALU]
-			s= rd_wdata alu_result
-			s= rd_rdy	1
-		endif
+		acif::begin [ac== rd_source $riscv_pipe::RD_ALU]
+			ac= rd_wdata alu_result
+			ac= rd_rdy	1
+		acif::end
 
-		begif [s== rd_source $riscv_pipe::RD_CF_COND]
-			s= rd_wdata alu_CF
-			s= rd_rdy	1
-		endif
+		acif::begin [ac== rd_source $riscv_pipe::RD_CF_COND]
+			ac= rd_wdata alu_CF
+			ac= rd_rdy	1
+		acif::end
 
-		begif [s== rd_source $riscv_pipe::RD_OF_COND]
-			s= rd_wdata alu_OF
-			s= rd_rdy	1
-		endif
+		acif::begin [ac== rd_source $riscv_pipe::RD_OF_COND]
+			ac= rd_wdata alu_OF
+			ac= rd_rdy	1
+		acif::end
 
-		begif [s== rd_source $riscv_pipe::RD_PC_INC]
-			s= rd_wdata nextinstr_addr
-			s= rd_rdy	1
-		endif
+		acif::begin [ac== rd_source $riscv_pipe::RD_PC_INC]
+			ac= rd_wdata nextinstr_addr
+			ac= rd_rdy	1
+		acif::end
 	}
 
 	proc process_rd_csr_prev {} {
-		#begif [s== rd_source $riscv_pipe::RD_CSR]
+		#acif::begin [ac== rd_source $riscv_pipe::RD_CSR]
 			# TODO: fetching previous CSR data
-		#endif
+		#acif::end
 	}
 
 	proc process_curinstraddr_imm {} {
-		s= curinstraddr_imm [s+ curinstr_addr immediate]
+		ac= curinstraddr_imm [ac+ curinstr_addr immediate]
 	}
 
 	proc process_jump {} {
-		begif [s== jump_src $riscv_pipe::JMP_SRC_OP1]
-			s= jump_vector alu_op1
-		endif
+		acif::begin [ac== jump_src $riscv_pipe::JMP_SRC_OP1]
+			ac= jump_vector alu_op1
+		acif::end
 
-		begif [s== jump_src $riscv_pipe::JMP_SRC_ALU]
-			s= jump_vector alu_result
-		endif
+		acif::begin [ac== jump_src $riscv_pipe::JMP_SRC_ALU]
+			ac= jump_vector alu_result
+		acif::end
 
-		begif jump_req_cond
+		acif::begin jump_req_cond
 
 			# BEQ
-			begif [s== funct3 0x0]
-				begif alu_ZF
-					s= jump_req 1
-					s= jump_vector curinstraddr_imm
-				endif
-			endif
+			acif::begin [ac== funct3 0x0]
+				acif::begin alu_ZF
+					ac= jump_req 1
+					ac= jump_vector curinstraddr_imm
+				acif::end
+			acif::end
 
 			# BNE
-			begif [s== funct3 0x1]
-				begif [s! alu_ZF]
-					s= jump_req 1
-					s= jump_vector curinstraddr_imm
-				endif
-			endif
+			acif::begin [ac== funct3 0x1]
+				acif::begin [ac! alu_ZF]
+					ac= jump_req 1
+					ac= jump_vector curinstraddr_imm
+				acif::end
+			acif::end
 
 			# BLT, BLTU
-			begif [s|| [s== funct3 0x4] [s== funct3 0x6]]
-				begif alu_CF
-					s= jump_req 1
-					s= jump_vector curinstraddr_imm
-				endif
-			endif
+			acif::begin [ac|| [ac== funct3 0x4] [ac== funct3 0x6]]
+				acif::begin alu_CF
+					ac= jump_req 1
+					ac= jump_vector curinstraddr_imm
+				acif::end
+			acif::end
 
 			# BGE, BGEU
-			begif [s|| [s== funct3 0x5] [s== funct3 0x7]]
-				begif [s! alu_CF]
-					s= jump_req 1
-					s= jump_vector curinstraddr_imm
-				endif
-			endif
+			acif::begin [ac|| [ac== funct3 0x5] [ac== funct3 0x7]]
+				acif::begin [ac! alu_CF]
+					ac= jump_req 1
+					ac= jump_vector curinstraddr_imm
+				acif::end
+			acif::end
 
-		endif
+		acif::end
 	}
 
 	# mem addr processing
 	proc process_setup_mem_reqdata {} {
-		s= mem_addr alu_result
-		s= mem_wdata rs2_rdata
+		ac= mem_addr alu_result
+		ac= mem_wdata rs2_rdata
 	}
 
 	# branch control
 	proc process_branch {} {
 		pipe::p<= jump_req_cmd jump_req
 		pipe::p<= jump_vector_cmd jump_vector
-		begif jump_req
+		acif::begin jump_req
 			pipe::pflush
-		endif
+		acif::end
 	}
 
 	proc process_rd_mem_wdata {} {
-		begif [s== rd_source $riscv_pipe::RD_MEM]
-			s= rd_wdata mem_rdata
-		endif
+		acif::begin [ac== rd_source $riscv_pipe::RD_MEM]
+			ac= rd_wdata mem_rdata
+		acif::end
 	}
 
 	proc process_wb {} {
-		begif rd_req
+		acif::begin rd_req
 			_acc_index rd_addr
 			pipe::p<= regfile rd_wdata
-		endif
+		acif::end
 	}
 
 	proc connect_copipes {} {

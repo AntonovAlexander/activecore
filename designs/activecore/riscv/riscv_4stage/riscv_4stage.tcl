@@ -40,17 +40,17 @@ rtl::module riscv_4stage
 			riscv_pipe::process_branch
 
 			# memory access
-			begif mem_req
-				begif mem_cmd
+			acif::begin mem_req
+				acif::begin mem_cmd
 					pipe::mcopipe::wrreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-				endif
-				begelse
+				acif::end
+				acif::begelse
 					pipe::mcopipe::rdreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-					begif [pipe::mcopipe::resp data_mem mem_rdata]
-						s= rd_rdy	1
-					endif
-				endif
-			endif
+					acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+						ac= rd_rdy	1
+					acif::end
+				acif::end
+			acif::end
 
 			riscv_pipe::process_rd_mem_wdata
 			riscv_pipe::process_wb

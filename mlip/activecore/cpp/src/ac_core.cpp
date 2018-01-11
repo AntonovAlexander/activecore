@@ -20,41 +20,41 @@ template<typename T> std::string NumberToString ( T Number )
 bool DEBUG_FLAG = false;
 
 //// GPLC AST ISA ////
-char OP1_ASSIGN[] = "s=";
-char OP1_COMPLEMENT[] = "c-";
+char OP1_ASSIGN[] = "ac=";
+char OP1_COMPLEMENT[] = "acc-";
 
-char OP2_ARITH_ADD[] = "s+";
-char OP2_ARITH_SUB[] = "s-";
-char OP2_ARITH_MUL[] = "sx";
-char OP2_ARITH_DIV[] = "s/";
-char OP2_ARITH_SHL[] = "s<<";
-char OP2_ARITH_SHR[] = "s>>";
-char OP2_ARITH_SRA[] = "s>>>";
+char OP2_ARITH_ADD[] = "ac+";
+char OP2_ARITH_SUB[] = "ac-";
+char OP2_ARITH_MUL[] = "acx";
+char OP2_ARITH_DIV[] = "ac/";
+char OP2_ARITH_SHL[] = "ac<<";
+char OP2_ARITH_SHR[] = "ac>>";
+char OP2_ARITH_SRA[] = "ac>>>";
 
-char OP1_LOGICAL_NOT[] = "s!";
-char OP2_LOGICAL_AND[] = "s&&";
-char OP2_LOGICAL_OR[] = "s||";
-char OP2_LOGICAL_G[] = "s>";
-char OP2_LOGICAL_L[] = "s<";
-char OP2_LOGICAL_GEQ[] = "s>=";
-char OP2_LOGICAL_LEQ[] = "s<=";
-char OP2_LOGICAL_EQ2[] = "s==";
-char OP2_LOGICAL_NEQ2[] = "s!=";
-char OP2_LOGICAL_EQ4[] = "s===";
-char OP2_LOGICAL_NEQ4[] = "s!===";
+char OP1_LOGICAL_NOT[] = "ac!";
+char OP2_LOGICAL_AND[] = "ac&&";
+char OP2_LOGICAL_OR[] = "ac||";
+char OP2_LOGICAL_G[] = "ac>";
+char OP2_LOGICAL_L[] = "ac<";
+char OP2_LOGICAL_GEQ[] = "ac>=";
+char OP2_LOGICAL_LEQ[] = "ac<=";
+char OP2_LOGICAL_EQ2[] = "ac==";
+char OP2_LOGICAL_NEQ2[] = "ac!=";
+char OP2_LOGICAL_EQ4[] = "ac===";
+char OP2_LOGICAL_NEQ4[] = "ac!===";
 
-char OP1_BITWISE_NOT[] = "s~";
-char OP2_BITWISE_AND[] = "s&";
-char OP2_BITWISE_OR[] = "s|";
-char OP2_BITWISE_XOR[] = "s^";
-char OP2_BITWISE_XNOR[] = "s^~";
+char OP1_BITWISE_NOT[] = "ac~";
+char OP2_BITWISE_AND[] = "ac&";
+char OP2_BITWISE_OR[] = "ac|";
+char OP2_BITWISE_XOR[] = "ac^";
+char OP2_BITWISE_XNOR[] = "ac^~";
 
-char OP1_REDUCT_AND[] = "r&";
-char OP1_REDUCT_NAND[] = "r~&";
-char OP1_REDUCT_OR[] = "r|";
-char OP1_REDUCT_NOR[] = "r~|";
-char OP1_REDUCT_XOR[] = "r^";
-char OP1_REDUCT_XNOR[] = "r^~";
+char OP1_REDUCT_AND[] = "acr&";
+char OP1_REDUCT_NAND[] = "acr~&";
+char OP1_REDUCT_OR[] = "acr|";
+char OP1_REDUCT_NOR[] = "acr~|";
+char OP1_REDUCT_XOR[] = "acr^";
+char OP1_REDUCT_XNOR[] = "acr^~";
 
 char OP2_INDEXED[] = "indexed";
 char OP3_RANGED[] = "ranged";
