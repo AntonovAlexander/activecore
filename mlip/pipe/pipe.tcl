@@ -235,9 +235,9 @@ namespace eval pipe {
 		__mlip_pipe_call pstage
 	}
 
-	proc pbreak {} {
+	proc pkill {} {
 		__gplc_acc_param_clr
-		__mlip_pipe_call pbreak
+		__mlip_pipe_call pkill
 	}
 
 	proc pactivate {} {

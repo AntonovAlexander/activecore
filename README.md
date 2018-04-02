@@ -9,7 +9,7 @@ Pipe MLIP functionality is demonstrated via 6 RISC-V (RV32I) CPU designs with va
 MLIP-based codes for RISC-V CPU cores are located at /designs/activecore/riscv.
 All the cores function in hardware (however, exaustive testing is in progress).
 
-Previously, mainline working projects were based on CPUs with DLX architecture (codes available, but not supported now).
+Previously, mainline working projects were based on CPUs with DLX architecture.
 
 At the moment, I use Eclipse IDE to build the C++ shared library. Shell-based build flow will be provided later.
 

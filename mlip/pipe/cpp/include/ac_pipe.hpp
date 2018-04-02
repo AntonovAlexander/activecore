@@ -65,7 +65,7 @@ namespace pipe
 	int assign_always_cmd(ac_dimensions dimensions, ac_var * target, ac_param param);
 	int assign_succ_cmd(ac_dimensions dimensions, ac_var * target, ac_param param);
 	int pstage_cmd(std::string pstage_name);
-	int pbreak_cmd();
+	int pkill_cmd();
 	int pactivate_cmd(ac_var ** int_var);
 	int pstall_cmd();
 	int prepeat_cmd();

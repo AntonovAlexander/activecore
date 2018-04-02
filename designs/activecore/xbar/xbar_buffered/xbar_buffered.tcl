@@ -196,7 +196,7 @@ namespace eval xbar_buffered {
 							acif::end
 
 							pipe::pwe m$mnum_idx\_ack 1
-							pipe::pbreak
+							pipe::pkill
 
 						acif::end
 						
@@ -281,11 +281,11 @@ namespace eval xbar_buffered {
 								acif::end
 							}
 							acif::begelse
-								pipe::pbreak
+								pipe::pkill
 							acif::end
 						acif::end
 						acif::begelse
-							pipe::pbreak
+							pipe::pkill
 						acif::end
 
 					pipe::pstage MRESP
@@ -353,7 +353,7 @@ namespace eval xbar_buffered {
 						}
 
 						acif::begelse
-							pipe::pbreak
+							pipe::pkill
 						acif::end
 
 					pipe::pstage SREQ
@@ -379,7 +379,7 @@ namespace eval xbar_buffered {
 									acif::begin [ac== router_fifo_wptr router_fifo_rptr]
 										ac= router_fifo_full 1
 									acif::end
-									pipe::pbreak
+									pipe::pkill
 								acif::end
 							acif::end
 							acif::begelse
