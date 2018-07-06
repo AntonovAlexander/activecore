@@ -7,7 +7,8 @@ source [file join $MLIP_PATH activecore activecore.tcl]
 #ActiveCore::debug_set
 ActiveCore_Reset
 
-source riscv_4stage.tcl
+source ../riscv_pipe.tcl
+riscv_pipe::generate 4
 
 set filename riscv_4stage.v
 
