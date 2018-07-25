@@ -27,7 +27,7 @@ add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC c
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpsticky_glbl_jump_vector_cmd
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_initiated
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_activereq
-add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_breakreq
+add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_killreq
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_broken
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_new
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_repeatreq
@@ -67,7 +67,7 @@ add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC c
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpsticky_glbl_jump_vector_cmd
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_initiated
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_activereq
-add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_breakreq
+add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_killreq
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_broken
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_new
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_repeatreq
@@ -127,7 +127,7 @@ add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC c
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpsticky_glbl_jump_vector_cmd
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_initiated
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_activereq
-add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_breakreq
+add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_killreq
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_broken
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_new
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_repeatreq
@@ -175,7 +175,7 @@ add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC c
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/rst_i
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_initiated
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_activereq
-add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_breakreq
+add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_killreq
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_broken
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_repeatreq
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_new
@@ -214,7 +214,7 @@ add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC c
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/rst_i
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_initiated
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_activereq
-add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_breakreq
+add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_killreq
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_broken
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_repeatreq
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_genpctrl_new
