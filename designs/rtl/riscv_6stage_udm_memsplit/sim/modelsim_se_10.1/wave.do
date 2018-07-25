@@ -211,13 +211,10 @@ add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC c
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_alu_overflow
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_jump_req
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_jump_req_cond
-add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/genpproc_instrpipe_genpstage_MEM_jump_vector
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_jump_src
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_funct3
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_mem_req
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/genpproc_instrpipe_genpstage_EXEC_mem_cmd
-add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/genpproc_instrpipe_genpstage_MEM_mem_addr
-add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {EXEC combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/genpproc_instrpipe_genpstage_MEM_mem_wdata
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/clk_i
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/rst_i
 add wave -noupdate -expand -group {riscv instrpipe combs} -expand -group {MEM combs} -radix hexadecimal /riscv_tb/riscv_udm/genblk1/cpu_test_wrapper/genblk1/riscv/genpproc_instrpipe_genpstage_MEM_genpctrl_initiated
@@ -365,10 +362,10 @@ add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus
 add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6207]}
 add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/riscv_udm/bus_unit/ram_dual_memsplit/ram_dual/ram[6208]}
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {2907714406 ps} 0}
+WaveRestoreCursors {{Cursor 1} {2907280609 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 1108
-configure wave -valuecolwidth 104
+configure wave -namecolwidth 1119
+configure wave -valuecolwidth 164
 configure wave -justifyvalue left
 configure wave -signalnamewidth 0
 configure wave -snapdistance 10
@@ -381,4 +378,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {2905999060 ps} {2908710940 ps}
+WaveRestoreZoom {2906650978 ps} {2907929646 ps}
