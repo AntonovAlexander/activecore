@@ -4,48 +4,56 @@
 try {namespace delete pipe} on error {} {}
 namespace eval pipe {
 
-	proc pproc {name} {
-		__gplc_acc_param_clr
-		__mlip_rtl_SetPtrs
-		__gplc_acc_param_v_rd $rtl::clk_domain
-		__gplc_acc_param_v_rd $rtl::rst_domain
-		__gplc_acc_param_string $name
-		__mlip_pipe_call pproc
+
+	try {namespace delete pmodule} on error {} {}
+	namespace eval pmodule {
+
+		proc begin {name} {
+			__gplc_acc_param_clr
+			__mlip_rtl_SetPtrs
+			__gplc_acc_param_string $name
+			__mlip_pipe_call pmodule_begin
+		}
+
+		proc end {} {
+			__mlip_pipe_call pmodule_end
+		}
+		
 	}
 
-	proc endpproc {} {
-		__mlip_pipe_call endpproc
-	}
 
-	proc pvar {dimensions name defval} {
+	proc plocal {vartype dimensions name defval} {
 		if {[ActiveCore::isnumeric $defval] == 0} {
-			ActiveCore::ERROR default\ value\ of\ pvar\ $name\ is\ not\ a\ number!
+			ActiveCore::ERROR default\ value\ of\ plocal\ $name\ is\ not\ a\ number!
 		}
 		__gplc_acc_param_clr
 		_acc_index $dimensions
 		__gplc_acc_param_string $name
+		__gplc_acc_param_string $vartype
 		__gplc_acc_param_string $defval
-		__mlip_pipe_call pvar
+		__mlip_pipe_call plocal
 	}
 
-	proc psticky {dimensions name defval} {
+	proc psticky {vartype dimensions name defval} {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ psticky\ $name\ is\ not\ a\ number!
 		}
 		__gplc_acc_param_clr
 		_acc_index $dimensions
 		__gplc_acc_param_string $name
+		__gplc_acc_param_string $vartype
 		__gplc_acc_param_string $defval
 		__mlip_pipe_call psticky
 	}
 
-	proc psticky_glbl {dimensions name defval} {
+	proc psticky_glbl {vartype dimensions name defval} {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ psticky_glbl\ $name\ is\ not\ a\ number!
 		}
 		__gplc_acc_param_clr
 		_acc_index $dimensions
 		__gplc_acc_param_string $name
+		__gplc_acc_param_string $vartype
 		__gplc_acc_param_string $defval
 		__mlip_pipe_call psticky_glbl
 	}
@@ -123,10 +131,9 @@ namespace eval pipe {
 	try {namespace delete copipe} on error {} {}
 	namespace eval copipe {
 
-		proc declare {dimensions name} {
+		proc declare {name} {
 			__gplc_acc_param_clr
 			__gplc_acc_param_string $name
-			_acc_index $dimensions
 			__mlip_pipe_call copipeif
 		}
 
@@ -135,28 +142,28 @@ namespace eval pipe {
 	try {namespace delete mcopipe} on error {} {}
 	namespace eval mcopipe {
 
-		proc declare {dimensions name} {
+		proc declare {name vartype_wdata vartype_rdata} {
 			__gplc_acc_param_clr
 			__gplc_acc_param_string $name
-			_acc_index $dimensions
+			__gplc_acc_param_string $vartype_wdata
+			__gplc_acc_param_string $vartype_rdata
 			__mlip_pipe_call mcopipeif
 		}
 
-		proc req {mcopipeif_name dimension cmd param} {
+		proc req {mcopipeif_name cmd param} {
 			__gplc_acc_param_clr
 			ActiveCore::_accum_param $cmd
 			ActiveCore::_accum_param $param
-			_acc_index $dimension
 			__gplc_acc_param_string $mcopipeif_name
 			__mlip_pipe_call mcopipe_req
 		}
 
-		proc wrreq {mcopipeif_name dimension param} {
-			req $mcopipeif_name $dimension 1 $param
+		proc wrreq {mcopipeif_name param} {
+			req $mcopipeif_name 1 $param
 		}
 
-		proc rdreq {mcopipeif_name dimension param} {
-			req $mcopipeif_name $dimension 0 $param
+		proc rdreq {mcopipeif_name param} {
+			req $mcopipeif_name 0 $param
 		}
 
 		proc resp {mcopipeif_name target} {
@@ -174,7 +181,7 @@ namespace eval pipe {
 			__mlip_pipe_call mcopipe_connect
 		}
 
-		proc export {mcopipeif_name chnum signals} {
+		proc export {mcopipeif_name signals} {
 			if { [llength $signals] != 6 } {
 				ActiveCore::ERROR parameters\ incorrect!
 			} else {
@@ -187,7 +194,6 @@ namespace eval pipe {
 				__gplc_acc_param_v_wr [lindex $signals 3]
 				__gplc_acc_param_v_rd [lindex $signals 4]
 				__gplc_acc_param_v_rd [lindex $signals 5]
-				__gplc_acc_param_uint $chnum
 				__mlip_pipe_call mcopipe_export
 			}
 		}
@@ -197,9 +203,11 @@ namespace eval pipe {
 	try {namespace delete scopipe} on error {} {}
 	namespace eval scopipe {
 
-		proc declare {name} {
+		proc declare {name vartype_wdata vartype_rdata} {
 			__gplc_acc_param_clr
 			__gplc_acc_param_string $name
+			__gplc_acc_param_string $vartype_wdata
+			__gplc_acc_param_string $vartype_rdata
 			__mlip_pipe_call scopipeif
 		}
 
@@ -333,8 +341,21 @@ namespace eval pipe {
 		__mlip_pipe_call issucc
 	}
 
-	proc export {} {
-		__mlip_pipe_call export
+	proc translate {} {
+		__mlip_pipe_call translate
+	}
+
+	proc export {target subtarget path} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $subtarget
+		__gplc_acc_param_string $path
+		if {$target == "rtl"} {
+			__mlip_pipe_call export_rtl
+		} elseif {$target == "hls"} {
+			__mlip_pipe_call export_hls
+		} else {
+			ActiveCore::ERROR export\ target\ incorrect!
+		}
 	}
 
 	proc monitor {file_name} {

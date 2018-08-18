@@ -61,168 +61,6 @@ namespace eval riscv_pipe {
 	set JMP_SRC_OP1 0
 	set JMP_SRC_ALU 1
 
-	## wrapper ports
-	proc declare_wrapper_ports {} {
-		rtl::input 	{0 0} 	clk_i
-		rtl::input 	{0 0} 	rst_i
-
-		rtl::setclk clk_i
-		rtl::setrst rst_i
-		
-		
-		rtl::output {0 0} 	instr_mem_req
-		rtl::output {0 0} 	instr_mem_we
-		rtl::input 	{0 0} 	instr_mem_ack
-		rtl::output {31 0} 	instr_mem_addr
-		rtl::output {31 0} 	instr_mem_wdata
-		rtl::output	{3 0}	instr_mem_be
-		rtl::input 	{0 0}	instr_mem_resp
-		rtl::input 	{31 0}	instr_mem_rdata
-
-		rtl::output {0 0} 	data_mem_req
-		rtl::output {0 0} 	data_mem_we
-		rtl::input 	{0 0} 	data_mem_ack
-		rtl::output {31 0} 	data_mem_addr
-		rtl::output {31 0} 	data_mem_wdata
-		rtl::output	{3 0}	data_mem_be
-		rtl::input 	{0 0}	data_mem_resp
-		rtl::input 	{31 0}	data_mem_rdata
-
-
-		rtl::comb 	{0 0} 	instr_mcopipe_req 	0
-		rtl::comb 	{0 0} 	instr_mcopipe_we 	0
-		rtl::comb 	{0 0} 	instr_mcopipe_ack 	0
-		rtl::comb 	{63 0} 	instr_mcopipe_wdata	0
-		rtl::comb	{0 0}	instr_mcopipe_resp	0
-		rtl::comb 	{31 0}	instr_mcopipe_rdata	0
-
-		rtl::comb 	{0 0} 	data_mcopipe_req		0
-		rtl::comb 	{0 0} 	data_mcopipe_we		0
-		rtl::comb 	{0 0} 	data_mcopipe_ack		0
-		rtl::comb 	{67 0} 	data_mcopipe_wdata	0
-		rtl::comb	{0 0}	data_mcopipe_resp	0
-		rtl::comb 	{31 0}	data_mcopipe_rdata	0
-
-		ac= instr_mem_req instr_mcopipe_req
-		ac= instr_mem_we instr_mcopipe_we
-		ac= instr_mcopipe_ack instr_mem_ack
-		ac= instr_mem_addr [indexed instr_mcopipe_wdata {63 32}]
-		ac= instr_mem_wdata [indexed instr_mcopipe_wdata {31 0}]
-		ac= instr_mem_be 0xf
-		ac= instr_mcopipe_resp instr_mem_resp
-		ac= instr_mcopipe_rdata instr_mem_rdata
-
-		ac= data_mem_req data_mcopipe_req
-		ac= data_mem_we data_mcopipe_we
-		ac= data_mcopipe_ack data_mem_ack
-		ac= data_mem_addr [indexed data_mcopipe_wdata {67 36}]
-		ac= data_mem_be [indexed data_mcopipe_wdata {35 32}]
-		ac= data_mem_wdata [indexed data_mcopipe_wdata {31 0}]
-		ac= data_mcopipe_resp data_mem_resp
-		ac= data_mcopipe_rdata data_mem_rdata
-	}
-
-	## transaction context
-	proc declare_pcontext {} {
-		pipe::pvar {0 0} 	reset_active	0
-		pipe::pvar {31 0} 	curinstr_addr	0
-		pipe::pvar {31 0} 	nextinstr_addr	0
-		pipe::pvar {31 0} 	instr_code		0
-
-		# opcode signals
-		pipe::pvar {6 0}	opcode 			$riscv_pipe::aluop_ADD
-
-		# control transfer signlas
-		pipe::pvar {0 0} 	jump_req		0
-		pipe::pvar {0 0} 	jump_req_cond	0
-		pipe::pvar {0 0}	jump_src		$riscv_pipe::JMP_SRC_OP1
-		pipe::pvar {31 0} 	jump_vector		0
-
-		# regfile control signals
-		pipe::pvar {0 0}	rs1_req 		0
-		pipe::pvar {4 0} 	rs1_addr		0
-		pipe::pvar {31 0}	rs1_rdata 		0
-
-		pipe::pvar {0 0}	rs2_req 		0
-		pipe::pvar {4 0} 	rs2_addr		0
-		pipe::pvar {31 0}	rs2_rdata 		0
-
-		pipe::pvar {0 0}	rd_req 			0
-		pipe::pvar {2 0} 	rd_source		$riscv_pipe::RD_ALU
-		pipe::pvar {4 0} 	rd_addr			0
-		pipe::pvar {31 0}	rd_wdata 		0
-		pipe::pvar {0 0}	rd_rdy 			0
-
-		pipe::pvar {31 0}	immediate_I		0
-		pipe::pvar {31 0}	immediate_S		0
-		pipe::pvar {31 0}	immediate_B		0
-		pipe::pvar {31 0}	immediate_U		0
-		pipe::pvar {31 0}	immediate_J		0
-
-		pipe::pvar {31 0}	immediate		0
-
-		pipe::pvar {31 0}	curinstraddr_imm	0
-
-		pipe::pvar {2 0}	funct3			0
-		pipe::pvar {6 0}	funct7			0
-		pipe::pvar {4 0}	shamt			0
-		
-		pipe::pvar {0 0}	fencereq		0
-		pipe::pvar {3 0}	pred			0
-		pipe::pvar {3 0}	succ			0
-
-		pipe::pvar {0 0}	ecallreq		0
-		pipe::pvar {0 0}	ebreakreq		0
-
-		pipe::pvar {0 0}	csrreq			0
-		pipe::pvar {11 0} 	csrnum 			0
-		pipe::pvar {4 0}	zimm			0
-
-		pipe::pvar {1 0}	op1_source		$riscv_pipe::OP1_SRC_RS1
-		pipe::pvar {1 0}	op2_source		$riscv_pipe::OP2_SRC_RS2
-
-		# ALU control
-		pipe::pvar {0 0} 	alu_req			0
-		pipe::pvar {31 0}	alu_op1			0
-		pipe::pvar {31 0}	alu_op2			0
-		pipe::pvar {3 0}	alu_opcode		0
-		pipe::pvar {0 0} 	alu_unsigned	0
-
-		pipe::pvar {32 0}	alu_op1_wide	0
-		pipe::pvar {32 0}	alu_op2_wide	0
-		pipe::pvar {32 0}	alu_result_wide 0
-		pipe::pvar {31 0}	alu_result 		0
-		pipe::pvar {0 0} 	alu_CF			0
-		pipe::pvar {0 0} 	alu_SF			0
-		pipe::pvar {0 0} 	alu_ZF			0
-		pipe::pvar {0 0} 	alu_OF			0
-		pipe::pvar {0 0} 	alu_overflow	0
-
-		# data memory control
-		pipe::pvar {0 0} 	mem_req 		0
-		pipe::pvar {0 0} 	mem_cmd			0
-		pipe::pvar {31 0} 	mem_addr		0
-		pipe::pvar {3 0}	mem_be 			0
-		pipe::pvar {31 0}	mem_wdata		0
-		pipe::pvar {31 0} 	mem_rdata 		0
-		pipe::pvar {0 0} 	mem_rshift		0
-		
-		pipe::psticky_glbl	{31 0} 	pc				$riscv_pipe::START_ADDR
-		_acc_index 	{31 1}	
-		pipe::psticky_glbl {31 0} 	regfile			0
-		pipe::psticky_glbl {0 0}	jump_req_cmd	0
-		pipe::psticky_glbl {31 0} 	jump_vector_cmd	0
-
-		# TODO: CSRs
-
-		pipe::_acc_index_wdata {63 0}
-		pipe::_acc_index_rdata {31 0}
-		pipe::mcopipe::declare {0 0} instr_mem
-
-		pipe::_acc_index_wdata {67 0}
-		pipe::_acc_index_rdata {31 0}
-		pipe::mcopipe::declare {0 0} data_mem
-	}
 
 	# RISC-V pipeline macro-operations
 	proc process_pc {} {
@@ -929,342 +767,454 @@ namespace eval riscv_pipe {
 		acif::end
 	}
 
-	proc connect_copipes {} {
-		pipe::_acc_index_wdata {63 0}
-		pipe::_acc_index_rdata {31 0}
-		pipe::copipe::declare {0 0} instr_mem
-
-		pipe::_acc_index_wdata {67 0}
-		pipe::_acc_index_rdata {31 0}
-		pipe::copipe::declare {0 0} data_mem
-
-		pipe::mcopipe::connect instrpipe instr_mem instr_mem
-		pipe::mcopipe::connect instrpipe data_mem data_mem
-
-		pipe::mcopipe::export instr_mem 0 { \
-					instr_mcopipe_req 	\
-					instr_mcopipe_we 	\
-					instr_mcopipe_ack 	\
-					instr_mcopipe_wdata	\
-					instr_mcopipe_resp	\
-					instr_mcopipe_rdata	\
-				}
-
-		pipe::mcopipe::export data_mem 0 { \
-					data_mcopipe_req	\
-					data_mcopipe_we		\
-					data_mcopipe_ack	\
-					data_mcopipe_wdata	\
-					data_mcopipe_resp	\
-					data_mcopipe_rdata	\
-				}
-	}
-
 	proc generate {num_stages} {
 
 		set module_name riscv_
 		append module_name $num_stages
 		append module_name stage
 
-		rtl::module $module_name
+		pipe::pmodule::begin $module_name
 
-			riscv_pipe::declare_wrapper_ports
+			set busreq_instr_struct_name $module_name
+			append busreq_instr_struct_name _busreq_instr_struct
 
-			pipe::pproc instrpipe
+			acstruct::begin $busreq_instr_struct_name
+				acstruct::var unsigned {31 0} 	addr 	0
+				acstruct::var unsigned {3 0} 	be 		0
+				acstruct::var unsigned {31 0} 	wdata 	0
+			acstruct::end
 
-				riscv_pipe::declare_pcontext
 
-				# 1-stage
-				if {$num_stages == 1} {
+			pipe::plocal unsigned {0 0} 	reset_active	0
+			pipe::plocal unsigned {31 0} 	curinstr_addr	0
+			pipe::plocal unsigned {31 0} 	nextinstr_addr	0
+			pipe::plocal unsigned {31 0} 	instr_code		0
 
-					pipe::pstage EXEC
-						
-						riscv_pipe::process_pc
-						pipe::mcopipe::rdreq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
-						pipe::mcopipe::resp instr_mem instr_code
-						riscv_pipe::process_decode
-						riscv_pipe::process_regfetch
-						riscv_pipe::process_alu
-						riscv_pipe::process_rd_csr_prev
-						riscv_pipe::process_curinstraddr_imm
-						riscv_pipe::process_jump
-						riscv_pipe::process_setup_mem_reqdata
-						riscv_pipe::process_branch
+			# opcode signals
+			pipe::plocal unsigned {6 0}		opcode 			$riscv_pipe::aluop_ADD
 
-						# memory access
-						acif::begin mem_req
-						
-							acif::begin mem_cmd
-								pipe::mcopipe::wrreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-							acif::end
-							acif::begelse
-								pipe::mcopipe::rdreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-								acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
-									ac= rd_rdy	1
-								acif::end
-							acif::end
+			# control transfer signlas
+			pipe::plocal unsigned {0 0} 	jump_req		0
+			pipe::plocal unsigned {0 0} 	jump_req_cond	0
+			pipe::plocal unsigned {0 0}		jump_src		$riscv_pipe::JMP_SRC_OP1
+			pipe::plocal unsigned {31 0} 	jump_vector		0
 
+			# regfile control signals
+			pipe::plocal unsigned {0 0}		rs1_req 		0
+			pipe::plocal unsigned {4 0} 	rs1_addr		0
+			pipe::plocal unsigned {31 0}	rs1_rdata 		0
+
+			pipe::plocal unsigned {0 0}		rs2_req 		0
+			pipe::plocal unsigned {4 0} 	rs2_addr		0
+			pipe::plocal unsigned {31 0}	rs2_rdata 		0
+
+			pipe::plocal unsigned {0 0}		rd_req 			0
+			pipe::plocal unsigned {2 0} 	rd_source		$riscv_pipe::RD_ALU
+			pipe::plocal unsigned {4 0} 	rd_addr			0
+			pipe::plocal unsigned {31 0}	rd_wdata 		0
+			pipe::plocal unsigned {0 0}		rd_rdy 			0
+
+			pipe::plocal unsigned {31 0}	immediate_I		0
+			pipe::plocal unsigned {31 0}	immediate_S		0
+			pipe::plocal unsigned {31 0}	immediate_B		0
+			pipe::plocal unsigned {31 0}	immediate_U		0
+			pipe::plocal unsigned {31 0}	immediate_J		0
+
+			pipe::plocal unsigned {31 0}	immediate		0
+
+			pipe::plocal unsigned {31 0}	curinstraddr_imm	0
+
+			pipe::plocal unsigned {2 0}		funct3			0
+			pipe::plocal unsigned {6 0}		funct7			0
+			pipe::plocal unsigned {4 0}		shamt			0
+			
+			pipe::plocal unsigned {0 0}		fencereq		0
+			pipe::plocal unsigned {3 0}		pred			0
+			pipe::plocal unsigned {3 0}		succ			0
+
+			pipe::plocal unsigned {0 0}		ecallreq		0
+			pipe::plocal unsigned {0 0}		ebreakreq		0
+
+			pipe::plocal unsigned {0 0}		csrreq			0
+			pipe::plocal unsigned {11 0} 	csrnum 			0
+			pipe::plocal unsigned {4 0}		zimm			0
+
+			pipe::plocal unsigned {1 0}		op1_source		$riscv_pipe::OP1_SRC_RS1
+			pipe::plocal unsigned {1 0}		op2_source		$riscv_pipe::OP2_SRC_RS2
+
+			# ALU control
+			pipe::plocal unsigned {0 0} 	alu_req			0
+			pipe::plocal unsigned {31 0}	alu_op1			0
+			pipe::plocal unsigned {31 0}	alu_op2			0
+			pipe::plocal unsigned {3 0}		alu_opcode		0
+			pipe::plocal unsigned {0 0} 	alu_unsigned	0
+
+			pipe::plocal unsigned {32 0}	alu_op1_wide	0
+			pipe::plocal unsigned {32 0}	alu_op2_wide	0
+			pipe::plocal unsigned {32 0}	alu_result_wide 0
+			pipe::plocal unsigned {31 0}	alu_result 		0
+			pipe::plocal unsigned {0 0} 	alu_CF			0
+			pipe::plocal unsigned {0 0} 	alu_SF			0
+			pipe::plocal unsigned {0 0} 	alu_ZF			0
+			pipe::plocal unsigned {0 0} 	alu_OF			0
+			pipe::plocal unsigned {0 0} 	alu_overflow	0
+
+			# data memory control
+			pipe::plocal unsigned {0 0} 	mem_req 		0
+			pipe::plocal unsigned {0 0} 	mem_cmd			0
+			pipe::plocal unsigned {31 0} 	mem_addr		0
+			pipe::plocal unsigned {3 0}		mem_be 			0
+			pipe::plocal unsigned {31 0}	mem_wdata		0
+			pipe::plocal unsigned {31 0} 	mem_rdata 		0
+			pipe::plocal unsigned {0 0} 	mem_rshift		0
+			
+			pipe::psticky_glbl unsigned	{31 0} 	pc				$riscv_pipe::START_ADDR
+			_acc_index 	{31 1}	
+			pipe::psticky_glbl unsigned {31 0} 	regfile			0
+			pipe::psticky_glbl unsigned {0 0}	jump_req_cmd	0
+			pipe::psticky_glbl unsigned {31 0} 	jump_vector_cmd	0
+
+			# TODO: CSRs
+
+			pipe::_acc_index_rdata {31 0}
+			pipe::mcopipe::declare instr_mem $busreq_instr_struct_name unsigned
+			pipe::plocal $busreq_instr_struct_name {0 0} instr_busreq 	0
+
+			pipe::_acc_index_rdata {31 0}
+			pipe::mcopipe::declare data_mem $busreq_instr_struct_name unsigned
+			pipe::plocal $busreq_instr_struct_name {0 0} data_busreq 	0
+
+			# 1-stage
+			if {$num_stages == 1} {
+
+				pipe::pstage EXEC
+					
+					riscv_pipe::process_pc
+
+					ac=s instr_busreq addr curinstr_addr
+					ac=s instr_busreq be 3
+					ac=s instr_busreq wdata 0
+					pipe::mcopipe::rdreq instr_mem instr_busreq
+					
+					pipe::mcopipe::resp instr_mem instr_code
+					riscv_pipe::process_decode
+					riscv_pipe::process_regfetch
+					riscv_pipe::process_alu
+					riscv_pipe::process_rd_csr_prev
+					riscv_pipe::process_curinstraddr_imm
+					riscv_pipe::process_jump
+					riscv_pipe::process_setup_mem_reqdata
+					riscv_pipe::process_branch
+
+					# memory access
+					acif::begin mem_req
+					
+						ac=s data_busreq addr mem_addr
+						ac=s data_busreq be 3
+						ac=s data_busreq wdata mem_wdata
+
+						acif::begin mem_cmd
+							pipe::mcopipe::wrreq data_mem data_busreq
 						acif::end
-
-						riscv_pipe::process_rd_mem_wdata
-						riscv_pipe::process_wb
-
-				# 2-stage
-				} elseif {$num_stages == 2} {
-
-					pipe::pstage IFETCH
-						
-						riscv_pipe::process_pc
-						pipe::mcopipe::rdreq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
-
-					pipe::pstage EXEC
-
-						pipe::mcopipe::resp instr_mem instr_code
-						riscv_pipe::process_decode
-						riscv_pipe::process_regfetch
-
-						riscv_pipe::process_alu
-						riscv_pipe::process_rd_csr_prev
-						riscv_pipe::process_curinstraddr_imm
-						riscv_pipe::process_jump
-						riscv_pipe::process_setup_mem_reqdata
-						
-						riscv_pipe::process_branch
-
-						# memory access
-						acif::begin mem_req
-						
-							acif::begin mem_cmd
-								pipe::mcopipe::wrreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-							acif::end
-							acif::begelse
-								pipe::mcopipe::rdreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-								acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
-									ac= rd_rdy	1
-								acif::end
-							acif::end
-
-						acif::end
-
-						riscv_pipe::process_rd_mem_wdata
-						riscv_pipe::process_wb
-
-				} elseif {$num_stages == 3} {
-
-					pipe::pstage IFETCH
-						
-						riscv_pipe::process_pc
-						pipe::mcopipe::rdreq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
-
-					pipe::pstage EXEC
-
-						pipe::mcopipe::resp instr_mem instr_code
-						riscv_pipe::process_decode
-						riscv_pipe::process_regfetch
-						riscv_pipe::forward_unblocking EXECMEMWB
-
-					pipe::pstage EXECMEMWB
-
-						set ST_EXEC		0
-						set ST_MEM		1
-						pipe::pvar {0 0} exestate		$ST_EXEC
-
-						acif::begin [ac== exestate $ST_EXEC]
-							riscv_pipe::process_alu
-							riscv_pipe::process_rd_csr_prev
-							riscv_pipe::process_curinstraddr_imm
-							riscv_pipe::process_jump
-							riscv_pipe::process_setup_mem_reqdata
-							riscv_pipe::process_branch
-
-							acif::begin mem_req
-								pipe::accum mem_addr mem_addr
-								pipe::accum mem_be mem_be
-								pipe::accum mem_wdata mem_wdata
-								pipe::accum exestate $ST_MEM
-								pipe::pstall
-							acif::end
-							acif::begelse
-								riscv_pipe::process_wb
-							acif::end
-						acif::end
-
 						acif::begelse
-							acif::begin mem_cmd
-								pipe::mcopipe::wrreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-							acif::end
-							acif::begelse
-								pipe::mcopipe::rdreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-								acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
-									ac= rd_rdy	1
-								acif::end
-							acif::end
-							riscv_pipe::process_rd_mem_wdata
-							riscv_pipe::process_wb
-						acif::end
-
-				} elseif {$num_stages == 4} {
-
-					pipe::pstage IFETCH
-
-						riscv_pipe::process_pc
-						pipe::mcopipe::rdreq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
-
-					pipe::pstage IDECODE
-
-						pipe::mcopipe::resp instr_mem instr_code
-						riscv_pipe::process_decode
-						riscv_pipe::process_regfetch
-
-						# pipeline MEMWB forwarding
-						riscv_pipe::forward_unblocking MEMWB
-
-					pipe::pstage EXEC
-
-						riscv_pipe::forward_accum_blocking MEMWB	
-
-						riscv_pipe::process_alu
-						riscv_pipe::process_rd_csr_prev
-						riscv_pipe::process_curinstraddr_imm
-
-					pipe::pstage MEMWB
-						
-						riscv_pipe::process_jump
-						riscv_pipe::process_setup_mem_reqdata
-						riscv_pipe::process_branch
-
-						# memory access
-						acif::begin mem_req
-							acif::begin mem_cmd
-								pipe::mcopipe::wrreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-							acif::end
-							acif::begelse
-								pipe::mcopipe::rdreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-								acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
-									ac= rd_rdy	1
-								acif::end
+							pipe::mcopipe::rdreq data_mem data_busreq
+							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+								ac= rd_rdy	1
 							acif::end
 						acif::end
 
-						riscv_pipe::process_rd_mem_wdata
-						riscv_pipe::process_wb
+					acif::end
 
-				} elseif {$num_stages == 5} {
+					riscv_pipe::process_rd_mem_wdata
+					riscv_pipe::process_wb
 
-					pipe::pstage IFETCH
+			
+			# 2-stage
+			} elseif {$num_stages == 2} {
 
-						riscv_pipe::process_pc
-						pipe::mcopipe::rdreq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
+				pipe::pstage IFETCH
+					
+					riscv_pipe::process_pc
+					
+					ac=s instr_busreq addr curinstr_addr
+					ac=s instr_busreq be 3
+					ac=s instr_busreq wdata 0
+					pipe::mcopipe::rdreq instr_mem instr_busreq
 
-					pipe::pstage IDECODE
+				pipe::pstage EXEC
 
-						pipe::mcopipe::resp instr_mem instr_code
-						riscv_pipe::process_decode
-						riscv_pipe::process_regfetch
-						
-						riscv_pipe::forward_blocking WB
-						riscv_pipe::forward_blocking MEM
-						riscv_pipe::forward_blocking EXEC
+					pipe::mcopipe::resp instr_mem instr_code
+					riscv_pipe::process_decode
+					riscv_pipe::process_regfetch
 
-					pipe::pstage EXEC
+					riscv_pipe::process_alu
+					riscv_pipe::process_rd_csr_prev
+					riscv_pipe::process_curinstraddr_imm
+					riscv_pipe::process_jump
+					riscv_pipe::process_setup_mem_reqdata
+					
+					riscv_pipe::process_branch
 
-						riscv_pipe::process_alu
-						riscv_pipe::process_rd_csr_prev
-						riscv_pipe::process_curinstraddr_imm
-						riscv_pipe::process_jump
-						riscv_pipe::process_setup_mem_reqdata
+					# memory access
+					acif::begin mem_req
+					
+						ac=s data_busreq addr mem_addr
+						ac=s data_busreq be 3
+						ac=s data_busreq wdata mem_wdata
 
-					pipe::pstage MEM
-						
-						riscv_pipe::process_branch
-
-						# memory access
-						acif::begin mem_req
-							acif::begin mem_cmd
-								pipe::mcopipe::wrreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-							acif::end
-							acif::begelse
-								pipe::mcopipe::rdreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
+						acif::begin mem_cmd
+							pipe::mcopipe::wrreq data_mem data_busreq
+						acif::end
+						acif::begelse
+							pipe::mcopipe::rdreq data_mem data_busreq
+							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+								ac= rd_rdy	1
 							acif::end
 						acif::end
 
-					pipe::pstage WB
-						
-						acif::begin mem_req
-							acif::begin [ac! mem_cmd]
-								acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
-									ac= rd_rdy	1
-								acif::end
+					acif::end
+
+					riscv_pipe::process_rd_mem_wdata
+					riscv_pipe::process_wb
+
+			
+			} elseif {$num_stages == 3} {
+
+				pipe::pstage IFETCH
+					
+					riscv_pipe::process_pc
+					
+					ac=s instr_busreq addr curinstr_addr
+					ac=s instr_busreq be 3
+					ac=s instr_busreq wdata 0
+					pipe::mcopipe::rdreq instr_mem instr_busreq
+
+				pipe::pstage EXEC
+
+					pipe::mcopipe::resp instr_mem instr_code
+					riscv_pipe::process_decode
+					riscv_pipe::process_regfetch
+					riscv_pipe::forward_blocking MEMWB
+
+					riscv_pipe::process_alu
+					riscv_pipe::process_rd_csr_prev
+					riscv_pipe::process_curinstraddr_imm
+					riscv_pipe::process_jump
+					riscv_pipe::process_setup_mem_reqdata
+
+				pipe::pstage MEMWB
+
+					riscv_pipe::process_branch
+
+					# memory access
+					acif::begin mem_req
+					
+						ac=s data_busreq addr mem_addr
+						ac=s data_busreq be 3
+						ac=s data_busreq wdata mem_wdata
+
+						acif::begin mem_cmd
+							pipe::mcopipe::wrreq data_mem data_busreq
+						acif::end
+						acif::begelse
+							pipe::mcopipe::rdreq data_mem data_busreq
+							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+								ac= rd_rdy	1
 							acif::end
 						acif::end
 
-						riscv_pipe::process_rd_mem_wdata
-						riscv_pipe::process_wb
+					acif::end
 
-				} elseif {$num_stages == 6} {
+					riscv_pipe::process_rd_mem_wdata
+					riscv_pipe::process_wb
 
-					pipe::pstage IADDR
+			
+			} elseif {$num_stages == 4} {
 
-						riscv_pipe::process_pc
+				pipe::pstage IFETCH
 
-					pipe::pstage IFETCH
+					riscv_pipe::process_pc
+					
+					ac=s instr_busreq addr curinstr_addr
+					ac=s instr_busreq be 3
+					ac=s instr_busreq wdata 0
+					pipe::mcopipe::rdreq instr_mem instr_busreq
 
-						pipe::mcopipe::rdreq instr_mem 0 [cnct {curinstr_addr curinstr_addr}]
+				pipe::pstage IDECODE
 
-					pipe::pstage IDECODE
+					pipe::mcopipe::resp instr_mem instr_code
+					riscv_pipe::process_decode
+					riscv_pipe::process_regfetch
 
-						pipe::mcopipe::resp instr_mem instr_code
-						riscv_pipe::process_decode
-						riscv_pipe::process_regfetch
-						
-						riscv_pipe::forward_blocking WB
-						riscv_pipe::forward_blocking MEM
-						riscv_pipe::forward_blocking EXEC
+					# pipeline MEMWB forwarding
+					riscv_pipe::forward_unblocking MEMWB
 
-					pipe::pstage EXEC
+				pipe::pstage EXEC
 
-						riscv_pipe::process_alu
-						riscv_pipe::process_rd_csr_prev
+					riscv_pipe::forward_accum_blocking MEMWB	
 
-					pipe::pstage MEM
+					riscv_pipe::process_alu
+					riscv_pipe::process_rd_csr_prev
+					riscv_pipe::process_curinstraddr_imm
 
-						riscv_pipe::process_setup_mem_reqdata
-						riscv_pipe::process_curinstraddr_imm
-						riscv_pipe::process_jump
-						riscv_pipe::process_branch
+				pipe::pstage MEMWB
+					
+					riscv_pipe::process_jump
+					riscv_pipe::process_setup_mem_reqdata
+					riscv_pipe::process_branch
 
-						# memory access
-						acif::begin mem_req
-							acif::begin mem_cmd
-								pipe::mcopipe::wrreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
-							acif::end
-							acif::begelse
-								pipe::mcopipe::rdreq data_mem 0 [cnct {mem_addr mem_be mem_wdata}]
+					# memory access
+					acif::begin mem_req
+
+						ac=s data_busreq addr mem_addr
+						ac=s data_busreq be 3
+						ac=s data_busreq wdata mem_wdata
+
+						acif::begin mem_cmd
+							pipe::mcopipe::wrreq data_mem data_busreq
+						acif::end
+						acif::begelse
+							pipe::mcopipe::rdreq data_mem data_busreq
+							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+								ac= rd_rdy	1
 							acif::end
 						acif::end
+					acif::end
 
-					pipe::pstage WB
-						
-						acif::begin mem_req
-							acif::begin [ac! mem_cmd]
-								acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
-									ac= rd_rdy	1
-								acif::end
+					riscv_pipe::process_rd_mem_wdata
+					riscv_pipe::process_wb
+
+			
+			} elseif {$num_stages == 5} {
+
+				pipe::pstage IFETCH
+
+					riscv_pipe::process_pc
+					
+					ac=s instr_busreq addr curinstr_addr
+					ac=s instr_busreq be 3
+					ac=s instr_busreq wdata 0
+					pipe::mcopipe::rdreq instr_mem instr_busreq
+
+				pipe::pstage IDECODE
+
+					pipe::mcopipe::resp instr_mem instr_code
+					riscv_pipe::process_decode
+					riscv_pipe::process_regfetch
+					
+					riscv_pipe::forward_blocking WB
+					riscv_pipe::forward_blocking MEM
+					riscv_pipe::forward_blocking EXEC
+
+				pipe::pstage EXEC
+
+					riscv_pipe::process_alu
+					riscv_pipe::process_rd_csr_prev
+					riscv_pipe::process_curinstraddr_imm
+					riscv_pipe::process_jump
+					riscv_pipe::process_setup_mem_reqdata
+
+				pipe::pstage MEM
+					
+					riscv_pipe::process_branch
+
+					# memory access
+					acif::begin mem_req
+
+						ac=s data_busreq addr mem_addr
+						ac=s data_busreq be 3
+						ac=s data_busreq wdata mem_wdata
+
+						acif::begin mem_cmd
+							pipe::mcopipe::wrreq data_mem data_busreq
+						acif::end
+						acif::begelse
+							pipe::mcopipe::rdreq data_mem data_busreq
+						acif::end
+					acif::end
+
+				pipe::pstage WB
+					
+					acif::begin mem_req
+						acif::begin [ac! mem_cmd]
+							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+								ac= rd_rdy	1
 							acif::end
 						acif::end
+					acif::end
 
-						riscv_pipe::process_rd_mem_wdata
-						riscv_pipe::process_wb
+					riscv_pipe::process_rd_mem_wdata
+					riscv_pipe::process_wb
 
-				} else {
-					error Generate\ parameter\ incorrect!
-				}
+			
+			} elseif {$num_stages == 6} {
 
-			pipe::endpproc
+				pipe::pstage IADDR
 
-			riscv_pipe::connect_copipes
+					riscv_pipe::process_pc
 
-		rtl::endmodule
+				pipe::pstage IFETCH
+
+					ac=s instr_busreq addr curinstr_addr
+					ac=s instr_busreq be 3
+					ac=s instr_busreq wdata 0
+					pipe::mcopipe::rdreq instr_mem instr_busreq
+
+				pipe::pstage IDECODE
+
+					pipe::mcopipe::resp instr_mem instr_code
+					riscv_pipe::process_decode
+					riscv_pipe::process_regfetch
+					
+					riscv_pipe::forward_blocking WB
+					riscv_pipe::forward_blocking MEM
+					riscv_pipe::forward_blocking EXEC
+
+				pipe::pstage EXEC
+
+					riscv_pipe::process_alu
+					riscv_pipe::process_rd_csr_prev
+
+				pipe::pstage MEM
+
+					riscv_pipe::process_setup_mem_reqdata
+					riscv_pipe::process_curinstraddr_imm
+					riscv_pipe::process_jump
+					riscv_pipe::process_branch
+
+					# memory access
+					acif::begin mem_req
+
+						ac=s data_busreq addr mem_addr
+						ac=s data_busreq be 3
+						ac=s data_busreq wdata mem_wdata
+
+						acif::begin mem_cmd
+							pipe::mcopipe::wrreq data_mem data_busreq
+						acif::end
+						acif::begelse
+							pipe::mcopipe::rdreq data_mem data_busreq
+						acif::end
+					acif::end
+
+				pipe::pstage WB
+					
+					acif::begin mem_req
+						acif::begin [ac! mem_cmd]
+							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+								ac= rd_rdy	1
+							acif::end
+						acif::end
+					acif::end
+
+					riscv_pipe::process_rd_mem_wdata
+					riscv_pipe::process_wb
+
+			} else {
+				error Generate\ parameter\ incorrect!
+			}
+
+		pipe::pmodule::end
 
 	}
 }

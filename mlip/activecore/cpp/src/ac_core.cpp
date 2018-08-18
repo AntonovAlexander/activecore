@@ -8,7 +8,7 @@
 
 #include "ac_utils.hpp"
 #include "ac_core.hpp"
-
+#include "ac_core_cmds.hpp"
 
 template<typename T> std::string NumberToString ( T Number )
 {
@@ -68,8 +68,9 @@ int GenCounter = 0;
 std::deque<ac_execode*> ExeStack;
 std::vector<std::vector<ac_var*>* > SignalsReadable;
 std::vector<std::vector<ac_var*>* > SignalsWriteable;
-ac_dimensions DimensionsAccumulator;
-std::vector<ac_param> ParamAccumulator;
+VarSegmentVector VarSegmentAccumulator;
+ac_dimensions_static StaticDimAccumulator;
+std::vector<ac_param*> ParamAccumulator;
 std::vector<std::string> StringParamAccumulator;
 std::vector<int> IntParamAccumulator;
 std::vector<unsigned int> UIntParamAccumulator;
@@ -92,72 +93,9 @@ std::string NumToString(int number)
 	//return ("gen" + toString(GenCounter++) + "_");
 }
 
-ac_imm::ac_imm(ac_dimensions_static dimensions_in, std::string value_in)
-{
-	dimensions = dimensions_in;
-	value = value_in;
-}
-
-ac_imm::ac_imm(std::string value_in)
-{
-	dimension_range_static new_range(31, 0);
-	ac_dimensions_static * new_dimensions = new ac_dimensions_static();
-	new_dimensions->push_back(new_range);
-	dimensions = *new_dimensions;
-	value = value_in;
-}
-
-ac_imm::ac_imm(unsigned int msb, unsigned int lsb, std::string value_in)
-{
-	dimension_range_static new_range(msb, lsb);
-	ac_dimensions_static * new_dimensions = new ac_dimensions_static();
-	new_dimensions->push_back(new_range);
-	dimensions = *new_dimensions;
-	value = value_in;
-}
-
-ac_param::ac_param(ac_var* var_in)
-{
-	type = PARAM_TYPE_VAR;
-	var = var_in;
-}
-
-ac_param::ac_param(ac_imm* imm_in)
-{
-	type = PARAM_TYPE_VAL;
-	imm = imm_in;
-}
-
-ac_param::ac_param(ac_dimensions_static dimensions_in, std::string value)
-{
-	ac_imm * new_imm = new ac_imm(dimensions_in, value);
-	type = PARAM_TYPE_VAL;
-	imm = new_imm;
-}
-
-ac_param::ac_param(unsigned int width, std::string value)
-{
-	ac_imm * new_imm = new ac_imm(width-1, 0, value);
-	type = PARAM_TYPE_VAL;
-	imm = new_imm;
-}
-
-std::string ac_param::GetString()
-{
-	if (type == PARAM_TYPE_VAR) return var->name;
-	else return imm->value;
-}
-
-std::string ac_param::GetStringFull()
-{
-	if (type == PARAM_TYPE_VAR) return var->name;
-	else return (NumberToString(imm->dimensions[0].GetWidth()) + "'d" + imm->value);
-}
-
 ac_dimensions_static ac_param::GetDimensions()
 {
-	if (type == PARAM_TYPE_VAR) return var->dimensions;
-	else return imm->dimensions;
+	return dimensions;
 }
 
 void dimension_range_static::PrintDimension()
@@ -167,50 +105,57 @@ void dimension_range_static::PrintDimension()
 	printf("lsb: %d\n", lsb);
 }
 
-void dimension_range::PrintDimension()
+void VarSegment::PrintDimension()
 {
 	switch (type)
 	{
-	case DimType_C:
-		printf("Dimension range type: C\n");
+	case SegType::C:
+		printf("Var segment type: C\n");
 		printf("msb: %d\n", msb_int);
 		break;
 
-	case DimType_V:
-		printf("Dimension range type: V\n");
+	case SegType::V:
+		printf("Var segment type: V\n");
 		printf("msb: %s\n", StringToCharArr(msb_var->name));
 		break;
 
-	case DimType_CC:
-		printf("Dimension range type: CC\n");
+	case SegType::CC:
+		printf("Var segment type: CC\n");
 		printf("msb: %d\n", msb_int);
 		printf("lsb: %d\n", lsb_int);
 		break;
 
-	case DimType_CV:
-		printf("Dimension range type: CV\n");
+	case SegType::CV:
+		printf("Var segment type: CV\n");
 		printf("msb: %d\n", msb_int);
 		printf("lsb: %s\n", StringToCharArr(lsb_var->name));
 		break;
 
-	case DimType_VC:
-		printf("Dimension range type: VC\n");
+	case SegType::VC:
+		printf("Var segment type: VC\n");
 		printf("msb: %s\n", StringToCharArr(msb_var->name));
 		printf("lsb: %d\n", lsb_int);
 		break;
 
-	case DimType_VV:
-		printf("Dimension range type: VV\n");
+	case SegType::VV:
+		printf("Var segment type: VV\n");
 		printf("msb: %s\n", StringToCharArr(msb_var->name));
 		printf("lsb: %s\n", StringToCharArr(lsb_var->name));
+		break;
+
+	case SegType::SubStruct:
+		printf("Var segment type: SubStruct\n");
+		printf("struct name: %s\n", StringToCharArr(src_struct->name));
+		printf("struct index: %d\n", structIndex);
+		printf("struct var name: %s\n", StringToCharArr(src_struct->structvars[structIndex]->name));
 		break;
 
 	default:
-		printf("Dimension range type unrecognized: %d\n", type);
+		printf("Var segment type unrecognized: %d\n", type);
 	}
 }
 
-void ac_dimensions::PrintDimensions()
+void VarSegmentVector::PrintDimensions()
 {
 	for (unsigned int i = 0; i < size(); i++)
 	{
@@ -218,13 +163,13 @@ void ac_dimensions::PrintDimensions()
 	}
 }
 
-int ac_dimensions::GetPower(unsigned int * power)
+int VarSegmentVector::GetPower(unsigned int * power)
 {
 	*power = 0;
 	for (unsigned int i = 0; i < size(); i++)
 	{
-		if ((at(i).type == DimType_C) || (at(i).type == DimType_V)) (*power)++;
-		else if ((at(i).type == DimType_CC) || (at(i).type == DimType_CV) || (at(i).type == DimType_VC) || (at(i).type == DimType_VV)) continue;
+		if ((at(i).type == SegType::C) || (at(i).type == SegType::V) || (at(i).type == SegType::SubStruct)) (*power)++;
+		else if ((at(i).type == SegType::CC) || (at(i).type == SegType::CV) || (at(i).type == SegType::VC) || (at(i).type == SegType::VV)) continue;
 		else return 1;
 	}
 	return 0;
@@ -249,50 +194,17 @@ int ac_dimensions_static::GetPower(unsigned int * power)
 	return 0;
 }
 
-int getdimstring(dimension_range_static * in_range, std::string * ret_val)
+bool ac_dimensions_static::isSingle()
 {
-	*ret_val = ("[" + toString(in_range->msb) + ":" + toString(in_range->lsb) + "]");
-	return 0;
-}
-
-int getdimstring(dimension_range * in_range, std::string * ret_val)
-{
-	switch (in_range->type)
-	{
-	case DimType_C:
-		*ret_val = ("[" + toString(in_range->msb_int) + "]");
-		return 0;
-
-	case DimType_V:
-		*ret_val = ("[" + in_range->msb_var->name + "]");
-		return 0;
-
-	case DimType_CC:
-		*ret_val = ("[" + toString(in_range->msb_int) + ":" + toString(in_range->lsb_int) + "]");
-		return 0;
-
-	case DimType_CV:
-		*ret_val = ("[" + toString(in_range->msb_int) + ":" + in_range->lsb_var->name + "]");
-		return 0;
-
-	case DimType_VC:
-		*ret_val = ("[" + in_range->msb_var->name + ":" + toString(in_range->lsb_int) + "]");
-		return 0;
-
-	case DimType_VV:
-		*ret_val = ("[" + in_range->msb_var->name + ":" + in_range->lsb_var->name + "]");
-		return 0;
-
-	default:
-		printf("Dimension type not resolved!\n");
-		return 1;
+	if (size() == 0) return true;
+	if (size() == 1) {
+		if (at(0).GetWidth() == 1) return true;
 	}
+	return false;
 }
 
-int ac_dimensions::GetDimensionsString(std::string * string_in)
+int VarSegmentVector::GetDimensionsString(std::string * string_in)
 {
-	//printf("GetDimensionsString: start, dimsize: %d\n", size());
-
 	*string_in = "";
 	for (int i = (size()-1); i > (-1); i--)
 	{
@@ -300,31 +212,227 @@ int ac_dimensions::GetDimensionsString(std::string * string_in)
 		if (at(i).GetString(&range_string) != 0) return 1;
 		*string_in = ((*string_in) + range_string);
 	}
-	//printf("GetDimensionsString: string: \n", StringToCharArr(*string_in));
-	//printf("GetDimensionsString: finish\n");
 	return 0;
 }
 
-ac_var::ac_var(char * type_name_in, std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in)
-{
-	name = name_in;
-	dimensions = dimensions_in;
-	defval = defval_in;
-	type_name = type_name_in;
-	read_done = false;
-	write_done = false;
+
+int DecodeVarType (std::string vartype_in, VarType * vartype) {
+	if (vartype_in == "signed") {
+		vartype->type = VAR_TYPE::vt_signed;
+		vartype->src_struct = nullptr;
+		return 0;
+
+	} else if (vartype_in == "unsigned") {
+		vartype->type = VAR_TYPE::vt_unsigned;
+		vartype->src_struct = nullptr;
+		return 0;
+
+	} else {
+		for (unsigned int i = 0; i < defined_structs.size(); i++) {
+			if (defined_structs[i]->name == vartype_in) {
+				vartype->type = VAR_TYPE::vt_structured;
+				vartype->src_struct = defined_structs[i];
+				return 0;
+			}
+		}
+		printf("Struct decoding failed!\n");
+		return 1;
+	}
+	return 0;
 }
 
-ac_var::ac_var(char * type_name_in, std::string name_in, unsigned int msb, unsigned int lsb, std::string defval_in)
+ac_structvar::ac_structvar(std::string name_in, VarType VarType_in, ac_dimensions_static dimensions_in, std::string defval_in)
 {
 	name = name_in;
+	vartype = VarType_in;
+	dimensions = dimensions_in;
+	defval = defval_in;
+}
+
+ac_structvar::ac_structvar(std::string name_in, VarType VarType_in, unsigned int msb, unsigned int lsb, std::string defval_in)
+{
+	name = name_in;
+	vartype = VarType_in;
 	dimension_range_static new_range(msb, lsb);
 	dimensions = ac_dimensions_static();
 	dimensions.push_back(new_range);
 	defval = defval_in;
+}
+
+ac_structvar::ac_structvar(std::string name_in, VarType VarType_in, std::string defval_in)
+{
+	name = name_in;
+	vartype = VarType_in;
+	defval = defval_in;
+}
+
+std::vector<ac_struct*> defined_structs;
+ac_struct* current_struct;
+
+ac_struct::ac_struct(std::string name_in)
+{
+	name = name_in;
+}
+
+int ac_struct_cmd(ac_struct ** new_struct, std::string name_in) {
+	*new_struct = new ac_struct(name_in);
+	defined_structs.push_back(*new_struct);
+	return 0;
+}
+
+void ac_var::init_internal(char * type_name_in)
+{
 	type_name = type_name_in;
 	read_done = false;
 	write_done = false;
+	type = PARAM_TYPE::VAR;
+	string_printable = name;
+}
+
+ac_var::ac_var(char * type_name_in, std::string name_in, VarType VarType_in, ac_dimensions_static dimensions_in, std::string defval_in) : ac_structvar(name_in, VarType_in, dimensions_in, defval_in)
+{
+	init_internal(type_name_in);
+}
+
+ac_var::ac_var(char * type_name_in, std::string name_in, VarType VarType_in, unsigned int msb, unsigned int lsb, std::string defval_in) : ac_structvar(name_in, VarType_in, msb, lsb, defval_in)
+{
+	init_internal(type_name_in);
+}
+
+ac_var::ac_var(char * type_name_in, std::string name_in, VarType VarType_in, std::string defval_in) : ac_structvar(name_in, VarType_in, defval_in)
+{
+	init_internal(type_name_in);
+}
+
+int ac_var::GetDePowered(ac_dimensions_static * ret_dimensions, VarType * ret_vartype, VarSegmentVector * DePower)
+{
+	ret_dimensions->clear();
+
+	// copying dimensions of a variable
+	for (unsigned int i = 0; i < dimensions.size(); i++)
+	{
+		ret_dimensions->push_back(dimensions[i]);
+	}
+	*ret_vartype = vartype;
+
+	// detaching dimensions
+	for (unsigned int DEPOW_INDEX = 0; DEPOW_INDEX < DePower->size(); DEPOW_INDEX++)
+	{
+		if (ret_dimensions->isSingle()) {
+			// undimensioned var
+			ret_dimensions->clear();
+			if (DePower->at(DEPOW_INDEX).type == SegType::SubStruct) {
+				// retrieving structure
+				*ret_vartype = DePower->at(DEPOW_INDEX).src_struct->structvars[DePower->at(DEPOW_INDEX).structIndex]->vartype;
+				for (unsigned int SUBSTR_DIM_INDEX = 0; SUBSTR_DIM_INDEX < DePower->at(DEPOW_INDEX).src_struct->structvars[DePower->at(DEPOW_INDEX).structIndex]->dimensions.size(); SUBSTR_DIM_INDEX++)
+				{
+					ret_dimensions->push_back(DePower->at(DEPOW_INDEX).src_struct->structvars[DePower->at(DEPOW_INDEX).structIndex]->dimensions[DEPOW_INDEX]);
+				}
+			} else {
+				// indexing 1-bit (dim) var
+				ret_dimensions->push_back(dimension_range_static(0, 0));
+			}
+		} else {
+			// dimensioned var
+			if (DePower->at(DEPOW_INDEX).type == SegType::SubStruct) {
+				printf("Depower index generation incorrect!\n");
+				return 1;
+			} else {
+				if ((DePower->at(DEPOW_INDEX).type == SegType::C)
+					|| (DePower->at(DEPOW_INDEX).type == SegType::V)) {
+					// taking indexed variable - detachment of last dimensions
+					ret_dimensions->pop_back();
+				} else if (DePower->at(DEPOW_INDEX).type == SegType::CC) {
+					// replacing last dimension with taken
+					ret_dimensions->pop_back();
+					ret_dimensions->push_back(dimension_range_static(DePower->at(DEPOW_INDEX).msb_int, DePower->at(DEPOW_INDEX).lsb_int));
+				} else continue;
+			}
+		}
+	}
+	return 0;
+}
+
+int ac_var::set_default_cmd_internal(unsigned int * cursor, VarSegmentVector * VarSegmentsDePower) {
+	int ret_val;
+
+	VarType vartypeDepowered;
+	ac_dimensions_static TargetDepoweredDimensions;
+	if (GetDePowered(&TargetDepoweredDimensions, &vartypeDepowered, VarSegmentsDePower) != 0) return 1;
+
+	if (vartypeDepowered.type == VAR_TYPE::vt_structured) {
+		if (TargetDepoweredDimensions.isSingle()) {
+			for (unsigned int i = 0; i < vartypeDepowered.src_struct->structvars.size(); i++) {
+				VarSegmentsDePower->push_front(VarSegment(vartypeDepowered.src_struct, i));
+				ret_val = expr_assign_cmd(cursor, *VarSegmentsDePower, this, new ac_imm(32,  vartypeDepowered.src_struct->structvars[i]->defval));
+				VarSegmentsDePower->pop_front();
+				if (ret_val != 0) return ret_val;
+			}
+		}
+		else {
+			for (unsigned int i = 0; i < TargetDepoweredDimensions.back().GetWidth(); i++)
+			{
+				VarSegmentsDePower->push_front(VarSegment(i + TargetDepoweredDimensions.back().lsb));
+				ret_val = expr_assign_cmd(cursor, *VarSegmentsDePower, this, new ac_imm(32, "defval"));
+				VarSegmentsDePower->pop_front();
+				if (ret_val != 0) return ret_val;
+			}
+			return ret_val;
+		}
+	} else {
+		return (expr_assign_cmd(cursor, this, new ac_imm(defval)) != 0);
+	}
+}
+
+int ac_var::set_default_cmd(unsigned int * cursor) {
+	VarSegmentVector VarSegmentsDePower;
+	return set_default_cmd_internal(cursor, &VarSegmentsDePower);
+}
+
+std::string ac_param::GetString()
+{
+	return string_printable;
+}
+
+bool ac_param::isDimSingle()
+{
+	return dimensions.isSingle();
+}
+
+ac_imm::ac_imm(ac_dimensions_static dimensions_in, std::string value_in)
+{
+	dimensions = dimensions_in;
+	value = value_in;
+	type = PARAM_TYPE::VAL;
+	string_printable = value;
+}
+
+ac_imm::ac_imm(std::string value_in)
+{
+	dimension_range_static new_range(31, 0);
+	ac_dimensions_static * new_dimensions = new ac_dimensions_static();
+	new_dimensions->push_back(new_range);
+	dimensions = *new_dimensions;
+	value = value_in;
+	type = PARAM_TYPE::VAL;
+	string_printable = value;
+}
+
+ac_imm::ac_imm(unsigned int msb, unsigned int lsb, std::string value_in)
+{
+	dimension_range_static new_range(msb, lsb);
+	ac_dimensions_static * new_dimensions = new ac_dimensions_static();
+	new_dimensions->push_back(new_range);
+	dimensions = *new_dimensions;
+	value = value_in;
+	type = PARAM_TYPE::VAL;
+	string_printable = value;
+}
+
+ac_imm::ac_imm(unsigned int width, std::string value) : ac_imm(width-1, 0, value)
+{
+	type = PARAM_TYPE::VAL;
+	string_printable = value;
 }
 
 bool ac_execode::AddWrVar(ac_var* new_wrvar)
@@ -370,13 +478,13 @@ void ac_execode::AddGenVar(ac_var* new_genvar)
 	genvars.push_back(new_genvar);
 }
 
-void ac_execode::AddRdParam(ac_param new_param)
+void ac_execode::AddRdParam(ac_param* new_param)
 {
 	params.push_back(new_param);
-	if (new_param.type == PARAM_TYPE_VAR) AddRdVar(new_param.var);
+	if (new_param->type == PARAM_TYPE::VAR) AddRdVar((ac_var*)new_param);
 }
 
-void ac_execode::AddRdParams(std::vector<ac_param> new_params)
+void ac_execode::AddRdParams(std::vector<ac_param*> new_params)
 {
 	for (unsigned int i = 0; i < new_params.size(); i++)
 	{
@@ -469,16 +577,19 @@ void ac_execode::AddGenVarWithStack(ac_var* new_op)
 	AddGenVarToStack(new_op);
 }
 
-void ac_execode::AddRdParamWithStack(ac_param new_param)
+void ac_execode::AddRdParamWithStack(ac_param* new_param)
 {
 	AddRdParam(new_param);
-	for (unsigned int i = 0; i < ExeStack.size(); i++)
+	if (new_param->type == PARAM_TYPE::VAR)
 	{
-		ExeStack[i]->AddRdParam(new_param);
+		for (unsigned int i = 0; i < ExeStack.size(); i++)
+		{
+			ExeStack[i]->AddRdVar((ac_var*)new_param);
+		}
 	}
 }
 
-void ac_execode::AddRdParamsWithStack(std::vector<ac_param> new_params)
+void ac_execode::AddRdParamsWithStack(std::vector<ac_param*> new_params)
 {
 	AddRdParams(new_params);
 	for (unsigned int i = 0; i < ExeStack.size(); i++)
@@ -548,6 +659,14 @@ int AddVarCheckUnique(ac_var* new_var, std::vector<ac_var*> * varlist)
 {
 	if (VarCheckUnique(new_var, varlist) != 0) {
 		printf("Failed to deploy var %s: name is previously defined!\n", StringToCharArr(new_var->name));
+		if (DEBUG_FLAG)
+		{
+			printf("[[ Var list ]]\n");
+			for (unsigned int i = 0; i < varlist->size(); i++)
+			{
+				printf("var name [%d]: %s;\n", i, StringToCharArr(varlist->at(i)->name));
+			}
+		}
 		throw 0;
 		return 1;
 	} else {
