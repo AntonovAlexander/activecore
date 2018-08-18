@@ -21,16 +21,16 @@ namespace eval rtl {
 		set rtl::rst_domain $signame
 	}
 
-	proc input {dimension name} {
-		_port in $dimension $name
+	proc input {vartype dimension name} {
+		_port in $vartype $dimension $name
 	}
 
-	proc output {dimension name} {
-		_port out $dimension $name
+	proc output {vartype dimension name} {
+		_port out $vartype $dimension $name
 	}
 
-	proc inout {dimension name} {
-		_port inout $dimension $name
+	proc inout {vartype dimension name} {
+		_port inout $vartype $dimension $name
 	}
 
 	set interfaces		[list]
@@ -183,21 +183,23 @@ namespace eval rtl {
 		return $retval
 	}
 
-	proc _port {type dimensions name} {
+	proc _port {type vartype dimensions name} {
 		__gplc_acc_param_clr
 		_acc_index $dimensions
 		__gplc_acc_param_string $type
+		__gplc_acc_param_string $vartype
 		__gplc_acc_param_string $name
 		__mlip_rtl_call port
 	}
 
-	proc comb {dimensions name defval} {
+	proc comb {vartype dimensions name defval} {
 		__gplc_acc_param_clr
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ comb\ $name\ is\ not\ a\ number!
 		}
 		_acc_index $dimensions
 		__gplc_acc_param_string $name
+		__gplc_acc_param_string $vartype
 		__gplc_acc_param_string $defval
 		__mlip_rtl_call comb
 	}
@@ -207,7 +209,7 @@ namespace eval rtl {
 	set SYNC_POS	false
 	set	SYNC_NEG	true
 
-	proc mem {dimensions name sync_levedge} {
+	proc mem {vartype dimensions name sync_levedge} {
 		__gplc_acc_param_clr
 		_acc_index $dimensions
 		if { $sync_levedge != true && $sync_levedge != false } {
@@ -215,6 +217,7 @@ namespace eval rtl {
 		}
 		_acc_index $dimension
 		__gplc_acc_param_string $name
+		__gplc_acc_param_string $vartype
 		__gplc_acc_param_string $sync_levedge
 		__mlip_rtl_call mem
 	}
@@ -254,20 +257,22 @@ namespace eval rtl {
 		_mem_addreset $mem_name async $signal $posneg $source
 	}
 
-	proc buffered {dimensions name defval} {
+	proc buffered {vartype dimensions name defval} {
 		__gplc_acc_param_clr
 		_acc_index $dimensions
 		__gplc_acc_param_string $name
+		__gplc_acc_param_string $vartype
 		__gplc_acc_param_string $defval
 		__gplc_acc_param_v_rd $rtl::clk_domain
 		__gplc_acc_param_v_rd $rtl::rst_domain
 		__mlip_rtl_call buffered
 	}
 
-	proc sticky {dimensions name defval} {
+	proc sticky {vartype dimensions name defval} {
 		__gplc_acc_param_clr
 		_acc_index $dimensions
 		__gplc_acc_param_string $name
+		__gplc_acc_param_string $vartype
 		__gplc_acc_param_string $defval
 		__gplc_acc_param_v_rd $rtl::clk_domain
 		__gplc_acc_param_v_rd $rtl::rst_domain
@@ -280,22 +285,32 @@ namespace eval rtl {
 		__mlip_rtl_call rdbuf
 	}
 
-	proc module {name} {
-		__gplc_acc_param_clr
-		__gplc_acc_param_string $name
-		__mlip_rtl_call module
+	try {namespace delete module} on error {} {}
+	namespace eval module {
+
+		proc begin {name} {
+			__gplc_acc_param_clr
+			__gplc_acc_param_string $name
+			__mlip_rtl_call module_begin
+		}
+
+		proc end {} {
+			puts endmodule\ is\ currently\ a\ stub!
+		}
+		
 	}
 
-	proc endmodule {} {
-		puts endmodule\ is\ currently\ a\ stub!
-	}
+	try {namespace delete cproc} on error {} {}
+	namespace eval cproc {
 
-	proc cproc {} {
-		__mlip_rtl_call cproc
-	}
+		proc begin {} {
+			__mlip_rtl_call cproc
+		}
 
-	proc endcproc {} {
-		__mlip_rtl_call endcproc
+		proc end {} {
+			__mlip_rtl_call endcproc
+		}
+		
 	}
 
 	proc export {language filename} {

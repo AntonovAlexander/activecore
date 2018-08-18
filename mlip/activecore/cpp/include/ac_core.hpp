@@ -58,78 +58,143 @@ extern char OP1_IF[];
 extern char OP1_WHILE[];
 
 
-struct dimension_range;
 struct dimension_range_static;
-
-class ac_dimensions : public std::deque<dimension_range>
-{
-public:
-	void PrintDimensions();
-	int GetDimensionsString(std::string * string_in);
-	int GetPower(unsigned int * power);
-};
 
 class ac_dimensions_static : public std::deque<dimension_range_static>
 {
 public:
 	void PrintDimensions();
 	int GetPower(unsigned int * power);
+	bool isSingle();
 };
 
-class ac_imm
+enum class PARAM_TYPE: int
+{
+	VAR = 0,
+	VAL = 1
+};
+
+class ac_param
 {
 public:
+	PARAM_TYPE type;
 	ac_dimensions_static dimensions;
+	std::string string_printable;
+
+	std::string GetString();
+	ac_dimensions_static GetDimensions();
+
+	bool isDimSingle();
+};
+
+class ac_imm : public ac_param
+{
+public:
 	std::string value;
 
 	ac_imm(ac_dimensions_static dimensions_in, std::string value_in);
 	ac_imm(std::string value_in);
 	ac_imm(unsigned int msb, unsigned int lsb, std::string value_in);
+	ac_imm(unsigned int width, std::string value);
 };
 
 extern char DEFAULT_TYPEVAR[];
 
-class ac_var
+enum class VAR_TYPE: int
+{
+	vt_signed = 0,
+	vt_unsigned = 1,
+	vt_structured = 2,
+	vt_undefined = 3
+};
+
+class ac_struct;
+
+struct VarType {
+	VAR_TYPE type;
+	ac_struct * src_struct;
+
+	VarType() {
+		type = VAR_TYPE::vt_undefined;
+		src_struct = nullptr;
+	}
+
+	VarType(VAR_TYPE TYPE_in) {
+		type = TYPE_in;
+		if ((TYPE_in == VAR_TYPE::vt_signed) || (TYPE_in == VAR_TYPE::vt_unsigned)) src_struct = nullptr;
+		else {
+			printf("ActiveCore ERROR: var type incorrect!\n");
+			return;
+		}
+	}
+
+	VarType(ac_struct * struct_in) {
+		type = VAR_TYPE::vt_structured;
+		src_struct = struct_in;
+	}
+};
+
+int DecodeVarType (std::string vartype_in, VarType * vartype);
+
+class ac_structvar : public ac_param
 {
 public:
 	std::string name;
-	ac_dimensions_static dimensions;
 	std::string defval;
+
+	VarType vartype;
+
+	ac_structvar(std::string name_in, VarType VarType_in, ac_dimensions_static dimensions_in, std::string defval_in);
+	ac_structvar(std::string name_in, VarType VarType_in, unsigned int msb, unsigned int lsb, std::string defval_in);
+	ac_structvar(std::string name_in, VarType VarType_in, std::string defval_in);
+};
+
+class ac_struct
+{
+public:
+	std::string name;
+	std::vector<ac_structvar*> structvars;
+
+	ac_struct(std::string name_in);
+};
+
+extern std::vector<ac_struct*> defined_structs;
+extern ac_struct* current_struct;
+
+int ac_struct_cmd(ac_struct ** new_struct, std::string name_in);
+
+class VarSegmentVector;
+
+class ac_var : public ac_structvar
+{
+public:
 	char * type_name;
 	bool read_done;
 	bool write_done;
 
-	ac_var(char * type_name_in, std::string name_in, ac_dimensions_static dimensions_in, std::string defval_in);
-	ac_var(char * type_name_in, std::string name_in, unsigned int msb, unsigned int lsb, std::string defval_in);
+	int GetDePowered(ac_dimensions_static * ret_dimensions, VarType * ret_vartype, VarSegmentVector * DePower);
+
+	ac_var(char * type_name_in, std::string name_in, VarType VarType_in, ac_dimensions_static dimensions_in, std::string defval_in);
+	ac_var(char * type_name_in, std::string name_in, VarType VarType_in, unsigned int msb, unsigned int lsb, std::string defval_in);
+	ac_var(char * type_name_in, std::string name_in, VarType VarType_in, std::string defval_in);
+
+	int set_default_cmd(unsigned int * cursor);
+
+private:
+	void init_internal(char * type_name_in);
+	int set_default_cmd_internal(unsigned int * cursor, VarSegmentVector * VarSegmentsDePower);
 };
 
-#define PARAM_TYPE_VAR 	true
-#define PARAM_TYPE_VAL	false
-
-class ac_param
+enum class SegType: int
 {
-public:
-	bool type;
-	ac_var * var;
-	ac_imm * imm;
-
-	ac_param() {};
-	ac_param(ac_var* var_in);
-	ac_param(ac_imm* imm_in);
-	ac_param(ac_dimensions_static dimensions_in, std::string value);
-	ac_param(unsigned int width, std::string value);
-
-	std::string GetString();
-	std::string GetStringFull();
-	ac_dimensions_static GetDimensions();
+	C = 0,
+	V = 1,
+	CC = 2,
+	CV = 3,
+	VC = 4,
+	VV = 5,
+	SubStruct = 6
 };
-
-#define DimType_C	0
-#define DimType_V	1
-#define DimType_CC	2
-#define DimType_CV	3
-#define DimType_VC	4
-#define DimType_VV	5
 
 struct dimension_range_static {
 	unsigned int msb;
@@ -150,8 +215,8 @@ struct dimension_range_static {
 	void PrintDimension();
 };
 
-struct dimension_range {
-	unsigned int type;
+struct VarSegment {
+	SegType type;
 
 	unsigned int msb_int;
 	unsigned int lsb_int;
@@ -159,50 +224,67 @@ struct dimension_range {
 	ac_var* msb_var;
 	ac_var* lsb_var;
 
-	dimension_range(unsigned int msb)
+	ac_struct * src_struct;
+	unsigned int structIndex;
+	std::string substruct_name;
+
+	VarSegment(unsigned int msb)
 	{
-		type = DimType_C;
+		type = SegType::C;
 		msb_int = msb;
 	}
 
-	dimension_range(ac_var* msb)
+	VarSegment(ac_var* msb)
 	{
-		type = DimType_V;
+		type = SegType::V;
 		msb_var = msb;
 	}
 
-	dimension_range(unsigned int msb, unsigned int lsb)
+	VarSegment(unsigned int msb, unsigned int lsb)
 	{
-		type = DimType_CC;
+		type = SegType::CC;
 		msb_int = msb;
 		lsb_int = lsb;
 	}
 
-	dimension_range(unsigned int msb, ac_var* lsb)
+	VarSegment(unsigned int msb, ac_var* lsb)
 	{
-		type = DimType_CV;
+		type = SegType::CV;
 		msb_int = msb;
 		lsb_var = lsb;
 	}
 
-	dimension_range(ac_var* msb, unsigned int lsb)
+	VarSegment(ac_var* msb, unsigned int lsb)
 	{
-		type = DimType_VC;
+		type = SegType::VC;
 		msb_var = msb;
 		lsb_int = lsb;
 	}
 
-	dimension_range(ac_var* msb, ac_var* lsb)
+	VarSegment(ac_var* msb, ac_var* lsb)
 	{
-		type = DimType_VV;
+		type = SegType::VV;
 		msb_var = msb;
 		lsb_var = lsb;
+	}
+
+	VarSegment(ac_struct * src_struct_in, unsigned int structIndex_in)
+	{
+		type = SegType::SubStruct;
+		src_struct = src_struct_in;
+		structIndex = structIndex_in;
+	}
+
+	VarSegment(std::string substruct_name_in)
+	{
+		type = SegType::SubStruct;
+		substruct_name = substruct_name_in;
 	}
 
 	int GetWidth(unsigned int * width)
 	{
-		if ((type == DimType_C) || (type == DimType_V)) *width = 1;
-		else if (type == DimType_CC)
+		if ((type == SegType::C) || (type == SegType::V)) *width = 1;
+		else if (type == SegType::CC)
 		{
 			if (msb_int > lsb_int) *width = msb_int - lsb_int;
 			else *width = lsb_int - msb_int;
@@ -214,61 +296,65 @@ struct dimension_range {
 
 	int GetString(std::string * string_in)
 	{
-		//printf("GetString: start\n");
 		switch (type)
 		{
-		case DimType_C:
+		case SegType::C:
 			*string_in = "[" + NumberToString(msb_int) + "]";
 			break;
-		case DimType_V:
+		case SegType::V:
 			*string_in = "[" + msb_var->name + "]";
 			break;
-		case DimType_CC:
+		case SegType::CC:
 			*string_in = "[" + NumberToString(msb_int) + ":" +  NumberToString(lsb_int) + "]";
 			break;
-		case DimType_CV:
+		case SegType::CV:
 			*string_in = "[" + NumberToString(msb_int) + ":" +  lsb_var->name + "]";
 			break;
-		case DimType_VC:
+		case SegType::VC:
 			*string_in = "[" + msb_var->name + ":" +  NumberToString(lsb_int) + "]";
 			break;
-		case DimType_VV:
+		case SegType::VV:
 			*string_in = "[" + msb_var->name + ":" +  lsb_var->name + "]";
+			break;
+		case SegType::SubStruct:
+			*string_in = "." + src_struct->structvars[structIndex]->name;
 			break;
 		default:
 			return 1;
 		}
-		//printf("GetString: string: %s\n", StringToCharArr(*string_in));
-		//printf("GetString: finish\n");
 		return 0;
 	}
 
 	void PrintDimension();
 };
 
-int getdimstring(dimension_range * in_range, std::string * ret_val);
-int getdimstring(dimension_range_static * in_range, std::string * ret_val);
+class VarSegmentVector : public std::deque<VarSegment>
+{
+public:
+	void PrintDimensions();
+	int GetDimensionsString(std::string * string_in);
+	int GetPower(unsigned int * power);
+};
 
 class ac_execode
 {
 public:
 	char * opcode;
-	std::vector<ac_param> params;
+	std::vector<ac_param*> params;
 	std::vector<std::string> string_params;
 	std::vector<int> int_params;
 	std::vector<unsigned int> uint_params;
 	std::deque<ac_execode*> expressions;
 
-	std::vector<ac_param> priority_conditions;
+	std::vector<ac_param*> priority_conditions;
 
-	ac_dimensions dimensions;
+	VarSegmentVector VarSegments;
 
 	std::vector<ac_var*> wrvars;
 	std::vector<ac_var*> rdvars;
 	std::vector<ac_var*> genvars;
 	std::vector<ac_var*> iftargets;
 
-	ac_execode();
 	ac_execode(char * opcode_in);
 
 	void AddExpr(ac_execode* new_expr);
@@ -276,15 +362,15 @@ public:
 	bool AddWrVar(ac_var* new_wrvar);
 	bool AddRdVar(ac_var* new_rdvar);
 	void AddGenVar(ac_var* new_genvar);
-	void AddRdParam(ac_param new_param);
-	void AddRdParams(std::vector<ac_param> new_params);
+	void AddRdParam(ac_param* new_param);
+	void AddRdParams(std::vector<ac_param*> new_params);
 	bool AddIfTargetVar(ac_var* new_iftvar);
 
 	void AddRdVarWithStack(ac_var* new_op);
 	void AddWrVarWithStack(ac_var* new_op);
 	void AddGenVarWithStack(ac_var* new_op);
-	void AddRdParamWithStack(ac_param new_param);
-	void AddRdParamsWithStack(std::vector<ac_param> new_params);
+	void AddRdParamWithStack(ac_param* new_param);
+	void AddRdParamsWithStack(std::vector<ac_param*> new_params);
 };
 
 extern bool DEBUG_FLAG;
@@ -293,8 +379,9 @@ extern bool DEBUG_FLAG;
 extern std::deque<ac_execode*> ExeStack;
 extern std::vector<std::vector<ac_var*>* > SignalsReadable;
 extern std::vector<std::vector<ac_var*>* > SignalsWriteable;
-extern ac_dimensions DimensionsAccumulator;
-extern std::vector<ac_param> ParamAccumulator;
+extern VarSegmentVector VarSegmentAccumulator;
+extern ac_dimensions_static StaticDimAccumulator;
+extern std::vector<ac_param*> ParamAccumulator;
 extern std::vector<std::string> StringParamAccumulator;
 extern std::vector<int> IntParamAccumulator;
 extern std::vector<unsigned int> UIntParamAccumulator;

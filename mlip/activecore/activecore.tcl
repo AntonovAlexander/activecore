@@ -91,11 +91,6 @@ namespace eval ActiveCore {
 		__gplc_acc_param_string $opcode
 		__gplc_call op
 	}
-
-	proc export {language filename} {
-		pipe::export
-		rtl::export $language $filename
-	}
 }
 
 proc _acc_index {index} {
@@ -125,6 +120,16 @@ proc _acc_index {index} {
 	}
 }
 
+proc _acc_substruct {substruct} {
+	if {[llength $substruct] != 1} {
+		ActiveCore::ERROR Substruct\ is\ incorrect!
+	} elseif {[ActiveCore::isnumeric $substruct] == 1} {
+		ActiveCore::ERROR Substruct\ is\ incorrect!
+	} else {
+		__gplc_acc_substruct $substruct
+	}
+}
+
 proc initval {dimensions value} {
 	_acc_index $dimensions
 	ActiveCore::_accum_param $value
@@ -140,8 +145,15 @@ proc ac= {target source} {
 	__gplc_call assign
 }
 
-proc aci= {target indices source} {
-	_acc_index $indices
+## shortcut for _acc_index / ac=
+proc ac=i {target index source} {
+	_acc_index $index
+	ac= $target $source
+}
+
+## shortcut for _acc_substruct / ac=
+proc ac=s {target substruct source} {
+	_acc_substruct $substruct
 	ac= $target $source
 }
 
@@ -366,6 +378,33 @@ proc signext {op size} {
 	ActiveCore::_accum_param $op
 	__gplc_acc_param_uint $size
 	__gplc_call signext 
+}
+
+try {namespace delete acstruct} on error {} {}
+namespace eval acstruct {
+
+	proc begin {struct_name} {
+		__gplc_acc_param_clr
+		__gplc_acc_param_string $struct_name
+		__gplc_call struct_begin
+	}
+
+	proc var {vartype dimensions name defval} {
+		__gplc_acc_param_clr
+		if {[ActiveCore::isnumeric $defval] == 0} {
+			ActiveCore::ERROR default\ value\ of\ val\ $name\ is\ not\ a\ number!
+		}
+		_acc_index $dimensions
+		__gplc_acc_param_string $name
+		__gplc_acc_param_string $vartype
+		__gplc_acc_param_string $defval
+		__gplc_call struct_var
+	}
+
+	proc end {} {
+		__gplc_call struct_end
+	}
+
 }
 
 proc ActiveCore_Reset {} {

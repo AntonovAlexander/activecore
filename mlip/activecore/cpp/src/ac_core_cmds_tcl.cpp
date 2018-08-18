@@ -25,7 +25,7 @@ int TCL_gplc_reset_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_
 	ExeStack.clear();
 	SignalsReadable.clear();
 	SignalsWriteable.clear();
-	DimensionsAccumulator.clear();
+	VarSegmentAccumulator.clear();
 	ParamAccumulator.clear();
 	StringParamAccumulator.clear();
 	IntParamAccumulator.clear();
@@ -128,9 +128,7 @@ int TCL_accum_param_c_cmd(ClientData clientData, Tcl_Interp *interp, int objc, T
 	dimension_range_static new_range(conv_string_to_int(msb), conv_string_to_int(lsb));
 	new_dimensions.push_back(new_range);
 
-	ac_imm * new_imm = new ac_imm(new_dimensions, val);
-	ac_param * new_param = new ac_param(new_imm);
-	ParamAccumulator.push_back(*new_param);
+	ParamAccumulator.push_back(new ac_imm(new_dimensions, val));
 	return TCL_OK;
 }
 
@@ -146,8 +144,7 @@ int TCL_accum_param_v_rd_cmd(ClientData clientData, Tcl_Interp *interp, int objc
 	std::string varname = std::string(Tcl_GetString(objv[1]));
 	ac_var * var;
 	if (GetVarReadable(varname, &var) != 0) return 1;
-	ac_param * new_param = new ac_param(var);
-	ParamAccumulator.push_back(*new_param);
+	ParamAccumulator.push_back(var);
 	return TCL_OK;
 }
 
@@ -163,8 +160,7 @@ int TCL_accum_param_v_wr_cmd(ClientData clientData, Tcl_Interp *interp, int objc
 	std::string varname = std::string(Tcl_GetString(objv[1]));
 	ac_var * var;
 	if (GetVarWriteable(varname, &var) != 0) return 1;
-	ac_param * new_param = new ac_param(var);
-	ParamAccumulator.push_back(*new_param);
+	ParamAccumulator.push_back(var);
 	return TCL_OK;
 }
 
@@ -176,7 +172,7 @@ int TCL_accum_dim_clr_cmd(ClientData clientData, Tcl_Interp *interp, int objc, T
 		printf("Incorrect command!\n");
 		return TCL_ERROR;
 	}
-	DimensionsAccumulator.clear();
+	VarSegmentAccumulator.clear();
 
 	return TCL_OK;
 }
@@ -192,8 +188,7 @@ int TCL_accum_index_c_cmd(ClientData clientData, Tcl_Interp *interp, int objc, T
 
 	int msb = conv_string_to_int(std::string(Tcl_GetString(objv[1])));
 
-	dimension_range new_range(msb);
-	DimensionsAccumulator.push_front(new_range);
+	VarSegmentAccumulator.push_front(VarSegment(msb));
 
 	return TCL_OK;
 }
@@ -211,8 +206,7 @@ int TCL_accum_index_v_cmd(ClientData clientData, Tcl_Interp *interp, int objc, T
 	ac_var* msb_var;
 	if (SetVarReadable(msb, &msb_var) != 0) return TCL_ERROR;
 
-	dimension_range new_range(msb_var);
-	DimensionsAccumulator.push_front(new_range);
+	VarSegmentAccumulator.push_front(VarSegment(msb_var));
 
 	return TCL_OK;
 }
@@ -229,8 +223,7 @@ int TCL_accum_range_cc_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	int msb = conv_string_to_int(std::string(Tcl_GetString(objv[1])));
 	int lsb = conv_string_to_int(std::string(Tcl_GetString(objv[2])));
 
-	dimension_range new_range(msb, lsb);
-	DimensionsAccumulator.push_front(new_range);
+	VarSegmentAccumulator.push_front(VarSegment(msb, lsb));
 
 	return TCL_OK;
 }
@@ -250,8 +243,7 @@ int TCL_accum_range_cv_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	ac_var* lsb_var;
 	if (SetVarReadable(lsb, &lsb_var) != 0) return TCL_ERROR;
 
-	dimension_range new_range(msb, lsb_var);
-	DimensionsAccumulator.push_front(new_range);
+	VarSegmentAccumulator.push_front(VarSegment(msb, lsb_var));
 
 	return TCL_OK;
 }
@@ -271,8 +263,7 @@ int TCL_accum_range_vc_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 
 	int lsb = conv_string_to_int(std::string(Tcl_GetString(objv[2])));
 
-	dimension_range new_range(msb_var, lsb);
-	DimensionsAccumulator.push_front(new_range);
+	VarSegmentAccumulator.push_front(VarSegment(msb_var, lsb));
 
 	return TCL_OK;
 }
@@ -294,8 +285,23 @@ int TCL_accum_range_vv_cmd(ClientData clientData, Tcl_Interp *interp, int objc, 
 	ac_var* lsb_var;
 	if (SetVarReadable(lsb, &lsb_var) != 0) return TCL_ERROR;
 
-	dimension_range new_range(msb_var, lsb_var);
-	DimensionsAccumulator.push_front(new_range);
+	VarSegmentAccumulator.push_front(VarSegment(msb_var, lsb_var));
+
+	return TCL_OK;
+}
+
+int TCL_accum_substruct_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
+{
+	if (DEBUG_FLAG == true) printf("Accum substruct command!\n");
+	if (objc != 2)
+	{
+		printf("Incorrect command!\n");
+		return TCL_ERROR;
+	}
+
+	std::string substruct = std::string(Tcl_GetString(objv[1]));
+
+	VarSegmentAccumulator.push_front(VarSegment(substruct));
 
 	return TCL_OK;
 }
@@ -337,9 +343,7 @@ int TCL_gplc_call_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_O
 		printf("[Regular params: %d]\n", ParamAccumulator.size());
 		for (unsigned int i = 0; i < ParamAccumulator.size(); i++)
 		{
-			unsigned int dimsize = 1;
-			if (ParamAccumulator[i].type == PARAM_TYPE_VAR) dimsize = ParamAccumulator[i].var->dimensions.size();
-			printf("%s, dimsize: %d\n", StringToCharArr(ParamAccumulator[i].GetStringFull()), dimsize);
+			printf("%s, dimsize: %d\n", StringToCharArr(ParamAccumulator[i]->GetString()), ParamAccumulator[i]->dimensions.size());
 		}
 	}
 
@@ -471,29 +475,58 @@ int TCL_gplc_call_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_O
 			printf("--ParamAccumulator size: %d\n", ParamAccumulator.size());
 			for (unsigned int i = 0; i < ParamAccumulator.size(); i++)
 			{
-				printf("---Param %d:, %s\n", i, StringToCharArr(ParamAccumulator[i].GetString()));
+				printf("---Param %d:, %s\n", i, StringToCharArr(ParamAccumulator[i]->GetString()));
 			}
 		}
+
+		// restoring VarSegmentAccumulator
+		if (DEBUG_FLAG) printf("restoring VarSegmentAccumulator...\n");
+		ac_struct * target_struct_ptr;
+		if (((ac_var*)ParamAccumulator[1])->vartype.type == VAR_TYPE::vt_structured) {
+			target_struct_ptr = ((ac_var*)ParamAccumulator[1])->vartype.src_struct;
+		} else {
+			target_struct_ptr = nullptr;
+		}
+		for (unsigned int VSA_INDEX = 0; VSA_INDEX < VarSegmentAccumulator.size(); VSA_INDEX++)
+		{
+			if (VarSegmentAccumulator[VSA_INDEX].type == SegType::SubStruct) {
+				if (target_struct_ptr) {
+					bool substr_found = true;
+					for (unsigned int SUBSTR_INDEX = 0; SUBSTR_INDEX < target_struct_ptr->structvars.size(); SUBSTR_INDEX++)
+					{
+						if (target_struct_ptr->structvars[SUBSTR_INDEX]->name == VarSegmentAccumulator[VSA_INDEX].substruct_name) {
+							VarSegmentAccumulator[VSA_INDEX].src_struct = target_struct_ptr;
+							VarSegmentAccumulator[VSA_INDEX].structIndex = SUBSTR_INDEX;
+							if (target_struct_ptr->structvars[SUBSTR_INDEX]->vartype.type == VAR_TYPE::vt_structured) {
+								target_struct_ptr = target_struct_ptr->structvars[SUBSTR_INDEX]->vartype.src_struct;
+							} else {
+								target_struct_ptr = nullptr;
+							}
+							substr_found = true;
+							break;
+						}
+					}
+					if (substr_found == false) {
+						printf("ActiveCore ERROR: substruct %s not found!\n", StringToCharArr(VarSegmentAccumulator[VSA_INDEX].substruct_name));
+						return 1;
+					}
+				} else {
+					printf("ActiveCore ERROR: substruct %s request inconsistent!\n", StringToCharArr(VarSegmentAccumulator[VSA_INDEX].substruct_name));
+					return 1;
+				}
+			}
+		}
+		if (DEBUG_FLAG) printf("VarSegmentAccumulator restoration complete\n");
 
 		bool cproc_gen = false;
 		if (ExeStack.size() == 0) cproc_gen = true;
 		if (cproc_gen == true) rtl::cproc_cmd();
 
-		if (expr_assign_cmd(DimensionsAccumulator, ParamAccumulator[1].var, ParamAccumulator[0]) != 0) return TCL_ERROR;
+		if (expr_assign_cmd(VarSegmentAccumulator, (ac_var*)ParamAccumulator[1], ParamAccumulator[0]) != 0) return TCL_ERROR;
 
 		if (cproc_gen == true) rtl::endcproc_cmd();
 
 	} else if (opcode == "initval") {
-		ac_dimensions_static new_dimensions;
-		for (unsigned int i = 0; i < DimensionsAccumulator.size(); i++)
-		{
-			if (DimensionsAccumulator[i].type != DimType_CC)
-			{
-				printf("Range arguments are incorrect!\n");
-				return TCL_ERROR;
-			}
-			new_dimensions.push_back(*(new dimension_range_static(DimensionsAccumulator[i].msb_int, DimensionsAccumulator[i].lsb_int)));
-		}
 
 		if (ParamAccumulator.size() != 1)
 		{
@@ -501,8 +534,19 @@ int TCL_gplc_call_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_O
 			return TCL_ERROR;
 		}
 
+		ac_dimensions_static dimensions;
+		for (unsigned int i = 0; i < VarSegmentAccumulator.size(); i++)
+		{
+			if (VarSegmentAccumulator[i].type == SegType::CC) {
+				dimensions.push_back(dimension_range_static(VarSegmentAccumulator[i].msb_int, VarSegmentAccumulator[i].lsb_int));
+			} else {
+				printf("ERROR: indices incorrect!\n");
+				return 1;
+			}
+		}
+
 		ac_var * genvar;
-		if (expr_initval_cmd(&genvar, new_dimensions, ParamAccumulator[0]) != 0) return TCL_ERROR;
+		if (expr_initval_cmd(&genvar, dimensions, ParamAccumulator[0]) != 0) return TCL_ERROR;
 		Tcl_SetResult(interp, StringToCharArr(genvar->name), TCL_VOLATILE);
 
 	} else if (opcode == "zeroext") {
@@ -547,12 +591,56 @@ int TCL_gplc_call_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_O
 
 		Tcl_SetResult(interp, StringToCharArr(genvar->name), TCL_VOLATILE);
 
+	} else if (opcode == "struct_begin") {
+		if ((ParamAccumulator.size() != 0) || (UIntParamAccumulator.size() != 0) || (StringParamAccumulator.size() != 1))
+		{
+			printf("Incorrect params!\n");
+			return TCL_ERROR;
+		}
+
+		printf("creating struct...\n");
+		if (ac_struct_cmd(&current_struct, StringParamAccumulator[0]) != 0) return 1;
+		printf("done\n");
+
+	} else if (opcode == "struct_var") {
+		if ((ParamAccumulator.size() != 0) || (StringParamAccumulator.size() != 3))
+		{
+			printf("Incorrect arguments!\n");
+			return TCL_ERROR;
+		}
+		ac_dimensions_static new_dimensions;
+		for (unsigned int i = 0; i < VarSegmentAccumulator.size(); i++)
+		{
+			if (VarSegmentAccumulator[i].type != SegType::CC)
+			{
+				printf("Range arguments are incorrect!\n");
+				return TCL_ERROR;
+			}
+			new_dimensions.push_back(dimension_range_static(VarSegmentAccumulator[i].msb_int, VarSegmentAccumulator[i].lsb_int));
+		}
+
+		VarType vartype;
+		if (DecodeVarType(StringParamAccumulator[1], &vartype) != 0) return 1;
+
+		ac_structvar * new_structvar = new ac_structvar(StringParamAccumulator[0], vartype, new_dimensions, StringParamAccumulator[2]);
+		current_struct->structvars.push_back(new_structvar);
+
+		VarSegmentAccumulator.clear();
+
+	} else if (opcode == "struct_end") {
+		if ((ParamAccumulator.size() != 0) || (UIntParamAccumulator.size() != 0) || (StringParamAccumulator.size() != 0))
+		{
+			printf("Incorrect params!\n");
+			return TCL_ERROR;
+		}
+		current_struct = nullptr;
+
 	} else {
 		printf("Command %s unknown!\n", StringToCharArr(opcode));
 		return TCL_ERROR;
 	}
 
-	DimensionsAccumulator.clear();
+	VarSegmentAccumulator.clear();
 	StringParamAccumulator.clear();
 	ParamAccumulator.clear();
 	return TCL_OK;
@@ -581,4 +669,5 @@ int TCL_core_InitCmds(Tcl_Interp *interp)
 	Tcl_CreateObjCommand(interp, "__gplc_acc_range_cv", TCL_accum_range_cv_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_acc_range_vc", TCL_accum_range_vc_cmd, NULL, NULL);
 	Tcl_CreateObjCommand(interp, "__gplc_acc_range_vv", TCL_accum_range_vv_cmd, NULL, NULL);
+	Tcl_CreateObjCommand(interp, "__gplc_acc_substruct", TCL_accum_substruct_cmd, NULL, NULL);
 }

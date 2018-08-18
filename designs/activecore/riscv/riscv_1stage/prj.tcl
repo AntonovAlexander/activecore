@@ -10,9 +10,6 @@ ActiveCore_Reset
 source ../riscv_pipe.tcl
 riscv_pipe::generate 1
 
-set filename riscv_1stage.v
-
-rtl::monitor debug_rtl.txt
-pipe::monitor debug_pipe.txt
-
-ActiveCore::export verilog $filename
+pipe::translate
+pipe::export rtl sverilog sverilog
+pipe::export hls vivado_cpp vivado_cpp
