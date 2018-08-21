@@ -63,7 +63,7 @@ wire [31:0] LED;
 pss_memsplit
 #(
 	.CPU("riscv_1stage"),
-	.delay_test_flag(0),
+	.delay_test_flag(1),
 	//.mem_data("../../../../activecore/riscv/sw/benchmarks/heartbeat_variable.riscv.hex"),
 	.mem_data("../../../../activecore/riscv/sw/benchmarks/median.riscv.hex"),
 	//.mem_data("../../../../activecore/riscv/sw/benchmarks/qsort.riscv.hex"),
