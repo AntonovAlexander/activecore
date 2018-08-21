@@ -8,7 +8,7 @@
 namespace pipe
 {
 
-	int translate_to_ir(ac_pproc* pproc);
+	int translate_to_ir(ac_pmodule* pmodule);
 
 }
 

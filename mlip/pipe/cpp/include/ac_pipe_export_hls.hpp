@@ -17,7 +17,7 @@
 namespace pipe
 {
 
-	int export_hls(ac_pproc_ir* pproc_ir, std::string system, std::string pathname);
+	int export_hls(ac_cycled_ir* cycled_ir, std::string system, std::string pathname);
 
 }
 

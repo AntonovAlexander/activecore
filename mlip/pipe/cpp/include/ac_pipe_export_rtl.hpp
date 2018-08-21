@@ -16,7 +16,7 @@
 namespace pipe
 {
 
-	int export_rtl(ac_pproc_ir* pproc_ir);
+	int export_rtl(ac_cycled_ir* cycled_ir);
 
 }
 

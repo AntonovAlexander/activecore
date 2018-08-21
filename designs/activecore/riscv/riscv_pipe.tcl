@@ -868,20 +868,26 @@ namespace eval riscv_pipe {
 			pipe::plocal unsigned {31 0} 	mem_rdata 		0
 			pipe::plocal unsigned {0 0} 	mem_rshift		0
 			
-			pipe::psticky_glbl unsigned	{31 0} 	pc				$riscv_pipe::START_ADDR
+			pipe::pglobal unsigned	{31 0} 	pc				$riscv_pipe::START_ADDR
 			_acc_index 	{31 1}	
-			pipe::psticky_glbl unsigned {31 0} 	regfile			0
-			pipe::psticky_glbl unsigned {0 0}	jump_req_cmd	0
-			pipe::psticky_glbl unsigned {31 0} 	jump_vector_cmd	0
+			pipe::pglobal unsigned {31 0} 	regfile			0
+			pipe::pglobal unsigned {0 0}	jump_req_cmd	0
+			pipe::pglobal unsigned {31 0} 	jump_vector_cmd	0
 
 			# TODO: CSRs
 
+			pipe::plocal unsigned {0 0} 	instr_req_done		0
 			pipe::_acc_index_rdata {31 0}
-			pipe::mcopipe::declare instr_mem $busreq_instr_struct_name unsigned
+			pipe::mcopipe::interface instr_mem $busreq_instr_struct_name unsigned
+			pipe::_acc_index_rdata {31 0}
+			pipe::mcopipe::handle instr_handle unsigned
 			pipe::plocal $busreq_instr_struct_name {0 0} instr_busreq 	0
 
+			pipe::plocal unsigned {0 0} 	data_req_done		0
 			pipe::_acc_index_rdata {31 0}
-			pipe::mcopipe::declare data_mem $busreq_instr_struct_name unsigned
+			pipe::mcopipe::interface data_mem $busreq_instr_struct_name unsigned
+			pipe::_acc_index_rdata {31 0}
+			pipe::mcopipe::handle data_handle unsigned
 			pipe::plocal $busreq_instr_struct_name {0 0} data_busreq 	0
 
 			# 1-stage
@@ -894,9 +900,13 @@ namespace eval riscv_pipe {
 					ac=s instr_busreq addr curinstr_addr
 					ac=s instr_busreq be 3
 					ac=s instr_busreq wdata 0
-					pipe::mcopipe::rdreq instr_mem instr_busreq
 					
-					pipe::mcopipe::resp instr_mem instr_code
+					acif::begnot instr_req_done
+						pipe::accum instr_req_done [pipe::mcopipe::rdreq instr_mem instr_handle instr_busreq]
+					acif::end
+					
+					pipe::mcopipe::resp instr_handle instr_code
+					
 					riscv_pipe::process_decode
 					riscv_pipe::process_regfetch
 					riscv_pipe::process_alu
@@ -914,11 +924,15 @@ namespace eval riscv_pipe {
 						ac=s data_busreq wdata mem_wdata
 
 						acif::begin mem_cmd
-							pipe::mcopipe::wrreq data_mem data_busreq
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::wrreq data_mem data_handle data_busreq]
+							acif::end
 						acif::end
 						acif::begelse
-							pipe::mcopipe::rdreq data_mem data_busreq
-							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::rdreq data_mem data_handle data_busreq]
+							acif::end
+							acif::begin [pipe::mcopipe::resp data_handle mem_rdata]
 								ac= rd_rdy	1
 							acif::end
 						acif::end
@@ -939,11 +953,14 @@ namespace eval riscv_pipe {
 					ac=s instr_busreq addr curinstr_addr
 					ac=s instr_busreq be 3
 					ac=s instr_busreq wdata 0
-					pipe::mcopipe::rdreq instr_mem instr_busreq
+					
+					acif::begnot instr_req_done
+						pipe::accum instr_req_done [pipe::mcopipe::rdreq instr_mem instr_handle instr_busreq]
+					acif::end
 
 				pipe::pstage EXEC
 
-					pipe::mcopipe::resp instr_mem instr_code
+					pipe::mcopipe::resp instr_handle instr_code
 					riscv_pipe::process_decode
 					riscv_pipe::process_regfetch
 
@@ -963,11 +980,15 @@ namespace eval riscv_pipe {
 						ac=s data_busreq wdata mem_wdata
 
 						acif::begin mem_cmd
-							pipe::mcopipe::wrreq data_mem data_busreq
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::wrreq data_mem data_handle data_busreq]
+							acif::end
 						acif::end
 						acif::begelse
-							pipe::mcopipe::rdreq data_mem data_busreq
-							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::rdreq data_mem data_handle data_busreq]
+							acif::end
+							acif::begin [pipe::mcopipe::resp data_handle mem_rdata]
 								ac= rd_rdy	1
 							acif::end
 						acif::end
@@ -987,11 +1008,14 @@ namespace eval riscv_pipe {
 					ac=s instr_busreq addr curinstr_addr
 					ac=s instr_busreq be 3
 					ac=s instr_busreq wdata 0
-					pipe::mcopipe::rdreq instr_mem instr_busreq
+					
+					acif::begnot instr_req_done
+						pipe::accum instr_req_done [pipe::mcopipe::rdreq instr_mem instr_handle instr_busreq]
+					acif::end
 
 				pipe::pstage EXEC
 
-					pipe::mcopipe::resp instr_mem instr_code
+					pipe::mcopipe::resp instr_handle instr_code
 					riscv_pipe::process_decode
 					riscv_pipe::process_regfetch
 					riscv_pipe::forward_blocking MEMWB
@@ -1014,11 +1038,15 @@ namespace eval riscv_pipe {
 						ac=s data_busreq wdata mem_wdata
 
 						acif::begin mem_cmd
-							pipe::mcopipe::wrreq data_mem data_busreq
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::wrreq data_mem data_handle data_busreq]
+							acif::end
 						acif::end
 						acif::begelse
-							pipe::mcopipe::rdreq data_mem data_busreq
-							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::rdreq data_mem data_handle data_busreq]
+							acif::end
+							acif::begin [pipe::mcopipe::resp data_handle mem_rdata]
 								ac= rd_rdy	1
 							acif::end
 						acif::end
@@ -1038,11 +1066,14 @@ namespace eval riscv_pipe {
 					ac=s instr_busreq addr curinstr_addr
 					ac=s instr_busreq be 3
 					ac=s instr_busreq wdata 0
-					pipe::mcopipe::rdreq instr_mem instr_busreq
+					
+					acif::begnot instr_req_done
+						pipe::accum instr_req_done [pipe::mcopipe::rdreq instr_mem instr_handle instr_busreq]
+					acif::end
 
 				pipe::pstage IDECODE
 
-					pipe::mcopipe::resp instr_mem instr_code
+					pipe::mcopipe::resp instr_handle instr_code
 					riscv_pipe::process_decode
 					riscv_pipe::process_regfetch
 
@@ -1071,11 +1102,15 @@ namespace eval riscv_pipe {
 						ac=s data_busreq wdata mem_wdata
 
 						acif::begin mem_cmd
-							pipe::mcopipe::wrreq data_mem data_busreq
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::wrreq data_mem data_handle data_busreq]
+							acif::end
 						acif::end
 						acif::begelse
-							pipe::mcopipe::rdreq data_mem data_busreq
-							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::rdreq data_mem data_handle data_busreq]
+							acif::end
+							acif::begin [pipe::mcopipe::resp data_handle mem_rdata]
 								ac= rd_rdy	1
 							acif::end
 						acif::end
@@ -1094,11 +1129,14 @@ namespace eval riscv_pipe {
 					ac=s instr_busreq addr curinstr_addr
 					ac=s instr_busreq be 3
 					ac=s instr_busreq wdata 0
-					pipe::mcopipe::rdreq instr_mem instr_busreq
+					
+					acif::begnot instr_req_done
+						pipe::accum instr_req_done [pipe::mcopipe::rdreq instr_mem instr_handle instr_busreq]
+					acif::end
 
 				pipe::pstage IDECODE
 
-					pipe::mcopipe::resp instr_mem instr_code
+					pipe::mcopipe::resp instr_handle instr_code
 					riscv_pipe::process_decode
 					riscv_pipe::process_regfetch
 					
@@ -1126,10 +1164,14 @@ namespace eval riscv_pipe {
 						ac=s data_busreq wdata mem_wdata
 
 						acif::begin mem_cmd
-							pipe::mcopipe::wrreq data_mem data_busreq
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::wrreq data_mem data_handle data_busreq]
+							acif::end
 						acif::end
 						acif::begelse
-							pipe::mcopipe::rdreq data_mem data_busreq
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::rdreq data_mem data_handle data_busreq]
+							acif::end
 						acif::end
 					acif::end
 
@@ -1137,7 +1179,7 @@ namespace eval riscv_pipe {
 					
 					acif::begin mem_req
 						acif::begin [ac! mem_cmd]
-							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+							acif::begin [pipe::mcopipe::resp data_handle mem_rdata]
 								ac= rd_rdy	1
 							acif::end
 						acif::end
@@ -1158,11 +1200,14 @@ namespace eval riscv_pipe {
 					ac=s instr_busreq addr curinstr_addr
 					ac=s instr_busreq be 3
 					ac=s instr_busreq wdata 0
-					pipe::mcopipe::rdreq instr_mem instr_busreq
+					
+					acif::begnot instr_req_done
+						pipe::accum instr_req_done [pipe::mcopipe::rdreq instr_mem instr_handle instr_busreq]
+					acif::end
 
 				pipe::pstage IDECODE
 
-					pipe::mcopipe::resp instr_mem instr_code
+					pipe::mcopipe::resp instr_handle instr_code
 					riscv_pipe::process_decode
 					riscv_pipe::process_regfetch
 					
@@ -1190,10 +1235,14 @@ namespace eval riscv_pipe {
 						ac=s data_busreq wdata mem_wdata
 
 						acif::begin mem_cmd
-							pipe::mcopipe::wrreq data_mem data_busreq
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::wrreq data_mem data_handle data_busreq]
+							acif::end
 						acif::end
 						acif::begelse
-							pipe::mcopipe::rdreq data_mem data_busreq
+							acif::begnot data_req_done
+								pipe::accum data_req_done [pipe::mcopipe::rdreq data_mem data_handle data_busreq]
+							acif::end
 						acif::end
 					acif::end
 
@@ -1201,7 +1250,7 @@ namespace eval riscv_pipe {
 					
 					acif::begin mem_req
 						acif::begin [ac! mem_cmd]
-							acif::begin [pipe::mcopipe::resp data_mem mem_rdata]
+							acif::begin [pipe::mcopipe::resp data_handle mem_rdata]
 								ac= rd_rdy	1
 							acif::end
 						acif::end

@@ -72,7 +72,7 @@ namespace pipe
 	int ir_wrfifo_req(ac_var ** fifo_rdy, ir_wrfifo_if * fifo_if, ac_param* wrdata);
 	int ir_rdfifo_req(ac_var ** fifo_rdy, ir_rdfifo_if * fifo_if, ac_var * rddata);
 
-	class ac_pproc_ir : public ac_execode
+	class ac_cycled_ir : public ac_execode
 	{
 	public:
 		std::string name;
@@ -86,14 +86,14 @@ namespace pipe
 		std::vector<ir_wrfifo_if*> ir_wrfifo_ifs;
 		std::vector<ir_rdfifo_if*> ir_rdfifo_ifs;
 
-		ac_pproc_ir(std::string name_in) : ac_execode(IR_PROC)
+		ac_cycled_ir(std::string name_in) : ac_execode(IR_PROC)
 		{
 			name = name_in;
 		}
 	};
 
-	extern ac_pproc_ir* Pproc_ir;
-	int set_new_pproc_ir(ac_pproc_ir ** new_proc_ir, std::string name);
+	extern ac_cycled_ir* Cycled_ir;
+	int set_new_cycled_ir(ac_cycled_ir ** new_cycled_ir, std::string name);
 }
 
 #endif /* INCLUDE_AC_PIPE_IR_HPP_ */

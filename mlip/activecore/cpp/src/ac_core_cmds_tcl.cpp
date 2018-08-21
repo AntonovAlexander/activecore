@@ -150,7 +150,7 @@ int TCL_accum_param_v_rd_cmd(ClientData clientData, Tcl_Interp *interp, int objc
 
 int TCL_accum_param_v_wr_cmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
 {
-	if (DEBUG_FLAG == true) printf("Accum param v rd command!\n");
+	if (DEBUG_FLAG == true) printf("Accum param v wr command!\n");
 	if (objc != 2)
 	{
 		printf("Incorrect command!\n");
@@ -161,6 +161,7 @@ int TCL_accum_param_v_wr_cmd(ClientData clientData, Tcl_Interp *interp, int objc
 	ac_var * var;
 	if (GetVarWriteable(varname, &var) != 0) return 1;
 	ParamAccumulator.push_back(var);
+
 	return TCL_OK;
 }
 

@@ -17,4 +17,3 @@ tclsh prj.tcl | tee debug.txt
 
 cd ../riscv_6stage
 tclsh prj.tcl | tee debug.txt
-

@@ -34,19 +34,19 @@ namespace eval pipe {
 		__mlip_pipe_call plocal
 	}
 
-	proc psticky {vartype dimensions name defval} {
-		if {[ActiveCore::isnumeric $defval] == 0} {
-			ActiveCore::ERROR default\ value\ of\ psticky\ $name\ is\ not\ a\ number!
-		}
-		__gplc_acc_param_clr
-		_acc_index $dimensions
-		__gplc_acc_param_string $name
-		__gplc_acc_param_string $vartype
-		__gplc_acc_param_string $defval
-		__mlip_pipe_call psticky
-	}
+	#proc psticky {vartype dimensions name defval} {
+	#	if {[ActiveCore::isnumeric $defval] == 0} {
+	#		ActiveCore::ERROR default\ value\ of\ psticky\ $name\ is\ not\ a\ number!
+	#	}
+	#	__gplc_acc_param_clr
+	#	_acc_index $dimensions
+	#	__gplc_acc_param_string $name
+	#	__gplc_acc_param_string $vartype
+	#	__gplc_acc_param_string $defval
+	#	__mlip_pipe_call psticky
+	#}
 
-	proc psticky_glbl {vartype dimensions name defval} {
+	proc pglobal {vartype dimensions name defval} {
 		if {[ActiveCore::isnumeric $defval] == 0} {
 			ActiveCore::ERROR default\ value\ of\ psticky_glbl\ $name\ is\ not\ a\ number!
 		}
@@ -55,7 +55,7 @@ namespace eval pipe {
 		__gplc_acc_param_string $name
 		__gplc_acc_param_string $vartype
 		__gplc_acc_param_string $defval
-		__mlip_pipe_call psticky_glbl
+		__mlip_pipe_call pglobal
 	}
 
 	proc rdbuf {name} {
@@ -142,34 +142,42 @@ namespace eval pipe {
 	try {namespace delete mcopipe} on error {} {}
 	namespace eval mcopipe {
 
-		proc declare {name vartype_wdata vartype_rdata} {
+		proc interface {name vartype_wdata vartype_rdata} {
 			__gplc_acc_param_clr
 			__gplc_acc_param_string $name
 			__gplc_acc_param_string $vartype_wdata
 			__gplc_acc_param_string $vartype_rdata
-			__mlip_pipe_call mcopipeif
+			__mlip_pipe_call mcopipe_interface
 		}
 
-		proc req {mcopipeif_name cmd param} {
+		proc handle {name vartype_rdata} {
+			__gplc_acc_param_clr
+			__gplc_acc_param_string $name
+			__gplc_acc_param_string $vartype_rdata
+			__mlip_pipe_call mcopipe_handle
+		}
+
+		proc req {mcopipe_if_name mcopipe_handle_name cmd param} {
 			__gplc_acc_param_clr
 			ActiveCore::_accum_param $cmd
 			ActiveCore::_accum_param $param
-			__gplc_acc_param_string $mcopipeif_name
+			__gplc_acc_param_string $mcopipe_if_name
+			__gplc_acc_param_string $mcopipe_handle_name
 			__mlip_pipe_call mcopipe_req
 		}
 
-		proc wrreq {mcopipeif_name param} {
-			req $mcopipeif_name 1 $param
+		proc wrreq {mcopipe_if_name mcopipe_handle_name param} {
+			req $mcopipe_if_name $mcopipe_handle_name 1 $param
 		}
 
-		proc rdreq {mcopipeif_name param} {
-			req $mcopipeif_name 0 $param
+		proc rdreq {mcopipe_if_name mcopipe_handle_name param} {
+			req $mcopipe_if_name $mcopipe_handle_name 0 $param
 		}
 
-		proc resp {mcopipeif_name target} {
+		proc resp {mcopipe_handle_name target} {
 			__gplc_acc_param_clr
 			__gplc_acc_param_v_wr $target
-			__gplc_acc_param_string $mcopipeif_name
+			__gplc_acc_param_string $mcopipe_handle_name
 			__mlip_pipe_call mcopipe_resp
 		}
 
@@ -203,26 +211,34 @@ namespace eval pipe {
 	try {namespace delete scopipe} on error {} {}
 	namespace eval scopipe {
 
-		proc declare {name vartype_wdata vartype_rdata} {
+		proc interface {name vartype_wdata vartype_rdata} {
 			__gplc_acc_param_clr
 			__gplc_acc_param_string $name
 			__gplc_acc_param_string $vartype_wdata
 			__gplc_acc_param_string $vartype_rdata
-			__mlip_pipe_call scopipeif
+			__mlip_pipe_call scopipe_interface
 		}
 
-		proc req {mcopipeif_name we data} {
+		proc handle {name vartype_rdata} {
+			__gplc_acc_param_clr
+			__gplc_acc_param_string $name
+			__gplc_acc_param_string $vartype_rdata
+			__mlip_pipe_call scopipe_handle
+		}
+
+		proc req {scopipe_if_name scopipe_handle_name we data} {
 			__gplc_acc_param_clr
 			__gplc_acc_param_v_wr $we
 			__gplc_acc_param_v_wr $data
-			__gplc_acc_param_string $mcopipeif_name
+			__gplc_acc_param_string $scopipe_if_name
+			__gplc_acc_param_string $scopipe_handle_name
 			__mlip_pipe_call scopipe_req
 		}
 
-		proc resp {mcopipeif_name data} {
+		proc resp {scopipe_handle_name data} {
 			__gplc_acc_param_clr
 			__gplc_acc_param_v_rd $data
-			__gplc_acc_param_string $mcopipeif_name
+			__gplc_acc_param_string $scopipe_handle_name
 			__mlip_pipe_call scopipe_resp
 		}
 
