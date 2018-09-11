@@ -1,4 +1,4 @@
-ActiveCore is a temporary working name for MLIP-enabled framework prototype and may change in the future.
+ActiveCore is a temporary working name for "Micro-Language IP"(MLIP)-enabled framework prototype and may change in the future.
 
 At the moment, GPLC component is distributed as open-source, while rtl and pipe MLIPs are distributed as static compiled libraries.
 
@@ -7,7 +7,7 @@ Test designs are located at /designs. MLIP-based components are located at activ
 
 Pipe MLIP functionality is demonstrated via 6 RISC-V (RV32I) CPU designs with variable-length pipelines (riscv_1stage-riscv_6stage).
 MLIP-based codes for RISC-V CPU cores are located at /designs/activecore/riscv.
-All the cores function in hardware (however, exaustive testing is in progress).
+All the cores function in hardware (exaustive testing is in progress).
 
 Previously, mainline working projects were based on CPUs with DLX architecture.
 
