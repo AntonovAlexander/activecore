@@ -369,7 +369,7 @@ int expr_op_cmd(unsigned int * cursor, char * opcode, ac_var** respvar, std::vec
 			return 1;
 		}
 		ac_dimensions_static genvar_dimensions;
-		if ((opcode == OP1_BITWISE_NOT) || (OP1_COMPLEMENT)) genvar_dimensions = params[0]->GetDimensions();
+		if ((opcode == OP1_BITWISE_NOT) || (opcode == OP1_COMPLEMENT)) genvar_dimensions = params[0]->GetDimensions();
 		else if (opcode == OP1_LOGICAL_NOT) genvar_dimensions.push_back(dimension_range_static(0, 0));
 		else {
 			// TODO: vectored operations

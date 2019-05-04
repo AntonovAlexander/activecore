@@ -1,5 +1,9 @@
 ActiveCore is a temporary working name for "Micro-Language IP"(MLIP)-enabled framework prototype and may change in the future.
 
+Full description of the project is available in my PhD thesis:
+"Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators"
+Thesis web page: http://fppo.ifmo.ru/dissertation/?number=63419
+
 At the moment, GPLC component is distributed as open-source, while rtl and pipe MLIPs are distributed as static compiled libraries.
 
 MLIP components are located at /mlip.
