@@ -28,7 +28,7 @@ pss_memsplit
 #(
 	.CPU("riscv_6stage")
 	, .delay_test_flag(0)
-	, .mem_data("../../activecore/riscv/sw/benchmarks/heartbeat_variable.riscv.hex")
+	, .mem_data("../pss_memsplit/sw/benchmarks/heartbeat_variable.riscv.hex")
 	, .mem_size(8192)
 ) riscv_udm
 (

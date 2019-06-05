@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2015 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="5" Path="D:/git_projects/activecore/designs/rtl/pss_memsplit/syn/syn_4stage/NEXYS4-DDR/NEXYS4_DDR.xpr">
+<Project Version="7" Minor="5" Path="D:/git_projects/activecore_current/designs/rtl/pss_memsplit/syn/syn_4stage/NEXYS4-DDR/NEXYS4_DDR.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="dbe4f722851248e3976cc912f1a3ff99"/>
@@ -46,20 +46,20 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../activecore/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.svh">
+      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../activecore/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.sv">
+      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../cpu_stub.v">
+      <File Path="$PPRDIR/../../../hw/cpu_stub.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -94,51 +94,51 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../bus_unit_memsplit.v">
+      <File Path="$PPRDIR/../../../hw/bus_unit_memsplit.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../activecore/riscv/coregen/riscv_5stage/sverilog/riscv_5stage.svh">
+      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_5stage/sverilog/riscv_5stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../activecore/riscv/coregen/riscv_1stage/sverilog/riscv_1stage.svh">
+      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_1stage/sverilog/riscv_1stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../activecore/riscv/coregen/riscv_6stage/sverilog/riscv_6stage.svh">
+      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_6stage/sverilog/riscv_6stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../activecore/riscv/coregen/riscv_2stage/sverilog/riscv_2stage.svh">
+      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_2stage/sverilog/riscv_2stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../activecore/riscv/coregen/riscv_3stage/sverilog/riscv_3stage.svh">
+      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_3stage/sverilog/riscv_3stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../cpu_wrapper.sv">
+      <File Path="$PPRDIR/../../../hw/cpu_wrapper.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../pss_memsplit.v">
+      <File Path="$PPRDIR/../../../hw/pss_memsplit.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
