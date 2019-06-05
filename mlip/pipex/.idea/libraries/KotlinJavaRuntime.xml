@@ -6,9 +6,9 @@
       <root url="jar://$KOTLIN_BUNDLED$/lib/kotlin-test.jar!/" />
       <root url="jar://$KOTLIN_BUNDLED$/lib/kotlin-stdlib-jdk7.jar!/" />
       <root url="jar://$KOTLIN_BUNDLED$/lib/kotlin-stdlib-jdk8.jar!/" />
-      <root url="file://D:/git_projects/activecore_kt/hwast/out/production/hwast" />
-      <root url="file://D:/git_projects/activecore_kt/mlip/rtl/out/production/rtl" />
-      <root url="file://D:/git_projects/activecore_kt/mlip/cyclix/out/production/cyclix" />
+      <root url="file://$PROJECT_DIR$/../../hwast/out/production/hwast" />
+      <root url="file://$PROJECT_DIR$/../rtl/out/production/rtl" />
+      <root url="file://$PROJECT_DIR$/../cyclix/out/production/cyclix" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
