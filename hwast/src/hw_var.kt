@@ -1,3 +1,11 @@
+/*
+ * hw_var.kt
+ *
+ *  Created on: 05.06.2019
+ *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+ *     License: See LICENSE file for details
+ */
+
 package hwast
 
 data class hw_var_descr(var VarType : VAR_TYPE, var src_struct: hw_struct, var dimensions : hw_dim_static, var defval : String)

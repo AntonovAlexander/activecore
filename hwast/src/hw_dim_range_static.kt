@@ -1,3 +1,11 @@
+/*
+ * hw_dim_range_static.kt
+ *
+ *  Created on: 05.06.2019
+ *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+ *     License: See LICENSE file for details
+ */
+
 package hwast
 
 class hw_dim_range_static (val msb: Int, val lsb: Int) {

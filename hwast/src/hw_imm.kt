@@ -1,3 +1,11 @@
+/*
+ * hw_imm.kt
+ *
+ *  Created on: 05.06.2019
+ *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+ *     License: See LICENSE file for details
+ */
+
 package hwast
 
 class hw_imm (val dimensions_in : hw_dim_static, val imm_value : String) : hw_param(PARAM_TYPE.VAL, dimensions_in, imm_value)

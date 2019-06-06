@@ -1,3 +1,11 @@
+/*
+ * hw_struct.kt
+ *
+ *  Created on: 05.06.2019
+ *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+ *     License: See LICENSE file for details
+ */
+
 package hwast
 
 enum class VAR_TYPE {
