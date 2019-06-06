@@ -10,6 +10,40 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return ret_val
     }
 
+    var hw_structs          = mutableMapOf<String, hw_struct>()
+    var hw_if_structs       = ArrayList<hw_struct>()
+    var hw_private_structs  = ArrayList<hw_struct>()
+
+    fun add_if_struct(new_struct : hw_struct) {
+        if (hw_structs.containsKey(new_struct.name)) {
+            ERROR("Name conflict for struct: " + new_struct.name)
+        } else {
+            hw_structs.put(new_struct.name, new_struct)
+            hw_if_structs.add(new_struct)
+        }
+    }
+
+    fun add_if_struct(new_struct_name : String) : hw_struct {
+        var new_struct = hw_struct(new_struct_name)
+        add_if_struct(new_struct)
+        return new_struct
+    }
+
+    fun add_private_struct(new_struct : hw_struct) {
+        if (hw_structs.containsKey(new_struct.name)) {
+            ERROR("Name conflict for struct: " + new_struct.name)
+        } else {
+            hw_structs.put(new_struct.name, new_struct)
+            hw_private_structs.add(new_struct)
+        }
+    }
+
+    fun add_private_struct(new_struct_name : String) : hw_struct {
+        var new_struct = hw_struct(new_struct_name)
+        add_private_struct(new_struct)
+        return new_struct
+    }
+
     fun DistributeVars(new_expr: hw_exec) {
         for (cur_exec in this) {
             for (new_wrvar in new_expr.wrvars) {

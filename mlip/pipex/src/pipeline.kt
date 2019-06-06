@@ -32,10 +32,6 @@ open class pipeline(name_in : String) : hw_astc() {
     val name = name_in
     var tab_Counter = 0
 
-    var hw_structs = mutableMapOf<String, hw_struct>()
-    var hw_if_structs = ArrayList<hw_struct>()
-    var hw_int_structs = ArrayList<hw_struct>()
-
     var wrvars = mutableMapOf<String, hw_var>()
     var rdvars = mutableMapOf<String, hw_var>()
 
@@ -96,32 +92,6 @@ open class pipeline(name_in : String) : hw_astc() {
     var var_dict = mutableMapOf<hw_var, hw_var>()
     var fifo_out_dict = mutableMapOf<hw_fifo_out, fifo_out_descr>()
     var fifo_in_dict = mutableMapOf<hw_fifo_in, fifo_in_descr>()
-
-    fun add_if_struct(new_struct: hw_struct) {
-        hw_if_structs.add(new_struct)
-        if (hw_structs.put(new_struct.name, new_struct) != null) {
-            ERROR("Struct addition problem!")
-        }
-    }
-
-    fun add_if_struct(new_struct_name : String) : hw_struct {
-        var new_struct = hw_struct(new_struct_name)
-        add_if_struct(new_struct)
-        return new_struct
-    }
-
-    fun add_int_struct(new_struct: hw_struct) {
-        hw_int_structs.add(new_struct)
-        if (hw_structs.put(new_struct.name, new_struct) != null) {
-            ERROR("Struct addition problem!")
-        }
-    }
-
-    fun add_int_struct(new_struct_name : String) : hw_struct {
-        var new_struct = hw_struct(new_struct_name)
-        add_int_struct(new_struct)
-        return new_struct
-    }
 
     private fun add_local(new_local: hw_local) {
         if (wrvars.put(new_local.name, new_local) != null) {
@@ -1374,8 +1344,8 @@ open class pipeline(name_in : String) : hw_astc() {
         for (if_struct in hw_if_structs) {
             cyclix_gen.add_if_struct(if_struct)
         }
-        for (int_struct in hw_int_structs) {
-            cyclix_gen.add_int_struct(int_struct)
+        for (private_struct in hw_private_structs) {
+            cyclix_gen.add_private_struct(private_struct)
         }
 
         MSG(DEBUG_FLAG, "Processing globals")

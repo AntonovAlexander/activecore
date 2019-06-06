@@ -10,10 +10,6 @@ open class module(name_in : String) : hw_astc() {
     val OP_CPROC    = hw_opcode("cproc")
     var tab_Counter = 0
 
-    var hw_structs      = mutableMapOf<String, hw_struct>()
-    var hw_if_structs   = ArrayList<hw_struct>()
-    var hw_int_structs  = ArrayList<hw_struct>()
-
     var wrvars      = mutableMapOf<String, hw_var>()
     var rdvars      = mutableMapOf<String, hw_var>()
 
@@ -22,20 +18,6 @@ open class module(name_in : String) : hw_astc() {
     var Mems        = ArrayList<hw_mem>()
     var SyncBufs    = ArrayList<hw_syncbuf>()
     var Cprocs      = ArrayList<hw_exec>()
-
-    fun add_if_struct(new_struct : hw_struct) {
-        hw_if_structs.add(new_struct)
-        if (hw_structs.put(new_struct.name, new_struct) != null) {
-            ERROR("Struct addition problem!")
-        }
-    }
-
-    fun add_int_struct(new_struct : hw_struct) {
-        hw_int_structs.add(new_struct)
-        if (hw_structs.put(new_struct.name, new_struct) != null) {
-            ERROR("Struct addition problem!")
-        }
-    }
 
     private fun add_comb(new_comb : hw_var) {
         if (wrvars.containsKey(new_comb.name)) ERROR("Naming conflict for comb: " + new_comb.name)
