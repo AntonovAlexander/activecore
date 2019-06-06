@@ -25,7 +25,7 @@ buf_size = 8192
 test_succ_counter = 0
 test_fail_counter = 0
 
-udm.cc('COM5', 921600)
+udm.cc('COM8', 921600)
 print("")
 
 def reset_buf():    

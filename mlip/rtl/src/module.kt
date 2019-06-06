@@ -858,8 +858,9 @@ open class module(name_in : String) : hw_astc() {
 
         } else if (expr.opcode == OP1_WHILE) {
             wrFile.write("while (" + expr.params[0].GetString() + " == 1'b1)\n")
-            wrFile.write("begin\n")
             tab_Counter++
+            PrintTab(wrFile)
+            wrFile.write("begin\n")
             for (child_expr in expr.expressions) {
                 export_sverilog_expr(wrFile, child_expr)
             }
@@ -870,11 +871,11 @@ open class module(name_in : String) : hw_astc() {
         } else ERROR("undefined opcode")
     }
 
-    fun export_sv(pathname : String) {
+    fun export_to_sv(pathname : String) {
 
-        println("#######################################")
-        println("#### Starting SystemVerilog export ####")
-        println("#######################################")
+        println("############################################")
+        println("#### rtl: starting SystemVerilog export ####")
+        println("############################################")
 
         validate()
 
@@ -943,13 +944,13 @@ open class module(name_in : String) : hw_astc() {
             if (mem.mem_srcs.size == 0) throw Exception("Mem signals with no sources is not supported, mem signal: %s!\n")
             else {
                 var reset_sensivity = ""
-                if (mem.rst_present && (mem.rst_type == RST_TYPE.ASYNC)) reset_sensivity = (", " + mem.rst_signal.name);
+                if (mem.rst_present && (mem.rst_type == RST_TYPE.ASYNC)) reset_sensivity = (", " + mem.rst_signal.name)
 
                 var reset_condition = ""
                 if (mem.rst_present)
                 {
                     if (mem.rst_lvl == SYNC_LVL.POS) reset_condition = (mem.rst_signal.name + " == 1")
-                    else reset_condition = (mem.rst_signal.name + " == 0");
+                    else reset_condition = (mem.rst_signal.name + " == 0")
                 }
 
                 for (mem_src in mem.mem_srcs)
@@ -968,8 +969,8 @@ open class module(name_in : String) : hw_astc() {
                                 + reset_sensivity
                                 + ")\n")
 
-                        wrFileModule.write("\tif ($reset_condition)\n");
-                        wrFileModule.write("\t\tbegin\n");
+                        wrFileModule.write("\tif ($reset_condition)\n")
+                        wrFileModule.write("\t\tbegin\n")
                         if (mem.dimensions.size == 1) {
                             wrFileModule.write("\t\t" + mem.name + " <= " + mem.rst_src.GetString() +";\n")
                         } else if (mem.dimensions.size == 2) {
@@ -1050,7 +1051,7 @@ open class module(name_in : String) : hw_astc() {
                             } else
                                 ERROR("Undimensioned mems (data) are currently not supported!\n")
                         }
-                        wrFileModule.write("\t\tend\n");
+                        wrFileModule.write("\t\tend\n")
 
                     } else {
                         wrFileModule.write("always @("
@@ -1071,7 +1072,7 @@ open class module(name_in : String) : hw_astc() {
         println("done")
 
         // Cprocs
-        println("Exporting cprocs...");
+        println("Exporting cprocs...")
         for (cproc in Cprocs) {
             wrFileModule.write("always @*\n")
             tab_Counter = 1
@@ -1094,8 +1095,8 @@ open class module(name_in : String) : hw_astc() {
 
         wrFileModule.close()
 
-        println("########################################")
-        println("#### SystemVerilog export complete! ####")
-        println("########################################")
+        println("#############################################")
+        println("#### rtl: SystemVerilog export complete! ####")
+        println("#############################################")
     }
 }

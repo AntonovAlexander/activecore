@@ -2,6 +2,7 @@ package cyclix
 
 import hwast.*
 import java.lang.Exception
+import java.io.File
 
 val OP_CYCPROC = hw_opcode("cycproc")
 
@@ -745,7 +746,7 @@ open class module(name_in : String) : hw_astc() {
         // println("#### Cyclix: exporting expression complete!")
     }
 
-    fun export_rtl() : rtl.module {
+    fun export_to_rtl() : rtl.module {
 
         println("#######################################")
         println("#### Starting Cyclix-to-RTL export ####")
@@ -845,5 +846,370 @@ open class module(name_in : String) : hw_astc() {
         println("########################################")
 
         return rtl_gen
+    }
+
+    fun getStringWithDim(param : hw_param) : String
+    {
+        if (param.type == PARAM_TYPE.VAR) return param.token_printable
+        else return (param.dimensions[0].GetWidth().toString() + "'d" + param.token_printable)
+    }
+
+    fun getDimString(in_range : hw_dim_range_static) : String
+    {
+        return ("[" + in_range.msb.toString() + ":" + in_range.lsb.toString() + "]")
+    }
+
+    fun getDimString(fraction : hw_fraction) : String
+    {
+        if (fraction.type == FRAC_TYPE.C)
+            return ("[" + (fraction as hw_fraction_C).index.token_printable + "]")
+
+        else if (fraction.type == FRAC_TYPE.V)
+            return ("[" + (fraction as hw_fraction_V).index.name + "]")
+
+        else if (fraction.type == FRAC_TYPE.CC)
+            return ("[" + (fraction as hw_fraction_CC).msb.token_printable + ":"
+                    + fraction.lsb.token_printable + "]")
+
+        else if (fraction.type == FRAC_TYPE.CV)
+            return ("[" + (fraction as hw_fraction_CV).msb.token_printable + ":"
+                    + fraction.lsb.name + "]")
+
+        else if (fraction.type == FRAC_TYPE.VC)
+            return ("[" + (fraction as hw_fraction_VC).msb.name + ":"
+                    + fraction.lsb.token_printable + "]")
+
+        else if (fraction.type == FRAC_TYPE.VV)
+            return ("[" + (fraction as hw_fraction_VV).msb.name + ":"
+                    + fraction.lsb.name + "]")
+
+        else if (fraction.type == FRAC_TYPE.SubStruct)
+            return ("." + (fraction as hw_fraction_SubStruct).substruct_name)
+
+        else {
+            ERROR("Dimensions unrecognized!")
+            return ""
+        }
+    }
+
+    fun getDimString(fractions : hw_fractions) : String
+    {
+        var ret_val = ""
+        for (i in fractions.lastIndex downTo 0) {
+            ret_val += getDimString(fractions[i])
+        }
+        return ret_val
+    }
+
+    fun export_sverilog_structvar(preambule_uncond : String, preambule_cond : String, trailer : String, structvar : hw_structvar, wrFile : java.io.OutputStreamWriter) {
+        var dimstring = ""
+        if (structvar.VarType == VAR_TYPE.STRUCTURED) {
+            if (!structvar.dimensions.isSingle()) {
+                for (dim in structvar.dimensions) {
+                    dimstring += ("" + getDimString(dim))
+                }
+            }
+            wrFile.write(preambule_uncond
+                    + structvar.src_struct.name
+                    + " "
+                    + structvar.name
+                    + dimstring
+                    + trailer)
+        } else {
+            if (structvar.dimensions.size > 0) {
+                for (DIM_INDEX in 1 until structvar.dimensions.size) {
+                    dimstring += (" [" + structvar.dimensions[DIM_INDEX].msb + ":" + structvar.dimensions[DIM_INDEX].lsb + "]")
+                }
+                wrFile.write(preambule_uncond
+                        + preambule_cond
+                        + "["
+                        + structvar.dimensions[0].msb.toString()
+                        + ":"
+                        + structvar.dimensions[0].lsb.toString()
+                        + "] "
+                        + structvar.name
+                        + dimstring
+                        + trailer)
+            } else ERROR("Dimensions error")
+        }
+    }
+
+    fun PrintTab(wrFile : java.io.OutputStreamWriter){
+        for (i in 0 until tab_Counter) wrFile.write("\t")
+    }
+
+    fun export_vivado_cpp_expr(wrFile : java.io.OutputStreamWriter, expr : hw_exec)
+    {
+        PrintTab(wrFile)
+
+        var dimstring = getDimString(expr.fractions)
+
+        var opstring = ""
+        if (expr.opcode == OP1_ASSIGN) 	            opstring = ""
+        else if (expr.opcode == OP1_COMPLEMENT) 	opstring = "-"
+
+        else if (expr.opcode == OP2_ARITH_ADD) 	    opstring = "+"
+        else if (expr.opcode == OP2_ARITH_SUB) 	    opstring = "-"
+        else if (expr.opcode == OP2_ARITH_MUL) 	    opstring = "*"
+        else if (expr.opcode == OP2_ARITH_DIV) 	    opstring = "/"
+        else if (expr.opcode == OP2_ARITH_SHL) 	    opstring = "<<"
+        else if (expr.opcode == OP2_ARITH_SHR) 	    opstring = ">>"
+        else if (expr.opcode == OP2_ARITH_SRA) 	    opstring = ">>>"
+
+        else if (expr.opcode == OP1_LOGICAL_NOT)  opstring = "!"
+        else if (expr.opcode == OP2_LOGICAL_AND)  opstring = "&&"
+        else if (expr.opcode == OP2_LOGICAL_OR)   opstring = "||"
+        else if (expr.opcode == OP2_LOGICAL_G)    opstring = ">"
+        else if (expr.opcode == OP2_LOGICAL_L)    opstring = "<"
+        else if (expr.opcode == OP2_LOGICAL_GEQ)  opstring = ">="
+        else if (expr.opcode == OP2_LOGICAL_LEQ)  opstring = "<="
+        else if (expr.opcode == OP2_LOGICAL_EQ2)  opstring = "=="
+        else if (expr.opcode == OP2_LOGICAL_NEQ2) opstring = "!="
+        else if (expr.opcode == OP2_LOGICAL_EQ4)  opstring = "==="
+        else if (expr.opcode == OP2_LOGICAL_NEQ4) opstring = "!=="
+
+        else if (expr.opcode == OP1_BITWISE_NOT) 	opstring = "~"
+        else if (expr.opcode == OP2_BITWISE_AND) 	opstring = "&"
+        else if (expr.opcode == OP2_BITWISE_OR) 	opstring = "|"
+        else if (expr.opcode == OP2_BITWISE_XOR) 	opstring = "^"
+        else if (expr.opcode == OP2_BITWISE_XNOR) 	opstring = "^~"
+
+        else if (expr.opcode == OP1_REDUCT_AND) 	opstring = "&"
+        else if (expr.opcode == OP1_REDUCT_NAND) 	opstring = "~&"
+        else if (expr.opcode == OP1_REDUCT_OR) 	    opstring = "|"
+        else if (expr.opcode == OP1_REDUCT_NOR) 	opstring = "~|"
+        else if (expr.opcode == OP1_REDUCT_XOR) 	opstring = "^"
+        else if (expr.opcode == OP1_REDUCT_XNOR) 	opstring = "^~"
+
+        else if (expr.opcode == OP2_INDEXED) 	    opstring = ""
+        else if (expr.opcode == OP3_RANGED) 	    opstring = ""
+        else if (expr.opcode == OP2_SUBSTRUCT) 	    opstring = ""
+        else if (expr.opcode == OPS_CNCT) 	        opstring = ""
+        else if (expr.opcode == OP1_IF) 	        opstring = ""
+        else if (expr.opcode == OP1_WHILE) 	        opstring = ""
+
+        else if (expr.opcode == OP_FIFO_WR) 	    opstring = ""
+        else if (expr.opcode == OP_FIFO_RD) 	    opstring = ""
+
+        else ERROR("operation" + expr.opcode.default_string + " not recognized")
+
+        if ((expr.opcode == OP1_ASSIGN)
+            || (expr.opcode == OP1_COMPLEMENT)
+            || (expr.opcode == OP1_LOGICAL_NOT)
+            || (expr.opcode == OP1_BITWISE_NOT)
+            || (expr.opcode == OP1_REDUCT_AND)
+            || (expr.opcode == OP1_REDUCT_NAND)
+            || (expr.opcode == OP1_REDUCT_OR)
+            || (expr.opcode == OP1_REDUCT_NOR)
+            || (expr.opcode == OP1_REDUCT_XOR)
+            || (expr.opcode == OP1_REDUCT_XNOR))
+        {
+            var var_descr = expr.wrvars[0].GetDepowered(expr.fractions)
+            if ((var_descr.VarType == VAR_TYPE.STRUCTURED) && (expr.params[0].type == PARAM_TYPE.VAL)) {
+                if (opstring == "") {
+                    wrFile.write(expr.wrvars[0].name +
+                            dimstring +
+                            " = '{default:" +
+                            getStringWithDim(expr.params[0]) +
+                            "};\n")
+                } else ERROR("assignment error")
+            } else {
+                wrFile.write(expr.wrvars[0].name +
+                        dimstring +
+                        " = " +
+                        opstring +
+                        getStringWithDim(expr.params[0]) +
+                        ";\n")
+            }
+
+        } else if ((expr.opcode == OP2_ARITH_ADD)
+            || (expr.opcode == OP2_ARITH_SUB)
+            || (expr.opcode == OP2_ARITH_MUL)
+            || (expr.opcode == OP2_ARITH_DIV)
+            || (expr.opcode == OP2_ARITH_SHL)
+            || (expr.opcode == OP2_ARITH_SHR)
+            || (expr.opcode == OP2_ARITH_SRA)
+
+            || (expr.opcode == OP2_LOGICAL_AND)
+            || (expr.opcode == OP2_LOGICAL_OR)
+            || (expr.opcode == OP2_LOGICAL_G)
+            || (expr.opcode == OP2_LOGICAL_L)
+            || (expr.opcode == OP2_LOGICAL_GEQ)
+            || (expr.opcode == OP2_LOGICAL_LEQ)
+            || (expr.opcode == OP2_LOGICAL_EQ2)
+            || (expr.opcode == OP2_LOGICAL_NEQ2)
+            || (expr.opcode == OP2_LOGICAL_EQ4)
+            || (expr.opcode == OP2_LOGICAL_NEQ4)
+
+            || (expr.opcode == OP2_BITWISE_AND)
+            || (expr.opcode == OP2_BITWISE_OR)
+            || (expr.opcode == OP2_BITWISE_XOR)
+            || (expr.opcode == OP2_BITWISE_XNOR)) {
+            wrFile.write(expr.wrvars[0].name +
+                    dimstring +
+                    " = (" +
+                    getStringWithDim(expr.params[0]) +
+                    " " +
+                    opstring +
+                    " " +
+                    getStringWithDim(expr.params[1]) +
+                    ");\n")
+
+        } else if (expr.opcode == OP2_INDEXED) {
+            wrFile.write(expr.wrvars[0].name +
+                    " = " +
+                    expr.params[0].GetString() +
+                    "[" +
+                    expr.params[1].GetString() +
+                    "];\n")
+
+        } else if (expr.opcode == OP3_RANGED) {
+            wrFile.write(expr.wrvars[0].name +
+                    " = " +
+                    expr.params[0].GetString() +
+                    "[" +
+                    expr.params[1].GetString() +
+                    ":" +
+                    expr.params[2].GetString() +
+                    "];\n")
+
+        } else if (expr.opcode == OP2_SUBSTRUCT) {
+            wrFile.write(expr.wrvars[0].name +
+                    " = " +
+                    expr.params[0].GetString() +
+                    "." +
+                    expr.subStructvar_name +
+                    ";\n")
+
+        } else if (expr.opcode == OPS_CNCT) {
+            var cnct_string = "{"
+            for (i in 0 until expr.params.size) {
+                if (i != 0) cnct_string += ", "
+                cnct_string += getStringWithDim(expr.params[i])
+            }
+            cnct_string += "}"
+            wrFile.write(expr.wrvars[0].name +
+                    " = " +
+                    cnct_string +
+                    ";\n")
+
+        } else if (expr.opcode == OP1_IF) {
+            wrFile.write("if (" + expr.params[0].GetString() + ") {\n")
+            tab_Counter++
+            for (child_expr in expr.expressions) {
+                export_vivado_cpp_expr(wrFile, child_expr)
+            }
+            tab_Counter--
+            PrintTab(wrFile)
+            wrFile.write("}\n")
+
+        } else if (expr.opcode == OP1_WHILE) {
+            wrFile.write("while (" + expr.params[0].GetString() + " == 1'b1) {\n")
+            tab_Counter++
+            for (child_expr in expr.expressions) {
+                export_vivado_cpp_expr(wrFile, child_expr)
+            }
+            tab_Counter--
+            PrintTab(wrFile)
+            wrFile.write("}\n")
+
+        } else if (expr.opcode == OP_FIFO_WR) {
+            wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_wr).fifo.name + ".write(" + expr.params[0].GetString() + ")\n")
+
+        } else if (expr.opcode == OP_FIFO_RD) {
+            wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_rd).fifo.name + ".read(" + expr.wrvars[1].name + ")\n")
+
+        } else ERROR("undefined opcode")
+    }
+
+    fun export_to_vivado_cpp(pathname : String) {
+
+        println("###############################################")
+        println("#### Cyclix: starting SystemVerilog export ####")
+        println("###############################################")
+
+        // TODO: validate()
+
+        // writing interface structures
+        // TODO: restrict to interfaces
+        File(pathname).mkdirs()
+        val wrFileInterface = File(pathname + "/" + name + ".hpp").writer()
+        wrFileInterface.write("`ifndef __" + name +"_h_\n")
+        wrFileInterface.write("`define __" + name +"_h_\n")
+        wrFileInterface.write("\n")
+
+        println("Exporting structs...")
+
+        for (hw_struct in hw_if_structs) {
+            wrFileInterface.write("typedef struct packed {\n")
+            for (structvar in hw_struct) {
+                export_sverilog_structvar("\t", "logic ", ";\n", structvar, wrFileInterface)
+            }
+            wrFileInterface.write("} " + hw_struct.name + ";\n\n")
+        }
+        wrFileInterface.write("`endif\n")
+        wrFileInterface.close()
+        println("done")
+
+        // writing module
+        val wrFileModule = File(pathname + "/" + name + ".cpp").writer()
+        println("Exporting modules and ports...")
+        wrFileModule.write("`include \"" + name + ".svh\"\n")
+        wrFileModule.write("\n")
+        wrFileModule.write("module " + name + " (\n")
+        var preambule = "\t"
+        for (port in Ports) {
+            wrFileModule.write(preambule)
+            var preambule_cond = ""
+            var dir_string = ""
+            if (port.port_dir == PORT_DIR.IN) dir_string = "input"
+            else {
+                dir_string = "output"
+                preambule_cond = "reg "
+            }
+            export_sverilog_structvar((dir_string + " "), preambule_cond, "", port, wrFileModule)
+            preambule = "\n\t, "
+        }
+
+        wrFileModule.write("\n);\n")
+        wrFileModule.write("\n")
+
+        println("done")
+
+        tab_Counter++
+
+        // globals
+        println("Exporting mems...")
+        for (global in globals) {
+            export_sverilog_structvar("\t", "reg ", ";\n", global, wrFileModule)
+        }
+        wrFileModule.write("\n")
+        println("done")
+
+        // proc
+        println("Exporting cyclix process...")
+        wrFileModule.write("void exec() {\n")
+        tab_Counter = 1
+
+        for (local in locals) {
+            export_sverilog_structvar("\t", "reg ", ";\n", local, wrFileModule)
+        }
+        wrFileModule.write("\n")
+
+        for (expression in proc.expressions) {
+            export_vivado_cpp_expr(wrFileModule, expression)
+        }
+        tab_Counter = 0
+        wrFileModule.write("}\n")
+        println("done")
+
+        wrFileModule.write("\n")
+        wrFileModule.write("endmodule\n")
+
+        wrFileModule.close()
+
+        println("################################################")
+        println("#### Cyclix: SystemVerilog export complete! ####")
+        println("################################################")
     }
 }
