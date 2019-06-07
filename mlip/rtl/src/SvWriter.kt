@@ -69,7 +69,7 @@ class SvWriter(module_in : module) {
         return ret_val
     }
 
-    fun export_sverilog_structvar(preambule_uncond : String, preambule_cond : String, trailer : String, structvar : hw_structvar, wrFile : java.io.OutputStreamWriter) {
+    fun export_structvar(preambule_uncond : String, preambule_cond : String, trailer : String, structvar : hw_structvar, wrFile : java.io.OutputStreamWriter) {
         var dimstring = ""
         if (structvar.VarType == VAR_TYPE.STRUCTURED) {
             if (!structvar.dimensions.isSingle()) {
@@ -106,7 +106,7 @@ class SvWriter(module_in : module) {
         for (i in 0 until tab_Counter) wrFile.write("\t")
     }
 
-    fun export_sverilog_expr(wrFile : java.io.OutputStreamWriter, expr : hw_exec)
+    fun export_expr(wrFile : java.io.OutputStreamWriter, expr : hw_exec)
     {
         PrintTab(wrFile)
 
@@ -264,7 +264,7 @@ class SvWriter(module_in : module) {
             PrintTab(wrFile)
             wrFile.write("begin\n")
             for (child_expr in expr.expressions) {
-                export_sverilog_expr(wrFile, child_expr)
+                export_expr(wrFile, child_expr)
             }
             PrintTab(wrFile)
             wrFile.write("end\n")
@@ -276,7 +276,7 @@ class SvWriter(module_in : module) {
             PrintTab(wrFile)
             wrFile.write("begin\n")
             for (child_expr in expr.expressions) {
-                export_sverilog_expr(wrFile, child_expr)
+                export_expr(wrFile, child_expr)
             }
             PrintTab(wrFile)
             wrFile.write("end\n")
@@ -299,7 +299,7 @@ class SvWriter(module_in : module) {
         for (hw_struct in mod.hw_if_structs) {
             wrFileInterface.write("typedef struct packed {\n")
             for (structvar in hw_struct) {
-                export_sverilog_structvar("\t", "logic ", ";\n", structvar, wrFileInterface)
+                export_structvar("\t", "logic ", ";\n", structvar, wrFileInterface)
             }
             wrFileInterface.write("} " + hw_struct.name + ";\n\n")
         }
@@ -323,7 +323,7 @@ class SvWriter(module_in : module) {
                 dir_string = "output"
                 preambule_cond = "reg "
             } else if (port.port_dir == PORT_DIR.INOUT) dir_string = "inout"
-            export_sverilog_structvar((dir_string + " "), preambule_cond, "", port, wrFileModule)
+            export_structvar((dir_string + " "), preambule_cond, "", port, wrFileModule)
             preambule = "\n\t, "
         }
 
@@ -336,7 +336,7 @@ class SvWriter(module_in : module) {
 
         println("Exporting combinationals...")
         for (comb in mod.Combs) {
-            export_sverilog_structvar("", "reg ", ";\n", comb, wrFileModule)
+            export_structvar("", "reg ", ";\n", comb, wrFileModule)
         }
         wrFileModule.write("\n")
 
@@ -346,7 +346,7 @@ class SvWriter(module_in : module) {
         println("Exporting mems...")
         for (mem in mod.Mems) {
 
-            export_sverilog_structvar("","reg ", ";\n", mem, wrFileModule)
+            export_structvar("","reg ", ";\n", mem, wrFileModule)
 
             if (mem.mem_srcs.size == 0) throw Exception("Mem signals with no sources is not supported, mem signal: %s!\n")
             else {
@@ -487,7 +487,7 @@ class SvWriter(module_in : module) {
             wrFileModule.write("begin\n")
 
             for (expression in cproc.expressions) {
-                export_sverilog_expr(wrFileModule, expression)
+                export_expr(wrFileModule, expression)
             }
 
             PrintTab(wrFileModule)

@@ -1,5 +1,5 @@
 /*
- * RtlWriter.kt
+ * RtlGenerator.kt
  *
  *  Created on: 05.06.2019
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
@@ -10,10 +10,9 @@ package cyclix
 
 import hwast.*
 
-class RtlWriter(module_in : module) {
+class RtlGenerator(module_in : module) {
 
     var mod = module_in
-    var tab_Counter = 0
 
     class fifo_out_descr (val ext_req      : rtl.hw_port,
                           val ext_wdata    : rtl.hw_port,
@@ -56,10 +55,10 @@ class RtlWriter(module_in : module) {
         if (ret_var == null) ERROR("FIFO translation error")
         return ret_var!!
     }
-    
+
     fun export_expr(rtl_gen : hw_astc,
-                        expr : hw_exec,
-                        rst : rtl.hw_port) {
+                    expr : hw_exec,
+                    rst : rtl.hw_port) {
 
         // println("#### Cyclix: exporting expression: " + expr.opcode.default_string)
         // for (param in expr.params) println("param: " + param.GetString())
@@ -212,7 +211,7 @@ class RtlWriter(module_in : module) {
         // println("#### Cyclix: exporting expression complete!")
     }
 
-    fun export() : rtl.module {
+    fun generate() : rtl.module {
 
         println("#######################################")
         println("#### Starting Cyclix-to-RTL export ####")
@@ -309,4 +308,3 @@ class RtlWriter(module_in : module) {
     }
 
 }
-

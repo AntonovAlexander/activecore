@@ -557,37 +557,37 @@ open class module(name_in : String) : hw_astc() {
 
     fun export_to_rtl() : rtl.module {
 
-        println("#######################################")
-        println("#### Starting Cyclix-to-RTL export ####")
-        println("#######################################")
+        println("###########################################")
+        println("#### Starting Cyclix-to-RTL generation ####")
+        println("###########################################")
 
         // TODO: pre-validation
 
-        var writer = RtlWriter(this)
-        var rtl_gen = writer.export()
+        var rtl_generator = RtlGenerator(this)
+        var rtl_gen = rtl_generator.generate()
 
         // TODO: post-validation
 
-        println("########################################")
-        println("#### Cyclix-to-RTL export complete! ####")
-        println("########################################")
+        println("############################################")
+        println("#### Cyclix-to-RTL generation complete! ####")
+        println("############################################")
 
         return rtl_gen
     }
 
     fun export_to_vivado_cpp(pathname : String) {
 
-        println("#############################################")
+        println("############################################")
         println("#### Cyclix: starting vivado_cpp export ####")
-        println("#############################################")
+        println("############################################")
 
         // TODO: validate()
 
         var writer = VivadoCppWriter(this)
         writer.write(pathname)
 
-        println("##############################################")
+        println("#############################################")
         println("#### Cyclix: vivado_cpp export complete! ####")
-        println("##############################################")
+        println("#############################################")
     }
 }

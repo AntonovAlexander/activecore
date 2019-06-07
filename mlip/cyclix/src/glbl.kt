@@ -8,6 +8,10 @@
 
 package cyclix
 
+fun CRITICAL(err_string : String) {
+    println("ActiveCore (cyclix) CRITICAL WARNING: " + err_string)
+}
+
 fun ERROR(err_string : String) {
     throw Exception("ActiveCore (cyclix) ERROR: " + err_string)
 }
