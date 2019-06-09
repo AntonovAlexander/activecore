@@ -1278,7 +1278,6 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             run {
                 process_branch()
                 process_req_datamem()
-                process_wb()
 
             }; endstage()
 
@@ -1334,17 +1333,16 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             run {
                 process_alu()
                 process_rd_csr_prev()
-                process_curinstraddr_imm()
-                process_jump()
-                process_setup_mem_reqdata()
 
             }; endstage()
 
             MEM.begin()
             run {
+                process_curinstraddr_imm()
+                process_jump()
+                process_setup_mem_reqdata()
                 process_branch()
                 process_req_datamem()
-                process_wb()
 
             }; endstage()
 
