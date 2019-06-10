@@ -208,6 +208,28 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
         pc.assign_succ(nextinstr_addr)
     }
 
+    fun process_req_instrmem() {
+        instr_busreq.assign(hw_fractions("addr"), curinstr_addr)
+        instr_busreq.assign(hw_fractions("be"), 0xf)
+        instr_busreq.assign(hw_fractions("wdata"), 0)
+
+        begif(!instr_req_done)
+        run {
+            instr_req_done.accum(instr_mem.rdreq(instr_handle, instr_busreq))
+        }; endif()
+        begif(!instr_req_done)
+        run {
+            pstall()
+        }; endif()
+    }
+
+    fun process_resp_instrmem() {
+        begif(!instr_handle.resp(instr_code))
+        run {
+            pstall()
+        }; endif()
+    }
+
     fun process_decode() {
         opcode.assign(instr_code[6, 0])
         alu_unsigned.assign(0)
@@ -994,15 +1016,21 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
     fun process_req_datamem() {
         // memory access
-        begif(!data_req_done)
+
+        begif(mem_req)
         run {
-            begif(mem_req)
+            begif(!data_req_done)
             run {
                 data_busreq.assign(hw_fractions("addr"), mem_addr)
                 data_busreq.assign(hw_fractions("be"), 0xf)
                 data_busreq.assign(hw_fractions("wdata"), mem_wdata)
 
                 data_req_done.accum(data_mem.req(data_handle, mem_cmd, data_busreq))
+            }; endif()
+
+            begif(!data_req_done)
+            run {
+                pstall()
             }; endif()
         }; endif()
     }
@@ -1015,6 +1043,10 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
                 begif(data_handle.resp(mem_rdata))
                 run {
                     rd_rdy.assign(1)
+                }; endif()
+                begelse()
+                run {
+                    pstall()
                 }; endif()
             }; endif()
         }; endif()
@@ -1048,20 +1080,9 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             var EXEC = add_stage("EXEC")
             EXEC.begin()
             run {
-
                 process_pc()
-
-                instr_busreq.assign(hw_fractions("addr"), curinstr_addr)
-                instr_busreq.assign(hw_fractions("be"), 0xf)
-                instr_busreq.assign(hw_fractions("wdata"), 0)
-
-                begif(!instr_req_done)
-                run {
-                    instr_req_done.accum(instr_mem.rdreq(instr_handle, instr_busreq))
-                }; endif()
-
-                instr_handle.resp(instr_code)
-
+                process_req_instrmem()
+                process_resp_instrmem()
                 process_decode()
                 process_regfetch()
                 process_alu()
@@ -1089,21 +1110,13 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             IFETCH.begin()
             run {
                 process_pc()
-
-                instr_busreq.assign(hw_fractions("addr"), curinstr_addr)
-                instr_busreq.assign(hw_fractions("be"), 0xf)
-                instr_busreq.assign(hw_fractions("wdata"), 0)
-
-                begif(!instr_req_done)
-                run {
-                    instr_req_done.accum(instr_mem.rdreq(instr_handle, instr_busreq))
-                }; endif()
+                process_req_instrmem()
 
             }; endstage()
 
             EXEC.begin()
             run {
-                instr_handle.resp(instr_code)
+                process_resp_instrmem()
 
                 process_decode()
                 process_regfetch()
@@ -1134,21 +1147,13 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             IFETCH.begin()
             run {
                 process_pc()
-
-                instr_busreq.assign(hw_fractions("addr"), curinstr_addr)
-                instr_busreq.assign(hw_fractions("be"), 0xf)
-                instr_busreq.assign(hw_fractions("wdata"), 0)
-
-                begif(!instr_req_done)
-                run {
-                    instr_req_done.accum(instr_mem.rdreq(instr_handle, instr_busreq))
-                }; endif()
+                process_req_instrmem()
 
             }; endstage()
 
             EXEC.begin()
             run {
-                instr_handle.resp(instr_code)
+                process_resp_instrmem()
 
                 process_decode()
                 process_regfetch()
@@ -1184,21 +1189,13 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             IFETCH.begin()
             run {
                 process_pc()
-
-                instr_busreq.assign(hw_fractions("addr"), curinstr_addr)
-                instr_busreq.assign(hw_fractions("be"), 0xf)
-                instr_busreq.assign(hw_fractions("wdata"), 0)
-
-                begif(!instr_req_done)
-                run {
-                    instr_req_done.accum(instr_mem.rdreq(instr_handle, instr_busreq))
-                }; endif()
+                process_req_instrmem()
 
             }; endstage()
 
             IDECODE.begin()
             run {
-                instr_handle.resp(instr_code)
+                process_resp_instrmem()
                 process_decode()
                 process_regfetch()
                 forward_unblk(MEMWB)
@@ -1240,21 +1237,13 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             IFETCH.begin()
             run {
                 process_pc()
-
-                instr_busreq.assign(hw_fractions("addr"), curinstr_addr)
-                instr_busreq.assign(hw_fractions("be"), 0xf)
-                instr_busreq.assign(hw_fractions("wdata"), 0)
-
-                begif(!instr_req_done)
-                run {
-                    instr_req_done.accum(instr_mem.rdreq(instr_handle, instr_busreq))
-                }; endif()
+                process_req_instrmem()
 
             }; endstage()
 
             IDECODE.begin()
             run {
-                instr_handle.resp(instr_code)
+                process_resp_instrmem()
                 process_decode()
                 process_regfetch()
 
@@ -1305,21 +1294,13 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
             IFETCH.begin()
             run {
-
-                instr_busreq.assign(hw_fractions("addr"), curinstr_addr)
-                instr_busreq.assign(hw_fractions("be"), 0xf)
-                instr_busreq.assign(hw_fractions("wdata"), 0)
-
-                begif(!instr_req_done)
-                run {
-                    instr_req_done.accum(instr_mem.rdreq(instr_handle, instr_busreq))
-                }; endif()
+                process_req_instrmem()
 
             }; endstage()
 
             IDECODE.begin()
             run {
-                instr_handle.resp(instr_code)
+                process_resp_instrmem()
                 process_decode()
                 process_regfetch()
 

@@ -55,8 +55,7 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
 
                                    val pctrl_active_glbl : hwast.hw_var,
                                    val pctrl_stalled_glbl : hwast.hw_var,
-                                   val pctrl_killed_glbl : hwast.hw_var,
-                                   val mcopipe_stallreq_unblk : hwast.hw_var) {
+                                   val pctrl_killed_glbl : hwast.hw_var) {
 
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
     var pContext_srcglbl_dict   = mutableMapOf<hw_var, hw_var>()    // src global bufs for not-new local (non-sticky) variables

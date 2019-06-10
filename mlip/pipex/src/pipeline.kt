@@ -1194,62 +1194,48 @@ open class pipeline(name_in : String) : hw_astc() {
             var tid_translated              = curStageAssoc.TranslateVar(mcopipe_handle_assoc.tid)
             var if_id_translated            = curStageAssoc.TranslateVar(mcopipe_handle_assoc.if_id)
 
-            cyclix_gen.begif(!curStageAssoc.pctrl_stalled_glbl)
+            cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
             run {
 
-                cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
+                cyclix_gen.begif(cyclix_gen.bnot(mcopipe_if_assoc.full_flag))
                 run {
 
-                    cyclix_gen.begif(mcopipe_if_assoc.full_flag)
+                    // translating params
+                    var cmd_translated      = curStageAssoc.TranslateParam(expr.params[0])
+                    var wdata_translated    = curStageAssoc.TranslateParam(expr.params[1])
+
+                    // finding id
+                    var handle_id = TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!.indexOf(expr.mcopipe_if)
+
+                    var req_struct = cyclix_gen.local(GetGenName("req_struct"),
+                        mcopipe_if_assoc.req_fifo.VarType,
+                        mcopipe_if_assoc.req_fifo.src_struct,
+                        mcopipe_if_assoc.req_fifo.dimensions,
+                        mcopipe_if_assoc.req_fifo.defval)
+
+                    cyclix_gen.assign(hw_fractions("we"), req_struct, cmd_translated)
+                    cyclix_gen.assign(hw_fractions("wdata"), req_struct, wdata_translated)
+
+                    cyclix_gen.begif(cyclix_gen.fifo_wr(mcopipe_if_assoc.req_fifo, req_struct))
                     run {
-                        cyclix_gen.assign(curStageAssoc.mcopipe_stallreq_unblk, 1)
-                    }; cyclix_gen.endif()
 
-                    cyclix_gen.begelse()
-                    run {
+                        // req management
+                        cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), 1)
+                        cyclix_gen.assign(rdreq_pending_translated, cyclix_gen.lnot(cmd_translated))
+                        cyclix_gen.assign(tid_translated, mcopipe_if_assoc.wr_ptr)
+                        cyclix_gen.assign(if_id_translated, hw_imm(mcopipe_handle_assoc.if_id.dimensions, handle_id.toString()))
 
-                        // translating params
-                        var cmd_translated      = curStageAssoc.TranslateParam(expr.params[0])
-                        var wdata_translated    = curStageAssoc.TranslateParam(expr.params[1])
-
-                        // finding id
-                        var handle_id = TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!.indexOf(expr.mcopipe_if)
-
-                        var req_struct = cyclix_gen.local(GetGenName("req_struct"),
-                            mcopipe_if_assoc.req_fifo.VarType,
-                            mcopipe_if_assoc.req_fifo.src_struct,
-                            mcopipe_if_assoc.req_fifo.dimensions,
-                            mcopipe_if_assoc.req_fifo.defval)
-
-                        cyclix_gen.assign(hw_fractions("we"), req_struct, cmd_translated)
-                        cyclix_gen.assign(hw_fractions("wdata"), req_struct, wdata_translated)
-
-                        cyclix_gen.begif(cyclix_gen.fifo_wr(mcopipe_if_assoc.req_fifo, req_struct))
+                        // mcopipe fifo management
+                        cyclix_gen.begif(rdreq_pending_translated)
                         run {
+                            cyclix_gen.assign(mcopipe_if_assoc.wr_ptr, mcopipe_if_assoc.wr_ptr_next)
+                            cyclix_gen.assign(mcopipe_if_assoc.empty_flag, 0)
 
-                            // req management
-                            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), 1)
-                            cyclix_gen.assign(rdreq_pending_translated, cyclix_gen.lnot(cmd_translated))
-                            cyclix_gen.assign(tid_translated, mcopipe_if_assoc.wr_ptr)
-                            cyclix_gen.assign(if_id_translated, hw_imm(mcopipe_handle_assoc.if_id.dimensions, handle_id.toString()))
-
-                            // mcopipe fifo management
-                            cyclix_gen.begif(rdreq_pending_translated)
+                            cyclix_gen.begif(cyclix_gen.eq2(mcopipe_if_assoc.rd_ptr, mcopipe_if_assoc.wr_ptr))
                             run {
-                                cyclix_gen.assign(mcopipe_if_assoc.wr_ptr, mcopipe_if_assoc.wr_ptr_next)
-                                cyclix_gen.assign(mcopipe_if_assoc.empty_flag, 0)
-
-                                cyclix_gen.begif(cyclix_gen.eq2(mcopipe_if_assoc.rd_ptr, mcopipe_if_assoc.wr_ptr))
-                                run {
-                                    cyclix_gen.assign(mcopipe_if_assoc.full_flag, 1)
-                                }; cyclix_gen.endif()
-
+                                cyclix_gen.assign(mcopipe_if_assoc.full_flag, 1)
                             }; cyclix_gen.endif()
 
-                        }; cyclix_gen.endif()
-                        cyclix_gen.begelse()
-                        run {
-                            cyclix_gen.assign(curStageAssoc.mcopipe_stallreq_unblk, 1)
                         }; cyclix_gen.endif()
 
                     }; cyclix_gen.endif()
@@ -1269,10 +1255,6 @@ open class pipeline(name_in : String) : hw_astc() {
             cyclix_gen.begif(resp_done_translated)
             run {
                 cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[1]), rdata_translated)
-            }; cyclix_gen.endif()
-            cyclix_gen.begelse()
-            run {
-                curStageAssoc.pstall_ifactive_cmd(cyclix_gen)
             }; cyclix_gen.endif()
 
             cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), resp_done_translated)
@@ -1481,8 +1463,6 @@ open class pipeline(name_in : String) : hw_astc() {
             var pctrl_stalled_glbl  = cyclix_gen.uglobal((name_prefix + "genpctrl_stalled_glbl"), 0, 0, "0")
             var pctrl_killed_glbl   = cyclix_gen.uglobal((name_prefix + "genpctrl_killed_glbl"), 0, 0, "0")
 
-            var mcopipe_stallreq_unblk = cyclix_gen.ulocal((name_prefix + "genmcopipe_stallreq_unblk"), 0, 0, "0")
-
             var pstage_info = __pstage_info(TranslateInfo,
                 name_prefix,
                 pctrl_new,
@@ -1494,8 +1474,7 @@ open class pipeline(name_in : String) : hw_astc() {
                 pctrl_nevictable,
                 pctrl_active_glbl,
                 pctrl_stalled_glbl,
-                pctrl_killed_glbl,
-                mcopipe_stallreq_unblk)
+                pctrl_killed_glbl)
 
             TranslateInfo.__stage_assocs.put(stage.value, pstage_info)
             for (expression in stage.value.expressions) {
@@ -1707,7 +1686,6 @@ open class pipeline(name_in : String) : hw_astc() {
             // Asserting pctrl defaults (deployed even if signal is not used)
             cyclix_gen.assign(curStageAssoc.pctrl_succ, 0)
             cyclix_gen.assign(curStageAssoc.pctrl_working, 0)
-            cyclix_gen.assign(curStageAssoc.mcopipe_stallreq_unblk, 0)
 
             // Generating root pctrls
             MSG(DEBUG_FLAG, "#### Initializing pctrls ####")
@@ -1913,13 +1891,6 @@ open class pipeline(name_in : String) : hw_astc() {
             for (mcopipe_handle in curStageAssoc.mcopipe_handles) {
                 cyclix_gen.lor_gen(curStageAssoc.pctrl_nevictable, curStageAssoc.pctrl_nevictable, curStageAssoc.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.rdreq_pending))
             }
-
-            // Stalling in case mcopipe requests are not satisfied
-            MSG(DEBUG_FLAG, "#### Stalling in case mcopipe requests are not satisfied ####")
-            cyclix_gen.begif(curStageAssoc.mcopipe_stallreq_unblk)
-            run {
-                curStageAssoc.pstall_ifactive_cmd(cyclix_gen)
-            }; cyclix_gen.endif()
 
             // Processing of pstall from next pstage
             MSG(DEBUG_FLAG, "#### Processing of pstall from next pstage ####")

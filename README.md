@@ -20,7 +20,7 @@ Current version of project is implemented as several Kotlin libraries that are s
 
 * rtl - MLIP core for behavioral RTL generation
 
-* cyclix - MLIP core for cycle-oriented processing hardware targeting RTL and HLS flows
+* cyclix - MLIP core for generation of cycle-oriented processing hardware targeting RTL and HLS flows
 
 * pipex - MLIP core for pipelined structures generation
 
@@ -32,6 +32,6 @@ The following demo designs for FPGA are available:
 
 * mpss - SoC with multiple RISC-V cores and xbar (located at /designs/rtl/mpss)
 
-Pipex MLIP functionality is demonstrated via 6 RISC-V (RV32I) CPU designs with variable-length pipelines (riscv_1stage-riscv_6stage). RISC-V CPU core generator is located at /designs/activecore/riscv_pipex. Preliminary build of the core and software is required. Demo projects use UART-controllable bus master for reset and initialization (tests for pss_memsplit are launched by /designs/rtl/pss_memsplit/sw/benchmarks/hw_test.py).
+Pipex MLIP functionality is demonstrated via 6 RISC-V (RV32I) CPU designs with varying-length pipelines (riscv_1stage-riscv_6stage). RISC-V CPU core generator is located at /designs/activecore/riscv_pipex. Preliminary build of the core and software is required. Demo projects use UART-controllable bus master for reset and initialization (tests for pss_memsplit are launched by /designs/rtl/pss_memsplit/sw/benchmarks/hw_test.py).
 
 For questions, please contact antonov.alex.alex@gmail.com
