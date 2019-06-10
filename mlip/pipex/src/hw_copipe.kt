@@ -34,37 +34,21 @@ class hw_exec_scopipe_resp(scopipe_handle_in : hw_scopipe_handle) : hw_exec(OP_S
 }
 
 open class hw_copipe(name_in: String,
-                    wdata_VarType_in: VAR_TYPE,
-                    wdata_src_struct_in: hw_struct,
-                    wdata_dim_in: hw_dim_static,
-                    rdata_VarType_in: VAR_TYPE,
-                    rdata_src_struct_in: hw_struct,
-                    rdata_dim_in: hw_dim_static) {
+                     wdata_vartype_in: hw_type,
+                     rdata_vartype_in: hw_type) {
 
     var name = name_in
-    var wdata_VarType = wdata_VarType_in
-    var wdata_src_struct = wdata_src_struct_in
-    var wdata_dim = wdata_dim_in
-    var rdata_VarType = rdata_VarType_in
-    var rdata_src_struct = rdata_src_struct_in
-    var rdata_dim = rdata_dim_in
+    var wdata_vartype = wdata_vartype_in
+    var rdata_vartype = rdata_vartype_in
 }
 
 class hw_mcopipe_if(pipeline_in: pipeline,
-                name_in: String,
-                wdata_VarType_in: VAR_TYPE,
-                wdata_src_struct_in: hw_struct,
-                wdata_dim_in: hw_dim_static,
-                rdata_VarType_in: VAR_TYPE,
-                rdata_src_struct_in: hw_struct,
-                rdata_dim_in: hw_dim_static)
+                    name_in: String,
+                    wdata_vartype_in: hw_type,
+                    rdata_vartype_in: hw_type)
     : hw_copipe(name_in,
-        wdata_VarType_in,
-        wdata_src_struct_in,
-        wdata_dim_in,
-        rdata_VarType_in,
-        rdata_src_struct_in,
-        rdata_dim_in) {
+                wdata_vartype_in,
+                rdata_vartype_in) {
 
     val pipeline = pipeline_in
 
@@ -83,31 +67,19 @@ class hw_mcopipe_if(pipeline_in: pipeline,
 
 class hw_mcopipe_handle(pipeline_in: pipeline,
                         name_in: String,
-                        wdata_VarType_in: VAR_TYPE,
-                        wdata_src_struct_in: hw_struct,
-                        wdata_dim_in: hw_dim_static,
-                        rdata_VarType_in: VAR_TYPE,
-                        rdata_src_struct_in: hw_struct,
-                        rdata_dim_in: hw_dim_static)
+                        wdata_vartype_in: hw_type,
+                        rdata_vartype_in: hw_type)
             : hw_copipe(name_in,
-            wdata_VarType_in,
-            wdata_src_struct_in,
-            wdata_dim_in,
-            rdata_VarType_in,
-            rdata_src_struct_in,
-            rdata_dim_in) {
+                        wdata_vartype_in,
+                        rdata_vartype_in) {
 
     val pipeline = pipeline_in
 
     constructor(mcopipe_if : hw_mcopipe_if)
             : this(mcopipe_if.pipeline,
                 mcopipe_if.name,
-                mcopipe_if.wdata_VarType,
-                mcopipe_if.wdata_src_struct,
-                mcopipe_if.wdata_dim,
-                mcopipe_if.rdata_VarType,
-                mcopipe_if.rdata_src_struct,
-                mcopipe_if.rdata_dim)
+                mcopipe_if.wdata_vartype,
+                mcopipe_if.rdata_vartype)
 
     fun resp(rdata : hw_var) : hw_var {
         return pipeline.mcopipe_resp(this, rdata)
@@ -116,19 +88,11 @@ class hw_mcopipe_handle(pipeline_in: pipeline,
 
 class hw_scopipe_if(pipeline_in: pipeline,
                     name_in: String,
-                    wdata_VarType_in: VAR_TYPE,
-                    wdata_src_struct_in: hw_struct,
-                    wdata_dim_in: hw_dim_static,
-                    rdata_VarType_in: VAR_TYPE,
-                    rdata_src_struct_in: hw_struct,
-                    rdata_dim_in: hw_dim_static)
+                    wdata_vartype_in: hw_type,
+                    rdata_vartype_in: hw_type)
     : hw_copipe(name_in,
-    wdata_VarType_in,
-    wdata_src_struct_in,
-    wdata_dim_in,
-    rdata_VarType_in,
-    rdata_src_struct_in,
-    rdata_dim_in) {
+                wdata_vartype_in,
+                rdata_vartype_in) {
 
     val pipeline = pipeline_in
 
@@ -139,31 +103,19 @@ class hw_scopipe_if(pipeline_in: pipeline,
 
 class hw_scopipe_handle(pipeline_in: pipeline,
                         name_in: String,
-                        wdata_VarType_in: VAR_TYPE,
-                        wdata_src_struct_in: hw_struct,
-                        wdata_dim_in: hw_dim_static,
-                        rdata_VarType_in: VAR_TYPE,
-                        rdata_src_struct_in: hw_struct,
-                        rdata_dim_in: hw_dim_static)
+                        wdata_vartype_in: hw_type,
+                        rdata_vartype_in: hw_type)
                 : hw_copipe(name_in,
-                wdata_VarType_in,
-                wdata_src_struct_in,
-                wdata_dim_in,
-                rdata_VarType_in,
-                rdata_src_struct_in,
-                rdata_dim_in) {
+                            wdata_vartype_in,
+                            rdata_vartype_in) {
 
     val pipeline = pipeline_in
 
     constructor(scopipe_if : hw_scopipe_if)
             : this(scopipe_if.pipeline,
                 scopipe_if.name,
-                scopipe_if.wdata_VarType,
-                scopipe_if.wdata_src_struct,
-                scopipe_if.wdata_dim,
-                scopipe_if.rdata_VarType,
-                scopipe_if.rdata_src_struct,
-                scopipe_if.rdata_dim)
+                scopipe_if.wdata_vartype,
+                scopipe_if.rdata_vartype)
 
     fun resp(rdata : hw_param) : hw_var {
         return pipeline.scopipe_resp(this, rdata)

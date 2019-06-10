@@ -170,23 +170,15 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
     //// interfaces ////
     var instr_mem = mcopipe_if("instr_mem",
-        VAR_TYPE.STRUCTURED,
-        busreq_mem_struct,
-        hw_dim_static(0, 0),
-        VAR_TYPE.UNSIGNED,
-        DUMMY_STRUCT,
-        hw_dim_static(31, 0))
+        hw_type(busreq_mem_struct),
+        hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(31, 0)))
     var instr_handle = mcopipe_handle(instr_mem)
     var instr_busreq = local("instr_busreq", busreq_mem_struct)
     var instr_req_done = ulocal("instr_req_done", 0, 0, "0")
 
     var data_mem = mcopipe_if("data_mem",
-        VAR_TYPE.STRUCTURED,
-        busreq_mem_struct,
-        hw_dim_static(0, 0),
-        VAR_TYPE.UNSIGNED,
-        DUMMY_STRUCT,
-        hw_dim_static(31, 0))
+        hw_type(busreq_mem_struct),
+        hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(31, 0)))
     var data_handle = mcopipe_handle(data_mem)
     var data_busreq = local("data_busreq", busreq_mem_struct)
     var data_req_done = ulocal("data_req_done", 0, 0, "0")

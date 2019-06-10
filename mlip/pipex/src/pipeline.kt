@@ -38,7 +38,6 @@ class hw_exec_read_remote(stage_in : hw_stage, remote_var_in : hw_pipex_var) : h
 open class pipeline(name_in : String) : hw_astc() {
 
     val name = name_in
-    var tab_Counter = 0
 
     var wrvars = mutableMapOf<String, hw_var>()
     var rdvars = mutableMapOf<String, hw_var>()
@@ -112,74 +111,56 @@ open class pipeline(name_in : String) : hw_astc() {
         new_local.default_astc = this
     }
 
-    fun local(name: String, VarType: VAR_TYPE, src_struct_in: hw_struct, dimensions: hw_dim_static, defval: String): hw_local {
-        var ret_var = hw_local(name, VarType, src_struct_in, dimensions, defval)
-        add_local(ret_var)
-        return ret_var
-    }
-
-    fun local(name: String, VarType: VAR_TYPE, dimensions: hw_dim_static, defval: String): hw_local {
-        var ret_var = hw_local(name, VarType, dimensions, defval)
-        add_local(ret_var)
-        return ret_var
-    }
-
-    fun local(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int, defval: String): hw_local {
-        var ret_var = hw_local(name, VarType, msb, lsb, defval)
-        add_local(ret_var)
-        return ret_var
-    }
-
-    fun local(name: String, VarType: VAR_TYPE, defval: String): hw_local {
-        var ret_var = hw_local(name, VarType, defval)
+    fun local(name: String, vartype : hw_type, defval: String): hw_local {
+        var ret_var = hw_local(name, vartype, defval)
         add_local(ret_var)
         return ret_var
     }
 
     fun local(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_local {
-        var ret_var = hw_local(name, src_struct_in, dimensions)
+        var ret_var = hw_local(name, hw_type(src_struct_in, dimensions), "0")
         add_local(ret_var)
         return ret_var
     }
 
     fun local(name: String, src_struct_in: hw_struct): hw_local {
-        var ret_var = hw_local(name, src_struct_in)
+        var ret_var = hw_local(name, hw_type(src_struct_in), "0")
         add_local(ret_var)
         return ret_var
     }
 
     fun ulocal(name: String, dimensions: hw_dim_static, defval: String): hw_local {
-        var ret_var = hw_local(name, VAR_TYPE.UNSIGNED, dimensions, defval)
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
         add_local(ret_var)
         return ret_var
     }
 
     fun ulocal(name: String, msb: Int, lsb: Int, defval: String): hw_local {
-        var ret_var = hw_local(name, VAR_TYPE.UNSIGNED, msb, lsb, defval)
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
         add_local(ret_var)
         return ret_var
     }
 
     fun ulocal(name: String, defval: String): hw_local {
-        var ret_var = hw_local(name, VAR_TYPE.UNSIGNED, defval)
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
         add_local(ret_var)
         return ret_var
     }
 
     fun slocal(name: String, dimensions: hw_dim_static, defval: String): hw_local {
-        var ret_var = hw_local(name, VAR_TYPE.SIGNED, dimensions, defval)
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
         add_local(ret_var)
         return ret_var
     }
 
     fun slocal(name: String, msb: Int, lsb: Int, defval: String): hw_local {
-        var ret_var = hw_local(name, VAR_TYPE.SIGNED, msb, lsb, defval)
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
         add_local(ret_var)
         return ret_var
     }
 
     fun slocal(name: String, defval: String): hw_local {
-        var ret_var = hw_local(name, VAR_TYPE.SIGNED, defval)
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.SIGNED, defval), defval)
         add_local(ret_var)
         return ret_var
     }
@@ -195,74 +176,56 @@ open class pipeline(name_in : String) : hw_astc() {
         new_local_sticky.default_astc = this
     }
 
-    fun local_sticky(name: String, VarType: VAR_TYPE, src_struct_in: hw_struct, dimensions: hw_dim_static, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, VarType, src_struct_in, dimensions, defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun local_sticky(name: String, VarType: VAR_TYPE, dimensions: hw_dim_static, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, VarType, dimensions, defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun local_sticky(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, VarType, msb, lsb, defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun local_sticky(name: String, VarType: VAR_TYPE, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, VarType, defval)
+    fun local_sticky(name: String, vartype: hw_type, defval: String): hw_local_sticky {
+        var ret_var = hw_local_sticky(name, vartype, defval)
         add_local_sticky(ret_var)
         return ret_var
     }
 
     fun local_sticky(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, src_struct_in, dimensions)
+        var ret_var = hw_local_sticky(name, hw_type(src_struct_in, dimensions), "0")
         add_local_sticky(ret_var)
         return ret_var
     }
 
     fun local_sticky(name: String, src_struct_in: hw_struct): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, src_struct_in)
+        var ret_var = hw_local_sticky(name, hw_type(src_struct_in), "0")
         add_local_sticky(ret_var)
         return ret_var
     }
 
     fun ulocal_sticky(name: String, dimensions: hw_dim_static, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, VAR_TYPE.UNSIGNED, dimensions, defval)
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
         add_local_sticky(ret_var)
         return ret_var
     }
 
     fun ulocal_sticky(name: String, msb: Int, lsb: Int, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, VAR_TYPE.UNSIGNED, msb, lsb, defval)
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
         add_local_sticky(ret_var)
         return ret_var
     }
 
     fun ulocal_sticky(name: String, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, VAR_TYPE.UNSIGNED, defval)
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
         add_local_sticky(ret_var)
         return ret_var
     }
 
     fun slocal_sticky(name: String, dimensions: hw_dim_static, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, VAR_TYPE.SIGNED, dimensions, defval)
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
         add_local_sticky(ret_var)
         return ret_var
     }
 
     fun slocal_sticky(name: String, msb: Int, lsb: Int, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, VAR_TYPE.SIGNED, msb, lsb, defval)
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
         add_local_sticky(ret_var)
         return ret_var
     }
 
     fun slocal_sticky(name: String, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, VAR_TYPE.SIGNED, defval)
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, defval), defval)
         add_local_sticky(ret_var)
         return ret_var
     }
@@ -278,74 +241,56 @@ open class pipeline(name_in : String) : hw_astc() {
         new_global.default_astc = this
     }
 
-    fun global(name: String, VarType: VAR_TYPE, src_struct_in: hw_struct, dimensions: hw_dim_static, defval: String): hw_global {
-        var ret_var = hw_global(name, VarType, src_struct_in, dimensions, defval)
-        add_global(ret_var)
-        return ret_var
-    }
-
-    fun global(name: String, VarType: VAR_TYPE, dimensions: hw_dim_static, defval: String): hw_global {
-        var ret_var = hw_global(name, VarType, dimensions, defval)
-        add_global(ret_var)
-        return ret_var
-    }
-
-    fun global(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int, defval: String): hw_global {
-        var ret_var = hw_global(name, VarType, msb, lsb, defval)
-        add_global(ret_var)
-        return ret_var
-    }
-
-    fun global(name: String, VarType: VAR_TYPE, defval: String): hw_global {
-        var ret_var = hw_global(name, VarType, defval)
+    fun global(name: String, vartype: hw_type, defval: String): hw_global {
+        var ret_var = hw_global(name, vartype, defval)
         add_global(ret_var)
         return ret_var
     }
 
     fun global(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_global {
-        var ret_var = hw_global(name, src_struct_in, dimensions)
+        var ret_var = hw_global(name, hw_type(src_struct_in, dimensions), "0")
         add_global(ret_var)
         return ret_var
     }
 
     fun global(name: String, src_struct_in: hw_struct): hw_global {
-        var ret_var = hw_global(name, src_struct_in)
+        var ret_var = hw_global(name, hw_type(src_struct_in), "0")
         add_global(ret_var)
         return ret_var
     }
 
     fun uglobal(name: String, dimensions: hw_dim_static, defval: String): hw_global {
-        var ret_var = hw_global(name, VAR_TYPE.UNSIGNED, dimensions, defval)
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
         add_global(ret_var)
         return ret_var
     }
 
     fun uglobal(name: String, msb: Int, lsb: Int, defval: String): hw_global {
-        var ret_var = hw_global(name, VAR_TYPE.UNSIGNED, msb, lsb, defval)
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
         add_global(ret_var)
         return ret_var
     }
 
     fun uglobal(name: String, defval: String): hw_global {
-        var ret_var = hw_global(name, VAR_TYPE.UNSIGNED, defval)
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
         add_global(ret_var)
         return ret_var
     }
 
     fun sglobal(name: String, dimensions: hw_dim_static, defval: String): hw_global {
-        var ret_var = hw_global(name, VAR_TYPE.SIGNED, dimensions, defval)
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
         add_global(ret_var)
         return ret_var
     }
 
     fun sglobal(name: String, msb: Int, lsb: Int, defval: String): hw_global {
-        var ret_var = hw_global(name, VAR_TYPE.SIGNED, msb, lsb, defval)
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
         add_global(ret_var)
         return ret_var
     }
 
     fun sglobal(name: String, defval: String): hw_global {
-        var ret_var = hw_global(name, VAR_TYPE.SIGNED, defval)
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.SIGNED, defval), defval)
         add_global(ret_var)
         return ret_var
     }
@@ -364,211 +309,190 @@ open class pipeline(name_in : String) : hw_astc() {
         new_port.default_astc = this
     }
 
-    fun port(
-        name: String,
-        port_dir: PORT_DIR,
-        VarType: VAR_TYPE,
-        dimensions: hw_dim_static,
-        defval: String
+    fun port(name: String,
+        port_dir: PORT_DIR, vartype: hw_type, defval: String): hw_port {
+        var ret_var = hw_port(name, port_dir, vartype, defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun port(name: String, port_dir: PORT_DIR, src_struct_in: hw_struct, dimensions: hw_dim_static
     ): hw_port {
-        var ret_var = hw_port(name, port_dir, VarType, dimensions, defval)
-        add_port(ret_var)
-        return ret_var
-    }
-
-    fun port(name: String, port_dir: PORT_DIR, VarType: VAR_TYPE, msb: Int, lsb: Int, defval: String): hw_port {
-        var ret_var = hw_port(name, port_dir, VarType, msb, lsb, defval)
-        add_port(ret_var)
-        return ret_var
-    }
-
-    fun port(name: String, port_dir: PORT_DIR, VarType: VAR_TYPE, defval: String): hw_port {
-        var ret_var = hw_port(name, port_dir, VarType, defval)
-        add_port(ret_var)
-        return ret_var
-    }
-
-    fun port(
-        name: String,
-        port_dir: PORT_DIR,
-        src_struct_in: hw_struct,
-        dimensions: hw_dim_static
-    ): hw_port {
-        var ret_var = hw_port(name, port_dir, src_struct_in, dimensions)
+        var ret_var = hw_port(name, port_dir, hw_type(src_struct_in, dimensions), "0")
         add_port(ret_var)
         return ret_var
     }
 
     fun port(name: String, port_dir: PORT_DIR, src_struct_in: hw_struct): hw_port {
-        var ret_var = hw_port(name, port_dir, src_struct_in)
+        var ret_var = hw_port(name, port_dir, hw_type(src_struct_in), "0")
         add_port(ret_var)
         return ret_var
     }
 
     fun uport(name: String, port_dir: PORT_DIR, dimensions: hw_dim_static, defval: String): hw_port {
-        var ret_var = hw_port(name, port_dir, VAR_TYPE.UNSIGNED, dimensions, defval)
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uport(name: String, port_dir: PORT_DIR, msb: Int, lsb: Int, defval: String): hw_port {
-        var ret_var = hw_port(name, port_dir, VAR_TYPE.UNSIGNED, msb, lsb, defval)
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uport(name: String, port_dir: PORT_DIR, defval: String): hw_port {
-        var ret_var = hw_port(name, port_dir, VAR_TYPE.UNSIGNED, defval)
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sport(name: String, port_dir: PORT_DIR, dimensions: hw_dim_static, defval: String): hw_port {
-        var ret_var = hw_port(name, port_dir, VAR_TYPE.SIGNED, dimensions, defval)
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sport(name: String, port_dir: PORT_DIR, msb: Int, lsb: Int, defval: String): hw_port {
-        var ret_var = hw_port(name, port_dir, VAR_TYPE.SIGNED, msb, lsb, defval)
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sport(name: String, port_dir: PORT_DIR, defval: String): hw_port {
-        var ret_var = hw_port(name, port_dir, VAR_TYPE.SIGNED, defval)
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.SIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun input(name: String, VarType: VAR_TYPE, dimensions: hw_dim_static, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, VarType, dimensions, defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VarType, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun input(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, VarType, msb, lsb, defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VarType, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun input(name: String, VarType: VAR_TYPE, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, VarType, defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VarType, defval), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun input(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, src_struct_in, dimensions)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(src_struct_in, dimensions), "0")
         add_port(ret_var)
         return ret_var
     }
 
     fun input(name: String, src_struct_in: hw_struct): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, src_struct_in)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(src_struct_in), "0")
         add_port(ret_var)
         return ret_var
     }
 
     fun uinput(name: String, dimensions: hw_dim_static, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, VAR_TYPE.UNSIGNED, dimensions, defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinput(name: String, msb: Int, lsb: Int, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, VAR_TYPE.UNSIGNED, msb, lsb, defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinput(name: String, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, VAR_TYPE.UNSIGNED, defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinput(name: String, dimensions: hw_dim_static, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, VAR_TYPE.SIGNED, dimensions, defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinput(name: String, msb: Int, lsb: Int, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, VAR_TYPE.SIGNED, msb, lsb, defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinput(name: String, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, VAR_TYPE.SIGNED, defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.SIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun output(name: String, VarType: VAR_TYPE, dimensions: hw_dim_static, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, VarType, dimensions, defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VarType, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun output(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, VarType, msb, lsb, defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VarType, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun output(name: String, VarType: VAR_TYPE, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, VarType, defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VarType, defval), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun output(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, src_struct_in, dimensions)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(src_struct_in, dimensions), "0")
         add_port(ret_var)
         return ret_var
     }
 
     fun output(name: String, src_struct_in: hw_struct): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, src_struct_in)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(src_struct_in), "0")
         add_port(ret_var)
         return ret_var
     }
 
     fun uoutput(name: String, dimensions: hw_dim_static, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, VAR_TYPE.UNSIGNED, dimensions, defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uoutput(name: String, msb: Int, lsb: Int, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, VAR_TYPE.UNSIGNED, msb, lsb, defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uoutput(name: String, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, VAR_TYPE.UNSIGNED, defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun soutput(name: String, dimensions: hw_dim_static, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, VAR_TYPE.SIGNED, dimensions, defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun soutput(name: String, msb: Int, lsb: Int, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, VAR_TYPE.SIGNED, msb, lsb, defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun soutput(name: String, defval: String): hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, VAR_TYPE.SIGNED, defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.SIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
@@ -580,50 +504,50 @@ open class pipeline(name_in : String) : hw_astc() {
         fifo_ins.add(new_fifo_in)
     }
 
-    fun fifo_in(name: String, VarType: VAR_TYPE, dimensions: hw_dim_static): hw_fifo_in {
-        var ret_var = hw_fifo_in(name, VarType, dimensions)
+    fun fifo_in(name: String, vartype: hw_type): hw_fifo_in {
+        var ret_var = hw_fifo_in(name, vartype)
         add_fifo_in(ret_var)
         return ret_var
     }
 
     fun fifo_in(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int): hw_fifo_in {
-        var ret_var = hw_fifo_in(name, VarType, msb, lsb)
+        var ret_var = hw_fifo_in(name, hw_type(VarType, msb, lsb))
         add_fifo_in(ret_var)
         return ret_var
     }
 
     fun fifo_in(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_fifo_in {
-        var ret_var = hw_fifo_in(name, src_struct_in, dimensions)
+        var ret_var = hw_fifo_in(name, hw_type(src_struct_in, dimensions))
         add_fifo_in(ret_var)
         return ret_var
     }
 
     fun fifo_in(name: String, src_struct_in: hw_struct): hw_fifo_in {
-        var ret_var = hw_fifo_in(name, src_struct_in)
+        var ret_var = hw_fifo_in(name, hw_type(src_struct_in))
         add_fifo_in(ret_var)
         return ret_var
     }
 
     fun ufifo_in(name: String, dimensions: hw_dim_static): hw_fifo_in {
-        var ret_var = hw_fifo_in(name, VAR_TYPE.UNSIGNED, dimensions)
+        var ret_var = hw_fifo_in(name, hw_type(VAR_TYPE.UNSIGNED, dimensions))
         add_fifo_in(ret_var)
         return ret_var
     }
 
     fun ufifo_in(name: String, msb: Int, lsb: Int): hw_fifo_in {
-        var ret_var = hw_fifo_in(name, VAR_TYPE.UNSIGNED, msb, lsb)
+        var ret_var = hw_fifo_in(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb))
         add_fifo_in(ret_var)
         return ret_var
     }
 
     fun sfifo_in(name: String, dimensions: hw_dim_static): hw_fifo_in {
-        var ret_var = hw_fifo_in(name, VAR_TYPE.SIGNED, dimensions)
+        var ret_var = hw_fifo_in(name, hw_type(VAR_TYPE.SIGNED, dimensions))
         add_fifo_in(ret_var)
         return ret_var
     }
 
     fun sfifo_in(name: String, msb: Int, lsb: Int): hw_fifo_in {
-        var ret_var = hw_fifo_in(name, VAR_TYPE.SIGNED, msb, lsb)
+        var ret_var = hw_fifo_in(name, hw_type(VAR_TYPE.SIGNED, msb, lsb))
         add_fifo_in(ret_var)
         return ret_var
     }
@@ -635,50 +559,50 @@ open class pipeline(name_in : String) : hw_astc() {
         fifo_outs.add(new_fifo_out)
     }
 
-    fun fifo_out(name: String, VarType: VAR_TYPE, dimensions: hw_dim_static): hw_fifo_out {
-        var ret_var = hw_fifo_out(name, VarType, dimensions)
+    fun fifo_out(name: String, vartype: hw_type): hw_fifo_out {
+        var ret_var = hw_fifo_out(name, vartype)
         add_fifo_out(ret_var)
         return ret_var
     }
 
     fun fifo_out(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int): hw_fifo_out {
-        var ret_var = hw_fifo_out(name, VarType, msb, lsb)
+        var ret_var = hw_fifo_out(name, hw_type(VarType, msb, lsb))
         add_fifo_out(ret_var)
         return ret_var
     }
 
     fun fifo_out(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_fifo_out {
-        var ret_var = hw_fifo_out(name, src_struct_in, dimensions)
+        var ret_var = hw_fifo_out(name, hw_type(src_struct_in, dimensions))
         add_fifo_out(ret_var)
         return ret_var
     }
 
     fun fifo_out(name: String, src_struct_in: hw_struct): hw_fifo_out {
-        var ret_var = hw_fifo_out(name, src_struct_in)
+        var ret_var = hw_fifo_out(name, hw_type(src_struct_in))
         add_fifo_out(ret_var)
         return ret_var
     }
 
     fun ufifo_out(name: String, dimensions: hw_dim_static): hw_fifo_out {
-        var ret_var = hw_fifo_out(name, VAR_TYPE.UNSIGNED, dimensions)
+        var ret_var = hw_fifo_out(name, hw_type(VAR_TYPE.UNSIGNED, dimensions))
         add_fifo_out(ret_var)
         return ret_var
     }
 
     fun ufifo_out(name: String, msb: Int, lsb: Int): hw_fifo_out {
-        var ret_var = hw_fifo_out(name, VAR_TYPE.UNSIGNED, msb, lsb)
+        var ret_var = hw_fifo_out(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb))
         add_fifo_out(ret_var)
         return ret_var
     }
 
     fun sfifo_out(name: String, dimensions: hw_dim_static): hw_fifo_out {
-        var ret_var = hw_fifo_out(name, VAR_TYPE.SIGNED, dimensions)
+        var ret_var = hw_fifo_out(name, hw_type(VAR_TYPE.SIGNED, dimensions))
         add_fifo_out(ret_var)
         return ret_var
     }
 
     fun sfifo_out(name: String, msb: Int, lsb: Int): hw_fifo_out {
-        var ret_var = hw_fifo_out(name, VAR_TYPE.SIGNED, msb, lsb)
+        var ret_var = hw_fifo_out(name, hw_type(VAR_TYPE.SIGNED, msb, lsb))
         add_fifo_out(ret_var)
         return ret_var
     }
@@ -711,20 +635,12 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     fun mcopipe_if(name: String,
-                   wdata_VarType: VAR_TYPE,
-                   wdata_src_struct: hw_struct,
-                   wdata_dim: hw_dim_static,
-                   rdata_VarType: VAR_TYPE,
-                   rdata_src_struct: hw_struct,
-                   rdata_dim: hw_dim_static): hw_mcopipe_if {
+                   wdata_vartype_in: hw_type,
+                   rdata_vartype_in: hw_type): hw_mcopipe_if {
         var new_mcopipe = hw_mcopipe_if(this,
             name,
-            wdata_VarType,
-            wdata_src_struct,
-            wdata_dim,
-            rdata_VarType,
-            rdata_src_struct,
-            rdata_dim)
+            wdata_vartype_in,
+            rdata_vartype_in)
         add_mcopipe_if(new_mcopipe)
         return new_mcopipe
     }
@@ -737,20 +653,12 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     fun mcopipe_handle(name: String,
-                   wdata_VarType: VAR_TYPE,
-                   wdata_src_struct: hw_struct,
-                   wdata_dim: hw_dim_static,
-                   rdata_VarType: VAR_TYPE,
-                   rdata_src_struct: hw_struct,
-                   rdata_dim: hw_dim_static): hw_mcopipe_handle {
+                       wdata_vartype_in: hw_type,
+                       rdata_vartype_in: hw_type): hw_mcopipe_handle {
         var new_mcopipe = hw_mcopipe_handle(this,
             name,
-            wdata_VarType,
-            wdata_src_struct,
-            wdata_dim,
-            rdata_VarType,
-            rdata_src_struct,
-            rdata_dim)
+            wdata_vartype_in,
+            rdata_vartype_in)
         add_mcopipe_handle(new_mcopipe)
         return new_mcopipe
     }
@@ -769,21 +677,12 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     fun scopipe_if(name: String,
-                   wdata_VarType: VAR_TYPE,
-                   wdata_src_struct: hw_struct,
-                   wdata_dim: hw_dim_static,
-                   rdata_VarType: VAR_TYPE,
-                   rdata_src_struct: hw_struct,
-                   rdata_dim: hw_dim_static): hw_scopipe_if {
+                   wdata_vartype_in: hw_type,
+                   rdata_vartype_in: hw_type): hw_scopipe_if {
         var new_scopipe = hw_scopipe_if(this,
             name,
-            wdata_VarType,
-            wdata_src_struct,
-            wdata_dim,
-            rdata_VarType,
-            rdata_src_struct,
-            rdata_dim
-        )
+            wdata_vartype_in,
+            rdata_vartype_in)
         add_scopipe_if(new_scopipe)
         return new_scopipe
     }
@@ -796,20 +695,12 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     fun scopipe_handle(name: String,
-                       wdata_VarType: VAR_TYPE,
-                       wdata_src_struct: hw_struct,
-                       wdata_dim: hw_dim_static,
-                       rdata_VarType: VAR_TYPE,
-                       rdata_src_struct: hw_struct,
-                       rdata_dim: hw_dim_static): hw_scopipe_handle {
+                       wdata_vartype_in: hw_type,
+                       rdata_vartype_in: hw_type): hw_scopipe_handle {
         var new_scopipe = hw_scopipe_handle(this,
             name,
-            wdata_VarType,
-            wdata_src_struct,
-            wdata_dim,
-            rdata_VarType,
-            rdata_src_struct,
-            rdata_dim)
+            wdata_vartype_in,
+            rdata_vartype_in)
         add_scopipe_handle(new_scopipe)
         return new_scopipe
     }
@@ -822,7 +713,7 @@ open class pipeline(name_in : String) : hw_astc() {
 
     fun readremote(remote_stage : hw_stage, remote_local: hw_pipex_var) : hw_var {
         var new_expr = hw_exec_read_remote(remote_stage, remote_local)
-        var genvar = hw_var(GetGenName("var"), remote_local.VarType, remote_local.src_struct, remote_local.dimensions, "0")
+        var genvar = hw_var(GetGenName("var"), remote_local.vartype, "0")
         remote_stage.AddRdVar(remote_local)
         new_expr.AddWrVar(genvar)
         new_expr.AddGenVar(genvar)
@@ -922,7 +813,7 @@ open class pipeline(name_in : String) : hw_astc() {
 
     fun readprev(src : hw_pipex_var) : hw_pipex_var {
         var new_expr = hw_exec(OP_RD_PREV)
-        var genvar = hw_pipex_var(GetGenName("readprev"), src.VarType, src.dimensions, src.defval)
+        var genvar = hw_pipex_var(GetGenName("readprev"), src.vartype, src.defval)
         genvar.default_astc = this
         new_expr.AddRdVar(src)
         new_expr.AddGenVar(genvar)
@@ -986,7 +877,7 @@ open class pipeline(name_in : String) : hw_astc() {
         } else if (expression.opcode == OP_ASSIGN_SUCC) {
             if (!pstage_info.assign_succ_assocs.containsKey(expression.wrvars[0])) {
                 val req = cyclix_gen.ulocal(GetGenName("syncreq"), 0, 0, "0")
-                val buf = cyclix_gen.local(GetGenName("syncbuf"), expression.wrvars[0].VarType, expression.wrvars[0].src_struct, expression.wrvars[0].dimensions, expression.wrvars[0].defval)
+                val buf = cyclix_gen.local(GetGenName("syncbuf"), expression.wrvars[0].vartype, expression.wrvars[0].defval)
                 pstage_info.assign_succ_assocs.put((expression.wrvars[0] as hw_pipex_var), __assign_succ_buf(req, buf))
             }
 
@@ -1208,9 +1099,7 @@ open class pipeline(name_in : String) : hw_astc() {
                     var handle_id = TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!.indexOf(expr.mcopipe_if)
 
                     var req_struct = cyclix_gen.local(GetGenName("req_struct"),
-                        mcopipe_if_assoc.req_fifo.VarType,
-                        mcopipe_if_assoc.req_fifo.src_struct,
-                        mcopipe_if_assoc.req_fifo.dimensions,
+                        mcopipe_if_assoc.req_fifo.vartype,
                         mcopipe_if_assoc.req_fifo.defval)
 
                     cyclix_gen.assign(hw_fractions("we"), req_struct, cmd_translated)
@@ -1223,7 +1112,7 @@ open class pipeline(name_in : String) : hw_astc() {
                         cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), 1)
                         cyclix_gen.assign(rdreq_pending_translated, cyclix_gen.lnot(cmd_translated))
                         cyclix_gen.assign(tid_translated, mcopipe_if_assoc.wr_ptr)
-                        cyclix_gen.assign(if_id_translated, hw_imm(mcopipe_handle_assoc.if_id.dimensions, handle_id.toString()))
+                        cyclix_gen.assign(if_id_translated, hw_imm(mcopipe_handle_assoc.if_id.vartype.dimensions, handle_id.toString()))
 
                         // mcopipe fifo management
                         cyclix_gen.begif(rdreq_pending_translated)
@@ -1340,8 +1229,8 @@ open class pipeline(name_in : String) : hw_astc() {
 
         MSG(DEBUG_FLAG, "Processing globals")
         for (global in globals) {
-            var new_global = cyclix_gen.global(("genpsticky_glbl_" + global.name), global.VarType, global.src_struct, global.dimensions, global.defval)
-            var new_global_buf = cyclix_gen.local(("genpsticky_glbl_" + global.name + "_buf"), global.VarType, global.src_struct, global.dimensions, global.defval)
+            var new_global = cyclix_gen.global(("genpsticky_glbl_" + global.name), global.vartype, global.defval)
+            var new_global_buf = cyclix_gen.local(("genpsticky_glbl_" + global.name + "_buf"), global.vartype, global.defval)
             TranslateInfo.__global_assocs.put(global, __global_info(new_global, new_global_buf))
         }
 
@@ -1359,10 +1248,10 @@ open class pipeline(name_in : String) : hw_astc() {
 
             var wr_struct = cyclix_gen.add_if_struct("genpmodule_" + name + "_" + mcopipe_name_prefix + "genstruct_fifo_wdata")
             wr_struct.addu("we", 0, 0, "0")
-            wr_struct.add("wdata", mcopipe_if.wdata_VarType, mcopipe_if.wdata_src_struct, mcopipe_if.wdata_dim, "0")
+            wr_struct.add("wdata", mcopipe_if.wdata_vartype, "0")
 
             var req_fifo = cyclix_gen.fifo_out((mcopipe_name_prefix + "req"), wr_struct)
-            var resp_fifo = cyclix_gen.fifo_in((mcopipe_name_prefix + "resp"), mcopipe_if.rdata_VarType, mcopipe_if.rdata_src_struct, mcopipe_if.rdata_dim)
+            var resp_fifo = cyclix_gen.fifo_in((mcopipe_name_prefix + "resp"), mcopipe_if.rdata_vartype)
 
             TranslateInfo.__mcopipe_if_assocs.put(mcopipe_if, __mcopipe_if_info(
                 full_flag,
@@ -1390,7 +1279,7 @@ open class pipeline(name_in : String) : hw_astc() {
 
             var if_id           = ulocal_sticky((name_prefix + "if_id"), GetWidthToContain(TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!.size)-1, 0, "0")
             var resp_done       = ulocal_sticky((name_prefix + "resp_done"), 0, 0, "0")
-            var rdata           =  local_sticky((name_prefix + "rdata"), mcopipe_handle.rdata_VarType, mcopipe_handle.rdata_src_struct, mcopipe_handle.rdata_dim, "0")
+            var rdata           =  local_sticky((name_prefix + "rdata"), mcopipe_handle.rdata_vartype, "0")
             var rdreq_pending   = ulocal_sticky((name_prefix + "rdreq_pending"), 0, 0, "0")
             var tid             = ulocal_sticky((name_prefix + "tid"), (COPIPE_TRX_ID_WIDTH-1), 0, "0")
 
@@ -1409,10 +1298,10 @@ open class pipeline(name_in : String) : hw_astc() {
 
             var rd_struct = cyclix_gen.add_if_struct("genpmodule_" + name + "_" + scopipe_name_prefix + "genstruct_fifo_rdata")
             rd_struct.addu("we", 0, 0, "0")
-            rd_struct.add("rdata", scopipe_if.rdata_VarType, scopipe_if.rdata_dim, "0")
+            rd_struct.add("rdata", scopipe_if.rdata_vartype, "0")
 
             var req_fifo = cyclix_gen.fifo_in((scopipe_name_prefix + "req"), rd_struct)
-            var resp_fifo = cyclix_gen.fifo_out((scopipe_name_prefix + "resp"), scopipe_if.wdata_VarType, scopipe_if.wdata_dim)
+            var resp_fifo = cyclix_gen.fifo_out((scopipe_name_prefix + "resp"), scopipe_if.wdata_vartype)
 
             TranslateInfo.__scopipe_if_assocs.put(scopipe_if, __scopipe_if_info(
                 req_fifo,
@@ -1433,7 +1322,7 @@ open class pipeline(name_in : String) : hw_astc() {
             val name_prefix = "genscopipe_handle_" + scopipe_handle.name + "_genvar_"
 
             var if_id           = ulocal_sticky((name_prefix + "if_id"), GetWidthToContain(TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.size)-1, 0, "0")
-            var wdata           =  local_sticky((name_prefix + "wdata"), scopipe_handle.wdata_VarType, scopipe_handle.wdata_src_struct, scopipe_handle.wdata_dim, "0")
+            var wdata           =  local_sticky((name_prefix + "wdata"), scopipe_handle.wdata_vartype, "0")
             var we              = ulocal_sticky((name_prefix + "we"), 0, 0, "0")
             var resp_done       = ulocal_sticky((name_prefix + "resp_done"), 0, 0, "0")
             var rdreq_pending   = ulocal_sticky((name_prefix + "rdreq_pending"), 0, 0, "0")
@@ -1494,7 +1383,7 @@ open class pipeline(name_in : String) : hw_astc() {
         MSG(DEBUG_FLAG, "Processing genvars")
         for (CUR_STAGE_INDEX in 0 until StageList.size) {
             for (genvar in StageList[CUR_STAGE_INDEX].genvars) {
-                var genvar_local = cyclix_gen.local(GetGenName("var"), genvar.VarType, genvar.src_struct, genvar.dimensions, genvar.defval)
+                var genvar_local = cyclix_gen.local(GetGenName("var"), genvar.vartype, genvar.defval)
                 StageAssocList[CUR_STAGE_INDEX].pContext_local_dict.put(genvar, genvar_local)
             }
         }
@@ -1613,18 +1502,14 @@ open class pipeline(name_in : String) : hw_astc() {
                 if (local is hw_local) {
                     var new_local = cyclix_gen.local(
                         (StageAssocList[CUR_STAGE_INDEX].name_prefix + local.name),
-                        local.VarType,
-                        local.src_struct,
-                        local.dimensions,
+                        local.vartype,
                         local.defval
                     )
                     StageAssocList[CUR_STAGE_INDEX].pContext_local_dict.put(local, new_local)
                 } else if (local is hw_local_sticky) {
                     var new_local = cyclix_gen.global(
                         (StageAssocList[CUR_STAGE_INDEX].name_prefix + local.name),
-                        local.VarType,
-                        local.src_struct,
-                        local.dimensions,
+                        local.vartype,
                         local.defval
                     )
                     StageAssocList[CUR_STAGE_INDEX].pContext_local_dict.put(local, new_local)
@@ -1650,9 +1535,7 @@ open class pipeline(name_in : String) : hw_astc() {
                 if (notnew is hw_local) {
                     var new_global = cyclix_gen.global(
                         (StageAssocList[CUR_STAGE_INDEX].name_prefix + notnew.name + "_genglbl"),
-                        notnew.VarType,
-                        notnew.src_struct,
-                        notnew.dimensions,
+                        notnew.vartype,
                         notnew.defval)
                     StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict.put(notnew, new_global)
                 }
@@ -1793,13 +1676,13 @@ open class pipeline(name_in : String) : hw_astc() {
                         for (mcopipe_if in TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!) {
                             var mcopipe_if_assoc = TranslateInfo.__mcopipe_if_assocs[mcopipe_if]!!
 
-                            cyclix_gen.begif(cyclix_gen.eq2(if_id_translated, hw_imm(if_id_translated.dimensions, IF_NUM.toString())))
+                            cyclix_gen.begif(cyclix_gen.eq2(if_id_translated, hw_imm(if_id_translated.vartype.dimensions, IF_NUM.toString())))
                             run {
 
                                 cyclix_gen.begif(cyclix_gen.eq2(tid_translated, mcopipe_if_assoc.rd_ptr))
                                 run {
 
-                                    var fifo_rdata = cyclix_gen.local(GetGenName("mcopipe_rdata"), mcopipe_if.rdata_VarType, mcopipe_if.rdata_src_struct, mcopipe_if.rdata_dim, "0")
+                                    var fifo_rdata = cyclix_gen.local(GetGenName("mcopipe_rdata"), mcopipe_if.rdata_vartype, "0")
 
                                     cyclix_gen.begif(cyclix_gen.fifo_rd(mcopipe_if_assoc.resp_fifo, fifo_rdata))
                                     run {

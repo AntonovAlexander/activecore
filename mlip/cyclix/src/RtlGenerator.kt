@@ -240,24 +240,24 @@ class RtlGenerator(module_in : module) {
 
         // Generating combinationals
         for (local in mod.locals)
-            var_dict.put(local, rtl_gen.comb(local.name, local.VarType, local.src_struct, local.dimensions, local.defval))
+            var_dict.put(local, rtl_gen.comb(local.name, local.vartype, local.defval))
 
         // Generating genvars
         for (genvar in mod.proc.genvars)
-            var_dict.put(genvar, rtl_gen.comb(mod.GetGenName("comb"), genvar.VarType, genvar.src_struct, genvar.dimensions, genvar.defval))
+            var_dict.put(genvar, rtl_gen.comb(mod.GetGenName("comb"), genvar.vartype, genvar.defval))
 
         // Generating globals
         for (global in mod.globals)
-            var_dict.put(global, rtl_gen.sticky(global.name, global.VarType, global.src_struct, global.dimensions, global.defval, clk, rst))
+            var_dict.put(global, rtl_gen.sticky(global.name, global.vartype, global.defval, clk, rst))
 
         // Generating fifo_outs
         for (fifo_out in mod.fifo_outs) {
             fifo_out_dict.put(fifo_out, fifo_out_descr(
                 rtl_gen.uoutput((fifo_out.name + "_genfifo_req_o"), 0, 0, "0"),
-                rtl_gen.port((fifo_out.name + "_genfifo_wdata_bo"), rtl.PORT_DIR.OUT, fifo_out.VarType, fifo_out.src_struct, fifo_out.dimensions, fifo_out.defval),
+                rtl_gen.port((fifo_out.name + "_genfifo_wdata_bo"), rtl.PORT_DIR.OUT, fifo_out.vartype, fifo_out.defval),
                 rtl_gen.uinput((fifo_out.name + "_genfifo_ack_i"), 0, 0, "0"),
                 rtl_gen.usticky((fifo_out.name + "_genfifo_reqbuf_req"), 0, 0, "0", clk, rst),
-                rtl_gen.sticky((fifo_out.name + "_genfifo_reqbuf_wdata"), fifo_out.VarType, fifo_out.src_struct, fifo_out.dimensions, fifo_out.defval, clk, rst)
+                rtl_gen.sticky((fifo_out.name + "_genfifo_reqbuf_wdata"), fifo_out.vartype, fifo_out.defval, clk, rst)
             ))
         }
 
@@ -265,10 +265,10 @@ class RtlGenerator(module_in : module) {
         for (fifo_in in mod.fifo_ins) {
             fifo_in_dict.put(fifo_in, fifo_in_descr(
                 rtl_gen.uinput((fifo_in.name + "_genfifo_req_i"), 0, 0, "0"),
-                rtl_gen.port((fifo_in.name + "_genfifo_rdata_bi"), rtl.PORT_DIR.IN, fifo_in.VarType, fifo_in.src_struct, fifo_in.dimensions, fifo_in.defval),
+                rtl_gen.port((fifo_in.name + "_genfifo_rdata_bi"), rtl.PORT_DIR.IN, fifo_in.vartype, fifo_in.defval),
                 rtl_gen.uoutput((fifo_in.name + "_genfifo_ack_o"), 0, 0, "0"),
                 rtl_gen.ucomb((fifo_in.name + "_genfifo_buf_req"), 0, 0, "0"),
-                rtl_gen.comb((fifo_in.name + "_genfifo_buf_rdata"), fifo_in.VarType, fifo_in.src_struct, fifo_in.dimensions, fifo_in.defval)
+                rtl_gen.comb((fifo_in.name + "_genfifo_buf_rdata"), fifo_in.vartype, fifo_in.defval)
             ))
         }
 

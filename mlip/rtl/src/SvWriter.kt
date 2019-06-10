@@ -19,7 +19,7 @@ class SvWriter(module_in : module) {
     fun getStringWithDim(param : hw_param) : String
     {
         if (param.type == PARAM_TYPE.VAR) return param.token_printable
-        else return (param.dimensions[0].GetWidth().toString() + "'d" + param.token_printable)
+        else return (param.vartype.dimensions[0].GetWidth().toString() + "'d" + param.token_printable)
     }
 
     fun getDimString(in_range : hw_dim_range_static) : String
@@ -71,29 +71,29 @@ class SvWriter(module_in : module) {
 
     fun export_structvar(preambule_uncond : String, preambule_cond : String, trailer : String, structvar : hw_structvar, wrFile : java.io.OutputStreamWriter) {
         var dimstring = ""
-        if (structvar.VarType == VAR_TYPE.STRUCTURED) {
-            if (!structvar.dimensions.isSingle()) {
-                for (dim in structvar.dimensions) {
+        if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
+            if (!structvar.vartype.dimensions.isSingle()) {
+                for (dim in structvar.vartype.dimensions) {
                     dimstring += ("" + getDimString(dim))
                 }
             }
             wrFile.write(preambule_uncond
-                    + structvar.src_struct.name
+                    + structvar.vartype.src_struct.name
                     + " "
                     + structvar.name
                     + dimstring
                     + trailer)
         } else {
-            if (structvar.dimensions.size > 0) {
-                for (DIM_INDEX in 1 until structvar.dimensions.size) {
-                    dimstring += (" [" + structvar.dimensions[DIM_INDEX].msb + ":" + structvar.dimensions[DIM_INDEX].lsb + "]")
+            if (structvar.vartype.dimensions.size > 0) {
+                for (DIM_INDEX in 1 until structvar.vartype.dimensions.size) {
+                    dimstring += (" [" + structvar.vartype.dimensions[DIM_INDEX].msb + ":" + structvar.vartype.dimensions[DIM_INDEX].lsb + "]")
                 }
                 wrFile.write(preambule_uncond
                         + preambule_cond
                         + "["
-                        + structvar.dimensions[0].msb.toString()
+                        + structvar.vartype.dimensions[0].msb.toString()
                         + ":"
-                        + structvar.dimensions[0].lsb.toString()
+                        + structvar.vartype.dimensions[0].lsb.toString()
                         + "] "
                         + structvar.name
                         + dimstring
@@ -378,16 +378,16 @@ class SvWriter(module_in : module) {
 
                         wrFileModule.write("\tif ($reset_condition)\n")
                         wrFileModule.write("\t\tbegin\n")
-                        if (mem.dimensions.size == 1) {
+                        if (mem.vartype.dimensions.size == 1) {
                             wrFileModule.write("\t\t" + mem.name + " <= " + mem.rst_src.GetString() +";\n")
-                        } else if (mem.dimensions.size == 2) {
-                            var power = mem.dimensions[1].GetWidth()
+                        } else if (mem.vartype.dimensions.size == 2) {
+                            var power = mem.vartype.dimensions[1].GetWidth()
                             for (k in 0 until power) {
                                 if (mem.rst_src.type == PARAM_TYPE.VAR)
                                     wrFileModule.write("\t\t"
                                             + mem.name
                                             + "["
-                                            + (k + mem.dimensions[1].lsb)
+                                            + (k + mem.vartype.dimensions[1].lsb)
                                             + "] <= "
                                             + mem.rst_src.GetString()
                                             + "["
@@ -397,15 +397,15 @@ class SvWriter(module_in : module) {
                                     wrFileModule.write("\t\t"
                                             + mem.name
                                             + "["
-                                            + (k + mem.dimensions[1].lsb)
+                                            + (k + mem.vartype.dimensions[1].lsb)
                                             + "] <= "
                                             + mem.rst_src.GetString()
                                             + ";\n")
                             }
-                        } else if (mem.dimensions.size > 2)
+                        } else if (mem.vartype.dimensions.size > 2)
                             ERROR("Large dimensions for mems (reset) are currently not supported!\n")
                         else {
-                            if (mem.VarType == VAR_TYPE.STRUCTURED) {
+                            if (mem.vartype.VarType == VAR_TYPE.STRUCTURED) {
                                 wrFileModule.write("\t\t"
                                         + mem.name
                                         + " <= '{default:"
@@ -418,20 +418,20 @@ class SvWriter(module_in : module) {
                         wrFileModule.write("\t\tend\n")
                         wrFileModule.write("\telse\n")
                         wrFileModule.write("\t\tbegin\n")
-                        if (mem.dimensions.size == 1) {
+                        if (mem.vartype.dimensions.size == 1) {
                             wrFileModule.write("\t\t"
                                     + mem.name
                                     + " <= "
                                     + mem_src.sync_src.GetString()
                                     + ";\n")
-                        } else if (mem.dimensions.size == 2) {
-                            var power = mem.dimensions[1].GetWidth()
+                        } else if (mem.vartype.dimensions.size == 2) {
+                            var power = mem.vartype.dimensions[1].GetWidth()
                             for (k in 0 until power) {
                                 if (mem_src.sync_src.type == PARAM_TYPE.VAR)
                                     wrFileModule.write("\t\t"
                                             + mem.name
                                             + "["
-                                            + (k + mem.dimensions[1].lsb)
+                                            + (k + mem.vartype.dimensions[1].lsb)
                                             + "] <= "
                                             + mem_src.sync_src.GetString()
                                             + "["
@@ -441,15 +441,15 @@ class SvWriter(module_in : module) {
                                     wrFileModule.write("\t\t"
                                             + mem.name
                                             + "["
-                                            + (k + mem.dimensions[1].lsb)
+                                            + (k + mem.vartype.dimensions[1].lsb)
                                             + "] <= "
                                             + mem_src.sync_src.GetString()
                                             + ";\n")
                             }
-                        } else if (mem.dimensions.size > 2)
+                        } else if (mem.vartype.dimensions.size > 2)
                             ERROR("Large dimensions for mems (data) are currently not supported!\n")
                         else {
-                            if (mem.VarType == VAR_TYPE.STRUCTURED) {
+                            if (mem.vartype.VarType == VAR_TYPE.STRUCTURED) {
                                 wrFileModule.write("\t\t"
                                         + mem.name
                                         + " <= "

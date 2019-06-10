@@ -8,9 +8,7 @@
 
 package hwast
 
-data class hw_var_descr(var VarType : VAR_TYPE, var src_struct: hw_struct, var dimensions : hw_dim_static, var defval : String)
-
-open class hw_var(name_in : String, VarType : VAR_TYPE, src_struct: hw_struct, dimensions : hw_dim_static, defval_in : String) : hw_structvar(name_in, VarType, src_struct, dimensions, defval_in) {
+open class hw_var(name_in : String, vartype_in : hw_type, defval_in : String) : hw_structvar(name_in, vartype_in, defval_in) {
 
     var read_done: Boolean
     var write_done: Boolean
@@ -24,20 +22,20 @@ open class hw_var(name_in : String, VarType : VAR_TYPE, src_struct: hw_struct, d
         token_printable = name
     }
 
-    constructor(name : String, VarType : VAR_TYPE, dimensions : hw_dim_static, defval : String)
-            : this(name, VarType, DUMMY_STRUCT, dimensions, defval)
+    constructor(name: String, VarType : VAR_TYPE, dimensions : hw_dim_static, defval : String)
+            : this(name, hw_type(VarType, dimensions), defval)
 
     constructor(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int, defval: String)
-            : this(name, VarType, DUMMY_STRUCT, hw_dim_static(msb, lsb), defval)
+            : this(name, hw_type(VarType, msb, lsb), defval)
 
     constructor(name: String, VarType: VAR_TYPE, defval: String)
-            : this(name, VarType, DUMMY_STRUCT, hw_dim_static(defval), defval)
+            : this(name, hw_type(VarType, defval), defval)
 
     constructor(name: String, src_struct_in: hw_struct, dimensions : hw_dim_static)
-            : this(name, VAR_TYPE.STRUCTURED, src_struct_in, dimensions, "0")
+            : this(name, hw_type(src_struct_in, dimensions), "0")
 
     constructor(name: String, src_struct_in: hw_struct, msb: Int, lsb: Int)
-            : this(name, VAR_TYPE.STRUCTURED, src_struct_in, hw_dim_static(msb, lsb), "0")
+            : this(name, hw_type(src_struct_in, msb, lsb), "0")
 
     constructor(name: String, src_struct_in: hw_struct)
             : this(name, src_struct_in, 0, 0)
@@ -156,18 +154,16 @@ open class hw_var(name_in : String, VarType : VAR_TYPE, src_struct: hw_struct, d
         default_astc.assign(depow_fractions, this, src)
     }
 
-    fun GetDepowered(depow_fractions: hw_fractions): hw_var_descr {
+    fun GetDepowered(depow_fractions: hw_fractions): hw_type {
         var ret_dim = hw_dim_static()
         ret_dim.clear()
         var ret_vartype : VAR_TYPE
         var ret_struct : hw_struct
-        var ret_defval : String
 
         // copying dimensions of a variable
-        for (i in 0 until dimensions.size) ret_dim.add(dimensions[i])
-        ret_vartype = VarType
-        ret_struct = src_struct
-        ret_defval = defval
+        for (i in 0 until vartype.dimensions.size) ret_dim.add(vartype.dimensions[i])
+        ret_vartype = vartype.VarType
+        ret_struct = vartype.src_struct
 
         // detaching dimensions
         for (depow_fraction in depow_fractions) {
@@ -177,10 +173,9 @@ open class hw_var(name_in : String, VarType : VAR_TYPE, src_struct: hw_struct, d
                 ret_dim.clear()
                 if (depow_fraction.type == FRAC_TYPE.SubStruct) {
                     // retrieving structure
-                    ret_vartype = (depow_fraction as hw_fraction_SubStruct).src_struct[depow_fraction.subStructIndex].VarType
-                    ret_struct = depow_fraction.src_struct[depow_fraction.subStructIndex].src_struct
-                    ret_defval = depow_fraction.src_struct[depow_fraction.subStructIndex].defval
-                    for (dimension in depow_fraction.src_struct[depow_fraction.subStructIndex].dimensions) {
+                    ret_vartype = (depow_fraction as hw_fraction_SubStruct).src_struct[depow_fraction.subStructIndex].vartype.VarType
+                    ret_struct = depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.src_struct
+                    for (dimension in depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.dimensions) {
                         ret_dim.add(dimension)
                     }
                 } else {
@@ -204,6 +199,6 @@ open class hw_var(name_in : String, VarType : VAR_TYPE, src_struct: hw_struct, d
             }
         }
 
-        return hw_var_descr(ret_vartype, ret_struct, ret_dim, ret_defval)
+        return hw_type(ret_vartype, ret_struct, ret_dim)
     }
 }

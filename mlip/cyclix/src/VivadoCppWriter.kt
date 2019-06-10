@@ -71,33 +71,33 @@ class VivadoCppWriter(module_in : module) {
 
     fun export_structvar(structvar : hw_structvar, wrFile : java.io.OutputStreamWriter) {
         var dimstring = ""
-        if (structvar.VarType == VAR_TYPE.STRUCTURED) {
-            if (!structvar.dimensions.isSingle()) {
-                for (dim in structvar.dimensions) {
+        if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
+            if (!structvar.vartype.dimensions.isSingle()) {
+                for (dim in structvar.vartype.dimensions) {
                     dimstring += ("" + getDimString(dim))
                 }
             }
             wrFile.write("\t"
-                    + structvar.src_struct.name
+                    + structvar.vartype.src_struct.name
                     + " "
                     + structvar.name
                     + dimstring
                     + ";\n")
         } else {
-            if (structvar.dimensions.size > 0) {
-                if (structvar.dimensions[0].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is no 0!")
-                for (DIM_INDEX in 1 until structvar.dimensions.size) {
-                    if (structvar.dimensions[DIM_INDEX].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is no 0!")
-                    dimstring += (" [" + (structvar.dimensions[DIM_INDEX].msb + 1) + "]")
+            if (structvar.vartype.dimensions.size > 0) {
+                if (structvar.vartype.dimensions[0].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is no 0!")
+                for (DIM_INDEX in 1 until structvar.vartype.dimensions.size) {
+                    if (structvar.vartype.dimensions[DIM_INDEX].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is no 0!")
+                    dimstring += (" [" + (structvar.vartype.dimensions[DIM_INDEX].msb + 1) + "]")
                 }
 
                 var typename = "ap_int"
-                if (structvar.VarType == VAR_TYPE.UNSIGNED) typename = "ap_uint"
+                if (structvar.vartype.VarType == VAR_TYPE.UNSIGNED) typename = "ap_uint"
 
                 wrFile.write("\t"
                         + typename
                         + "<"
-                        + (structvar.dimensions[0].msb + 1)
+                        + (structvar.vartype.dimensions[0].msb + 1)
                         + "> "
                         + structvar.name
                         + dimstring

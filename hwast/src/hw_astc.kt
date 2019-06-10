@@ -238,7 +238,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             }
 
             var curVarType: VAR_TYPE
-            if (params[0].type == PARAM_TYPE.VAR) curVarType = (params[0] as hw_var).VarType
+            if (params[0].type == PARAM_TYPE.VAR) curVarType = (params[0] as hw_var).vartype.VarType
             else curVarType = VAR_TYPE.UNSIGNED
 
             return hw_var(GetGenName("var"), curVarType, gen_dim, "0")
@@ -284,7 +284,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     || (opcode == OP2_ARITH_SRA)) {
                 for (param in params) {
                     if (param.type == PARAM_TYPE.VAR) {
-                        if ((param as hw_var).VarType == VAR_TYPE.SIGNED) curVarType = VAR_TYPE.SIGNED
+                        if ((param as hw_var).vartype.VarType == VAR_TYPE.SIGNED) curVarType = VAR_TYPE.SIGNED
                     }
                 }
             }
@@ -367,7 +367,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     private fun process_depow_fractions(depow_fractions: hw_fractions, tgt: hw_var) {
-        var tgt_struct_ptr = tgt.src_struct
+        var tgt_struct_ptr = tgt.vartype.src_struct
         for (fraction in depow_fractions) {
             if (fraction.type == FRAC_TYPE.SubStruct) {
                 //println("Substruct found!")
@@ -383,8 +383,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
                             fraction.src_struct = tgt_struct_ptr
                             fraction.subStructIndex = SUBSTR_INDEX
 
-                            if (structvar.VarType == VAR_TYPE.STRUCTURED) {
-                                tgt_struct_ptr = structvar.src_struct
+                            if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                                tgt_struct_ptr = structvar.vartype.src_struct
                             } else {
                                 tgt_struct_ptr = DUMMY_STRUCT
                             }
@@ -431,24 +431,24 @@ open class hw_astc() : ArrayList<hw_exec>() {
         if (src_Power < 1) src_Power = 1                    // for 1-bit signals
 
         if (src.type == PARAM_TYPE.VAR) {
-            if (tgt_DePowered_Power != src_Power) ERROR("dimensions do not match for target " + tgt.name + " (source tgt power: " + tgt.dimensions.size + ", depow size: " + depow_fractions.size + ", final tgt power: " + tgt_DePowered_Power + "), src: " + src.GetString() + " (src power: " + src_Power + ")")
+            if (tgt_DePowered_Power != src_Power) ERROR("dimensions do not match for target " + tgt.name + " (source tgt power: " + tgt.vartype.dimensions.size + ", depow size: " + depow_fractions.size + ", final tgt power: " + tgt_DePowered_Power + "), src: " + src.GetString() + " (src power: " + src_Power + ")")
             else if (tgt_DePowered_Power == 1) {
-                if ((((src as hw_var).VarType == VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType != VAR_TYPE.STRUCTURED))
-                        || ((src.VarType != VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType == VAR_TYPE.STRUCTURED))) {
+                if ((((src as hw_var).vartype.VarType == VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType != VAR_TYPE.STRUCTURED))
+                        || ((src.vartype.VarType != VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType == VAR_TYPE.STRUCTURED))) {
                     ERROR("assignment between structured and non-structured variables!")
-                } else if (src.VarType == VAR_TYPE.STRUCTURED) {
+                } else if (src.vartype.VarType == VAR_TYPE.STRUCTURED) {
                     // assignment of 1-bit structs
-                    if (src.src_struct != tgt_DePow_descr.src_struct) {
+                    if (src.vartype.src_struct != tgt_DePow_descr.src_struct) {
                         // assignment of inequally structured variables
-                        ERROR("assignment of inequally structured variables! tgt: " + tgt.name + " (struct: " + tgt_DePow_descr.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.src_struct.name + ")")
+                        ERROR("assignment of inequally structured variables! tgt: " + tgt.name + " (struct: " + tgt_DePow_descr.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
                     }
                 }
                 assign_gen(depow_fractions, tgt, src)
 
             } else {
-                for (i in 0 until tgt.dimensions.last().GetWidth()) {
+                for (i in 0 until tgt.vartype.dimensions.last().GetWidth()) {
 
-                    depow_fractions.add(0, hw_fraction_C(i + tgt.dimensions.last().lsb))
+                    depow_fractions.add(0, hw_fraction_C(i + tgt.vartype.dimensions.last().lsb))
 
                     var new_dimrange = hw_dim_range_static(i - 1, 0)
                     var gen_dim = hw_dim_static()
@@ -456,7 +456,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
                     var new_srcs = ArrayList<hw_param>()
                     new_srcs.add(src)
-                    new_srcs.add(hw_imm((i + tgt.dimensions[tgt_DePowered_Power - 1].lsb).toString()))
+                    new_srcs.add(hw_imm((i + tgt.vartype.dimensions[tgt_DePowered_Power - 1].lsb).toString()))
 
                     var indexed_src = AddExpr_op(OP2_INDEXED, new_srcs)
 
@@ -468,8 +468,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
         } else if (src.type == PARAM_TYPE.VAL) {
             if (tgt_DePowered_Power == 1) assign_gen(depow_fractions, tgt, src)
             else {
-                for (i in 0 until tgt.dimensions.get(tgt_DePowered_Power - 1).GetWidth()) {
-                    depow_fractions.add(0, hw_fraction_C(i + tgt.dimensions.last().lsb))
+                for (i in 0 until tgt.vartype.dimensions.get(tgt_DePowered_Power - 1).GetWidth()) {
+                    depow_fractions.add(0, hw_fraction_C(i + tgt.vartype.dimensions.last().lsb))
                     assign(depow_fractions, tgt, src)
                     depow_fractions.removeAt(0)
                 }
@@ -751,20 +751,20 @@ open class hw_astc() : ArrayList<hw_exec>() {
         AddExpr(new_expr)
     }
 
-    fun get_subStruct_descr(src: hw_var, subStruct_name: String): hw_var_descr {
+    fun get_subStruct_type(src: hw_var, subStruct_name: String): hw_type {
 
-        if (!src.dimensions.isSingle()) ERROR("Attempting to take substruct of array")
-        if (src.VarType != VAR_TYPE.STRUCTURED) ERROR("Attempting to take substruct non-structured variable")
+        if (!src.vartype.dimensions.isSingle()) ERROR("Attempting to take substruct of array")
+        if (src.vartype.VarType != VAR_TYPE.STRUCTURED) ERROR("Attempting to take substruct non-structured variable")
 
         var structvar_found = false
-        for (structvar in src.src_struct)
+        for (structvar in src.vartype.src_struct)
         {
             if (structvar.name == subStruct_name) {
-                return hw_var_descr(structvar.VarType, structvar.src_struct, structvar.dimensions, structvar.defval)
+                return hw_type(structvar.vartype.VarType, structvar.vartype.src_struct, structvar.vartype.dimensions)
             }
         }
         if (!structvar_found) ERROR("Structvar not found")
-        return hw_var_descr(src.VarType, src.src_struct, src.dimensions, src.defval)
+        return hw_type(src.vartype.VarType, src.vartype.src_struct, src.vartype.dimensions)
     }
 
     fun subStruct_gen(tgt: hw_var, src : hw_var, subStruct_name : String) {
@@ -776,8 +776,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun subStruct(src : hw_var, subStruct_name : String) : hw_var {
-        var tgt_descr = get_subStruct_descr(src, subStruct_name)
-        var genvar = hw_var(GetGenName("var"), tgt_descr.VarType, tgt_descr.src_struct, tgt_descr.dimensions, tgt_descr.defval)
+        var tgt_vartype = get_subStruct_type(src, subStruct_name)
+        var genvar = hw_var(GetGenName("var"), tgt_vartype, "0")
         subStruct_withgen(genvar, src, subStruct_name)
         return genvar
     }
@@ -1045,8 +1045,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun zeroext(src : hw_param, tgt_width : Int): hw_var {
-        if (src.dimensions.size > 1) ERROR("zeroext op dimensions error")
-        val src_width = src.dimensions[0].GetWidth()
+        if (src.vartype.dimensions.size > 1) ERROR("zeroext op dimensions error")
+        val src_width = src.vartype.dimensions[0].GetWidth()
 
         var cnct_params = ArrayList<hw_param>()
         if (tgt_width > src_width) {
@@ -1060,12 +1060,12 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun signext(src : hw_param, tgt_width : Int): hw_var {
-        if (src.dimensions.size > 1) ERROR("signext op dimensions error")
-        val src_width = src.dimensions[0].GetWidth()
+        if (src.vartype.dimensions.size > 1) ERROR("signext op dimensions error")
+        val src_width = src.vartype.dimensions[0].GetWidth()
 
         var cnct_params = ArrayList<hw_param>()
         if (tgt_width > src_width) {
-            val sign_imm = indexed(src,  src.dimensions[0].msb)
+            val sign_imm = indexed(src,  src.vartype.dimensions[0].msb)
             for (i in 0 until (tgt_width - src_width)) {
                 cnct_params.add(sign_imm)
             }

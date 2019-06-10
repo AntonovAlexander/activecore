@@ -12,17 +12,19 @@ enum class PARAM_TYPE {
     VAR, VAL
 }
 
-open class hw_param (val type : PARAM_TYPE, val dimensions : hw_dim_static, var token_printable : String) {
+open class hw_param (val type : PARAM_TYPE, vartype_in : hw_type, var token_printable : String) {
+
+    var vartype = vartype_in
 
     fun GetString(): String {
         return token_printable
     }
 
     fun GetDimensions(): hw_dim_static {
-        return dimensions
+        return vartype.dimensions
     }
 
     fun isDimSingle(): Boolean {
-        return dimensions.isSingle()
+        return vartype.dimensions.isSingle()
     }
 }
