@@ -24,6 +24,7 @@ open class module(name_in : String) : hw_astc() {
     var Mems        = ArrayList<hw_mem>()
     var SyncBufs    = ArrayList<hw_syncbuf>()
     var Cprocs      = ArrayList<hw_exec>()
+    var Submodules  = ArrayList<hw_submodule>()
 
     private fun add_comb(new_comb : hw_var) {
         if (wrvars.containsKey(new_comb.name)) ERROR("Naming conflict for comb: " + new_comb.name)

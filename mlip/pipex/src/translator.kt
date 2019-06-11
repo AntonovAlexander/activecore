@@ -31,13 +31,10 @@ data class __mcopipe_handle_info(val if_id : hwast.hw_var,
                                  val tid : hwast.hw_var)
 
 data class __scopipe_if_info(val req_fifo : cyclix.hw_fifo_in,
-                                       var resp_fifo : cyclix.hw_fifo_out)
+                             var resp_fifo : cyclix.hw_fifo_out)
 
 data class __scopipe_handle_info(val if_id : hwast.hw_var,
-                                 val wdata : hwast.hw_var,
-                                 val we : hwast.hw_var,
-                                 val resp_done : hwast.hw_var,
-                                 val rdreq_pending : hwast.hw_var)
+                                 val we : hwast.hw_var)
 
 data class __assign_succ_buf(val req : hwast.hw_var,
                              val buf : hwast.hw_var)

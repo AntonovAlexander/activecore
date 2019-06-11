@@ -394,7 +394,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                         SUBSTR_INDEX += 1
                     }
                     if (!substr_found) ERROR("substruct " + (fraction as hw_fraction_SubStruct).substruct_name + " not found!")
-                } else ERROR("substruct " + (fraction as hw_fraction_SubStruct).substruct_name + " request inconsistent!")
+                } else ERROR("substruct " + (fraction as hw_fraction_SubStruct).substruct_name + " request for tgt " + tgt.name + " is inconsistent!")
             }
         }
     }
@@ -433,9 +433,11 @@ open class hw_astc() : ArrayList<hw_exec>() {
         if (src.type == PARAM_TYPE.VAR) {
             if (tgt_DePowered_Power != src_Power) ERROR("dimensions do not match for target " + tgt.name + " (source tgt power: " + tgt.vartype.dimensions.size + ", depow size: " + depow_fractions.size + ", final tgt power: " + tgt_DePowered_Power + "), src: " + src.GetString() + " (src power: " + src_Power + ")")
             else if (tgt_DePowered_Power == 1) {
-                if ((((src as hw_var).vartype.VarType == VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType != VAR_TYPE.STRUCTURED))
-                        || ((src.vartype.VarType != VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType == VAR_TYPE.STRUCTURED))) {
-                    ERROR("assignment between structured and non-structured variables!")
+
+                if (((src as hw_var).vartype.VarType == VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType != VAR_TYPE.STRUCTURED)) {
+                    ERROR("assignment to non-structured variable (" + tgt.name + ") of structured variable (" + src.name + ")")
+                } else if ((src.vartype.VarType != VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType == VAR_TYPE.STRUCTURED)) {
+                    ERROR("assignment to structured variable (" + tgt.name + ") of non-structured variable (" + src.name + ")")
                 } else if (src.vartype.VarType == VAR_TYPE.STRUCTURED) {
                     // assignment of 1-bit structs
                     if (src.vartype.src_struct != tgt_DePow_descr.src_struct) {

@@ -36,12 +36,11 @@ open class module(name_in : String) : hw_astc() {
     }
 
     private fun add_local(new_local : hw_var) {
-        if (wrvars.put(new_local.name, new_local) != null) {
-            ERROR("local addition problem!")
-        }
-        if (rdvars.put(new_local.name, new_local) != null) {
-            ERROR("local addition problem!")
-        }
+        if (wrvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
+        if (rdvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
+
+        wrvars.put(new_local.name, new_local)
+        rdvars.put(new_local.name, new_local)
         locals.add(new_local)
         new_local.default_astc = this
     }
@@ -101,12 +100,11 @@ open class module(name_in : String) : hw_astc() {
     }
 
     private fun add_global(new_global : hw_var) {
-        if (wrvars.put(new_global.name, new_global) != null) {
-            ERROR("global addition problem!")
-        }
-        if (rdvars.put(new_global.name, new_global) != null) {
-            ERROR("global addition problem!")
-        }
+        if (wrvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
+        if (rdvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
+
+        wrvars.put(new_global.name, new_global)
+        rdvars.put(new_global.name, new_global)
         globals.add(new_global)
         new_global.default_astc = this
     }

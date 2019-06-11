@@ -309,6 +309,14 @@ class SvWriter(module_in : module) {
 
         // writing module
         val wrFileModule = File(pathname + "/" + mod.name + ".sv").writer()
+
+        // Submodules
+        println("Exporting submodules...")
+        for (submodule in mod.Submodules) {
+            submodule.src_module.export_to_sv(submodule.src_module.name)
+        }
+        println("done")
+
         println("Exporting modules and ports...")
         wrFileModule.write("`include \"" + mod.name + ".svh\"\n")
         wrFileModule.write("\n")
@@ -477,6 +485,11 @@ class SvWriter(module_in : module) {
         }
         wrFileModule.write("\n")
         println("done")
+
+        // Submodule instantiations
+        //for (submodule in mod.Submodules) {
+        //    submodule.src_module.export_to_sv(submodule.src_module.name)
+        //}
 
         // Cprocs
         println("Exporting cprocs...")

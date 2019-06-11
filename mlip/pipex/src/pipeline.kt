@@ -101,12 +101,11 @@ open class pipeline(name_in : String) : hw_astc() {
     var fifo_in_dict = mutableMapOf<hw_fifo_in, fifo_in_descr>()
 
     private fun add_local(new_local: hw_local) {
-        if (wrvars.put(new_local.name, new_local) != null) {
-            ERROR("local addition problem!")
-        }
-        if (rdvars.put(new_local.name, new_local) != null) {
-            ERROR("local addition problem!")
-        }
+        if (wrvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
+        if (rdvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
+
+        wrvars.put(new_local.name, new_local)
+        rdvars.put(new_local.name, new_local)
         locals.add(new_local)
         new_local.default_astc = this
     }
@@ -166,12 +165,11 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     private fun add_local_sticky(new_local_sticky: hw_local_sticky) {
-        if (wrvars.put(new_local_sticky.name, new_local_sticky) != null) {
-            ERROR("local sticky addition problem!")
-        }
-        if (rdvars.put(new_local_sticky.name, new_local_sticky) != null) {
-            ERROR("local sticky addition problem!")
-        }
+        if (wrvars.containsKey(new_local_sticky.name)) ERROR("Naming conflict for local_sticky: " + new_local_sticky.name)
+        if (rdvars.containsKey(new_local_sticky.name)) ERROR("Naming conflict for local_sticky: " + new_local_sticky.name)
+
+        wrvars.put(new_local_sticky.name, new_local_sticky)
+        rdvars.put(new_local_sticky.name, new_local_sticky)
         locals.add(new_local_sticky)
         new_local_sticky.default_astc = this
     }
@@ -231,12 +229,11 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     fun add_global(new_global: hw_global) {
-        if (wrvars.put(new_global.name, new_global) != null) {
-            ERROR("global addition problem!")
-        }
-        if (rdvars.put(new_global.name, new_global) != null) {
-            ERROR("global addition problem!")
-        }
+        if (wrvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
+        if (rdvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
+
+        wrvars.put(new_global.name, new_global)
+        rdvars.put(new_global.name, new_global)
         globals.add(new_global)
         new_global.default_astc = this
     }
@@ -1149,64 +1146,55 @@ open class pipeline(name_in : String) : hw_astc() {
             cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), resp_done_translated)
 
         } else if (expr.opcode == OP_SCOPIPE_REQ) {
-            // TODO
-            /*
-            scopipe_if * cur_scopipe_if;
-            if (cur_pmodule->GetScopipeIf(expression->string_params[0], &cur_scopipe_if) != true) return 1;
 
-            scopipe_handle * cur_scopipe_handle;
-            if (cur_pmodule->GetScopipeHandle(expression->string_params[1], &cur_scopipe_handle) != true) return 1;
+            var scopipe_if              = (expr as hw_exec_scopipe_req).scopipe_if
+            var scopipe_if_assoc        = TranslateInfo.__scopipe_if_assocs[scopipe_if]!!
+            var scopipe_handle          = expr.scopipe_handle
+            var scopipe_handle_assoc    = TranslateInfo.__scopipe_handle_assocs[scopipe_handle]!!
 
-            if (expr_begif_cmd(cur_pstage->pctrl_active_glbl) != 0) return 1;
-            {
-                ac_var * cmd_translated;
-                if (cur_pstage->FetchVarWr(expression->wrvars[0], &cmd_translated) == false) return 1;
-                ac_var * wdata_translated;
-                if (cur_pstage->FetchVarWr(expression->wrvars[1], &wdata_translated) == false) return 1;
+            var if_id_translated        = curStageAssoc.TranslateVar(scopipe_handle_assoc.if_id)
+            var we_translated           = curStageAssoc.TranslateVar(scopipe_handle_assoc.we)
 
-                if (expr_begif_cmd(cur_scopipe_if->req_var) != 0) return 1;
-                {
-                    // TODO
-                    ac_var* rdy_translated;
-                    if (cur_pstage->FetchVarWr(expression->wrvars[2], &rdy_translated) == false) return 1;
-                    if (expr_assign_cmd(rdy_translated, new ac_imm(1, "1")) != 0) return 1;
+            // finding id
+            var handle_id = TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(expr.scopipe_if)
 
-                    ac_var* nwe_var;
-                    if (expr_1op_cmd(OP1_LOGICAL_NOT, &nwe_var, cur_scopipe_if->we_var) != 0) return 1;
-                    if (expr_assign_cmd(cur_scopipe_handle->rdreq_pending, nwe_var) != 0) return 1;
-                    if (expr_assign_cmd(cur_scopipe_handle->wdata, cur_scopipe_if->wdata_var) != 0) return 1;
-                    if (expr_assign_cmd(cur_scopipe_if->ack_var, new ac_imm(1, "1")) != 0) return 1;
-                }
-                if (expr_endif_cmd() != 0) return 1;
+            cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
+            run {
 
-                if (expr_assign_cmd(cmd_translated, cur_scopipe_if->we_var) != 0) return 1;
-                if (expr_assign_cmd(wdata_translated, cur_scopipe_if->wdata_var) != 0) return 1;
-            }
-            if (expr_endif_cmd() != 0) return 1;
+                var req_struct = cyclix_gen.local(GetGenName("req_struct"),
+                    scopipe_if_assoc.req_fifo.vartype,
+                    scopipe_if_assoc.req_fifo.defval)
+
+                cyclix_gen.begif(cyclix_gen.fifo_rd(scopipe_if_assoc.req_fifo, req_struct))
+                run {
+                    cyclix_gen.subStruct_gen(curStageAssoc.TranslateVar(expr.wrvars[0]),  req_struct, "we")
+                    cyclix_gen.subStruct_gen(curStageAssoc.TranslateVar(expr.wrvars[1]),  req_struct, "wdata")
+                    cyclix_gen.assign(if_id_translated, hw_imm(scopipe_handle_assoc.if_id.vartype.dimensions, handle_id.toString()))
+
+                    cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[2]), 1)
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
 
         } else if (expr.opcode == OP_SCOPIPE_RESP) {
-            scopipe_handle * cur_scopipe_handle;
-            if (cur_pmodule->GetScopipeHandle(expression->string_params[0], &cur_scopipe_handle) != true) return 1;
 
-            if (expr_begifnot_cmd(cur_pstage->pctrl_stalled_glbl) != 0) return 1;
-            {
-                if (expr_begif_cmd(cur_pstage->pctrl_active_glbl) != 0) return 1;
-                {
-                    if (expr_begifnot_cmd(cur_scopipe_handle->resp_done) != 0) return 1;
-                    {
-                        ac_param* rdata_translated;
-                        if (cur_pstage->TranslateParam(expression->params[0], &rdata_translated) == false) return 1;
+            var scopipe_handle          = (expr as hw_exec_scopipe_resp).scopipe_handle
+            var scopipe_handle_assoc    = TranslateInfo.__scopipe_handle_assocs[scopipe_handle]!!
 
-                        if (expr_assign_cmd(cur_scopipe_handle->scopipe->resp_var, new ac_imm(1, "1")) != 0) return 1;
-                        if (expr_assign_cmd(cur_scopipe_handle->scopipe->rdata_var, rdata_translated) != 0) return 1;
-                        if (expr_assign_cmd(cur_scopipe_handle->resp_done, new ac_imm(1, "1")) != 0) return 1;
-                    }
-                    if (expr_endif_cmd() != 0) return 1;
+            var if_id_translated        = curStageAssoc.TranslateVar(scopipe_handle_assoc.if_id)
+            var we_translated           = curStageAssoc.TranslateVar(scopipe_handle_assoc.we)
+
+            cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
+            run {
+                for (scopipe_if in TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!) {
+                    var scopipe_if_assoc        = TranslateInfo.__scopipe_if_assocs[scopipe_if]!!
+
+                    cyclix_gen.begif(cyclix_gen.eq2(if_id_translated, TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(scopipe_if)))
+                    run {
+                        cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), cyclix_gen.fifo_wr(scopipe_if_assoc.resp_fifo, curStageAssoc.TranslateVar(expr.rdvars[0])))
+                    }; cyclix_gen.endif()
                 }
-                if (expr_endif_cmd() != 0) return 1;
-            }
-            if (expr_endif_cmd() != 0) return 1;
-        */
+            }; cyclix_gen.endif()
+
         } else {
             ERROR("Reconstruction of expression failed: opcode undefined: " + expr.opcode.default_string)
         }
@@ -1322,17 +1310,11 @@ open class pipeline(name_in : String) : hw_astc() {
             val name_prefix = "genscopipe_handle_" + scopipe_handle.name + "_genvar_"
 
             var if_id           = ulocal_sticky((name_prefix + "if_id"), GetWidthToContain(TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.size)-1, 0, "0")
-            var wdata           =  local_sticky((name_prefix + "wdata"), scopipe_handle.wdata_vartype, "0")
             var we              = ulocal_sticky((name_prefix + "we"), 0, 0, "0")
-            var resp_done       = ulocal_sticky((name_prefix + "resp_done"), 0, 0, "0")
-            var rdreq_pending   = ulocal_sticky((name_prefix + "rdreq_pending"), 0, 0, "0")
 
             TranslateInfo.__scopipe_handle_assocs.put(scopipe_handle, __scopipe_handle_info(
                 if_id,
-                wdata,
-                we,
-                resp_done,
-                rdreq_pending))
+                we))
         }
 
         // Analyzing sync operations //
@@ -1456,15 +1438,9 @@ open class pipeline(name_in : String) : hw_astc() {
 
                 StageList[CUR_STAGE_INDEX].AddRdVar(scopipe_handle_info.if_id)
                 StageList[CUR_STAGE_INDEX].AddRdVar(scopipe_handle_info.we)
-                StageList[CUR_STAGE_INDEX].AddRdVar(scopipe_handle_info.wdata)
-                StageList[CUR_STAGE_INDEX].AddRdVar(scopipe_handle_info.rdreq_pending)
-                StageList[CUR_STAGE_INDEX].AddRdVar(scopipe_handle_info.resp_done)
 
                 StageList[CUR_STAGE_INDEX].AddWrVar(scopipe_handle_info.if_id)
                 StageList[CUR_STAGE_INDEX].AddWrVar(scopipe_handle_info.we)
-                StageList[CUR_STAGE_INDEX].AddWrVar(scopipe_handle_info.wdata)
-                StageList[CUR_STAGE_INDEX].AddWrVar(scopipe_handle_info.rdreq_pending)
-                StageList[CUR_STAGE_INDEX].AddWrVar(scopipe_handle_info.resp_done)
             }
 
             // println("mcopipe analysis: " + StageList[CUR_STAGE_INDEX].name)
@@ -1800,6 +1776,7 @@ open class pipeline(name_in : String) : hw_astc() {
                     curStageAssoc.pstall_ifoccupied_cmd(cyclix_gen)
                 }; cyclix_gen.endif()
             }
+            // TODO: forced stalling in case any last scopipe pending reads are not satisfied
 
             // pstage_finish and pstage_succ formation
             MSG(DEBUG_FLAG, "#### pctrl_finish and pctrl_succ formation ####")
