@@ -16,7 +16,7 @@ open class hw_param (val type : PARAM_TYPE, vartype_in : hw_type, var token_prin
 
     var vartype = vartype_in
 
-    fun GetString(): String {
+    open fun GetString(): String {
         return token_printable
     }
 

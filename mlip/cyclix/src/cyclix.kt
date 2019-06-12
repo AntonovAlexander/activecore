@@ -459,7 +459,7 @@ open class module(name_in : String) : hw_astc() {
 
     fun end() {
         for (genvar in proc.genvars) {
-            genvar.name = GetGenName("comb")
+            genvar.name = GetGenName("cyclix")
             add_local(genvar)
         }
     }

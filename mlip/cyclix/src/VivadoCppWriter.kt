@@ -19,7 +19,7 @@ class VivadoCppWriter(module_in : module) {
     fun getStringWithDim(param : hw_param) : String
     {
         // TODO width of imm values
-        return param.token_printable
+        return param.GetString()
     }
 
     fun getDimString(in_range : hw_dim_range_static) : String
@@ -30,22 +30,22 @@ class VivadoCppWriter(module_in : module) {
     fun getDimString(fraction : hw_fraction) : String
     {
         if (fraction.type == FRAC_TYPE.C)
-            return ("[" + (fraction as hw_fraction_C).index.token_printable + "]")
+            return ("[" + (fraction as hw_fraction_C).index.GetString() + "]")
 
         else if (fraction.type == FRAC_TYPE.V)
             return ("[" + (fraction as hw_fraction_V).index.name + "]")
 
         else if (fraction.type == FRAC_TYPE.CC)
-            return ("[" + (fraction as hw_fraction_CC).msb.token_printable + ":"
-                    + fraction.lsb.token_printable + "]")
+            return ("[" + (fraction as hw_fraction_CC).msb.GetString() + ":"
+                    + fraction.lsb.GetString() + "]")
 
         else if (fraction.type == FRAC_TYPE.CV)
-            return ("[" + (fraction as hw_fraction_CV).msb.token_printable + ":"
+            return ("[" + (fraction as hw_fraction_CV).msb.GetString() + ":"
                     + fraction.lsb.name + "]")
 
         else if (fraction.type == FRAC_TYPE.VC)
             return ("[" + (fraction as hw_fraction_VC).msb.name + ":"
-                    + fraction.lsb.token_printable + "]")
+                    + fraction.lsb.GetString() + "]")
 
         else if (fraction.type == FRAC_TYPE.VV)
             return ("[" + (fraction as hw_fraction_VV).msb.name + ":"
@@ -69,7 +69,7 @@ class VivadoCppWriter(module_in : module) {
         return ret_val
     }
 
-    fun export_structvar(structvar : hw_structvar, wrFile : java.io.OutputStreamWriter) {
+    fun export_structvar(preambule : String, prename : String, structvar : hw_structvar, postString : String, wrFile : java.io.OutputStreamWriter) {
         var dimstring = ""
         if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
             if (!structvar.vartype.dimensions.isSingle()) {
@@ -77,12 +77,13 @@ class VivadoCppWriter(module_in : module) {
                     dimstring += ("" + getDimString(dim))
                 }
             }
-            wrFile.write("\t"
+            wrFile.write(preambule
                     + structvar.vartype.src_struct.name
                     + " "
+                    + prename
                     + structvar.name
                     + dimstring
-                    + ";\n")
+                    + postString)
         } else {
             if (structvar.vartype.dimensions.size > 0) {
                 if (structvar.vartype.dimensions[0].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is no 0!")
@@ -94,14 +95,15 @@ class VivadoCppWriter(module_in : module) {
                 var typename = "ap_int"
                 if (structvar.vartype.VarType == VAR_TYPE.UNSIGNED) typename = "ap_uint"
 
-                wrFile.write("\t"
+                wrFile.write(preambule
                         + typename
                         + "<"
                         + (structvar.vartype.dimensions[0].msb + 1)
                         + "> "
+                        + prename
                         + structvar.name
                         + dimstring
-                        + ";\n")
+                        + postString)
             } else ERROR("Dimensions error")
         }
     }
@@ -300,8 +302,8 @@ class VivadoCppWriter(module_in : module) {
         // TODO: restrict to interfaces
         File(pathname).mkdirs()
         val wrFileInterface = File(pathname + "/" + mod.name + ".hpp").writer()
-        wrFileInterface.write("`ifndef __" + mod.name +"_h_\n")
-        wrFileInterface.write("`define __" + mod.name +"_h_\n")
+        wrFileInterface.write("#ifndef __" + mod.name +"_h_\n")
+        wrFileInterface.write("#define __" + mod.name +"_h_\n")
         wrFileInterface.write("\n")
         wrFileInterface.write("#include <ap_int.h>")
         wrFileInterface.write("\n")
@@ -311,20 +313,19 @@ class VivadoCppWriter(module_in : module) {
         for (hw_struct in mod.hw_if_structs) {
             wrFileInterface.write("typedef struct {\n")
             for (structvar in hw_struct) {
-                export_structvar(structvar, wrFileInterface)
+                export_structvar("\t", "", structvar, ";\n", wrFileInterface)
             }
             wrFileInterface.write("} " + hw_struct.name + ";\n\n")
         }
-        wrFileInterface.write("`endif\n")
+        wrFileInterface.write("#endif\n")
         wrFileInterface.close()
         println("done")
 
         // writing module
         val wrFileModule = File(pathname + "/" + mod.name + ".cpp").writer()
         println("Exporting modules and ports...")
-        wrFileModule.write("#include \"" + mod.name + ".svh\"\n")
+        wrFileModule.write("#include \"" + mod.name + ".hpp\"\n")
         wrFileModule.write("#include <ap_int.h>\n")
-        wrFileModule.write("#include <interfaces.hpp>\n")
         wrFileModule.write("\n")
 
         println("done")
@@ -332,37 +333,34 @@ class VivadoCppWriter(module_in : module) {
         tab_Counter++
 
         // globals
-        println("Exporting mems...")
+        println("Exporting globals...")
         for (global in mod.globals) {
-            export_structvar(global, wrFileModule)
+            export_structvar("\t", "", global, ";\n", wrFileModule)
         }
         wrFileModule.write("\n")
         println("done")
 
         // proc
         println("Exporting cyclix process...")
+        wrFileModule.write("void " + mod.name + "(ap_uint<1> geninit")
 
-        var params = "ap_uint<1> geninit"
-        var preambule = ", "
         for (port in mod.Ports) {
-            params += (preambule + port.name)
+            export_structvar(", volatile ", "*", port, "", wrFileModule)
         }
         for (fifo_in in mod.fifo_ins) {
-            params += (preambule + fifo_in.name)
+            export_structvar(", volatile ", "*", fifo_in, "", wrFileModule)
         }
         for (fifo_out in mod.fifo_outs) {
-            params += (preambule + fifo_out.name)
+            export_structvar(", volatile ", "*", fifo_out, "", wrFileModule)
         }
 
-        wrFileModule.write("void " + mod.name + "(" + params + ") {\n")
+        wrFileModule.write(") {\n")
         wrFileModule.write("\n")
 
         for (fifo_in in mod.fifo_ins) {
-            params += (preambule + fifo_in.name)
             wrFileModule.write("#pragma HLS INTERFACE ap_fifo port=" + fifo_in.name + "\n")
         }
         for (fifo_out in mod.fifo_outs) {
-            params += (preambule + fifo_out.name)
             wrFileModule.write("#pragma HLS INTERFACE ap_fifo port=" + fifo_out.name + "\n")
         }
         wrFileModule.write("\n")
@@ -370,7 +368,7 @@ class VivadoCppWriter(module_in : module) {
         tab_Counter = 1
 
         for (local in mod.locals) {
-            export_structvar(local, wrFileModule)
+            export_structvar("\t", "", local, ";\n", wrFileModule)
         }
         wrFileModule.write("\n")
 
@@ -379,17 +377,15 @@ class VivadoCppWriter(module_in : module) {
         for (global in mod.globals) {
             wrFileModule.write("\t\t" + global.name + " = " + global.defval + ";\n")
         }
-        wrFileModule.write("\t}\n\n")
+        wrFileModule.write("\n\t} else {\n")
+        tab_Counter = 2
 
         for (expression in mod.proc.expressions) {
             export_expr(wrFileModule, expression)
         }
         tab_Counter = 0
-        wrFileModule.write("}\n")
+        wrFileModule.write("\t}\n}\n")
         println("done")
-
-        wrFileModule.write("\n")
-        wrFileModule.write("endmodule\n")
 
         wrFileModule.close()
     }

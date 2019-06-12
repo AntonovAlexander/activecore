@@ -32,6 +32,10 @@ open class hw_structvar(name_in: String, vartype_in : hw_type, defval_in : Strin
     var defval = defval_in
     var name = name_in
 
+    override fun GetString(): String {
+        return name
+    }
+
     constructor(name_in: String, VarType_in : VAR_TYPE, dimensions_in : hw_dim_static, defval : String) : this(name_in, hw_type(VarType_in, dimensions_in), defval)
     constructor(name_in: String, VarType_in : VAR_TYPE, msb: Int, lsb: Int, defval : String) : this(name_in, hw_type(VarType_in, msb, lsb), defval)
     constructor(name_in: String, VarType_in : VAR_TYPE, defval : String) : this(name_in, hw_type(VarType_in, hw_dim_static(defval)), defval)
