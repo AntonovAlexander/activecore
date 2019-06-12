@@ -1843,6 +1843,7 @@ open class pipeline(name_in : String) : hw_astc() {
             cyclix_gen.bor_gen(curStageAssoc.pctrl_working, curStageAssoc.pctrl_succ, curStageAssoc.pctrl_stalled_glbl)
         }
 
+        cyclix_gen.end()
         MSG(DEBUG_FLAG, "Translating to cyclix: complete")
         return cyclix_gen
     }

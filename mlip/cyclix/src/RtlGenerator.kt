@@ -242,10 +242,6 @@ class RtlGenerator(module_in : module) {
         for (local in mod.locals)
             var_dict.put(local, rtl_gen.comb(local.name, local.vartype, local.defval))
 
-        // Generating genvars
-        for (genvar in mod.proc.genvars)
-            var_dict.put(genvar, rtl_gen.comb(mod.GetGenName("comb"), genvar.vartype, genvar.defval))
-
         // Generating globals
         for (global in mod.globals)
             var_dict.put(global, rtl_gen.sticky(global.name, global.vartype, global.defval, clk, rst))

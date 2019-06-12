@@ -457,6 +457,13 @@ open class module(name_in : String) : hw_astc() {
         return genvar
     }
 
+    fun end() {
+        for (genvar in proc.genvars) {
+            genvar.name = GetGenName("comb")
+            add_local(genvar)
+        }
+    }
+
     fun export_to_rtl() : rtl.module {
 
         println("###########################################")
