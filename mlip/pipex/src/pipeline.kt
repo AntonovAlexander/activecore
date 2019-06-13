@@ -999,7 +999,18 @@ open class pipeline(name_in : String) : hw_astc() {
             || (expr.opcode == OP3_RANGED)
             || (expr.opcode == OPS_CNCT)) {
 
-            cyclix_gen.AddExpr_op_gen(expr.opcode, curStageAssoc.TranslateVar(expr.wrvars[0]), curStageAssoc.TranslateParams(expr.params))
+            cyclix_gen.AddExpr_op_gen(
+                expr.opcode,
+                curStageAssoc.TranslateVar(expr.wrvars[0]),
+                curStageAssoc.TranslateParams(expr.params)
+            )
+
+        } else if (expr.opcode == OP2_SUBSTRUCT) {
+            cyclix_gen.subStruct_gen(
+                curStageAssoc.TranslateVar(expr.wrvars[0]),
+                curStageAssoc.TranslateVar(expr.rdvars[0]),
+                expr.subStructvar_name
+            )
 
         } else if (expr.opcode == OP1_IF) {
 
@@ -1286,10 +1297,10 @@ open class pipeline(name_in : String) : hw_astc() {
 
             var rd_struct = cyclix_gen.add_if_struct("genpmodule_" + name + "_" + scopipe_name_prefix + "genstruct_fifo_rdata")
             rd_struct.addu("we", 0, 0, "0")
-            rd_struct.add("rdata", scopipe_if.rdata_vartype, "0")
+            rd_struct.add("rdata", scopipe_if.wdata_vartype, "0")
 
             var req_fifo = cyclix_gen.fifo_in((scopipe_name_prefix + "req"), rd_struct)
-            var resp_fifo = cyclix_gen.fifo_out((scopipe_name_prefix + "resp"), scopipe_if.wdata_vartype)
+            var resp_fifo = cyclix_gen.fifo_out((scopipe_name_prefix + "resp"), scopipe_if.rdata_vartype)
 
             TranslateInfo.__scopipe_if_assocs.put(scopipe_if, __scopipe_if_info(
                 req_fifo,

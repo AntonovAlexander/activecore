@@ -313,12 +313,21 @@ class SvWriter(module_in : module) {
         // Submodules
         println("Exporting submodules...")
         for (submodule in mod.Submodules) {
-            submodule.src_module.export_to_sv(submodule.src_module.name)
+            submodule.src_module.export_to_sv(pathname + "/" + submodule.src_module.name)
         }
         println("done")
 
         println("Exporting modules and ports...")
         wrFileModule.write("`include \"" + mod.name + ".svh\"\n")
+        var mods_included = ArrayList<String>()
+        for (submodule in mod.Submodules) {
+            println("Analyzing: inst_name: " + submodule.inst_name + ", src mod name: " + submodule.src_module.name)
+            if (!mods_included.contains(submodule.src_module.name)) {
+                wrFileModule.write("`include \"" + submodule.src_module.name + ".svh\"\n")
+                mods_included.add(submodule.src_module.name)
+            }
+        }
+
         wrFileModule.write("\n")
         wrFileModule.write("module " + mod.name + " (\n")
         var preambule = "\t"

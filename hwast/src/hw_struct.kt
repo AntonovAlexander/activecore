@@ -25,6 +25,11 @@ data class hw_type(var VarType : VAR_TYPE, var src_struct: hw_struct, var dimens
     constructor(src_struct_in : hw_struct, dimensions_in : hw_dim_static) : this(VAR_TYPE.STRUCTURED, src_struct_in, dimensions_in)
     constructor(src_struct_in : hw_struct, msb: Int, lsb: Int) : this(VAR_TYPE.STRUCTURED, src_struct_in, hw_dim_static(msb, lsb))
     constructor(src_struct_in : hw_struct) : this(VAR_TYPE.STRUCTURED, src_struct_in, hw_dim_static(0, 0))
+
+    fun Print() {
+        if (VarType == VAR_TYPE.STRUCTURED) println("Vartype: structured, src_struct: " + src_struct.name)
+        else println("Vartype: unstructured")
+    }
 }
 
 open class hw_structvar(name_in: String, vartype_in : hw_type, defval_in : String) : hw_param(PARAM_TYPE.VAR, vartype_in, defval_in) {

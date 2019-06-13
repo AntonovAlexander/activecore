@@ -435,8 +435,12 @@ open class hw_astc() : ArrayList<hw_exec>() {
             else if (tgt_DePowered_Power == 1) {
 
                 if (((src as hw_var).vartype.VarType == VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType != VAR_TYPE.STRUCTURED)) {
+                    tgt.vartype.Print()
+                    src.vartype.Print()
                     ERROR("assignment to non-structured variable (" + tgt.name + ") of structured variable (" + src.name + ")")
                 } else if ((src.vartype.VarType != VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType == VAR_TYPE.STRUCTURED)) {
+                    tgt.vartype.Print()
+                    src.vartype.Print()
                     ERROR("assignment to structured variable (" + tgt.name + ") of non-structured variable (" + src.name + ")")
                 } else if (src.vartype.VarType == VAR_TYPE.STRUCTURED) {
                     // assignment of 1-bit structs

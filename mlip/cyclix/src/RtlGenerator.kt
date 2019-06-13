@@ -123,6 +123,13 @@ class RtlGenerator(module_in : module) {
             }
             rtl_gen.AddExpr_op_gen(expr.opcode, TranslateVar(expr.wrvars[0]), params)
 
+        } else if (expr.opcode == OP2_SUBSTRUCT) {
+            rtl_gen.subStruct_gen(
+                TranslateVar(expr.wrvars[0]),
+                TranslateVar(expr.rdvars[0]),
+                expr.subStructvar_name
+            )
+
         } else if (expr.opcode == OP1_IF) {
 
             rtl_gen.begif(TranslateParam(expr.params[0]))
