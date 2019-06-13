@@ -17,8 +17,9 @@ class xbar(name_in          : String,
     var slave_pipes     = ArrayList<slave_pipe>()
 
     init {
+        // TODO: address overlap check
         var master_name = "m_" + name_in
-        var pipex_master_pipe = master_pipe(master_name, 4, req_vartype_in, map_in, resp_vartype_in)
+        var pipex_master_pipe = master_pipe(master_name, 32, 4, req_vartype_in, map_in, resp_vartype_in)
         var cyclix_master_pipe = pipex_master_pipe.translate_to_cyclix(true)
         var rtl_master_pipe = cyclix_master_pipe.export_to_rtl()
         for (num_master in 0 until num_masters_in) {
@@ -27,7 +28,7 @@ class xbar(name_in          : String,
         }
         for (num_slave in 0 until map.size) {
             var slave_name = "s" + num_slave + "_" + name_in
-            var pipex_slave_pipe = slave_pipe(slave_name, req_vartype_in, resp_vartype_in, map[num_slave].start_addr, map[num_slave].addr_width)
+            var pipex_slave_pipe = slave_pipe(slave_name, num_masters_in, map[num_slave].addr_width, 4, req_vartype_in, resp_vartype_in)
             var cyclix_slave_pipe = pipex_slave_pipe.translate_to_cyclix(true)
             var rtl_slave_pipe = cyclix_slave_pipe.export_to_rtl()
             Submodules.add(hw_submodule(slave_name, rtl_slave_pipe))
