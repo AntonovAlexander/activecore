@@ -46,7 +46,10 @@ class master_pipe(name          : String,
             slave_enb.add(ulocal("slave_enb" + map.indexOf(slave), 0, 0, "0"))
         }
 
-        var MDEC = add_stage("MDEC")
+        var MDEC    = add_stage("MDEC")
+        var MSEQ    = add_stage("MSEQ")
+        var MRESP   = add_stage("MRESP")
+
         MDEC.begin()
         run {
 
@@ -79,7 +82,6 @@ class master_pipe(name          : String,
             }
         }; endstage()
 
-        var MSEQ = add_stage("MSEQ")
         MSEQ.begin()
         run {
             // sending command
@@ -106,7 +108,6 @@ class master_pipe(name          : String,
             }; endif()
         }; endstage()
 
-        var MRESP = add_stage("MRESP")
         MRESP.begin()
         run {
             begif(slave_handle.resp(rdata))
