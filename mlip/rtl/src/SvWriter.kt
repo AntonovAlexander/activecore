@@ -22,6 +22,15 @@ class SvWriter(module_in : module) {
         else return (param.vartype.dimensions[0].GetWidth().toString() + "'d" + param.token_printable)
     }
 
+    fun getStringAssignDefval(tgt: hw_var, src : String) : String
+    {
+        if (tgt.vartype.VarType == VAR_TYPE.STRUCTURED) {
+            return "'{default:" + src + "}"
+        } else {
+            return src
+        }
+    }
+
     fun getDimString(in_range : hw_dim_range_static) : String
     {
         return ("[" + in_range.msb.toString() + ":" + in_range.lsb.toString() + "]")
@@ -333,14 +342,13 @@ class SvWriter(module_in : module) {
         var preambule = "\t"
         for (port in mod.Ports) {
             wrFileModule.write(preambule)
-            var preambule_cond = ""
+            var preambule_cond = "logic "
             var dir_string = ""
             if (port.port_dir == PORT_DIR.IN) dir_string = "input"
-            else if (port.port_dir == PORT_DIR.OUT) {
-                dir_string = "output"
-                preambule_cond = "reg "
-            } else if (port.port_dir == PORT_DIR.INOUT) dir_string = "inout"
-            export_structvar((dir_string + " "), preambule_cond, "", port, wrFileModule)
+            else if (port.port_dir == PORT_DIR.OUT) dir_string = "output"
+            else if (port.port_dir == PORT_DIR.INOUT) dir_string = "inout"
+            else ERROR("port type unrecognized!")
+            export_structvar((dir_string + " "), preambule_cond, (" = " + getStringAssignDefval(port, port.defval)), port, wrFileModule)
             preambule = "\n\t, "
         }
 
@@ -353,7 +361,7 @@ class SvWriter(module_in : module) {
 
         println("Exporting combinationals...")
         for (comb in mod.Combs) {
-            export_structvar("", "reg ", ";\n", comb, wrFileModule)
+            export_structvar("", "logic ", ";\n", comb, wrFileModule)
         }
         wrFileModule.write("\n")
 
@@ -363,7 +371,7 @@ class SvWriter(module_in : module) {
         println("Exporting mems...")
         for (mem in mod.Mems) {
 
-            export_structvar("","reg ", ";\n", mem, wrFileModule)
+            export_structvar("","logic ", ";\n", mem, wrFileModule)
 
             if (mem.mem_srcs.size == 0) throw Exception("Mem signals with no sources is not supported, mem signal: %s!\n")
             else {

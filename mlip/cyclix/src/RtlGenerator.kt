@@ -243,7 +243,7 @@ class RtlGenerator(module_in : module) {
 
         // Generating ports
         var clk = rtl_gen.uinput("clk_i", 0, 0, "0")
-        var rst = rtl_gen.uinput("rst_i", 0, 0, "0")
+        var rst = rtl_gen.uinput("rst_i", 0, 0, "1")
 
         // Generating combinationals
         for (local in mod.locals)
@@ -258,7 +258,7 @@ class RtlGenerator(module_in : module) {
             fifo_out_dict.put(fifo_out, fifo_out_descr(
                 rtl_gen.uoutput((fifo_out.name + "_genfifo_req_o"), 0, 0, "0"),
                 rtl_gen.port((fifo_out.name + "_genfifo_wdata_bo"), rtl.PORT_DIR.OUT, fifo_out.vartype, fifo_out.defval),
-                rtl_gen.uinput((fifo_out.name + "_genfifo_ack_i"), 0, 0, "0"),
+                rtl_gen.uinput((fifo_out.name + "_genfifo_ack_i"), 0, 0, "1"),
                 rtl_gen.usticky((fifo_out.name + "_genfifo_reqbuf_req"), 0, 0, "0", clk, rst),
                 rtl_gen.sticky((fifo_out.name + "_genfifo_reqbuf_wdata"), fifo_out.vartype, fifo_out.defval, clk, rst)
             ))

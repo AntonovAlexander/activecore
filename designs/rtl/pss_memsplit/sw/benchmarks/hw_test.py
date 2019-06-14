@@ -28,7 +28,7 @@ test_fail_counter = 0
 udm.cc('COM8', 921600)
 print("")
 
-def reset_buf():    
+def reset_buf():
     udm.clr(buf_addr, buf_size)
 
 reset_buf()
