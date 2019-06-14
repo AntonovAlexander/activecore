@@ -24,7 +24,11 @@ class xbar(name         : String,
 
     data class fifo_channel_internal(val req : hw_var, val ack : hw_var, var wdata : hw_var)
     data class copipe_channel_internal(val req : fifo_channel_internal, val resp : fifo_channel_internal)
-    var master_inst_signals = ArrayList<copipe_channel_internal>()
+    class m_channels_internal : ArrayList<copipe_channel_internal>()
+    var internal_channels = ArrayList<m_channels_internal>()
+
+    var master_ifs  = ArrayList<copipe_channel_internal>()
+    var slave_ifs   = ArrayList<copipe_channel_internal>()
 
     init {
         // TODO: address overlap check
@@ -38,19 +42,60 @@ class xbar(name         : String,
         var clk = uinput("clk_i", 0, 0, "0")
         var rst = uinput("rst_i", 0, 0, "0")
 
+        // generating ports
         for (num_master in 0 until num_masters) {
-            var fifo_mreq_channel = fifo_channel_internal(
-                ucomb("m" + num_master + "_" + name + "_req", 0, 0, "0"),
-                ucomb("m" + num_master + "_" + name + "_ack", 0, 0, "0"),
-                 comb("m" + num_master + "_" + name + "_wdata", hw_type(busreq_struct), "0")
+
+            var req_ch = fifo_channel_internal(
+                 uinput("m" + num_master + "_req_i", 0, 0, "0"),
+                  input("m" + num_master + "_wdata_bi", hw_type(busreq_struct), "0"),
+                uoutput("m" + num_master + "_ack_o", 0, 0, "0")
             )
-            var fifo_sreq_channel = fifo_channel_internal(
-                ucomb("s" + num_master + "_" + name + "_req", 0, 0, "0"),
-                ucomb("s" + num_master + "_" + name + "_ack", 0, 0, "0"),
-                 comb("s" + num_master + "_" + name + "_wdata", resp_vartype, "0")
+
+            var resp_ch = fifo_channel_internal(
+                 uinput("m" + num_master + "_req_o", 0, 0, "0"),
+                  input("m" + num_master + "_rdata_bo", hw_type(busreq_struct), "0"),
+                uoutput("m" + num_master + "_ack_i", 0, 0, "0")
             )
-            var copipe_channel = copipe_channel_internal(fifo_mreq_channel, fifo_sreq_channel)
-            master_inst_signals.add(copipe_channel)
+
+            master_ifs.add(copipe_channel_internal(req_ch, resp_ch))
+        }
+
+        for (num_slave in 0 until map.size) {
+
+            var req_ch = fifo_channel_internal(
+                 uinput("s" + num_slave + "_req_o", 0, 0, "0"),
+                  input("s" + num_slave + "_wdata_bo", hw_type(busreq_struct), "0"),
+                uoutput("s" + num_slave + "_ack_i", 0, 0, "0")
+            )
+
+            var resp_ch = fifo_channel_internal(
+                 uinput("s" + num_slave + "_req_i", 0, 0, "0"),
+                  input("s" + num_slave + "_rdata_bi", hw_type(busreq_struct), "0"),
+                uoutput("s" + num_slave + "_ack_o", 0, 0, "0")
+            )
+
+            slave_ifs.add(copipe_channel_internal(req_ch, resp_ch))
+        }
+
+        // generating internal signals
+        for (num_master in 0 until num_masters) {
+
+            var m_channels = m_channels_internal()
+            for (num_slave in 0 until map.size) {
+                var fifo_mreq_channel = fifo_channel_internal(
+                    ucomb("m" + num_master + "s" + num_slave + "_" + name + "_req", 0, 0, "0"),
+                    ucomb("m" + num_master + "s" + num_slave + "_" + name + "_ack", 0, 0, "0"),
+                     comb("m" + num_master + "s" + num_slave + "_" + name + "_wdata", hw_type(busreq_struct), "0")
+                )
+                var fifo_sreq_channel = fifo_channel_internal(
+                    ucomb("s" + num_slave + "m" + num_master + "_" + name + "_req", 0, 0, "0"),
+                    ucomb("s" + num_slave + "m" + num_master + "_" + name + "_ack", 0, 0, "0"),
+                     comb("s" + num_slave + "m" + num_master + "_" + name + "_wdata", resp_vartype, "0")
+                )
+                var s_channel = copipe_channel_internal(fifo_mreq_channel, fifo_sreq_channel)
+                m_channels.add(s_channel)
+            }
+            internal_channels.add(m_channels)
         }
 
         // generating master pipe instances
@@ -63,6 +108,24 @@ class xbar(name         : String,
             master_pipe_insts.add(new_inst)
             new_inst.connect("clk_i", clk)
             new_inst.connect("rst_i", rst)
+
+            new_inst.connect("genscopipe_master_req_genfifo_req_i", master_ifs[num_master].req.req)
+            new_inst.connect("genscopipe_master_req_genfifo_rdata_bi", master_ifs[num_master].req.wdata)
+            new_inst.connect("genscopipe_master_req_genfifo_ack_o", master_ifs[num_master].req.ack)
+
+            new_inst.connect("genscopipe_master_resp_genfifo_req_o", master_ifs[num_master].resp.req)
+            new_inst.connect("genscopipe_master_resp_genfifo_wdata_bo", master_ifs[num_master].resp.wdata)
+            new_inst.connect("genscopipe_master_resp_genfifo_ack_i", master_ifs[num_master].resp.ack)
+
+            for (num_slave in 0 until map.size) {
+                new_inst.connect("genmcopipe_slave" + num_slave + "_req_genfifo_req_o", internal_channels[num_master][num_slave].req.req)
+                new_inst.connect("genmcopipe_slave" + num_slave + "_req_genfifo_wdata_bo", internal_channels[num_master][num_slave].req.wdata)
+                new_inst.connect("genmcopipe_slave" + num_slave + "_req_genfifo_ack_i", internal_channels[num_master][num_slave].req.ack)
+
+                new_inst.connect("genmcopipe_slave" + num_slave + "_resp_genfifo_req_i", internal_channels[num_master][num_slave].resp.req)
+                new_inst.connect("genmcopipe_slave" + num_slave + "_resp_genfifo_rdata_bi", internal_channels[num_master][num_slave].resp.wdata)
+                new_inst.connect("genmcopipe_slave" + num_slave + "_resp_genfifo_ack_o", internal_channels[num_master][num_slave].resp.ack)
+            }
         }
 
         // generating slave pipe instances
@@ -71,7 +134,29 @@ class xbar(name         : String,
             var pipex_slave_pipe = slave_pipe(slave_name, num_masters, hw_type(busreq_struct), resp_vartype)
             var cyclix_slave_pipe = pipex_slave_pipe.translate_to_cyclix(true)
             var rtl_slave_pipe = cyclix_slave_pipe.export_to_rtl()
-            slave_pipe_insts.add(submodule(slave_name + "_inst", rtl_slave_pipe))
+
+            var new_inst = submodule(slave_name + "_inst", rtl_slave_pipe)
+            slave_pipe_insts.add(new_inst)
+            new_inst.connect("clk_i", clk)
+            new_inst.connect("rst_i", rst)
+
+            new_inst.connect("genmcopipe_slave_req_genfifo_req_o", slave_ifs[num_slave].req.req)
+            new_inst.connect("genmcopipe_slave_req_genfifo_wdata_bo", slave_ifs[num_slave].req.wdata)
+            new_inst.connect("genmcopipe_slave_req_genfifo_ack_i", slave_ifs[num_slave].req.ack)
+
+            new_inst.connect("genmcopipe_slave_resp_genfifo_req_i", slave_ifs[num_slave].resp.req)
+            new_inst.connect("genmcopipe_slave_resp_genfifo_rdata_bi", slave_ifs[num_slave].resp.wdata)
+            new_inst.connect("genmcopipe_slave_resp_genfifo_ack_o", slave_ifs[num_slave].resp.ack)
+
+            for (num_master in 0 until num_masters) {
+                new_inst.connect("genscopipe_master" + num_master + "_req_genfifo_req_i", internal_channels[num_master][num_slave].req.req)
+                new_inst.connect("genscopipe_master" + num_master + "_req_genfifo_rdata_bi", internal_channels[num_master][num_slave].req.wdata)
+                new_inst.connect("genscopipe_master" + num_master + "_req_genfifo_ack_o", internal_channels[num_master][num_slave].req.ack)
+
+                new_inst.connect("genscopipe_master" + num_master + "_resp_genfifo_req_o", internal_channels[num_master][num_slave].resp.req)
+                new_inst.connect("genscopipe_master" + num_master + "_resp_genfifo_wdata_bo", internal_channels[num_master][num_slave].resp.wdata)
+                new_inst.connect("genscopipe_master" + num_master + "_resp_genfifo_ack_i", internal_channels[num_master][num_slave].resp.ack)
+            }
         }
         // TODO: connecting submodules
     }
