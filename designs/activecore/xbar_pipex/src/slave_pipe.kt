@@ -5,25 +5,17 @@ import pipex.*
 
 class slave_pipe(name_in        : String,
                  num_masters    : Int,
-                 addr_width     : Int,
-                 be_width       : Int,
                  req_vartype    : hw_type,
                  resp_vartype   : hw_type) : pipex.pipeline(name_in) {
 
-    var busreq_struct = add_if_struct(name + "_busreq_struct")
-
     var master_ifs = ArrayList<hw_scopipe_if>()
-    var master_handle = scopipe_handle("master",
-        hw_type(busreq_struct),
-        resp_vartype)
+    var master_handle = scopipe_handle("master", req_vartype, resp_vartype)
 
-    var slave_if = mcopipe_if("slave",
-        hw_type(busreq_struct),
-        resp_vartype)
+    var slave_if = mcopipe_if("slave", req_vartype, resp_vartype)
     var slave_handle = mcopipe_handle(slave_if)
 
     var mreq_we       = ulocal("mreq_we", 0, 0, "0")
-    var mreq_wdata    =  local("mreq_wdata", busreq_struct)
+    var mreq_wdata    =  local("mreq_wdata", req_vartype, "0")
 
     var rr_arb          = ulocal("addr", (GetWidthToContain(num_masters)-1), 0, "0")
     var rdata           = local("rdata", resp_vartype, "0")
@@ -33,17 +25,13 @@ class slave_pipe(name_in        : String,
 
     init {
 
-        busreq_struct.addu("addr",     (addr_width-1), 0, "0")
-        busreq_struct.addu("be",       (be_width-1),  0, "0")
-        busreq_struct.add("wdata", req_vartype, "0")
-
         for (mnum in 0 until num_masters) {
-            master_ifs.add(scopipe_if("master" + mnum, hw_type(busreq_struct), resp_vartype))
+            master_ifs.add(scopipe_if("master" + mnum, req_vartype, resp_vartype))
         }
 
-        var ARB = add_stage("ARB")
-        var REQ = add_stage("REQ")
-        var RESP = add_stage("RESP")
+        var ARB     = add_stage("ARB")
+        var REQ     = add_stage("REQ")
+        var RESP    = add_stage("RESP")
 
         ARB.begin()
         run {
