@@ -46,11 +46,11 @@ class master_pipe(name          : String,
             slave_enb.add(ulocal("slave_enb" + map.indexOf(slave), 0, 0, "0"))
         }
 
-        var MDEC    = add_stage("MDEC")
-        var MSEQ    = add_stage("MSEQ")
-        var MRESP   = add_stage("MRESP")
+        var DEC    = add_stage("DEC")
+        var SEQ    = add_stage("SEQ")
+        var RESP   = add_stage("RESP")
 
-        MDEC.begin()
+        DEC.begin()
         run {
 
             // accepting command
@@ -82,7 +82,7 @@ class master_pipe(name          : String,
             }
         }; endstage()
 
-        MSEQ.begin()
+        SEQ.begin()
         run {
             // sending command
             begif(!scmd_accepted)
@@ -108,7 +108,7 @@ class master_pipe(name          : String,
             }; endif()
         }; endstage()
 
-        MRESP.begin()
+        RESP.begin()
         run {
             begif(slave_handle.resp(rdata))
             run {

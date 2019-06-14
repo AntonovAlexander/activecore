@@ -41,11 +41,11 @@ class slave_pipe(name_in        : String,
             master_ifs.add(scopipe_if("master" + mnum, hw_type(busreq_struct), resp_vartype))
         }
 
-        var SARB = add_stage("SARB")
-        var SREQ = add_stage("SREQ")
-        var SRESP = add_stage("SRESP")
+        var ARB = add_stage("ARB")
+        var REQ = add_stage("REQ")
+        var RESP = add_stage("RESP")
 
-        SARB.begin()
+        ARB.begin()
         run {
             clrif()
             for (mnum in 0 until num_masters) {
@@ -77,7 +77,7 @@ class slave_pipe(name_in        : String,
 
         }; endstage()
 
-        SREQ.begin()
+        REQ.begin()
         run {
 
             // sending command
@@ -95,7 +95,7 @@ class slave_pipe(name_in        : String,
             }; endif()
         }; endstage()
 
-        SRESP.begin()
+        RESP.begin()
         run {
             begif(slave_handle.resp(rdata))
             run {

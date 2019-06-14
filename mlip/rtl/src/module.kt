@@ -24,7 +24,14 @@ open class module(name_in : String) : hw_astc() {
     var Mems        = ArrayList<hw_mem>()
     var SyncBufs    = ArrayList<hw_syncbuf>()
     var Cprocs      = ArrayList<hw_exec>()
-    var Submodules  = ArrayList<hw_submodule>()
+    var Submodules  = mutableMapOf<String, hw_submodule>()
+
+    fun submodule(inst_name : String, new_submod : module) : hw_submodule {
+        if (Submodules.containsKey(inst_name)) ERROR("Naming conflict for instance: " + inst_name)
+        var new_inst = hw_submodule(inst_name, new_submod, this)
+        Submodules.put(inst_name, new_inst)
+        return new_inst
+    }
 
     private fun add_comb(new_comb : hw_var) {
         if (wrvars.containsKey(new_comb.name)) ERROR("Naming conflict for comb: " + new_comb.name)

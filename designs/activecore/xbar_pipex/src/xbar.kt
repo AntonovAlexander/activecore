@@ -18,8 +18,8 @@ class xbar(name_in          : String,
     var num_masters = num_masters_in
     var map         = map_in
 
-    var master_pipes    = ArrayList<master_pipe>()
-    var slave_pipes     = ArrayList<slave_pipe>()
+    var master_pipe_insts   = ArrayList<hw_submodule>()
+    var slave_pipe_insts    = ArrayList<hw_submodule>()
 
     init {
         // TODO: address overlap check
@@ -28,15 +28,14 @@ class xbar(name_in          : String,
         var cyclix_master_pipe = pipex_master_pipe.translate_to_cyclix(true)
         var rtl_master_pipe = cyclix_master_pipe.export_to_rtl()
         for (num_master in 0 until num_masters_in) {
-
-            Submodules.add(hw_submodule("m" + num_master + "_" + name_in, rtl_master_pipe))
+            master_pipe_insts.add(submodule("m" + num_master + "_" + name_in + "_inst", rtl_master_pipe))
         }
         for (num_slave in 0 until map.size) {
             var slave_name = "s" + num_slave + "_" + name_in
             var pipex_slave_pipe = slave_pipe(slave_name, num_masters_in, map[num_slave].addr_width, 4, req_vartype_in, resp_vartype_in)
             var cyclix_slave_pipe = pipex_slave_pipe.translate_to_cyclix(true)
             var rtl_slave_pipe = cyclix_slave_pipe.export_to_rtl()
-            Submodules.add(hw_submodule(slave_name, rtl_slave_pipe))
+            slave_pipe_insts.add(submodule(slave_name + "_inst", rtl_slave_pipe))
         }
         // TODO: connecting submodules
     }
