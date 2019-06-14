@@ -86,32 +86,40 @@ wire master_3_resp;
 wire slave_0_req;
 wire [31:0] slave_0_addr;
 wire slave_0_cmd;
+wire [1:0] slave_0_reqtid;
 wire [31:0] slave_0_wdata;
 wire slave_0_ack;
+wire [1:0] slave_0_resptid;
 wire [31:0] slave_0_rdata;
 wire slave_0_resp;
 
 wire slave_1_req;
 wire [31:0] slave_1_addr;
 wire slave_1_cmd;
+wire [1:0] slave_1_reqtid;
 wire [31:0] slave_1_wdata;
 wire slave_1_ack;
+wire [1:0] slave_1_resptid;
 wire [31:0] slave_1_rdata;
 wire slave_1_resp;
 
 wire slave_2_req;
 wire [31:0] slave_2_addr;
 wire slave_2_cmd;
+wire [1:0] slave_2_reqtid;
 wire [31:0] slave_2_wdata;
 wire slave_2_ack;
+wire [1:0] slave_2_resptid;
 wire [31:0] slave_2_rdata;
 wire slave_2_resp;
 
 wire slave_3_req;
 wire [31:0] slave_3_addr;
 wire slave_3_cmd;
+wire [1:0] slave_3_reqtid;
 wire [31:0] slave_3_wdata;
 wire slave_3_ack;
+wire [1:0] slave_3_resptid;
 wire [31:0] slave_3_rdata;
 wire slave_3_resp;
 
@@ -189,7 +197,7 @@ master_rd_monitor
 	.rdreq_fifo_full(rdreq3_fifo_full)
 );
 
-xbar_buffered DUV
+xbar_pipex DUV
 (
 	.clk_i(clk),
 	.rst_i(rst),
@@ -261,8 +269,7 @@ xbar_buffered DUV
 
 slave_mem_model
 #(
-	.REQ_RAND(4)
-	, .RESP_RAND(4)
+	.MEMSIZE32(SLAVE_MEMSIZE32)
 ) slave_0_mem_model (
 	.clk_i(clk),
 	.rst_i(rst),
@@ -270,16 +277,17 @@ slave_mem_model
 	.slave_req(slave_0_req),
 	.slave_addr(slave_0_addr),
 	.slave_cmd(slave_0_cmd),
+	.slave_reqtid(slave_0_reqtid),
 	.slave_wdata(slave_0_wdata),
 	.slave_ack(slave_0_ack),
+	.slave_resptid(slave_0_resptid),
 	.slave_rdata(slave_0_rdata),
 	.slave_resp(slave_0_resp)
 );
 
 slave_mem_model
 #(
-	.REQ_RAND(4)
-	, .RESP_RAND(4)
+	.MEMSIZE32(SLAVE_MEMSIZE32)
 ) slave_1_mem_model (
 	.clk_i(clk),
 	.rst_i(rst),
@@ -287,16 +295,17 @@ slave_mem_model
 	.slave_req(slave_1_req),
 	.slave_addr(slave_1_addr),
 	.slave_cmd(slave_1_cmd),
+	.slave_reqtid(slave_1_reqtid),
 	.slave_wdata(slave_1_wdata),
 	.slave_ack(slave_1_ack),
+	.slave_resptid(slave_1_resptid),
 	.slave_rdata(slave_1_rdata),
 	.slave_resp(slave_1_resp)
 );
 
 slave_mem_model
 #(
-	.REQ_RAND(4)
-	, .RESP_RAND(4)
+	.MEMSIZE32(SLAVE_MEMSIZE32)
 ) slave_2_mem_model (
 	.clk_i(clk),
 	.rst_i(rst),
@@ -304,16 +313,17 @@ slave_mem_model
 	.slave_req(slave_2_req),
 	.slave_addr(slave_2_addr),
 	.slave_cmd(slave_2_cmd),
+	.slave_reqtid(slave_2_reqtid),
 	.slave_wdata(slave_2_wdata),
 	.slave_ack(slave_2_ack),
+	.slave_resptid(slave_2_resptid),
 	.slave_rdata(slave_2_rdata),
 	.slave_resp(slave_2_resp)
 );
 
 slave_mem_model
 #(
-	.REQ_RAND(4)
-	, .RESP_RAND(4)
+	.MEMSIZE32(SLAVE_MEMSIZE32)
 ) slave_3_mem_model (
 	.clk_i(clk),
 	.rst_i(rst),
@@ -321,8 +331,10 @@ slave_mem_model
 	.slave_req(slave_3_req),
 	.slave_addr(slave_3_addr),
 	.slave_cmd(slave_3_cmd),
+	.slave_reqtid(slave_3_reqtid),
 	.slave_wdata(slave_3_wdata),
 	.slave_ack(slave_3_ack),
+	.slave_resptid(slave_3_resptid),
 	.slave_rdata(slave_3_rdata),
 	.slave_resp(slave_3_resp)
 );
@@ -469,7 +481,7 @@ initial
 	@(posedge memread_grant)
 	forever
 		begin
-		WAIT(1000);
+		WAIT(10);
 		for (mmon = 0; mmon < SLAVE_MEMSIZE32; mmon++)
 			begin
 			if (slave_0_mem_model.mem[mmon] != ((0 << 30) + (mmon << 2)) ) $fatal("MEMORY 0 CORRUPTED! word_num: %d, data: 0x%x", mmon, slave_0_mem_model.mem[mmon]);
