@@ -24,6 +24,7 @@ class master_pipe(name          : String,
     var mcmd_accepted   = ulocal("mcmd_accepted", 0, 0, "0")
     var scmd_accepted   = ulocal("scmd_accepted", 0, 0, "0")
 
+
     init {
 
         for (slave in map) {
@@ -32,6 +33,7 @@ class master_pipe(name          : String,
         }
 
         var DEC    = add_stage("DEC")
+        var REQ    = add_stage("REQ")
         var SEQ    = add_stage("SEQ")
         var RESP   = add_stage("RESP")
 
@@ -65,7 +67,7 @@ class master_pipe(name          : String,
             }
         }; endstage()
 
-        SEQ.begin()
+        REQ.begin()
         run {
             // sending command
             begif(!scmd_accepted)
@@ -91,16 +93,17 @@ class master_pipe(name          : String,
             }; endif()
         }; endstage()
 
-        RESP.begin()
+        SEQ.begin()
         run {
-            begif(slave_handle.resp(rdata))
-            run {
-                master_handle.resp(rdata)
-            }; endif()
-            begelse()
+            begif(!slave_handle.resp(rdata))
             run {
                 pstall()
             }; endif()
+        }; endstage()
+
+        RESP.begin()
+        run {
+            master_handle.resp(rdata)
         }; endstage()
     }
 }

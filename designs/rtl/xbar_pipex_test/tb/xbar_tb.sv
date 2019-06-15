@@ -432,8 +432,6 @@ master_exerciser
 	.memread_grant(memread_grant)
 );
 
-`include "sva_checkers.sva"
-
 //////// TASKS ////////
 
 ////wait////

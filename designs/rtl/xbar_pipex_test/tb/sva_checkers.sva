@@ -1,4 +1,0 @@
-always @* assert (rdreq0_fifo_full == 1'b0) else $fatal("Too many read requests acked in Master 0!");
-always @* assert (rdreq1_fifo_full == 1'b0) else $fatal("Too many read requests acked in Master 1!");
-always @* assert (rdreq2_fifo_full == 1'b0) else $fatal("Too many read requests acked in Master 2!");
-always @* assert (rdreq3_fifo_full == 1'b0) else $fatal("Too many read requests acked in Master 3!");

@@ -101,6 +101,14 @@ class xbar(name         : String,
         var pipex_master_pipe = master_pipe(master_name, hw_type(busreq_struct), map, resp_vartype)
         var cyclix_master_pipe = pipex_master_pipe.translate_to_cyclix(true)
         var rtl_master_pipe = cyclix_master_pipe.export_to_rtl()
+
+        /*
+        for (if_struct in rtl_master_pipe.hw_if_structs) {
+            add_if_struct(if_struct)
+        }
+        rtl_master_pipe.add_if_struct(busreq_struct)
+        */
+
         for (num_master in 0 until num_masters) {
             var new_inst = submodule("m" + num_master + "_" + name + "_inst", rtl_master_pipe)
             master_pipe_insts.add(new_inst)
@@ -125,13 +133,20 @@ class xbar(name         : String,
         }
 
         // generating slave pipe instances
-        for (num_slave in 0 until map.size) {
-            var slave_name = "s" + num_slave + "_" + name
-            var pipex_slave_pipe = slave_pipe(slave_name, num_masters, hw_type(busreq_struct), resp_vartype)
-            var cyclix_slave_pipe = pipex_slave_pipe.translate_to_cyclix(true)
-            var rtl_slave_pipe = cyclix_slave_pipe.export_to_rtl()
+        var slave_name = "s_" + name
+        var pipex_slave_pipe = slave_pipe(slave_name, num_masters, hw_type(busreq_struct), resp_vartype)
+        var cyclix_slave_pipe = pipex_slave_pipe.translate_to_cyclix(true)
+        var rtl_slave_pipe = cyclix_slave_pipe.export_to_rtl()
 
-            var new_inst = submodule(slave_name + "_inst", rtl_slave_pipe)
+        /*
+        for (if_struct in rtl_slave_pipe.hw_if_structs) {
+            add_if_struct(if_struct)
+        }
+        rtl_slave_pipe.add_if_struct(busreq_struct)
+        */
+
+        for (num_slave in 0 until map.size) {
+            var new_inst = submodule("s" + num_slave + "_" + name + "_inst", rtl_slave_pipe)
             slave_pipe_insts.add(new_inst)
             new_inst.connect("clk_i", clk)
             new_inst.connect("rst_i", rst)
