@@ -139,6 +139,7 @@ class xbar(name         : String,
             new_inst.connect("genscopipe_master_req_genfifo_ack_o", master_ifs[num_master].req.ack)
 
             new_inst.connect("genscopipe_master_resp_genfifo_req_o", master_ifs[num_master].resp.resp)
+            new_inst.connect("genscopipe_master_resp_genfifo_ack_i", 1)
             new_inst.connect("genscopipe_master_resp_genfifo_wdata_bo", master_ifs[num_master].resp.rdata)
 
             for (num_slave in 0 until map.size) {
@@ -192,10 +193,11 @@ class xbar(name         : String,
 
             for (num_master in 0 until num_masters) {
                 new_inst.connect("genscopipe_master" + num_master + "_req_genfifo_req_i", internal_channels[num_master][num_slave].req.req)
-                new_inst.connect("genscopipe_master" + num_master + "_req_genfifo_rdata_bi", internal_channels[num_master][num_slave].req.wdata)
                 new_inst.connect("genscopipe_master" + num_master + "_req_genfifo_ack_o", internal_channels[num_master][num_slave].req.ack)
+                new_inst.connect("genscopipe_master" + num_master + "_req_genfifo_rdata_bi", internal_channels[num_master][num_slave].req.wdata)
 
                 new_inst.connect("genscopipe_master" + num_master + "_resp_genfifo_req_o", internal_channels[num_master][num_slave].resp.resp)
+                new_inst.connect("genscopipe_master" + num_master + "_resp_genfifo_ack_i", 1)
                 new_inst.connect("genscopipe_master" + num_master + "_resp_genfifo_wdata_bo", internal_channels[num_master][num_slave].resp.rdata)
             }
 
