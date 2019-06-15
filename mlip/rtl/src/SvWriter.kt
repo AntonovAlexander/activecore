@@ -504,9 +504,9 @@ class SvWriter(module_in : module) {
         println("done")
 
         // Submodule instantiations
-        var subm_preambule = ""
         for (submodule in mod.Submodules) {
-            wrFileModule.write(submodule.value.inst_name + " " + submodule.value.src_module.name + " (\n")
+            var subm_preambule = ""
+            wrFileModule.write(submodule.value.src_module.name + " " + submodule.value.inst_name + " (\n")
             for (conn in submodule.value.Connections) {
                 wrFileModule.write("\t" + subm_preambule + "." + conn.key.name + "(" + conn.value.name + ")\n")
                 subm_preambule = ", "

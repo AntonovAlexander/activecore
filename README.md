@@ -36,6 +36,6 @@ The following demo designs for FPGA are available:
 
 * mpss - SoC with multiple RISC-V cores connected by full xbar (located at /designs/rtl/mpss)
 
-Pipex MLIP functionality is demonstrated via 6 RISC-V (RV32I) CPU designs with varying-length pipelines (riscv_1stage-riscv_6stage) and xbar generator based on it. Preliminary build of the core and software is required. Demo projects use UART-controllable bus master for reset and initialization.
+Pipex MLIP functionality is demonstrated via 6 RISC-V (RV32I) CPU designs with varying-length pipelines (riscv_1stage-riscv_6stage) and xbar generator based on it. Preliminary build of the cores and software is required. Demo projects use UART-controllable bus master for reset and initialization.
 
 For questions, please contact antonov.alex.alex@gmail.com
