@@ -23,7 +23,7 @@ class xbar(name         : String,
     var busreq_struct = add_if_struct(name + "_busreq_struct")
 
     data class reqfifo_channel_internal(val req : hw_var, val ack : hw_var, val we : hw_var, var wdata : hw_var)
-    data class respfifo_channel_internal(val req : hw_var, var rdata : hw_var)
+    data class respfifo_channel_internal(val resp : hw_var, var rdata : hw_var)
     data class copipe_channel_internal(val req : reqfifo_channel_internal, val resp : respfifo_channel_internal)
     class m_channels_internal : ArrayList<copipe_channel_internal>()
     var internal_channels = ArrayList<m_channels_internal>()
@@ -71,7 +71,7 @@ class xbar(name         : String,
             )
 
             var resp_ch = respfifo_channel_internal(
-                uoutput("m" + num_master + "_req_o", 0, 0, "0"),
+                uoutput("m" + num_master + "_resp_o", 0, 0, "0"),
                 output("m" + num_master + "_rdata_bo", resp_vartype, "0")
             )
 
@@ -92,7 +92,7 @@ class xbar(name         : String,
             )
 
             var resp_ch = respfifo_channel_internal(
-                uinput("s" + num_slave + "_req_i", 0, 0, "1"),
+                uinput("s" + num_slave + "_resp_i", 0, 0, "1"),
                 input("s" + num_slave + "_rdata_bi", resp_vartype, "0")
             )
 
@@ -138,7 +138,7 @@ class xbar(name         : String,
             new_inst.connect("genscopipe_master_req_genfifo_rdata_bi", master_ifs[num_master].req.wdata_struct)
             new_inst.connect("genscopipe_master_req_genfifo_ack_o", master_ifs[num_master].req.ack)
 
-            new_inst.connect("genscopipe_master_resp_genfifo_req_o", master_ifs[num_master].resp.req)
+            new_inst.connect("genscopipe_master_resp_genfifo_req_o", master_ifs[num_master].resp.resp)
             new_inst.connect("genscopipe_master_resp_genfifo_wdata_bo", master_ifs[num_master].resp.rdata)
 
             for (num_slave in 0 until map.size) {
@@ -146,7 +146,7 @@ class xbar(name         : String,
                 new_inst.connect("genmcopipe_slave" + num_slave + "_req_genfifo_ack_i", internal_channels[num_master][num_slave].req.ack)
                 new_inst.connect("genmcopipe_slave" + num_slave + "_req_genfifo_wdata_bo", internal_channels[num_master][num_slave].req.wdata)
 
-                new_inst.connect("genmcopipe_slave" + num_slave + "_resp_genfifo_req_i", internal_channels[num_master][num_slave].resp.req)
+                new_inst.connect("genmcopipe_slave" + num_slave + "_resp_genfifo_req_i", internal_channels[num_master][num_slave].resp.resp)
                 new_inst.connect("genmcopipe_slave" + num_slave + "_resp_genfifo_rdata_bi", internal_channels[num_master][num_slave].resp.rdata)
             }
 
@@ -187,7 +187,7 @@ class xbar(name         : String,
             new_inst.connect("genmcopipe_slave_req_genfifo_wdata_bo", slave_ifs[num_slave].req.wdata_struct)
             new_inst.connect("genmcopipe_slave_req_genfifo_ack_i", slave_ifs[num_slave].req.ack)
 
-            new_inst.connect("genmcopipe_slave_resp_genfifo_req_i", slave_ifs[num_slave].resp.req)
+            new_inst.connect("genmcopipe_slave_resp_genfifo_req_i", slave_ifs[num_slave].resp.resp)
             new_inst.connect("genmcopipe_slave_resp_genfifo_rdata_bi", slave_ifs[num_slave].resp.rdata)
 
             for (num_master in 0 until num_masters) {
@@ -195,7 +195,7 @@ class xbar(name         : String,
                 new_inst.connect("genscopipe_master" + num_master + "_req_genfifo_rdata_bi", internal_channels[num_master][num_slave].req.wdata)
                 new_inst.connect("genscopipe_master" + num_master + "_req_genfifo_ack_o", internal_channels[num_master][num_slave].req.ack)
 
-                new_inst.connect("genscopipe_master" + num_master + "_resp_genfifo_req_o", internal_channels[num_master][num_slave].resp.req)
+                new_inst.connect("genscopipe_master" + num_master + "_resp_genfifo_req_o", internal_channels[num_master][num_slave].resp.resp)
                 new_inst.connect("genscopipe_master" + num_master + "_resp_genfifo_wdata_bo", internal_channels[num_master][num_slave].resp.rdata)
             }
 

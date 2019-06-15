@@ -196,7 +196,7 @@ xbar_pipex DUV
 	.m0_addr_bi(master_0_addr),
 	.m0_we_i(master_0_we),
 	.m0_wdata_bi(master_0_wdata),
-	.m0_req_o(master_0_resp),
+	.m0_resp_o(master_0_resp),
 	.m0_rdata_bo(master_0_rdata),
 
 	.m1_req_i(master_1_req),
@@ -204,7 +204,7 @@ xbar_pipex DUV
 	.m1_addr_bi(master_1_addr),
 	.m1_we_i(master_1_we),
 	.m1_wdata_bi(master_1_wdata),
-	.m1_req_o(master_1_resp),
+	.m1_resp_o(master_1_resp),
 	.m1_rdata_bo(master_1_rdata),
 
 	.m2_req_i(master_2_req),
@@ -212,7 +212,7 @@ xbar_pipex DUV
 	.m2_addr_bi(master_2_addr),
 	.m2_we_i(master_2_we),
 	.m2_wdata_bi(master_2_wdata),
-	.m2_req_o(master_2_resp),
+	.m2_resp_o(master_2_resp),
 	.m2_rdata_bo(master_2_rdata),
 
 	.m3_req_i(master_3_req),
@@ -220,7 +220,7 @@ xbar_pipex DUV
 	.m3_addr_bi(master_3_addr),
 	.m3_we_i(master_3_we),
 	.m3_wdata_bi(master_3_wdata),
-	.m3_req_o(master_3_resp),
+	.m3_resp_o(master_3_resp),
 	.m3_rdata_bo(master_3_rdata),
 
 	.s0_req_o(slave_0_req),
@@ -228,7 +228,7 @@ xbar_pipex DUV
 	.s0_addr_bo(slave_0_addr),
 	.s0_we_o(slave_0_we),
 	.s0_wdata_bo(slave_0_wdata),
-	.s0_req_i(slave_0_resp),
+	.s0_resp_i(slave_0_resp),
 	.s0_rdata_bi(slave_0_rdata),
 
 	.s1_req_o(slave_1_req),
@@ -236,7 +236,7 @@ xbar_pipex DUV
 	.s1_addr_bo(slave_1_addr),
 	.s1_we_o(slave_1_we),
 	.s1_wdata_bo(slave_1_wdata),
-	.s1_req_i(slave_1_resp),
+	.s1_resp_i(slave_1_resp),
 	.s1_rdata_bi(slave_1_rdata),
 
 	.s2_req_o(slave_2_req),
@@ -244,7 +244,7 @@ xbar_pipex DUV
 	.s2_addr_bo(slave_2_addr),
 	.s2_we_o(slave_2_we),
 	.s2_wdata_bo(slave_2_wdata),
-	.s2_req_i(slave_2_resp),
+	.s2_resp_i(slave_2_resp),
 	.s2_rdata_bi(slave_2_rdata),
 
 	.s3_req_o(slave_3_req),
@@ -252,7 +252,7 @@ xbar_pipex DUV
 	.s3_addr_bo(slave_3_addr),
 	.s3_we_o(slave_3_we),
 	.s3_wdata_bo(slave_3_wdata),
-	.s3_req_i(slave_3_resp),
+	.s3_resp_i(slave_3_resp),
 	.s3_rdata_bi(slave_3_rdata)
 );
 
