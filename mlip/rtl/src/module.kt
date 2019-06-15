@@ -28,6 +28,14 @@ open class module(name_in : String) : hw_astc() {
     var Cprocs      = ArrayList<hw_exec>()
     var Submodules  = mutableMapOf<String, hw_submodule>()
 
+    fun getPortByName(name : String) : hw_port {
+        for (port in Ports) {
+            if (port.name == name) return port
+        }
+        ERROR("port " + name + " not found!")
+        return Ports[0]
+    }
+
     fun submodule(inst_name : String, new_submod : module) : hw_submodule {
         if (Submodules.containsKey(inst_name)) ERROR("Naming conflict for instance: " + inst_name)
         var new_inst = hw_submodule(inst_name, new_submod, this)
