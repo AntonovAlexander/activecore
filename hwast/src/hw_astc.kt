@@ -10,10 +10,11 @@ package hwast
 
 open class hw_astc() : ArrayList<hw_exec>() {
 
-    var GenCounter = 0
+    var GenCounter      = 0
+    open var GenNamePrefix   = "hwast"
     fun GetGenName(name_in : String) : String
     {
-        val ret_val = ("gen" + GenCounter.toString() + "_" + name_in)
+        val ret_val = ("gen" + GenCounter.toString() + "_" + GenNamePrefix + "_" + name_in)
         GenCounter++
         return ret_val
     }

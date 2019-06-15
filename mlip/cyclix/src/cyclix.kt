@@ -18,6 +18,8 @@ open class module(name_in : String) : hw_astc() {
 
     val name = name_in
 
+    override var GenNamePrefix   = "cyclix"
+
     var wrvars = mutableMapOf<String, hw_var>()
     var rdvars = mutableMapOf<String, hw_var>()
 
@@ -459,7 +461,7 @@ open class module(name_in : String) : hw_astc() {
 
     fun end() {
         for (genvar in proc.genvars) {
-            genvar.name = GetGenName("cyclix")
+            genvar.name = GetGenName("var")
             add_local(genvar)
         }
     }

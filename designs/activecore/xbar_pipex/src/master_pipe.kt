@@ -60,7 +60,8 @@ class master_pipe(name          : String,
 
             // decoding command
             for (slave in map) {
-                begif(land( geq(addr, hw_imm(slave.start_addr)), (less(addr, hw_imm(slave.start_addr + (1.shl(slave.addr_width))))) ) )
+
+                begif(land( geq(addr, hw_imm(slave.start_addr)), (leq(addr, (add(hw_imm(slave.start_addr), (1.shl(slave.addr_width))-1) )) ) ))
                 run {
                     slave_enb[map.indexOf(slave)].assign(1)
                 }; endif()

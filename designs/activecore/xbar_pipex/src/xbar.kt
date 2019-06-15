@@ -4,7 +4,7 @@ import hwast.*
 import rtl.*
 import pipex.*
 
-data class slave_entry(val start_addr : Int,
+data class slave_entry(val start_addr : String,
                        val addr_width : Int)
 
 class addr_map() : ArrayList<slave_entry>()

@@ -16,6 +16,8 @@ open class module(name_in : String) : hw_astc() {
     val name = name_in
     val OP_CPROC    = hw_opcode("cproc")
 
+    override var GenNamePrefix   = "rtl"
+
     var wrvars      = mutableMapOf<String, hw_var>()
     var rdvars      = mutableMapOf<String, hw_var>()
 

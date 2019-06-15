@@ -39,6 +39,8 @@ open class pipeline(name_in : String) : hw_astc() {
 
     val name = name_in
 
+    override var GenNamePrefix   = "pipex"
+
     var wrvars = mutableMapOf<String, hw_var>()
     var rdvars = mutableMapOf<String, hw_var>()
 
@@ -1295,9 +1297,9 @@ open class pipeline(name_in : String) : hw_astc() {
         for (scopipe_if in scopipe_ifs) {
             val scopipe_name_prefix = "genscopipe_" + scopipe_if.name + "_"
 
-            var rd_struct = cyclix_gen.add_if_struct("genpmodule_" + name + "_" + scopipe_name_prefix + "genstruct_fifo_rdata")
+            var rd_struct = cyclix_gen.add_if_struct("genpmodule_" + name + "_" + scopipe_name_prefix + "genstruct_fifo_wdata")
             rd_struct.addu("we", 0, 0, "0")
-            rd_struct.add("rdata", scopipe_if.wdata_vartype, "0")
+            rd_struct.add("wdata", scopipe_if.wdata_vartype, "0")
 
             var req_fifo = cyclix_gen.fifo_in((scopipe_name_prefix + "req"), rd_struct)
             var resp_fifo = cyclix_gen.fifo_out((scopipe_name_prefix + "resp"), scopipe_if.rdata_vartype)
