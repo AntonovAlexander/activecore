@@ -101,6 +101,7 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
 
     fun pstall_ifactive_cmd(cyclix_gen : cyclix.module) {
         cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, pctrl_active_glbl)
+        cyclix_gen.assign(pctrl_active_glbl, 0)
     }
 
     fun pstall_ifoccupied_cmd(cyclix_gen : cyclix.module) {

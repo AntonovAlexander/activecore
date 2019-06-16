@@ -72,7 +72,7 @@ class SvWriter(module_in : module) {
     fun getDimString(fractions : hw_fractions) : String
     {
         var ret_val = ""
-        for (i in fractions.lastIndex downTo 0) {
+        for (i in 0 until fractions.size) {
             ret_val += getDimString(fractions[i])
         }
         return ret_val
@@ -344,11 +344,13 @@ class SvWriter(module_in : module) {
             wrFileModule.write(preambule)
             var preambule_cond = "logic "
             var dir_string = ""
+            //var assign_default_string = (" = " + getStringAssignDefval(port, port.defval))
+            var assign_default_string = ""
             if (port.port_dir == PORT_DIR.IN) dir_string = "input"
             else if (port.port_dir == PORT_DIR.OUT) dir_string = "output"
             else if (port.port_dir == PORT_DIR.INOUT) dir_string = "inout"
             else ERROR("port type unrecognized!")
-            export_structvar((dir_string + " "), preambule_cond, (" = " + getStringAssignDefval(port, port.defval)), port, wrFileModule)
+            export_structvar((dir_string + " "), preambule_cond, assign_default_string, port, wrFileModule)
             preambule = "\n\t, "
         }
 
@@ -508,7 +510,7 @@ class SvWriter(module_in : module) {
             var subm_preambule = ""
             wrFileModule.write(submodule.value.src_module.name + " " + submodule.value.inst_name + " (\n")
             for (conn in submodule.value.Connections) {
-                wrFileModule.write("\t" + subm_preambule + "." + conn.key.name + "(" + conn.value.name + ")\n")
+                wrFileModule.write("\t" + subm_preambule + "." + conn.key.name + "(" + conn.value.GetString() + ")\n")
                 subm_preambule = ", "
             }
             wrFileModule.write(");\n\n")

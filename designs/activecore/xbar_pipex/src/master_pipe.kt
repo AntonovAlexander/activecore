@@ -15,21 +15,21 @@ class master_pipe(name          : String,
     var slave_handle = mcopipe_handle("slave", req_vartype, resp_vartype)
 
 
-    var mreq_we         = ulocal("mreq_we", 0, 0, "0")
-    var mreq_wdata      =  local("mreq_wdata", req_vartype, "0")
+    var mreq_we         = ulocal_sticky("mreq_we", 0, 0, "0")
+    var mreq_wdata      =  local_sticky("mreq_wdata", req_vartype, "0")
 
     var slave_enb       = ArrayList<hw_var>()
-    var rdata           = local("rdata", resp_vartype, "0")
+    var rdata           = local_sticky("rdata", resp_vartype, "0")
 
-    var mcmd_accepted   = ulocal("mcmd_accepted", 0, 0, "0")
-    var scmd_accepted   = ulocal("scmd_accepted", 0, 0, "0")
+    var mcmd_accepted   = ulocal_sticky("mcmd_accepted", 0, 0, "0")
+    var scmd_accepted   = ulocal_sticky("scmd_accepted", 0, 0, "0")
 
 
     init {
 
         for (slave in map) {
             slave_ifs.add(mcopipe_if("slave" + map.indexOf(slave), req_vartype, resp_vartype))
-            slave_enb.add(ulocal("slave_enb" + map.indexOf(slave), 0, 0, "0"))
+            slave_enb.add(ulocal_sticky("slave_enb" + map.indexOf(slave), 0, 0, "0"))
         }
 
         var DEC    = add_stage("DEC")
@@ -43,16 +43,12 @@ class master_pipe(name          : String,
             // accepting command
             begif(!mcmd_accepted)
             run {
-                begif(master_if.req(master_handle, mreq_we, mreq_wdata))
-                run {
-                    mcmd_accepted.accum(1)
-                    mreq_we.accum(mreq_we)
-                    mreq_wdata.accum(mreq_wdata)
-                }; endif()
-                begelse()
-                run {
-                    pstall()
-                }; endif()
+                mcmd_accepted.assign(master_if.req(master_handle, mreq_we, mreq_wdata))
+            }; endif()
+
+            begif(!mcmd_accepted)
+            run {
+                pstall()
             }; endif()
 
             // fetching address from command
@@ -60,7 +56,6 @@ class master_pipe(name          : String,
 
             // decoding command
             for (slave in map) {
-
                 begif(land( geq(addr, hw_imm(slave.start_addr)), (leq(addr, (add(hw_imm(slave.start_addr), (1.shl(slave.addr_width))-1) )) ) ))
                 run {
                     slave_enb[map.indexOf(slave)].assign(1)
@@ -76,19 +71,17 @@ class master_pipe(name          : String,
                 for (slave in map) {
                     begif(slave_enb[map.indexOf(slave)])
                     run {
-                        begif(slave_ifs[map.indexOf(slave)].req(slave_handle, mreq_we, mreq_wdata))
-                        run {
-                            scmd_accepted.accum(1)
-                        }; endif()
-                        begelse()
-                        run {
-                            pstall()
-                        }; endif()
+                        scmd_accepted.assign(slave_ifs[map.indexOf(slave)].req(slave_handle, mreq_we, mreq_wdata))
                     }; endif()
                 }
             }; endif()
+
+            begif(!scmd_accepted)
+            run {
+                pstall()
+            }; endif()
             
-            begif(!mreq_we)
+            begif(mreq_we)
             run {
                 pkill()
             }; endif()

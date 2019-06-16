@@ -22,7 +22,7 @@ class xbar(name         : String,
 
     var busreq_struct = add_if_struct(name + "_busreq_struct")
 
-    data class reqfifo_channel_internal(val req : hw_var, val ack : hw_var, val we : hw_var, var wdata : hw_var)
+    data class reqfifo_channel_internal(val req : hw_var, val ack : hw_var, var wdata : hw_var)
     data class respfifo_channel_internal(val resp : hw_var, var rdata : hw_var)
     data class copipe_channel_internal(val req : reqfifo_channel_internal, val resp : respfifo_channel_internal)
     class m_channels_internal : ArrayList<copipe_channel_internal>()
@@ -107,7 +107,6 @@ class xbar(name         : String,
                 var fifo_mreq_channel = reqfifo_channel_internal(
                     ucomb("m" + num_master + "s" + num_slave + "_" + name + "_req", 0, 0, "0"),
                     ucomb("m" + num_master + "s" + num_slave + "_" + name + "_ack", 0, 0, "0"),
-                    ucomb("m" + num_master + "s" + num_slave + "_" + name + "_we", 0, 0, "0"),
                     comb("m" + num_master + "s" + num_slave + "_" + name + "_wdata", rtl_master_pipe.getPortByName("genmcopipe_slave" + num_slave + "_req_genfifo_wdata_bo").vartype, "0")
                 )
                 var fifo_sreq_channel = respfifo_channel_internal(

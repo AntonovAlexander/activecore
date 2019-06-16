@@ -61,6 +61,7 @@ wire master_0_resp;
 
 wire master_1_req;
 wire master_1_ack;
+wire [31:0] master_1_addr;
 wire master_1_we;
 wire [31:0] master_1_wdata;
 wire [31:0] master_1_rdata;
@@ -68,6 +69,7 @@ wire master_1_resp;
 
 wire master_2_req;
 wire master_2_ack;
+wire [31:0] master_2_addr;
 wire master_2_we;
 wire [31:0] master_2_wdata;
 wire [31:0] master_2_rdata;
@@ -75,40 +77,41 @@ wire master_2_resp;
 
 wire master_3_req;
 wire master_3_ack;
+wire [31:0] master_3_addr;
 wire master_3_we;
 wire [31:0] master_3_wdata;
 wire [31:0] master_3_rdata;
 wire master_3_resp;
 
 wire slave_0_req;
+wire slave_0_ack;
 wire [31:0] slave_0_addr;
 wire slave_0_we;
 wire [31:0] slave_0_wdata;
-wire slave_0_ack;
 wire [31:0] slave_0_rdata;
 wire slave_0_resp;
 
 wire slave_1_req;
+wire slave_1_ack;
 wire [31:0] slave_1_addr;
 wire slave_1_we;
 wire [31:0] slave_1_wdata;
-wire slave_1_ack;
 wire [31:0] slave_1_rdata;
 wire slave_1_resp;
 
 wire slave_2_req;
+wire slave_2_ack;
 wire [31:0] slave_2_addr;
 wire slave_2_we;
 wire [31:0] slave_2_wdata;
-wire slave_2_ack;
 wire [31:0] slave_2_rdata;
 wire slave_2_resp;
 
 wire slave_3_req;
+wire slave_3_ack;
 wire [31:0] slave_3_addr;
 wire slave_3_we;
 wire [31:0] slave_3_wdata;
-wire slave_3_ack;
 wire [31:0] slave_3_rdata;
 wire slave_3_resp;
 
@@ -468,7 +471,7 @@ initial
 	@(posedge memread_grant)
 	forever
 		begin
-		WAIT(10);
+		WAIT(100);
 		for (mmon = 0; mmon < SLAVE_MEMSIZE32; mmon++)
 			begin
 			if (slave_0_mem_model.mem[mmon] != ((0 << 30) + (mmon << 2)) ) $fatal("MEMORY 0 CORRUPTED! word_num: %d, data: 0x%x", mmon, slave_0_mem_model.mem[mmon]);

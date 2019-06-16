@@ -1568,6 +1568,7 @@ open class pipeline(name_in : String) : hw_astc() {
 
                 // reattempt execution
                 cyclix_gen.assign(curStageAssoc.pctrl_stalled_glbl, 0)
+                cyclix_gen.assign(curStageAssoc.pctrl_active_glbl, cyclix_gen.lnot(curStageAssoc.pctrl_killed_glbl))
             }; cyclix_gen.endif()
             cyclix_gen.begelse()
             run {
