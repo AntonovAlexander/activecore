@@ -32,26 +32,6 @@ open class hw_pipex_var(name_in : String, vartype : hw_type, defval_in : String)
         else ERROR("assign_succ cmd is out of place!")
     }
 
-    fun accum(depow_fractions: hw_fractions, src: hw_param) {
-        if (default_astc is pipeline) (default_astc as pipeline).accum(depow_fractions, this, src)
-        else ERROR("accum cmd is out of place!")
-    }
-
-    fun accum(depow_fractions: hw_fractions, src: Int) {
-        if (default_astc is pipeline) (default_astc as pipeline).accum(depow_fractions, this, src)
-        else ERROR("accum cmd is out of place!")
-    }
-
-    fun accum(src: hw_param) {
-        if (default_astc is pipeline) (default_astc as pipeline).accum(this, src)
-        else ERROR("accum cmd is out of place!")
-    }
-
-    fun accum(src: Int) {
-        if (default_astc is pipeline) (default_astc as pipeline).accum(this, src)
-        else ERROR("accum cmd is out of place!")
-    }
-
     fun readprev() : hw_pipex_var {
         if (default_astc is pipeline) return (default_astc as pipeline).readprev(this)
         else ERROR("readprev cmd is out of place!")

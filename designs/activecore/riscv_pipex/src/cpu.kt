@@ -94,11 +94,11 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
     // regfile control signals
     var rs1_req         = ulocal("rs1_req", 0, 0, "0")
     var rs1_addr        = ulocal("rs1_addr", 4, 0, "0")
-    var rs1_rdata       = ulocal("rs1_rdata", 31, 0, "0")
+    var rs1_rdata       = ulocal_sticky("rs1_rdata", 31, 0, "0")
 
     var rs2_req         = ulocal("rs2_req", 0, 0, "0")
     var rs2_addr        = ulocal("rs2_addr", 4, 0, "0")
-    var rs2_rdata       = ulocal("rs2_rdata", 31, 0, "0")
+    var rs2_rdata       = ulocal_sticky("rs2_rdata", 31, 0, "0")
 
     var rd_req          = ulocal("rd_req", 0, 0, "0")
     var rd_source       = ulocal("rd_source", 2, 0, RD_ALU.toString())
@@ -174,14 +174,14 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
         hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(31, 0)))
     var instr_handle = mcopipe_handle(instr_mem)
     var instr_busreq = local("instr_busreq", busreq_mem_struct)
-    var instr_req_done = ulocal("instr_req_done", 0, 0, "0")
+    var instr_req_done = ulocal_sticky("instr_req_done", 0, 0, "0")
 
     var data_mem = mcopipe_if("data_mem",
         hw_type(busreq_mem_struct),
         hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(31, 0)))
     var data_handle = mcopipe_handle(data_mem)
     var data_busreq = local("data_busreq", busreq_mem_struct)
-    var data_req_done = ulocal("data_req_done", 0, 0, "0")
+    var data_req_done = ulocal_sticky("data_req_done", 0, 0, "0")
 
 
     //// RISC-V pipeline macro-operations ////
@@ -207,7 +207,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         begif(!instr_req_done)
         run {
-            instr_req_done.accum(instr_mem.rdreq(instr_handle, instr_busreq))
+            instr_req_done.assign(instr_mem.rdreq(instr_handle, instr_busreq))
         }; endif()
         begif(!instr_req_done)
         run {
@@ -719,7 +719,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             run {
                 begif(fw_stage.readremote(rd_rdy))
                 run {
-                    rs1_rdata.accum(fw_stage.readremote(rd_wdata))
+                    rs1_rdata.assign(fw_stage.readremote(rd_wdata))
                 }; endif()
                 begelse()
                 run {
@@ -731,7 +731,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             run {
                 begif(fw_stage.readremote(rd_rdy))
                 run {
-                    rs2_rdata.accum(fw_stage.readremote(rd_wdata))
+                    rs2_rdata.assign(fw_stage.readremote(rd_wdata))
                 }; endif()
                 begelse()
                 run {
@@ -1017,7 +1017,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
                 data_busreq.assign(hw_fractions("be"), 0xf)
                 data_busreq.assign(hw_fractions("wdata"), mem_wdata)
 
-                data_req_done.accum(data_mem.req(data_handle, mem_cmd, data_busreq))
+                data_req_done.assign(data_mem.req(data_handle, mem_cmd, data_busreq))
             }; endif()
 
             begif(!data_req_done)

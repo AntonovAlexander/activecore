@@ -23,7 +23,6 @@ val OP_PKILL        = hw_opcode("pkill")
 val OP_PFLUSH       = hw_opcode("pflush")
 
 val OP_ASSIGN_SUCC  = hw_opcode("assign_succ")
-val OP_ACCUM        = hw_opcode("accum")
 val OP_RD_PREV     = hw_opcode("rd_prev")
 
 
@@ -789,27 +788,6 @@ open class pipeline(name_in : String) : hw_astc() {
         assign_succ(tgt, hw_imm(src))
     }
 
-    fun accum(depow_fractions: hw_fractions, tgt : hw_pipex_var, src: hw_param) {
-        var new_expr = hw_exec(OP_ACCUM)
-        new_expr.AddWrVar(tgt)
-        new_expr.AddRdParam(src)
-        new_expr.fractions = depow_fractions
-        AddExpr(new_expr)
-    }
-
-    fun accum(depow_fractions: hw_fractions, tgt : hw_pipex_var, src: Int) {
-        accum(depow_fractions, tgt, hw_imm(src))
-    }
-
-    fun accum(tgt : hw_pipex_var, src: hw_param) {
-        var dummy_depow_fractions = hw_fractions()
-        accum(dummy_depow_fractions, tgt, src)
-    }
-
-    fun accum(tgt : hw_pipex_var, src: Int) {
-        accum(tgt, hw_imm(src))
-    }
-
     fun readprev(src : hw_pipex_var) : hw_pipex_var {
         var new_expr = hw_exec(OP_RD_PREV)
         var genvar = hw_pipex_var(GetGenName("readprev"), src.vartype, src.defval)
@@ -879,10 +857,6 @@ open class pipeline(name_in : String) : hw_astc() {
                 val buf = cyclix_gen.local(GetGenName("syncbuf"), expression.wrvars[0].vartype, expression.wrvars[0].defval)
                 pstage_info.assign_succ_assocs.put((expression.wrvars[0] as hw_pipex_var), __assign_succ_buf(req, buf))
             }
-
-        } else if (expression.opcode == OP_ACCUM) {
-            if (!pstage_info.accum_dict.contains(expression.wrvars[0] as hw_pipex_var))
-                pstage_info.accum_dict.add(expression.wrvars[0] as hw_pipex_var)
 
         } else if (expression.opcode == OP_RD_REMOTE) {
             (expression as hw_exec_read_remote).stage.AddRdVar(expression.remote_var)
@@ -1041,11 +1015,6 @@ open class pipeline(name_in : String) : hw_astc() {
                         curStageAssoc)
                 }
             }; cyclix_gen.endwhile()
-
-        } else if (expr.opcode == OP_ACCUM) {
-
-            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), curStageAssoc.TranslateParam(expr.params[0]))
-            cyclix_gen.assign(curStageAssoc.pContext_srcglbl_dict[expr.wrvars[0]]!!, curStageAssoc.TranslateParam(expr.params[0]))
 
         } else if (expr.opcode == OP_PKILL) {
             curStageAssoc.pkill_cmd_internal(cyclix_gen)
@@ -1505,21 +1474,6 @@ open class pipeline(name_in : String) : hw_astc() {
                 }
             }
 
-            // adding accumbufs in case they are new
-            MSG(DEBUG_FLAG, "Processing accumlist, accum_dict size: " + StageAssocList[CUR_STAGE_INDEX].accum_dict.size)
-            for (accum in StageAssocList[CUR_STAGE_INDEX].accum_dict) {
-                MSG(DEBUG_FLAG, "accum: " + accum.name)
-                if (CUR_STAGE_INDEX == 0) {
-                    StageAssocList[CUR_STAGE_INDEX].accum_dict_new.add(accum)
-                    pContext_notnew.add(accum)
-                } else {
-                    if (!StageAssocList[CUR_STAGE_INDEX-1].pContext_local_dict.containsKey(accum)) {
-                        StageAssocList[CUR_STAGE_INDEX].accum_dict_new.add(accum)
-                        pContext_notnew.add(accum)
-                    }
-                }
-            }
-
             for (notnew in pContext_notnew) {
                 if (notnew is hw_local) {
                     var new_global = cyclix_gen.global(
@@ -1586,18 +1540,6 @@ open class pipeline(name_in : String) : hw_astc() {
 
             // Generating "occupied" pctrl
             cyclix_gen.bor_gen(curStageAssoc.pctrl_occupied, curStageAssoc.pctrl_active_glbl, curStageAssoc.pctrl_killed_glbl)
-
-            // initializing new accum globals
-            MSG(DEBUG_FLAG, "#### Initializing accumbufs ####")
-            if (curStageAssoc.accum_dict_new.size > 0) {
-                cyclix_gen.begif(curStageAssoc.pctrl_new)
-                run {
-                    for (accum in curStageAssoc.accum_dict_new) {
-                        if (!curStageAssoc.pContext_srcglbl_dict.containsKey(accum)) ERROR("accum err: " + accum.name)
-                        cyclix_gen.assign((curStageAssoc.pContext_srcglbl_dict[accum] as hw_var), hw_imm(accum.defval))
-                    }
-                }; cyclix_gen.endif()
-            }
 
             // Fetching locals from src_glbls
             MSG(DEBUG_FLAG, "Fetching locals from src_glbls")
