@@ -16,25 +16,25 @@ Thesis web page: http://fppo.ifmo.ru/dissertation/?number=63419
 
 Current version of project is implemented as several Kotlin libraries that are separately built using IntelliJ IDEA in the following order:
 
-* hwast - AST constructor for behavioral HW specifications (/hwast)
+* **hwast** - AST constructor for behavioral HW specifications (/hwast)
 
-* rtl - MLIP core for behavioral RTL generation (/mlip/rtl)
+* **rtl** - MLIP core for behavioral RTL generation (/mlip/rtl)
 
-* cyclix - MLIP core for generation of cycle-oriented processing hardware targeting RTL and HLS flows (/mlip/cyclix)
+* **cyclix** - MLIP core for generation of cycle-oriented processing hardware targeting RTL and HLS flows (/mlip/cyclix)
 
-* pipex - MLIP core for pipelined structures generation (/mlip/pipex)
+* **pipex** - MLIP core for pipelined structures generation (/mlip/pipex)
 
 * core generators
 
-	* RISC-V CPU generator (/designs/activecore/riscv_pipex)
+	* **aquaris** - RISC-V CPU generator with varying-length pipelines (1-6 stages) based on pipex (/designs/coregen/aquaris)
 
-	* full xbar generator (/designs/activecore/xbar_pipex)
+	* **ariele** - full xbar generator based on pipex (/designs/coregen/ariele)
 
-Pipex MLIP functionality is demonstrated via 6 RISC-V (RV32I) CPU designs with varying-length pipelines (riscv_1stage-riscv_6stage) and xbar generator based on it. The following demo designs for FPGA are available:
+The following demo designs for FPGA are available:
 
-* pss_memsplit - minimalistic uC with one RISC-V core (/designs/rtl/pss_memsplit). Tests are run by /designs/rtl/pss_memsplit/sw/benchmarks/hw_test.py.
+* **pss_memsplit** - minimalistic uC with one RISC-V core (/designs/rtl/pss_memsplit). Tests are run by /designs/rtl/pss_memsplit/sw/benchmarks/hw_test.py.
 
-* mpss - SoC with multiple RISC-V cores connected by full xbar (/designs/rtl/mpss)
+* **mpss** - SoC with multiple RISC-V cores connected by full xbar (/designs/rtl/mpss)
 
 Preliminary build of the cores and software is required. Demo projects use UART-controllable bus master for reset and initialization.
 
