@@ -10,7 +10,7 @@
       <root url="file://$PROJECT_DIR$/../../../../../mlip/rtl/out/production/rtl" />
       <root url="file://$PROJECT_DIR$/../../../../../mlip/cyclix/out/production/cyclix" />
       <root url="file://$PROJECT_DIR$/../../../../../mlip/pipex/out/production/pipex" />
-      <root url="file://$PROJECT_DIR$/../../../../activecore/riscv_pipex/out/production/riscv_pipex" />
+      <root url="file://$PROJECT_DIR$/../../../../coregen/aquaris/out/production/aquaris" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

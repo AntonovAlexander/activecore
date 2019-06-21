@@ -10,7 +10,7 @@
       <root url="file://$PROJECT_DIR$/../../../../../mlip/rtl/out/production/rtl" />
       <root url="file://$PROJECT_DIR$/../../../../../mlip/cyclix/out/production/cyclix" />
       <root url="file://$PROJECT_DIR$/../../../../../mlip/pipex/out/production/pipex" />
-      <root url="file://$PROJECT_DIR$/../../../../activecore/xbar_pipex/out/production/xbar_pipex" />
+      <root url="file://$PROJECT_DIR$/../../../../coregen/ariele/out/production/ariele" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
@@ -19,6 +19,7 @@
       <root url="jar://$KOTLIN_BUNDLED$/lib/kotlin-test-sources.jar!/" />
       <root url="jar://$KOTLIN_BUNDLED$/lib/kotlin-stdlib-jdk7-sources.jar!/" />
       <root url="jar://$KOTLIN_BUNDLED$/lib/kotlin-stdlib-jdk8-sources.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../../../coregen" />
     </SOURCES>
   </library>
 </component>

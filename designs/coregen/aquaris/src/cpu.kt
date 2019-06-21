@@ -6,7 +6,7 @@
  *     License: See LICENSE file for details
  */
 
-package riscv_pipex
+package aquaris
 
 import hwast.*
 

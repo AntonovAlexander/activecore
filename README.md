@@ -30,12 +30,12 @@ Current version of project is implemented as several Kotlin libraries that are s
 
 	* full xbar generator (/designs/activecore/xbar_pipex)
 
-The following demo designs for FPGA are available:
+Pipex MLIP functionality is demonstrated via 6 RISC-V (RV32I) CPU designs with varying-length pipelines (riscv_1stage-riscv_6stage) and xbar generator based on it. The following demo designs for FPGA are available:
 
-* pss_memsplit - minimalistic uC with one RISC-V core (located at /designs/rtl/pss_memsplit). Tests are run by /designs/rtl/pss_memsplit/sw/benchmarks/hw_test.py.
+* pss_memsplit - minimalistic uC with one RISC-V core (/designs/rtl/pss_memsplit). Tests are run by /designs/rtl/pss_memsplit/sw/benchmarks/hw_test.py.
 
-* mpss - SoC with multiple RISC-V cores connected by full xbar (located at /designs/rtl/mpss)
+* mpss - SoC with multiple RISC-V cores connected by full xbar (/designs/rtl/mpss)
 
-Pipex MLIP functionality is demonstrated via 6 RISC-V (RV32I) CPU designs with varying-length pipelines (riscv_1stage-riscv_6stage) and xbar generator based on it. Preliminary build of the cores and software is required. Demo projects use UART-controllable bus master for reset and initialization.
+Preliminary build of the cores and software is required. Demo projects use UART-controllable bus master for reset and initialization.
 
 For questions, please contact antonov.alex.alex@gmail.com

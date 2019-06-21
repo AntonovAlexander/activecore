@@ -1,4 +1,4 @@
-package xbar_pipex
+package ariele
 
 import hwast.*
 import rtl.*

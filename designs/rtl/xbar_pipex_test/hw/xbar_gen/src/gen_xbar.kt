@@ -1,5 +1,5 @@
 import hwast.*
-import xbar_pipex.*
+import ariele.*
 
 fun main(args: Array<String>) {
     println("xbar: generating")
@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
         map.add(slave_entry((i * SLAVE_SPACE_SIZE).toString(), SLAVE_ADDR_WIDTH))
     }
 
-    var xbar = xbar_pipex.xbar(("xbar_pipex"),
+    var xbar = ariele.xbar(("xbar_pipex"),
         4,
         32,
         4,
