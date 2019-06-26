@@ -24,17 +24,17 @@ Current version of project is implemented as several Kotlin libraries that are s
 
 * **pipex** - MLIP core for pipelined structures generation (/mlip/pipex)
 
-* core generators
+* core generators:
 
-	* **aquaris** - RISC-V CPU generator with varying-length pipelines (1-6 stages) based on pipex (/designs/coregen/aquaris)
+	* **aquaris** - RISC-V CPU generator with varying-length pipelines (1-6 stages) based on pipex MLIP core (/designs/coregen/aquaris)
 
-	* **ariele** - full xbar generator based on pipex (/designs/coregen/ariele)
+	* **ariele** - full xbar generator based on pipex MLIP core (/designs/coregen/ariele)
 
 The following demo designs for FPGA are available:
 
 * **pss_memsplit** - minimalistic uC with one RISC-V core (/designs/rtl/pss_memsplit). Tests are run by /designs/rtl/pss_memsplit/sw/benchmarks/hw_test.py.
 
-* **mpss** - SoC with multiple RISC-V cores connected by full xbar (/designs/rtl/mpss)
+* **mpss** - MPSoC with multiple RISC-V cores connected by full xbar (/designs/rtl/mpss)
 
 Preliminary build of the cores and software is required. Demo projects use UART-controllable bus master for reset and initialization.
 

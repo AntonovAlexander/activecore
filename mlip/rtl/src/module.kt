@@ -37,6 +37,7 @@ open class module(name_in : String) : hw_astc() {
     }
 
     fun submodule(inst_name : String, new_submod : module) : hw_submodule {
+        if (FROZEN_FLAG) ERROR("Failed to add submodule " + inst_name + ": ASTC frozen")
         if (Submodules.containsKey(inst_name)) ERROR("Naming conflict for instance: " + inst_name)
         var new_inst = hw_submodule(inst_name, new_submod, this)
         Submodules.put(inst_name, new_inst)
@@ -44,6 +45,8 @@ open class module(name_in : String) : hw_astc() {
     }
 
     private fun add_comb(new_comb : hw_var) {
+        if (FROZEN_FLAG) ERROR("Failed to add comb " + new_comb.name + ": ASTC frozen")
+
         if (wrvars.containsKey(new_comb.name)) ERROR("Naming conflict for comb: " + new_comb.name)
         if (rdvars.containsKey(new_comb.name)) ERROR("Naming conflict for comb: " + new_comb.name)
 
@@ -108,6 +111,8 @@ open class module(name_in : String) : hw_astc() {
     }
 
     private fun add_port(new_port : hw_port) {
+        if (FROZEN_FLAG) ERROR("Failed to add port " + new_port.name + ": ASTC frozen")
+
         if (wrvars.containsKey(new_port.name)) ERROR("Naming conflict for port: " + new_port.name)
         if (rdvars.containsKey(new_port.name)) ERROR("Naming conflict for port: " + new_port.name)
 
@@ -337,8 +342,9 @@ open class module(name_in : String) : hw_astc() {
     }
 
     private fun add_mem(new_mem : hw_mem) {
-        if (rdvars.containsKey(new_mem.name)) ERROR("Naming conflict for mem: " + new_mem.name)
+        if (FROZEN_FLAG) ERROR("Failed to add mem " + new_mem.name + ": ASTC frozen")
 
+        if (rdvars.containsKey(new_mem.name)) ERROR("Naming conflict for mem: " + new_mem.name)
         rdvars.put(new_mem.name, new_mem)
         Mems.add(new_mem)
     }
@@ -380,6 +386,8 @@ open class module(name_in : String) : hw_astc() {
     }
 
     private fun add_syncbuf(new_syncbuf : hw_syncbuf) {
+        if (FROZEN_FLAG) ERROR("Failed to add syncbuf " + new_syncbuf.name + ": ASTC frozen")
+
         if (wrvars.containsKey(new_syncbuf.name)) ERROR("Naming conflict for syncbuf: " + new_syncbuf.name)
         if (rdvars.containsKey(new_syncbuf.name)) ERROR("Naming conflict for syncbuf: " + new_syncbuf.name)
 
@@ -531,6 +539,7 @@ open class module(name_in : String) : hw_astc() {
         println("############################################")
 
         validate()
+        freeze()
 
         var writer = SvWriter(this)
         writer.write(pathname)

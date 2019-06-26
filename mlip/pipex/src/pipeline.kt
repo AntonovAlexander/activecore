@@ -62,6 +62,7 @@ open class pipeline(name_in : String) : hw_astc() {
     var Stages  = mutableMapOf<String, hw_stage>()
 
     fun add_stage(name_in : String) : hw_stage {
+        if (FROZEN_FLAG) ERROR("Failed to add stage " + name_in + ": ASTC frozen")
         var new_stage = hw_stage(name_in, this)
         if (Stages.put(new_stage.name, new_stage) != null) {
             ERROR("Stage addition problem!")
@@ -70,12 +71,14 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     fun begstage(stage : hw_stage) {
+        if (FROZEN_FLAG) ERROR("Failed to begin stage " + stage.name + ": ASTC frozen")
         if (this.size != 0) ERROR("Pipex ASTC inconsistent!")
         // TODO: validate stage presence
         add(stage)
     }
 
     fun endstage() {
+        if (FROZEN_FLAG) ERROR("Failed to end stage: ASTC frozen")
         if (this.size != 1) ERROR("Stage ASTC inconsistent!")
         if (this[0].opcode != OP_STAGE) ERROR("Stage ASTC inconsistent!")
         this.clear()
@@ -102,6 +105,8 @@ open class pipeline(name_in : String) : hw_astc() {
     var fifo_in_dict = mutableMapOf<hw_fifo_in, fifo_in_descr>()
 
     private fun add_local(new_local: hw_local) {
+        if (FROZEN_FLAG) ERROR("Failed to add local " + new_local.name + ": ASTC frozen")
+
         if (wrvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
         if (rdvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
 
@@ -166,6 +171,8 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     private fun add_local_sticky(new_local_sticky: hw_local_sticky) {
+        if (FROZEN_FLAG) ERROR("Failed to add local_sticky " + new_local_sticky.name + ": ASTC frozen")
+
         if (wrvars.containsKey(new_local_sticky.name)) ERROR("Naming conflict for local_sticky: " + new_local_sticky.name)
         if (rdvars.containsKey(new_local_sticky.name)) ERROR("Naming conflict for local_sticky: " + new_local_sticky.name)
 
@@ -229,7 +236,9 @@ open class pipeline(name_in : String) : hw_astc() {
         return ret_var
     }
 
-    fun add_global(new_global: hw_global) {
+    private fun add_global(new_global: hw_global) {
+        if (FROZEN_FLAG) ERROR("Failed to add global " + new_global.name + ": ASTC frozen")
+
         if (wrvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
         if (rdvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
 
@@ -294,6 +303,8 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     fun add_port(new_port: hw_port) {
+        if (FROZEN_FLAG) ERROR("Failed to add port " + new_port.name + ": ASTC frozen")
+
         if (new_port.port_dir != PORT_DIR.IN) {
             if (wrvars.put(new_port.name, new_port) != null) {
                 ERROR("Port addition problem!")
@@ -496,6 +507,8 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     fun add_fifo_in(new_fifo_in: hw_fifo_in) {
+        if (FROZEN_FLAG) ERROR("Failed to add fifo_in " + new_fifo_in.name + ": ASTC frozen")
+
         if (fifo_ifs.put(new_fifo_in.name, new_fifo_in) != null) {
             ERROR("FIFO addition problem!")
         }
@@ -551,6 +564,8 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     fun add_fifo_out(new_fifo_out: hw_fifo_out) {
+        if (FROZEN_FLAG) ERROR("Failed to add fifo_out " + new_fifo_out.name + ": ASTC frozen")
+
         if (fifo_ifs.put(new_fifo_out.name, new_fifo_out) != null) {
             ERROR("FIFO addition problem!")
         }
@@ -626,6 +641,7 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     private fun add_mcopipe_if(new_mcopipe: hw_mcopipe_if) {
+        if (FROZEN_FLAG) ERROR("Failed to add mcopipe_if " + new_mcopipe.name + ": ASTC frozen")
         if (copipe_ifs.put(new_mcopipe.name, new_mcopipe) != null) {
             ERROR("Mcopipe addition problem!")
         }
@@ -644,6 +660,7 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     private fun add_mcopipe_handle(new_mcopipe: hw_mcopipe_handle) {
+        if (FROZEN_FLAG) ERROR("Failed to add mcopipe_handle " + new_mcopipe.name + ": ASTC frozen")
         if (copipe_handles.put(new_mcopipe.name, new_mcopipe) != null) {
             ERROR("Mcopipe addition problem!")
         }
@@ -668,6 +685,7 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     private fun add_scopipe_if(new_scopipe: hw_scopipe_if) {
+        if (FROZEN_FLAG) ERROR("Failed to add scopipe_if " + new_scopipe.name + ": ASTC frozen")
         if (copipe_ifs.put(new_scopipe.name, new_scopipe) != null) {
             ERROR("Scopipe addition problem!")
         }
@@ -686,6 +704,7 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     private fun add_scopipe_handle(new_scopipe: hw_scopipe_handle) {
+        if (FROZEN_FLAG) ERROR("Failed to add scopipe_handle " + new_scopipe.name + ": ASTC frozen")
         if (copipe_handles.put(new_scopipe.name, new_scopipe) != null) {
             ERROR("Scopipe addition problem!")
         }
@@ -839,6 +858,10 @@ open class pipeline(name_in : String) : hw_astc() {
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
+    }
+
+    fun validate() {
+        // TODO: validation
     }
 
     fun ProcessSyncOp(expression : hw_exec, Translate_info : __TranslateInfo, pstage_info : __pstage_info, cyclix_gen : cyclix.module) {
@@ -1185,6 +1208,7 @@ open class pipeline(name_in : String) : hw_astc() {
     fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.module {
 
         MSG("Translating to cyclix: beginning")
+        validate()
 
         var cyclix_gen = cyclix.module(name)
         var TranslateInfo = __TranslateInfo()
@@ -1298,6 +1322,8 @@ open class pipeline(name_in : String) : hw_astc() {
                 if_id,
                 we))
         }
+
+        freeze()
 
         // Analyzing sync operations //
         MSG(DEBUG_FLAG, "Distributing synchronization primitives by pstages")

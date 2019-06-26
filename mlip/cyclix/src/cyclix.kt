@@ -38,6 +38,8 @@ open class module(name_in : String) : hw_astc() {
     }
 
     private fun add_local(new_local : hw_var) {
+        if (FROZEN_FLAG) ERROR("Failed to add local " + new_local.name + ": ASTC frozen")
+
         if (wrvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
         if (rdvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
 
@@ -102,6 +104,8 @@ open class module(name_in : String) : hw_astc() {
     }
 
     private fun add_global(new_global : hw_var) {
+        if (FROZEN_FLAG) ERROR("Failed to add comb " + new_global.name + ": ASTC frozen")
+
         if (wrvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
         if (rdvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
 
@@ -166,6 +170,8 @@ open class module(name_in : String) : hw_astc() {
     }
 
     private fun add_port(new_port : hw_port) {
+        if (FROZEN_FLAG) ERROR("Failed to add port " + new_port.name + ": ASTC frozen")
+
         if (new_port.port_dir != PORT_DIR.IN) {
             if (wrvars.put(new_port.name, new_port) != null) {
                 ERROR("Port addition problem!")
@@ -342,6 +348,8 @@ open class module(name_in : String) : hw_astc() {
     }
 
     private fun add_fifo_in(new_fifo_in: hw_fifo_in) {
+        if (FROZEN_FLAG) ERROR("Failed to add comb " + new_fifo_in.name + ": ASTC frozen")
+
         if (fifo_ifs.put(new_fifo_in.name, new_fifo_in) != null) {
             ERROR("FIFO addition problem!")
         }
@@ -391,6 +399,8 @@ open class module(name_in : String) : hw_astc() {
     }
 
     fun add_fifo_out(new_fifo_out: hw_fifo_out) {
+        if (FROZEN_FLAG) ERROR("Failed to add comb " + new_fifo_out.name + ": ASTC frozen")
+
         if (fifo_ifs.put(new_fifo_out.name, new_fifo_out) != null) {
             ERROR("FIFO addition problem!")
         }
@@ -466,18 +476,21 @@ open class module(name_in : String) : hw_astc() {
         }
     }
 
+    fun validate() {
+        // TODO: validation
+    }
+
     fun export_to_rtl() : rtl.module {
 
         println("###########################################")
         println("#### Starting Cyclix-to-RTL generation ####")
         println("###########################################")
 
-        // TODO: pre-validation
+        validate()
+        freeze()
 
         var rtl_generator = RtlGenerator(this)
         var rtl_gen = rtl_generator.generate()
-
-        // TODO: post-validation
 
         println("############################################")
         println("#### Cyclix-to-RTL generation complete! ####")
@@ -492,7 +505,8 @@ open class module(name_in : String) : hw_astc() {
         println("#### Cyclix: starting vivado_cpp export ####")
         println("############################################")
 
-        // TODO: validate()
+        validate()
+        freeze()
 
         var writer = VivadoCppWriter(this)
         writer.write(pathname)

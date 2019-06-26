@@ -19,11 +19,18 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return ret_val
     }
 
+    protected var FROZEN_FLAG = false
+
     var hw_structs          = mutableMapOf<String, hw_struct>()
     var hw_if_structs       = ArrayList<hw_struct>()
     var hw_private_structs  = ArrayList<hw_struct>()
 
+    fun freeze() {
+        FROZEN_FLAG = true
+    }
+
     fun add_if_struct(new_struct : hw_struct) {
+        if (FROZEN_FLAG) ERROR("Failed to add if struct " + new_struct.name + ": ASTC frozen")
         if (hw_structs.containsKey(new_struct.name)) {
             ERROR("Name conflict for struct: " + new_struct.name)
         } else {
@@ -39,6 +46,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun add_private_struct(new_struct : hw_struct) {
+        if (FROZEN_FLAG) ERROR("Failed to add private struct " + new_struct.name + ": ASTC frozen")
         if (hw_structs.containsKey(new_struct.name)) {
             ERROR("Name conflict for struct: " + new_struct.name)
         } else {
@@ -75,6 +83,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun AddExpr(new_expr: hw_exec) {
+        if (FROZEN_FLAG) ERROR("Failed to add operation " + new_expr.opcode.default_string + ": ASTC frozen")
         if (size == 0) ERROR("Exec stack size error on opcode: " + new_expr.opcode.default_string + ", exec size: " + size)
         DistributeVars(new_expr)
         last().expressions.add(last().cursor, new_expr)
