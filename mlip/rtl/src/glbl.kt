@@ -8,6 +8,10 @@
 
 package rtl
 
+fun WARNING(err_string : String) {
+    println("ActiveCore (rtl) WARNING: " + err_string)
+}
+
 fun ERROR(err_string : String) {
     throw Exception("ActiveCore (rtl) ERROR: " + err_string)
 }

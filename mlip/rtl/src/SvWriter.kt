@@ -327,14 +327,20 @@ class SvWriter(module_in : module) {
         println("done")
 
         println("Exporting modules and ports...")
-        wrFileModule.write("`include \"" + mod.name + ".svh\"\n")
         var mods_included = ArrayList<String>()
+        for (incl in mod.Include_filenames) {
+            if (!mods_included.contains(incl)) {
+                mods_included.add(incl)
+            }
+        }
+        mods_included.add(mod.name)
         for (submodule in mod.Submodules) {
-            println("Analyzing: inst_name: " + submodule.value.inst_name + ", src mod name: " + submodule.value.src_module.name)
             if (!mods_included.contains(submodule.value.src_module.name)) {
-                wrFileModule.write("`include \"" + submodule.value.src_module.name + ".svh\"\n")
                 mods_included.add(submodule.value.src_module.name)
             }
+        }
+        for (incl_file in mods_included) {
+            wrFileModule.write("`include \"" + incl_file + ".svh\"\n")
         }
 
         wrFileModule.write("\n")

@@ -21,6 +21,7 @@ open class module(name_in : String) : hw_astc() {
     var wrvars      = mutableMapOf<String, hw_var>()
     var rdvars      = mutableMapOf<String, hw_var>()
 
+    var Include_filenames = ArrayList<String>()
     var Combs       = ArrayList<hw_var>()
     var Ports       = ArrayList<hw_port>()
     var Mems        = ArrayList<hw_mem>()
@@ -118,6 +119,9 @@ open class module(name_in : String) : hw_astc() {
 
         if (new_port.port_dir != PORT_DIR.IN) {
             wrvars.put(new_port.name, new_port)
+            new_port.read_done = true
+        }
+        if (new_port.port_dir != PORT_DIR.OUT) {
             new_port.write_done = true
         }
         rdvars.put(new_port.name, new_port)
@@ -529,6 +533,13 @@ open class module(name_in : String) : hw_astc() {
 
     fun validate() {
         for (cproc in Cprocs) validate_cproc(cproc)
+        // TODO: cproc wrvars and submodules intersection
+        for (wrvar in wrvars) {
+            if (!wrvar.value.write_done) WARNING("signal " + wrvar.value.name + " is not initialized")
+        }
+        for (rdvar in rdvars) {
+            if (!rdvar.value.read_done) WARNING("signal " + rdvar.value.name + " is not used!")
+        }
         println("Validation complete!")
     }
 

@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
         map.add(slave_entry((i * SLAVE_SPACE_SIZE).toString(), SLAVE_ADDR_WIDTH))
     }
 
-    var xbar = ariele.xbar(("xbar_pipex"),
+    var xbar = ariele.xbar(("ariele_xbar"),
         4,
         32,
         4,

@@ -189,7 +189,7 @@ master_rd_monitor
 	.rdreq_fifo_full(rdreq3_fifo_full)
 );
 
-xbar_pipex DUV
+ariele_xbar DUV
 (
 	.clk_i(clk),
 	.rst_i(rst),

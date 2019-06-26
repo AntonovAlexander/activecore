@@ -50,12 +50,14 @@ class xbar(name         : String,
         var pipex_master_pipe = master_pipe(master_name, hw_type(busreq_struct), map, resp_vartype)
         var cyclix_master_pipe = pipex_master_pipe.translate_to_cyclix(true)
         var rtl_master_pipe = cyclix_master_pipe.export_to_rtl()
+        rtl_master_pipe.Include_filenames.add(name)
 
         // generating slave pipe module
         var slave_name = "s_" + name
         var pipex_slave_pipe = slave_pipe(slave_name, num_masters, hw_type(busreq_struct), resp_vartype)
         var cyclix_slave_pipe = pipex_slave_pipe.translate_to_cyclix(true)
         var rtl_slave_pipe = cyclix_slave_pipe.export_to_rtl()
+        rtl_slave_pipe.Include_filenames.add(name)
 
         // generating master ports
         for (num_master in 0 until num_masters) {

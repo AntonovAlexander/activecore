@@ -27,6 +27,14 @@ class hw_submodule(inst_name_in : String, src_module_in: module, parent_module_i
                 + "cannot be connected to src " + src.GetString() +
                 " - it is already connected to src " + Connections[port]!!.GetString())
         Connections.put(port, src)
+        if (src is hw_var) {
+            if (port.port_dir == PORT_DIR.IN) src.read_done = true
+            else if (port.port_dir == PORT_DIR.OUT) src.write_done = true
+            else {
+                src.read_done = true
+                src.write_done = true
+            }
+        }
     }
 
     fun connect(port : hw_port, value : Int) {
@@ -35,10 +43,7 @@ class hw_submodule(inst_name_in : String, src_module_in: module, parent_module_i
 
     fun connect(port_name : String, src : hw_param) {
         var port = getPortByName(port_name)
-        if (Connections.containsKey(port)) ERROR("port " + port.name + " for instance " + inst_name
-                + "cannot be connected to src " + src.GetString() +
-                " - it is already connected to src " + Connections[port]!!.GetString())
-        Connections.put(port, src)
+        connect(port, src)
     }
 
     fun connect(port_name : String, value : Int) {
