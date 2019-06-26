@@ -25,6 +25,26 @@ open class hw_astc() : ArrayList<hw_exec>() {
     var hw_if_structs       = ArrayList<hw_struct>()
     var hw_private_structs  = ArrayList<hw_struct>()
 
+    fun WARNING(err_string : String) {
+        println("ActiveCore (" + GenNamePrefix + ") WARNING: " + err_string)
+    }
+
+    fun CRITICAL(err_string : String) {
+        println("ActiveCore (" + GenNamePrefix + ") CRITICAL WARNING: " + err_string)
+    }
+
+    fun ERROR(err_string : String) {
+        throw Exception("ActiveCore (" + GenNamePrefix + ") ERROR: " + err_string)
+    }
+
+    fun MSG(msg_string : String) {
+        println(GenNamePrefix + ": " + msg_string)
+    }
+
+    fun MSG(DEBUG_FLAG : Boolean, msg_string : String) {
+        if (DEBUG_FLAG) MSG(msg_string)
+    }
+
     fun freeze() {
         FROZEN_FLAG = true
     }

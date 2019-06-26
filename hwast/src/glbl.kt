@@ -14,6 +14,22 @@ fun ERROR(err_string : String) {
     throw Exception("ActiveCore ERROR: " + err_string)
 }
 
+fun WARNING(err_string : String) {
+    println("ActiveCore WARNING: " + err_string)
+}
+
+fun CRITICAL(err_string : String) {
+    println("ActiveCore CRITICAL WARNING: " + err_string)
+}
+
+fun MSG(msg_string : String) {
+    println("ActiveCore: " + msg_string)
+}
+
+fun MSG(DEBUG_FLAG : Boolean, msg_string : String) {
+    if (DEBUG_FLAG) MSG(msg_string)
+}
+
 var DUMMY_STRUCT = hw_struct("GEN_DUMMY")
 
 fun GetWidthToContain(variations: Int) : Int {

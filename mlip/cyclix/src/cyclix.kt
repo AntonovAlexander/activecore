@@ -477,7 +477,12 @@ open class module(name_in : String) : hw_astc() {
     }
 
     fun validate() {
-        // TODO: validation
+        for (wrvar in wrvars) {
+            if (!wrvar.value.write_done) WARNING("signal " + wrvar.value.name + " is not initialized")
+        }
+        for (rdvar in rdvars) {
+            if (!rdvar.value.read_done) WARNING("signal " + rdvar.value.name + " is not used!")
+        }
     }
 
     fun export_to_rtl() : rtl.module {

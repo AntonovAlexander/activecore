@@ -861,7 +861,12 @@ open class pipeline(name_in : String) : hw_astc() {
     }
 
     fun validate() {
-        // TODO: validation
+        for (wrvar in wrvars) {
+            if (!wrvar.value.write_done) WARNING("signal " + wrvar.value.name + " is not initialized")
+        }
+        for (rdvar in rdvars) {
+            if (!rdvar.value.read_done) WARNING("signal " + rdvar.value.name + " is not used!")
+        }
     }
 
     fun ProcessSyncOp(expression : hw_exec, Translate_info : __TranslateInfo, pstage_info : __pstage_info, cyclix_gen : cyclix.module) {
