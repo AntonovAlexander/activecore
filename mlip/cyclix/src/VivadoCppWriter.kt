@@ -116,7 +116,7 @@ class VivadoCppWriter(module_in : module) {
         if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
             wrFile.write(preambule + "<" + structvar.vartype.src_struct.name + ">& " + structvar.name + postString)
         } else {
-            wrFile.write(preambule + "<ap_uint<" + structvar.vartype.dimensions[0].GetWidth() + ">>& " + structvar.name + postString)
+            wrFile.write(preambule + "<ap_uint<" + structvar.vartype.dimensions[0].GetWidth() + "> >& " + structvar.name + postString)
         }
     }
 
@@ -127,9 +127,14 @@ class VivadoCppWriter(module_in : module) {
     fun append_cnct(expr : hw_exec, index : Int, str : String) : String {
         var cnct_string = ""
         if (index == expr.params.lastIndex) cnct_string = str + getStringWithDim(expr.params[index])
-        else cnct_string = str +
-                getStringWithDim(expr.params[index]) +
-                ".concat(" + append_cnct(expr, (index + 1), cnct_string) + ")"
+        else {
+            // TODO: length cleanup
+            var length = 0
+            for (i in (index + 1) until expr.params.size) length += expr.params[i].vartype.dimensions[0].GetWidth()
+            cnct_string = str +
+                    getStringWithDim(expr.params[index]) +
+                    ".concat((ap_uint<" + length + ">)" + append_cnct(expr, (index + 1), cnct_string) + ")"
+        }
         return cnct_string
     }
 
@@ -149,7 +154,7 @@ class VivadoCppWriter(module_in : module) {
         else if (expr.opcode == OP2_ARITH_DIV) 	    opstring = "/"
         else if (expr.opcode == OP2_ARITH_SHL) 	    opstring = "<<"
         else if (expr.opcode == OP2_ARITH_SHR) 	    opstring = ">>"
-        else if (expr.opcode == OP2_ARITH_SRA) 	    opstring = ">>>"
+        else if (expr.opcode == OP2_ARITH_SRA) 	    opstring = ">>"     // TODO: arith/logical cleanup
 
         else if (expr.opcode == OP1_LOGICAL_NOT)  opstring = "!"
         else if (expr.opcode == OP2_LOGICAL_AND)  opstring = "&&"
@@ -396,7 +401,15 @@ class VivadoCppWriter(module_in : module) {
         // generating global defaults
         wrFileModule.write("\tif (geninit) {\n")
         for (global in mod.globals) {
-            wrFileModule.write("\t\t" + global.name + " = " + global.defval + ";\n")
+            if (global.vartype.dimensions.size < 2) {
+                wrFileModule.write("\t\t" + global.name + " = " + global.defval + ";\n")
+            } else if (global.vartype.dimensions.size == 2) {
+                for (i in global.vartype.dimensions[1].lsb..global.vartype.dimensions[1].msb) {
+                    wrFileModule.write("\t\t" + global.name + "[" + i + "] = " + global.defval + ";\n")
+                }
+            } else {
+                throw Exception("cyclix: default value assignment error to value " + global.name)
+            }
         }
         wrFileModule.write("\n\t} else {\n")
         tab_Counter = 2
