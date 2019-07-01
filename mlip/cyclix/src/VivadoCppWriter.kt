@@ -18,7 +18,10 @@ class VivadoCppWriter(module_in : module) {
 
     fun getStringWithDim(param : hw_param) : String
     {
-        // TODO width of imm values
+        if (param is hw_imm) {
+            if (param.dimensions_in.size > 1) throw Exception("cyclix: param print error")
+            return "ap_uint<" + param.dimensions_in[0].GetWidth() + ">(" + param.imm_value + ")"
+        }
         return param.GetString()
     }
 
@@ -108,8 +111,26 @@ class VivadoCppWriter(module_in : module) {
         }
     }
 
+    fun export_stream(preambule : String, structvar : hw_structvar, postString : String, wrFile : java.io.OutputStreamWriter) {
+        // TODO: dimensions cleanup
+        if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
+            wrFile.write(preambule + "<" + structvar.vartype.src_struct.name + ">& " + structvar.name + postString)
+        } else {
+            wrFile.write(preambule + "<ap_uint<" + structvar.vartype.dimensions[0].GetWidth() + ">>& " + structvar.name + postString)
+        }
+    }
+
     fun PrintTab(wrFile : java.io.OutputStreamWriter){
         for (i in 0 until tab_Counter) wrFile.write("\t")
+    }
+
+    fun append_cnct(expr : hw_exec, index : Int, str : String) : String {
+        var cnct_string = ""
+        if (index == expr.params.lastIndex) cnct_string = str + getStringWithDim(expr.params[index])
+        else cnct_string = str +
+                getStringWithDim(expr.params[index]) +
+                ".concat(" + append_cnct(expr, (index + 1), cnct_string) + ")"
+        return cnct_string
     }
 
     fun export_expr(wrFile : java.io.OutputStreamWriter, expr : hw_exec)
@@ -241,11 +262,11 @@ class VivadoCppWriter(module_in : module) {
             wrFile.write(expr.wrvars[0].name +
                     " = " +
                     expr.params[0].GetString() +
-                    "[" +
+                    ".range(" +
                     expr.params[1].GetString() +
-                    ":" +
+                    ", " +
                     expr.params[2].GetString() +
-                    "];\n")
+                    ");\n")
 
         } else if (expr.opcode == OP2_SUBSTRUCT) {
             wrFile.write(expr.wrvars[0].name +
@@ -256,12 +277,9 @@ class VivadoCppWriter(module_in : module) {
                     ";\n")
 
         } else if (expr.opcode == OPS_CNCT) {
-            var cnct_string = "{"
-            for (i in 0 until expr.params.size) {
-                if (i != 0) cnct_string += ", "
-                cnct_string += getStringWithDim(expr.params[i])
-            }
-            cnct_string += "}"
+
+            var cnct_string = ""
+            cnct_string = append_cnct(expr, 0, cnct_string)
             wrFile.write(expr.wrvars[0].name +
                     " = " +
                     cnct_string +
@@ -288,10 +306,10 @@ class VivadoCppWriter(module_in : module) {
             wrFile.write("}\n")
 
         } else if (expr.opcode == OP_FIFO_WR) {
-            wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_wr).fifo.name + ".write(" + expr.params[0].GetString() + ")\n")
+            wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_wr).fifo.name + ".write_nb(" + expr.params[0].GetString() + ");\n")
 
         } else if (expr.opcode == OP_FIFO_RD) {
-            wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_rd).fifo.name + ".read(" + expr.wrvars[1].name + ")\n")
+            wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_rd).fifo.name + ".read_nb(" + expr.wrvars[1].name + ");\n")
 
         } else ERROR("undefined opcode")
     }
@@ -326,6 +344,7 @@ class VivadoCppWriter(module_in : module) {
         println("Exporting modules and ports...")
         wrFileModule.write("#include \"" + mod.name + ".hpp\"\n")
         wrFileModule.write("#include <ap_int.h>\n")
+        wrFileModule.write("#include <hls_stream.h>\n")
         wrFileModule.write("\n")
 
         println("done")
@@ -348,15 +367,16 @@ class VivadoCppWriter(module_in : module) {
             export_structvar(", volatile ", "*", port, "", wrFileModule)
         }
         for (fifo_in in mod.fifo_ins) {
-            export_structvar(", volatile ", "*", fifo_in, "", wrFileModule)
+            export_stream(", hls::stream", fifo_in, "", wrFileModule)
         }
         for (fifo_out in mod.fifo_outs) {
-            export_structvar(", volatile ", "*", fifo_out, "", wrFileModule)
+            export_stream(", hls::stream", fifo_out, "", wrFileModule)
         }
 
         wrFileModule.write(") {\n")
         wrFileModule.write("\n")
 
+        /*
         for (fifo_in in mod.fifo_ins) {
             wrFileModule.write("#pragma HLS INTERFACE ap_fifo port=" + fifo_in.name + "\n")
         }
@@ -364,6 +384,7 @@ class VivadoCppWriter(module_in : module) {
             wrFileModule.write("#pragma HLS INTERFACE ap_fifo port=" + fifo_out.name + "\n")
         }
         wrFileModule.write("\n")
+        */
 
         tab_Counter = 1
 

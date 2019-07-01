@@ -18,17 +18,19 @@ Current version of project is implemented as several Kotlin libraries that are s
 
 * **hwast** - AST constructor for behavioral HW specifications (/hwast)
 
-* **rtl** - MLIP core for behavioral RTL generation (/mlip/rtl)
+* MLIP cores based on hwast (/mlip):
 
-* **cyclix** - MLIP core for generation of cycle-oriented processing hardware targeting RTL and HLS flows (/mlip/cyclix)
+	* **rtl** - generator of behavioral RTL
 
-* **pipex** - MLIP core for pipelined structures generation (/mlip/pipex)
+	* **cyclix** - generator of cycle-oriented processing hardware targeting RTL and HLS flows
 
-* core generators:
+	* **pipex** - generator of pipelined structures
 
-	* **aquaris** - RISC-V CPU generator with varying-length pipelines (1-6 stages) based on pipex MLIP core (/designs/coregen/aquaris)
+* core generators based on MLIP cores (/designs/coregen):
 
-	* **ariele** - full xbar generator based on pipex MLIP core (/designs/coregen/ariele)
+	* **aquaris** - RISC-V CPU generator with varying-length pipelines (1-6 stages) based on pipex MLIP core
+
+	* **ariele** - full xbar generator based on pipex MLIP core
 
 The following demo designs for FPGA are available:
 
