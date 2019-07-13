@@ -32,10 +32,10 @@ class master_pipe(name          : String,
             slave_enb.add(ulocal_sticky("slave_enb" + map.indexOf(slave), 0, 0, "0"))
         }
 
-        var DEC    = add_stage("DEC")
-        var REQ    = add_stage("REQ")
-        var SEQ    = add_stage("SEQ")
-        var RESP   = add_stage("RESP")
+        var DEC    = stage_handler("DEC")
+        var REQ    = stage_handler("REQ")
+        var SEQ    = stage_handler("SEQ")
+        var RESP   = stage_handler("RESP")
 
         DEC.begin()
         run {

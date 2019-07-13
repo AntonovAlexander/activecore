@@ -61,7 +61,7 @@ open class pipeline(name_in : String) : hw_astc() {
 
     var Stages  = mutableMapOf<String, hw_stage>()
 
-    fun add_stage(name_in : String) : hw_stage {
+    fun stage_handler(name_in : String) : hw_stage {
         if (FROZEN_FLAG) ERROR("Failed to add stage " + name_in + ": ASTC frozen")
         var new_stage = hw_stage(name_in, this)
         if (Stages.put(new_stage.name, new_stage) != null) {

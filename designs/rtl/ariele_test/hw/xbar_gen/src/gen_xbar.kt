@@ -1,7 +1,7 @@
 import hwast.*
 import ariele.*
 
-fun main(args: Array<String>) {
+fun main() {
     println("xbar: generating")
 
     val SLAVE_ADDR_WIDTH = 30

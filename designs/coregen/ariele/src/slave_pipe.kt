@@ -29,9 +29,9 @@ class slave_pipe(name_in        : String,
             master_ifs.add(scopipe_if("master" + mnum, req_vartype, resp_vartype))
         }
 
-        var ARB     = add_stage("ARB")
-        var REQ     = add_stage("REQ")
-        var RESP    = add_stage("RESP")
+        var ARB     = stage_handler("ARB")
+        var REQ     = stage_handler("REQ")
+        var RESP    = stage_handler("RESP")
 
         ARB.begin()
         run {

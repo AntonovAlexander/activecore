@@ -1069,7 +1069,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         if (num_stages == 1) {
 
-            var EXEC = add_stage("EXEC")
+            var EXEC = stage_handler("EXEC")
             EXEC.begin()
             run {
                 process_pc()
@@ -1096,8 +1096,8 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         } else if (num_stages == 2) {
 
-            var IFETCH = add_stage("IFETCH")
-            var EXEC = add_stage("EXEC")
+            var IFETCH = stage_handler("IFETCH")
+            var EXEC = stage_handler("EXEC")
 
             IFETCH.begin()
             run {
@@ -1132,9 +1132,9 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         } else if (num_stages == 3) {
 
-            var IFETCH = add_stage("IFETCH")
-            var EXEC = add_stage("EXEC")
-            var MEMWB = add_stage("MEMWB")
+            var IFETCH = stage_handler("IFETCH")
+            var EXEC = stage_handler("EXEC")
+            var MEMWB = stage_handler("MEMWB")
 
             IFETCH.begin()
             run {
@@ -1173,10 +1173,10 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         } else if (num_stages == 4) {
 
-            var IFETCH = add_stage("IFETCH")
-            var IDECODE = add_stage("IDECODE")
-            var EXEC = add_stage("EXEC")
-            var MEMWB = add_stage("MEMWB")
+            var IFETCH = stage_handler("IFETCH")
+            var IDECODE = stage_handler("IDECODE")
+            var EXEC = stage_handler("EXEC")
+            var MEMWB = stage_handler("MEMWB")
 
             IFETCH.begin()
             run {
@@ -1220,11 +1220,11 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         } else if (num_stages == 5) {
 
-            var IFETCH = add_stage("IFETCH")
-            var IDECODE = add_stage("IDECODE")
-            var EXEC = add_stage("EXEC")
-            var MEM = add_stage("MEM")
-            var WB = add_stage("WB")
+            var IFETCH = stage_handler("IFETCH")
+            var IDECODE = stage_handler("IDECODE")
+            var EXEC = stage_handler("EXEC")
+            var MEM = stage_handler("MEM")
+            var WB = stage_handler("WB")
 
             IFETCH.begin()
             run {
@@ -1272,12 +1272,12 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         } else if (num_stages == 6) {
 
-            var IADDR = add_stage("IADDR")
-            var IFETCH = add_stage("IFETCH")
-            var IDECODE = add_stage("IDECODE")
-            var EXEC = add_stage("EXEC")
-            var MEM = add_stage("MEM")
-            var WB = add_stage("WB")
+            var IADDR = stage_handler("IADDR")
+            var IFETCH = stage_handler("IFETCH")
+            var IDECODE = stage_handler("IDECODE")
+            var EXEC = stage_handler("EXEC")
+            var MEM = stage_handler("MEM")
+            var WB = stage_handler("WB")
 
             IADDR.begin()
             run {
