@@ -25,7 +25,7 @@ module NEXYS4_DDR
     assign mpss_arst = !(CPU_RESETN & pll_locked);
     
     mpss #(
-        .CPU("riscv_1stage")
+        .CPU("riscv_5stage")
         , .mem_data("io_heartbeat_variable.hex")
         , .mem_size(8096)
     ) mpss (
