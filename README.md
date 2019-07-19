@@ -2,15 +2,9 @@
 
 ### Project description
 
-ActiveCore is a framework that demonstrates hardware designing concept based on "Micro-Language IP" (MLIP) cores.
+ActiveCore is a framework that demonstrates original hardware designing concept based on "Micro-Language IP" (MLIP) cores.
 
 MLIP core is a hardware generator that exposes selective functions of behavior and/or microarchitecture for design-time programming and generates hardware implemenations according to certain microarchitectural template.
-
-Full description of the concept and preliminary version of the project (based on C++/Tcl) is given in my PhD thesis:
-
-* A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation, ITMO University, Saint-Petersburg, 28.12.2018.
-
-Thesis web page: http://fppo.ifmo.ru/dissertation/?number=63419
 
 ### Project structure
 
