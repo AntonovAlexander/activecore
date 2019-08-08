@@ -4,7 +4,9 @@
 
 ActiveCore is a framework that demonstrates original hardware designing concept based on "Micro-Language IP" (MLIP) cores.
 
-MLIP core is a hardware generator that exposes selective functions of behavior and/or microarchitecture for design-time programming and generates hardware implemenations according to certain microarchitectural template.
+MLIP core is a hardware generator that exposes selective functions of behavior and/or microarchitecture for design-time programming and generates hardware implementations according to certain microarchitectural template. MLIP core approach serves as an intermediate solution for codification of custom microarchitectures between configurable IP cores with fixed functionality and general-purpose HW design tools:
+
+Fixed-function IP core <------ MLIP core ------> General-purpose design tool
 
 ### Project structure
 
