@@ -18,9 +18,9 @@ Current version of project is implemented as several Kotlin libraries that are s
 
 	* **rtl** - generator of behavioral RTL
 
-	* **cyclix** - generator of cycle-oriented processing hardware targeting RTL and HLS flows
+	* **cyclix** - generator of statically scheduled cycle-oriented processing hardware targeting RTL and HLS flows
 
-	* **pipex** - generator of pipelined structures
+	* **pipex** - generator of dynamically scheduled pipelined structures
 
 * core generators based on MLIP cores (/designs/coregen):
 
