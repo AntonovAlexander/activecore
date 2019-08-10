@@ -49,6 +49,7 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
                                    val pctrl_finish : hw_var,
                                    val pctrl_flushreq : hw_var,
                                    val pctrl_nevictable : hw_var,
+                                   val pctrl_rdy : hw_var,
 
                                    val pctrl_active_glbl : hw_var,
                                    val pctrl_stalled_glbl : hw_var,

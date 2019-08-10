@@ -9,6 +9,7 @@
 package aquaris
 
 import hwast.*
+import pipex.PSTAGE_MODE
 
 class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pipeline(name_in) {
 
@@ -1069,7 +1070,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         if (num_stages == 1) {
 
-            var EXEC = stage_handler("EXEC")
+            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
             EXEC.begin()
             run {
                 process_pc()
@@ -1096,8 +1097,8 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         } else if (num_stages == 2) {
 
-            var IFETCH = stage_handler("IFETCH")
-            var EXEC = stage_handler("EXEC")
+            var IFETCH = stage_handler("IFETCH", PSTAGE_MODE.FALL_THROUGH)
+            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
 
             IFETCH.begin()
             run {
@@ -1132,9 +1133,9 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         } else if (num_stages == 3) {
 
-            var IFETCH = stage_handler("IFETCH")
-            var EXEC = stage_handler("EXEC")
-            var MEMWB = stage_handler("MEMWB")
+            var IFETCH = stage_handler("IFETCH", PSTAGE_MODE.FALL_THROUGH)
+            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
+            var MEMWB = stage_handler("MEMWB", PSTAGE_MODE.FALL_THROUGH)
 
             IFETCH.begin()
             run {
@@ -1173,10 +1174,10 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         } else if (num_stages == 4) {
 
-            var IFETCH = stage_handler("IFETCH")
-            var IDECODE = stage_handler("IDECODE")
-            var EXEC = stage_handler("EXEC")
-            var MEMWB = stage_handler("MEMWB")
+            var IFETCH = stage_handler("IFETCH", PSTAGE_MODE.FALL_THROUGH)
+            var IDECODE = stage_handler("IDECODE", PSTAGE_MODE.FALL_THROUGH)
+            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
+            var MEMWB = stage_handler("MEMWB", PSTAGE_MODE.FALL_THROUGH)
 
             IFETCH.begin()
             run {
@@ -1220,11 +1221,11 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         } else if (num_stages == 5) {
 
-            var IFETCH = stage_handler("IFETCH")
-            var IDECODE = stage_handler("IDECODE")
-            var EXEC = stage_handler("EXEC")
-            var MEM = stage_handler("MEM")
-            var WB = stage_handler("WB")
+            var IFETCH = stage_handler("IFETCH", PSTAGE_MODE.FALL_THROUGH)
+            var IDECODE = stage_handler("IDECODE", PSTAGE_MODE.FALL_THROUGH)
+            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
+            var MEM = stage_handler("MEM", PSTAGE_MODE.FALL_THROUGH)
+            var WB = stage_handler("WB", PSTAGE_MODE.FALL_THROUGH)
 
             IFETCH.begin()
             run {
@@ -1272,12 +1273,12 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
         } else if (num_stages == 6) {
 
-            var IADDR = stage_handler("IADDR")
-            var IFETCH = stage_handler("IFETCH")
-            var IDECODE = stage_handler("IDECODE")
-            var EXEC = stage_handler("EXEC")
-            var MEM = stage_handler("MEM")
-            var WB = stage_handler("WB")
+            var IADDR = stage_handler("IADDR", PSTAGE_MODE.FALL_THROUGH)
+            var IFETCH = stage_handler("IFETCH", PSTAGE_MODE.FALL_THROUGH)
+            var IDECODE = stage_handler("IDECODE", PSTAGE_MODE.FALL_THROUGH)
+            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
+            var MEM = stage_handler("MEM", PSTAGE_MODE.FALL_THROUGH)
+            var WB = stage_handler("WB", PSTAGE_MODE.FALL_THROUGH)
 
             IADDR.begin()
             run {

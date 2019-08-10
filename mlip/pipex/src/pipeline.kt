@@ -25,6 +25,10 @@ val OP_PFLUSH       = hw_opcode("pflush")
 val OP_ASSIGN_SUCC  = hw_opcode("assign_succ")
 val OP_RD_PREV     = hw_opcode("rd_prev")
 
+enum class PSTAGE_MODE {
+    BUFFERED, FALL_THROUGH
+}
+
 
 open class hw_exec_stage_stat(stage_in : hw_stage, opcode : hw_opcode) : hw_exec(opcode) {
     var stage = stage_in
@@ -61,9 +65,9 @@ open class pipeline(name_in : String) : hw_astc() {
 
     var Stages  = mutableMapOf<String, hw_stage>()
 
-    fun stage_handler(name_in : String) : hw_stage {
+    fun stage_handler(name_in : String, mode_in : PSTAGE_MODE) : hw_stage {
         if (FROZEN_FLAG) ERROR("Failed to add stage " + name_in + ": ASTC frozen")
-        var new_stage = hw_stage(name_in, this)
+        var new_stage = hw_stage(name_in, mode_in, this)
         if (Stages.put(new_stage.name, new_stage) != null) {
             ERROR("Stage addition problem!")
         }
@@ -1342,6 +1346,7 @@ open class pipeline(name_in : String) : hw_astc() {
             var pctrl_finish        = cyclix_gen.ulocal((name_prefix + "genpctrl_finish"), 0, 0, "0")
             var pctrl_flushreq      = cyclix_gen.ulocal((name_prefix + "genpctrl_flushreq"), 0, 0, "0")
             var pctrl_nevictable    = cyclix_gen.ulocal((name_prefix + "genpctrl_nevictable"), 0, 0, "0")
+            var pctrl_rdy           = cyclix_gen.ulocal((name_prefix + "genpctrl_rdy"), 0, 0, "0")
 
             var pctrl_active_glbl   = cyclix_gen.uglobal((name_prefix + "genpctrl_active_glbl"), 0, 0, "0")
             var pctrl_stalled_glbl  = cyclix_gen.uglobal((name_prefix + "genpctrl_stalled_glbl"), 0, 0, "0")
@@ -1356,6 +1361,7 @@ open class pipeline(name_in : String) : hw_astc() {
                 pctrl_finish,
                 pctrl_flushreq,
                 pctrl_nevictable,
+                pctrl_rdy,
                 pctrl_active_glbl,
                 pctrl_stalled_glbl,
                 pctrl_killed_glbl)
@@ -1572,6 +1578,11 @@ open class pipeline(name_in : String) : hw_astc() {
             // Generating "occupied" pctrl
             cyclix_gen.bor_gen(curStageAssoc.pctrl_occupied, curStageAssoc.pctrl_active_glbl, curStageAssoc.pctrl_killed_glbl)
 
+            // rdy signal: before processing
+            if (curStage.mode == PSTAGE_MODE.BUFFERED) {
+                cyclix_gen.assign(curStageAssoc.pctrl_rdy, !curStageAssoc.pctrl_occupied)
+            }
+
             // Fetching locals from src_glbls
             MSG(DEBUG_FLAG, "Fetching locals from src_glbls")
             for (src_glbl in curStageAssoc.pContext_srcglbl_dict) {
@@ -1739,9 +1750,9 @@ open class pipeline(name_in : String) : hw_astc() {
             }
 
             // Processing of pstall from next pstage
-            MSG(DEBUG_FLAG, "#### Processing of pstall from next pstage ####")
+            MSG(DEBUG_FLAG, "#### Processing of next pstage busyness ####")
             if (CUR_STAGE_INDEX < StageList.lastIndex) {
-                cyclix_gen.begif(StageAssocList[CUR_STAGE_INDEX+1].pctrl_stalled_glbl)
+                cyclix_gen.begif(!StageAssocList[CUR_STAGE_INDEX+1].pctrl_rdy)
                 run {
                     // prepeat from next pstage requested
                     curStageAssoc.pstall_ifactive_cmd(cyclix_gen)
@@ -1797,7 +1808,7 @@ open class pipeline(name_in : String) : hw_astc() {
             run {
                 // programming next stage in case transaction is able to propagate
                 if (CUR_STAGE_INDEX < StageList.lastIndex) {
-                    cyclix_gen.begif(!StageAssocList[CUR_STAGE_INDEX+1].pctrl_stalled_glbl)
+                    cyclix_gen.begif(StageAssocList[CUR_STAGE_INDEX+1].pctrl_rdy)
                     run {
                         // propagating transaction context
                         for (local in StageAssocList[CUR_STAGE_INDEX+1].pContext_local_dict) {
@@ -1824,7 +1835,13 @@ open class pipeline(name_in : String) : hw_astc() {
                 cyclix_gen.assign(curStageAssoc.pctrl_active_glbl, 0)
                 cyclix_gen.assign(curStageAssoc.pctrl_killed_glbl, 0)
                 cyclix_gen.assign(curStageAssoc.pctrl_stalled_glbl, 0)
+
             }; cyclix_gen.endif()
+
+            // rdy signal: after processing
+            if (curStage.mode == PSTAGE_MODE.FALL_THROUGH) {
+                cyclix_gen.assign(curStageAssoc.pctrl_rdy, !curStageAssoc.pctrl_stalled_glbl)
+            }
 
             // working signal: succ or pstall
             cyclix_gen.bor_gen(curStageAssoc.pctrl_working, curStageAssoc.pctrl_succ, curStageAssoc.pctrl_stalled_glbl)

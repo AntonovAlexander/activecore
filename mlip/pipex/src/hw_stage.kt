@@ -10,8 +10,9 @@ package pipex
 
 val OP_STAGE = hwast.hw_opcode("pstage")
 
-class hw_stage(name_in : String, pipeline_in : pipeline) : hwast.hw_exec(OP_STAGE) {
+class hw_stage(name_in : String, mode_in : PSTAGE_MODE, pipeline_in : pipeline) : hwast.hw_exec(OP_STAGE) {
     val name = name_in
+    val mode = mode_in
     val pipeline = pipeline_in
 
     fun begin() {
