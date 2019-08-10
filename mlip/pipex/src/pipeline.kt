@@ -1125,17 +1125,10 @@ open class pipeline(name_in : String) : hw_astc() {
                         cyclix_gen.assign(tid_translated, mcopipe_if_assoc.wr_ptr)
                         cyclix_gen.assign(if_id_translated, hw_imm(mcopipe_handle_assoc.if_id.vartype.dimensions, handle_id.toString()))
 
-                        // mcopipe fifo management
+                        // mcopipe wr done
                         cyclix_gen.begif(rdreq_pending_translated)
                         run {
-                            cyclix_gen.assign(mcopipe_if_assoc.wr_ptr, mcopipe_if_assoc.wr_ptr_next)
-                            cyclix_gen.assign(mcopipe_if_assoc.empty_flag, 0)
-
-                            cyclix_gen.begif(cyclix_gen.eq2(mcopipe_if_assoc.rd_ptr, mcopipe_if_assoc.wr_ptr))
-                            run {
-                                cyclix_gen.assign(mcopipe_if_assoc.full_flag, 1)
-                            }; cyclix_gen.endif()
-
+                            cyclix_gen.assign(mcopipe_if_assoc.wr_done, 1)
                         }; cyclix_gen.endif()
 
                     }; cyclix_gen.endif()
@@ -1242,6 +1235,8 @@ open class pipeline(name_in : String) : hw_astc() {
         for (mcopipe_if in mcopipe_ifs) {
             val mcopipe_name_prefix = "genmcopipe_" + mcopipe_if.name + "_"
 
+            var wr_done     = cyclix_gen.uglobal((mcopipe_name_prefix + "wr_done"), 0, 0, "0")
+            var rd_done     = cyclix_gen.uglobal((mcopipe_name_prefix + "rd_done"), 0, 0, "0")
             var full_flag   = cyclix_gen.uglobal((mcopipe_name_prefix + "full_flag"), 0, 0, "0")
             var empty_flag  = cyclix_gen.uglobal((mcopipe_name_prefix + "empty_flag"), 0, 0, "1")
             var wr_ptr      = cyclix_gen.uglobal((mcopipe_name_prefix + "wr_ptr"), (COPIPE_TRX_ID_WIDTH-1), 0, "0")
@@ -1257,6 +1252,8 @@ open class pipeline(name_in : String) : hw_astc() {
             var resp_fifo = cyclix_gen.fifo_in((mcopipe_name_prefix + "resp"), mcopipe_if.rdata_vartype)
 
             TranslateInfo.__mcopipe_if_assocs.put(mcopipe_if, __mcopipe_if_info(
+                wr_done,
+                rd_done,
                 full_flag,
                 empty_flag,
                 wr_ptr,
@@ -1528,6 +1525,9 @@ open class pipeline(name_in : String) : hw_astc() {
         // mcopipe processing
         MSG(DEBUG_FLAG, "mcopipe processing")
         for (mcopipe_if in TranslateInfo.__mcopipe_if_assocs) {
+            cyclix_gen.assign(mcopipe_if.value.wr_done, 0)
+            cyclix_gen.assign(mcopipe_if.value.rd_done, 0)
+
             // forming mcopipe ptr next values
             cyclix_gen.add_gen(mcopipe_if.value.wr_ptr_next, mcopipe_if.value.wr_ptr, 1)
             cyclix_gen.add_gen(mcopipe_if.value.rd_ptr_next, mcopipe_if.value.rd_ptr, 1)
@@ -1665,14 +1665,8 @@ open class pipeline(name_in : String) : hw_astc() {
                                         cyclix_gen.assign(resp_done_translated, 1)
                                         cyclix_gen.assign(rdata_translated, fifo_rdata)
 
-                                        // mcopipe fifo management
-                                        cyclix_gen.assign(mcopipe_if_assoc.rd_ptr, mcopipe_if_assoc.rd_ptr_next)
-                                        cyclix_gen.assign(mcopipe_if_assoc.full_flag, 0)
-
-                                        cyclix_gen.begif(cyclix_gen.eq2(mcopipe_if_assoc.rd_ptr, mcopipe_if_assoc.wr_ptr))
-                                        run {
-                                            cyclix_gen.assign(mcopipe_if_assoc.empty_flag, 1)
-                                        }; cyclix_gen.endif()
+                                        // mcopipe rd done
+                                        cyclix_gen.assign(mcopipe_if_assoc.rd_done, 1)
                                     }; cyclix_gen.endif()
 
                                 }; cyclix_gen.endif()
@@ -1845,6 +1839,35 @@ open class pipeline(name_in : String) : hw_astc() {
 
             // working signal: succ or pstall
             cyclix_gen.bor_gen(curStageAssoc.pctrl_working, curStageAssoc.pctrl_succ, curStageAssoc.pctrl_stalled_glbl)
+        }
+
+        for (__mcopipe_if_assoc in TranslateInfo.__mcopipe_if_assocs) {
+
+            var mcopipe_if_assoc = __mcopipe_if_assoc.value
+
+            // mcopipe rd fifo management
+            cyclix_gen.begif(mcopipe_if_assoc.rd_done)
+            run {
+                cyclix_gen.assign(mcopipe_if_assoc.rd_ptr, mcopipe_if_assoc.rd_ptr_next)
+                cyclix_gen.assign(mcopipe_if_assoc.full_flag, 0)
+
+                cyclix_gen.begif(cyclix_gen.eq2(mcopipe_if_assoc.rd_ptr, mcopipe_if_assoc.wr_ptr))
+                run {
+                    cyclix_gen.assign(mcopipe_if_assoc.empty_flag, 1)
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
+
+            // mcopipe wr fifo management
+            cyclix_gen.begif(mcopipe_if_assoc.wr_done)
+            run {
+                cyclix_gen.assign(mcopipe_if_assoc.wr_ptr, mcopipe_if_assoc.wr_ptr_next)
+                cyclix_gen.assign(mcopipe_if_assoc.empty_flag, 0)
+
+                cyclix_gen.begif(cyclix_gen.eq2(mcopipe_if_assoc.rd_ptr, mcopipe_if_assoc.wr_ptr))
+                run {
+                    cyclix_gen.assign(mcopipe_if_assoc.full_flag, 1)
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
         }
 
         cyclix_gen.end()

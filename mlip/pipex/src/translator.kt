@@ -15,14 +15,16 @@ val COPIPE_TRX_ID_WIDTH = 4
 data class __global_info(val cyclix_global : hw_var,
                          val cyclix_global_buf : hw_var)
 
-data class __mcopipe_if_info(val full_flag : hw_var,
-                                       val empty_flag : hw_var,
-                                       val wr_ptr : hw_var,
-                                       val rd_ptr : hw_var,
-                                       val wr_ptr_next : hw_var,
-                                       val rd_ptr_next : hw_var,
-                                       val req_fifo : cyclix.hw_fifo_out,
-                                       var resp_fifo : cyclix.hw_fifo_in)
+data class __mcopipe_if_info(   val wr_done : hw_var,
+                                val rd_done : hw_var,
+                                val full_flag : hw_var,
+                                val empty_flag : hw_var,
+                                val wr_ptr : hw_var,
+                                val rd_ptr : hw_var,
+                                val wr_ptr_next : hw_var,
+                                val rd_ptr_next : hw_var,
+                                val req_fifo : cyclix.hw_fifo_out,
+                                var resp_fifo : cyclix.hw_fifo_in )
 
 data class __mcopipe_handle_info(val if_id : hw_var,
                                  val resp_done : hw_var,
