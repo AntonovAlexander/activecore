@@ -4,7 +4,7 @@ import ariele.*
 fun main() {
     println("xbar: generating")
 
-    val SLAVE_ADDR_WIDTH = 30
+    val SLAVE_ADDR_WIDTH = 28
     val SLAVE_SPACE_SIZE = 1L.shl(SLAVE_ADDR_WIDTH)
 
     var map = addr_map()
