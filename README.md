@@ -30,9 +30,9 @@ Current version of project is implemented as several Kotlin libraries that are s
 
 The following demo designs for FPGA are available:
 
-* **sigma** - minimalistic uC with one RISC-V core (/designs/rtl/sigma). Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py.
+* **sigma** - minimalistic uC with one aquaris RISC-V core (/designs/rtl/sigma). Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py.
 
-* **magma** - MPSoC with multiple RISC-V cores connected by full xbar (/designs/rtl/magma)
+* **magma** - MPSoC with multiple aquaris RISC-V cores connected by ariele xbar (/designs/rtl/magma)
 
 Preliminary build of the cores and software is required. Demo projects use UART-controllable bus master for reset and initialization.
 
