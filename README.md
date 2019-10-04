@@ -30,9 +30,9 @@ Current version of project is implemented as several Kotlin libraries that are s
 
 The following demo designs for FPGA are available:
 
-* **pss_memsplit** - minimalistic uC with one RISC-V core (/designs/rtl/pss_memsplit). Tests are run by /designs/rtl/pss_memsplit/sw/benchmarks/hw_test.py.
+* **sigma** - minimalistic uC with one RISC-V core (/designs/rtl/pss_memsplit). Tests are run by /designs/rtl/pss_memsplit/sw/benchmarks/hw_test.py.
 
-* **mpss** - MPSoC with multiple RISC-V cores connected by full xbar (/designs/rtl/mpss)
+* **magma** - MPSoC with multiple RISC-V cores connected by full xbar (/designs/rtl/mpss)
 
 Preliminary build of the cores and software is required. Demo projects use UART-controllable bus master for reset and initialization.
 
