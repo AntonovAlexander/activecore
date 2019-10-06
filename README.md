@@ -6,7 +6,7 @@ ActiveCore is a framework that demonstrates original hardware designing concept 
 
 MLIP core is a hardware generator that exposes selective functions of behavior and/or microarchitecture for design-time programming and generates hardware implementations according to certain microarchitectural template. MLIP core approach serves as an intermediate solution for codification of custom microarchitectures between configurable IP cores with fixed functionality and general-purpose HW design tools:
 
-Fixed-function IP core <------ MLIP core ------> General-purpose design tool
+Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
 
 ### Project structure
 
@@ -30,11 +30,11 @@ Current version of project is implemented as several Kotlin libraries that are s
 
 The following demo designs for FPGA are available:
 
-* **sigma** - minimalistic uC with one aquaris RISC-V core (/designs/rtl/sigma). Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py.
+* **sigma** (/designs/rtl/sigma) - minimalistic uC with a single aquaris RISC-V core, UART-controllable bus master (udm) and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py.
 
-* **magma** - MPSoC with multiple aquaris RISC-V cores connected by ariele xbar (/designs/rtl/magma)
+* **magma** (/designs/rtl/magma) - MPSoC with multiple aquaris RISC-V cores connected by ariele xbar.
 
-Preliminary build of the cores and software is required. Demo projects use UART-controllable bus master for reset and initialization.
+Preliminary build of the cores and software is required. Demo projects use udm for reset and initialization.
 
 ### Published works
 
