@@ -1329,7 +1329,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             }; endstage()
 
         } else {
-            throw Exception("RISCV-PIPEX: num_stages parameter incorrect!")
+            throw Exception("aquaris: num_stages parameter incorrect!")
         }
     }
 }

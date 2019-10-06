@@ -1,3 +1,12 @@
+/*
+ * arb_l1.v
+ *
+ *  Created on: 27.12.2017
+ *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+ *     License: See LICENSE file for details
+ */
+
+
 module arb_l1
 (
 	input [0:0] clk_i

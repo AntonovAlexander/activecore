@@ -1,3 +1,12 @@
+/*
+ * cpu_stub.v
+ *
+ *  Created on: 24.09.2017
+ *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+ *     License: See LICENSE file for details
+ */
+
+
 module cpu_stub (
 	input [0:0] clk_i,
 	input [0:0] rst_i,

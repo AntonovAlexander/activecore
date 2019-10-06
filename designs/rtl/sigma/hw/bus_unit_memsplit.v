@@ -1,3 +1,12 @@
+/*
+ * bus_unit_memsplit.v
+ *
+ *  Created on: 24.09.2017
+ *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+ *     License: See LICENSE file for details
+ */
+
+
 module bus_unit_memsplit
 #(
     parameter mem_data="data.hex", mem_size=1024

@@ -1,3 +1,12 @@
+/*
+ * gpio.v
+ *
+ *  Created on: 27.12.2017
+ *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+ *     License: See LICENSE file for details
+ */
+
+
 module gpio
 (
 	input [0:0] clk_i

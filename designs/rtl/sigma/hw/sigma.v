@@ -1,8 +1,17 @@
+/*
+ * sigma.v
+ *
+ *  Created on: 24.09.2017
+ *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+ *     License: See LICENSE file for details
+ */
+
+
 module sigma
 #(
 	parameter CPU = "none",
 	parameter delay_test_flag = 0,
-    parameter mem_data = "data.hex",
+	parameter mem_data = "data.hex",
 	parameter mem_size = 1024
 )
 (
