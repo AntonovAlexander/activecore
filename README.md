@@ -22,17 +22,17 @@ Current version of project is implemented as several Kotlin libraries that are s
 
 	* **pipex** (**pipe**lined e**x**ecution) - generator of dynamically scheduled pipelined structures
 
-* core generators based on pipex MLIP core (/designs/coregen):
+* core generators (/designs/coregen):
 
-	* **aquaris** - RISC-V CPU generator with varying-length pipelines (1-6 stages)
+	* **aquaris** - RISC-V CPU generator with varying-length pipelines (1-6 stages), based on pipex MLIP core
 
-	* **ariele** - full xbar generator
+	* **ariele** - full xbar generator, based on pipex MLIP core
 
 The following demo designs for FPGA are available:
 
-* **sigma** - minimalistic uC with a single aquaris RISC-V core, UART-controllable bus master (udm) and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma.
+* **sigma** - minimalistic uC consisting of a single aquaris RISC-V CPU core, on-chip RAM, UART-controllable bus master (udm) and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma.
 
-* **magma** - MPSoC with multiple aquaris RISC-V cores connected by ariele xbar. Location: /designs/rtl/magma.
+* **magma** - MPSoC consisting of multiple aquaris RISC-V CPU cores with dedicated scratchpad RAMs connected by ariele xbar. Location: /designs/rtl/magma.
 
 Preliminary build of the cores and software is required. Demo projects use udm for reset and initialization.
 
