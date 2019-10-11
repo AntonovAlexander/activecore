@@ -4,13 +4,15 @@
 
 ActiveCore is a framework that demonstrates original hardware designing concept based on "Micro-Language IP" (MLIP) cores.
 
-MLIP core is a hardware generator that exposes selective functions of behavior and/or microarchitecture for design-time programming and generates hardware implementations according to certain microarchitectural template. MLIP core approach serves as an intermediate solution for codification of custom microarchitectures between configurable IP cores with fixed functionality and general-purpose HW design tools:
+MLIP core is a hardware generator that provides base synthesizable execution core associated with certain microarchitectural template. Selective functions of the microarchitecture are exposed for design-time programming, with certain computational process scheduling and synchronization "services" of the microarchitecture manageable using MLIP-specific API. I.e., each MLIP core offers a custom computational model that reflects computational process organization inside a hardware microarchitecture.
+
+MLIP core approach serves as an intermediate solution for codification of custom microarchitectures between configurable IP cores with fixed functionality and general-purpose HW design tools:
 
 Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
 
 ### Project structure
 
-Current version of project is implemented as several Kotlin libraries that are separately built using IntelliJ IDEA in the following order:
+Current version of project is implemented as several Kotlin libraries that are individually built using IntelliJ IDEA in the following order:
 
 * **hwast** - AST constructor for behavioral HW specifications (/hwast)
 
@@ -22,7 +24,7 @@ Current version of project is implemented as several Kotlin libraries that are s
 
 	* **pipex** (**pipe**lined e**x**ecution) - generator of dynamically scheduled pipelined structures
 
-* core generators (/designs/coregen):
+* core generators based on MLIP cores (/designs/coregen):
 
 	* **aquaris** - RISC-V CPU generator with varying-length pipelines (1-6 stages), based on pipex MLIP core
 
@@ -30,9 +32,9 @@ Current version of project is implemented as several Kotlin libraries that are s
 
 The following demo designs for FPGA are available:
 
-* **sigma** - minimalistic uC consisting of a single aquaris RISC-V CPU core, on-chip RAM, UART-controllable bus master (udm) and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma.
+* **sigma** - minimalistic uC consisting of a single aquaris RISC-V CPU, on-chip RAM, UART-controllable bus master (udm) and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma.
 
-* **magma** - MPSoC consisting of multiple aquaris RISC-V CPU cores with dedicated scratchpad RAMs connected by ariele xbar. Location: /designs/rtl/magma.
+* **magma** - MPSoC consisting of multiple aquaris RISC-V CPUs with dedicated scratchpad RAMs connected by ariele xbar. Location: /designs/rtl/magma.
 
 Preliminary build of the cores and software is required. Demo projects use udm for reset and initialization.
 
