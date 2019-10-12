@@ -4,7 +4,7 @@
 
 ActiveCore is a framework that demonstrates original hardware designing concept based on "Micro-Language IP" (MLIP) cores.
 
-MLIP core is a hardware generator that provides base synthesizable execution core associated with certain microarchitectural template. Selective functions of the microarchitecture are exposed for design-time programming, with certain computational process scheduling and synchronization "services" of the microarchitecture manageable using MLIP-specific API. I.e., each MLIP core offers a custom computational model that reflects computational process organization inside a hardware microarchitecture.
+MLIP core is a hardware generator that provides custom synthesizable execution core associated with certain microarchitectural template. Selective functions of the microarchitecture are exposed for design-time programming, with scheduling, communication and synchronization "services" of the microarchitecture manageable using MLIP-specific API. I.e., each MLIP core offers custom computational model that reflects computational process organization inside a hardware microarchitecture.
 
 MLIP core approach serves as an intermediate solution for codification of custom microarchitectures between configurable IP cores with fixed functionality and general-purpose HW design tools:
 
@@ -12,31 +12,31 @@ Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
 
 ### Project structure
 
-Current version of project is implemented as several Kotlin libraries that are individually built using IntelliJ IDEA in the following order:
+Current version of project is implemented as a collection of Kotlin libraries that are individually built using IntelliJ IDEA in the following order:
 
-* **hwast** - AST constructor for behavioral HW specifications (/hwast)
+* **hwast** - generic AST constructor for behavioral HW specifications (/hwast)
 
 * MLIP cores based on hwast (/mlip):
 
-	* **rtl** - generator of behavioral RTL
+	* **rtl** - generator of behavioral RTL (in SystemVerilog HDL)
 
-	* **cyclix** (**cycli**c e**x**ecution) - generator of statically scheduled cycle-oriented processing hardware targeting RTL and HLS flows
+	* **cyclix** (**cycli**c e**x**ecution) - generator of statically scheduled cycle-oriented processing hardware targeting RTL and HLS flows. Translates either to rtl MLIP or to Vivado HLS sources
 
-	* **pipex** (**pipe**lined e**x**ecution) - generator of dynamically scheduled pipelined structures
+	* **pipex** (**pipe**lined e**x**ecution) - generator of dynamically scheduled pipelined structures. Translates to cyclix MLIP
 
 * core generators based on MLIP cores (/designs/coregen):
 
-	* **aquaris** - RISC-V CPU generator with varying-length pipelines (1-6 stages), based on pipex MLIP core
+	* **aquaris** - RISC-V (RV32I) CPU generator with varying-length pipelines (1-6 stages), based on pipex MLIP core
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 
 The following demo designs for FPGA are available:
 
-* **sigma** - minimalistic uC consisting of a single aquaris RISC-V CPU, on-chip RAM, UART-controllable bus master (udm) and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma.
+* **sigma** - minimalistic uC consisting of a single aquaris RISC-V CPU, on-chip RAM, UART-controllable bus master (UART Debug Module, udm) and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma
 
-* **magma** - MPSoC consisting of multiple aquaris RISC-V CPUs with dedicated scratchpad RAMs connected by ariele xbar. Location: /designs/rtl/magma.
+* **magma** - MPSoC consisting of multiple aquaris RISC-V CPUs with dedicated scratchpad RAMs connected by ariele xbar. Location: /designs/rtl/magma
 
-Preliminary build of the cores and software is required. Demo projects use udm for reset and initialization.
+Software is built using riscv-tools. Reset and software downloading is performed via UART using udm block.
 
 ### Published works
 
