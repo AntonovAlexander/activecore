@@ -43,7 +43,7 @@ always @(posedge clk_i)
 		if (irq_posedge)
 			begin
 			irq_req_o <= 1'b1;
-			irq_code_bo <= 8'h5a;
+			irq_code_bo <= 8'h03;
 			end
 		end
 	end
