@@ -59,14 +59,15 @@ module riscv_tb ();
 reg CLK_100MHZ, RST, rx;
 reg [31:0] SW;
 wire [31:0] LED;
+reg irq_btn;
 	
 sigma
 #(
-	//.CPU("riscv_1stage"),
+	.CPU("riscv_1stage"),
 	//.CPU("riscv_2stage"),
 	//.CPU("riscv_3stage"),
 	//.CPU("riscv_4stage"),
-	.CPU("riscv_5stage"),
+	//.CPU("riscv_5stage"),
 	//.CPU("riscv_6stage"),
 
 	.delay_test_flag(0),
@@ -75,11 +76,13 @@ sigma
 	.mem_data("../../sw/benchmarks/median.riscv.hex"),
 	//.mem_data("../../sw/benchmarks/qsort.riscv.hex"),
 	//.mem_data("../../sw/benchmarks/rsort.riscv.hex"),
+	//.mem_data("../../sw/benchmarks/interrupt_counter.riscv.hex"),
 	.mem_size(8192)
 ) sigma
 (
 	.clk_i(CLK_100MHZ)
 	, .arst_i(RST)
+	, .irq_btn_i(irq_btn)
 	, .rx_i(rx)
 	//, .tx_o()
 	, .gpio_bi(SW)
@@ -116,6 +119,7 @@ task RESET_ALL ();
 begin
 	CLK_100MHZ = 1'b0;
 	RST = 1'b1;
+	irq_btn = 1'b0;
 	rx = 1'b1;
 	#(`HALF_PERIOD/2);
 	RST = 1;
@@ -288,6 +292,10 @@ begin
 	SW = 8'h30;
 	RESET_ALL();
 	UART_CFG(`DIVIDER_115200, 2'b00);
+	WAIT(1000);
+	irq_btn = 1'b1;
+	WAIT(100);
+	irq_btn = 1'b0;
 	WAIT(50000);
 	UART_SEND(`SYNC_BYTE);
 	UART_SEND(`IDCODE_CMD);

@@ -22,6 +22,11 @@ module cpu_wrapper
 (
 	input [0:0] clk_i,
 	input [0:0] rst_i,
+
+	input [0:0] irq_req_i,
+	input [7:0] irq_code_bi,
+	output [0:0] irq_ack_o,
+
 	input [0:0] instr_mem_ack,
 	input [0:0] instr_mem_resp,
 	input [31:0] instr_mem_rdata,
@@ -78,6 +83,11 @@ generate
 		riscv_1stage riscv (
 			.clk_i(clk_i)
 			, .rst_i(rst_i)
+
+			// interrupt bus
+			, .irq_fifo_genfifo_req_i(irq_req_i)
+			, .irq_fifo_genfifo_rdata_bi(irq_code_bi)
+			, .irq_fifo_genfifo_ack_o(irq_ack_o)
 			
 			// instr req bus
 			, .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)
@@ -121,6 +131,11 @@ generate
 		riscv_2stage riscv (
 			.clk_i(clk_i)
 			, .rst_i(rst_i)
+
+			// interrupt bus
+			, .irq_fifo_genfifo_req_i(irq_req_i)
+			, .irq_fifo_genfifo_rdata_bi(irq_code_bi)
+			, .irq_fifo_genfifo_ack_o(irq_ack_o)
 			
 			// instr req bus
 			, .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)
@@ -164,6 +179,11 @@ generate
 		riscv_3stage riscv (
 			.clk_i(clk_i)
 			, .rst_i(rst_i)
+
+			// interrupt bus
+			, .irq_fifo_genfifo_req_i(irq_req_i)
+			, .irq_fifo_genfifo_rdata_bi(irq_code_bi)
+			, .irq_fifo_genfifo_ack_o(irq_ack_o)
 			
 			// instr req bus
 			, .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)
@@ -207,6 +227,11 @@ generate
 		riscv_4stage riscv (
 			.clk_i(clk_i)
 			, .rst_i(rst_i)
+
+			// interrupt bus
+			, .irq_fifo_genfifo_req_i(irq_req_i)
+			, .irq_fifo_genfifo_rdata_bi(irq_code_bi)
+			, .irq_fifo_genfifo_ack_o(irq_ack_o)
 			
 			// instr req bus
 			, .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)
@@ -250,6 +275,11 @@ generate
 		riscv_5stage riscv (
 			.clk_i(clk_i)
 			, .rst_i(rst_i)
+
+			// interrupt bus
+			, .irq_fifo_genfifo_req_i(irq_req_i)
+			, .irq_fifo_genfifo_rdata_bi(irq_code_bi)
+			, .irq_fifo_genfifo_ack_o(irq_ack_o)
 			
 			// instr req bus
 			, .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)
@@ -293,6 +323,11 @@ generate
 		riscv_6stage riscv (
 			.clk_i(clk_i)
 			, .rst_i(rst_i)
+
+			// interrupt bus
+			, .irq_fifo_genfifo_req_i(irq_req_i)
+			, .irq_fifo_genfifo_rdata_bi(irq_code_bi)
+			, .irq_fifo_genfifo_ack_o(irq_ack_o)
 			
 			// instr req bus
 			, .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)

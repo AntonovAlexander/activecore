@@ -121,6 +121,9 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
 class __TranslateInfo() {
     var __global_assocs = mutableMapOf<hw_var, __global_info>()
 
+    var __fifo_wr_assocs = mutableMapOf<hw_fifo_out, cyclix.hw_fifo_out>()
+    var __fifo_rd_assocs = mutableMapOf<hw_fifo_in, cyclix.hw_fifo_in>()
+
     var __mcopipe_if_assocs = mutableMapOf<hw_mcopipe_if, __mcopipe_if_info>()
     var __mcopipe_handle_assocs = mutableMapOf<hw_mcopipe_handle, __mcopipe_handle_info>()
     var __mcopipe_handle_reqdict = mutableMapOf<hw_mcopipe_handle, ArrayList<hw_mcopipe_if>>()

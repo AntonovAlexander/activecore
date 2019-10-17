@@ -17,6 +17,7 @@ module sigma
 (
 	input clk_i
 	, input arst_i
+	, input irq_btn_i
 	, input rx_i
 	, output tx_o
 	, input [31:0] gpio_bi
@@ -34,6 +35,28 @@ reset_cntrl reset_cntrl
 wire udm_reset;
 wire cpu_reset;
 assign cpu_reset = srst | udm_reset;
+
+wire irq_btn_debounced;
+debouncer debouncer
+(
+	.clk_i(clk_i)
+	, .rst_i(srst)
+	, .in(irq_btn_i)
+	, .out(irq_btn_debounced)
+);
+
+wire cpu_irq_req;
+wire [7:0] cpu_irq_code;
+wire cpu_irq_ack;
+irq_adapter irq_adapter
+(
+	.clk_i(clk_i)
+	, .rst_i(srst)
+	, .irq_btn_debounced_i(irq_btn_debounced)
+	, .irq_req_o(cpu_irq_req)
+	, .irq_code_bo(cpu_irq_code)
+	, .irq_ack_i(cpu_irq_ack)
+);
 
 wire [0:0] cpu_instr_req;
 wire [0:0] cpu_instr_we;
@@ -184,6 +207,10 @@ cpu_wrapper
 )  cpu_wrapper (
 	.clk_i(clk_i)
 	, .rst_i(cpu_reset)
+
+	, .irq_req_i(cpu_irq_req)
+	, .irq_code_bi(cpu_irq_code)
+	, .irq_ack_o(cpu_irq_ack)
 	
 	, .instr_mem_ack(cpu_instr_ack)
 	, .instr_mem_resp(cpu_instr_resp)

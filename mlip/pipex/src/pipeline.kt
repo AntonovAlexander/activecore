@@ -88,26 +88,6 @@ open class pipeline(name_in : String) : hw_astc() {
         this.clear()
     }
 
-    class fifo_out_descr(
-        val ext_req: rtl.hw_port,
-        val ext_wdata: rtl.hw_port,
-        val ext_ack: rtl.hw_port,
-        var reqbuf_req: rtl.hw_sticky,
-        var reqbuf_wdata: rtl.hw_sticky
-    )
-
-    class fifo_in_descr(
-        val ext_req: rtl.hw_port,
-        val ext_rdata: rtl.hw_port,
-        val ext_ack: rtl.hw_port,
-        var buf_req: hw_var,
-        var buf_rdata: hw_var
-    )
-
-    var var_dict = mutableMapOf<hw_var, hw_var>()
-    var fifo_out_dict = mutableMapOf<hw_fifo_out, fifo_out_descr>()
-    var fifo_in_dict = mutableMapOf<hw_fifo_in, fifo_in_descr>()
-
     private fun add_local(new_local: hw_local) {
         if (FROZEN_FLAG) ERROR("Failed to add local " + new_local.name + ": ASTC frozen")
 
@@ -1083,7 +1063,28 @@ open class pipeline(name_in : String) : hw_astc() {
             cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_killed_glbl)
 
         } else if (expr.opcode == OP_ISFINISHED) {
-            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_finish)
+            cyclix_gen.assign(
+                curStageAssoc.TranslateVar(expr.wrvars[0]),
+                TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_finish
+            )
+
+        } else if (expr.opcode == OP_FIFO_WR) {
+            var wdata_translated = curStageAssoc.TranslateParam(expr.params[0])
+            var ack_translated = curStageAssoc.TranslateVar(expr.wrvars[0])
+            var fifo_wr_translated = TranslateInfo.__fifo_wr_assocs[(expr as hw_exec_fifo_wr).fifo]!!
+            cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
+            run {
+                cyclix_gen.assign(ack_translated, cyclix_gen.fifo_wr(fifo_wr_translated, wdata_translated))
+            }; cyclix_gen.endif()
+
+        } else if (expr.opcode == OP_FIFO_RD) {
+            var ack_translated = curStageAssoc.TranslateVar(expr.wrvars[0])
+            var rdata_translated = curStageAssoc.TranslateVar(expr.wrvars[1])
+            var fifo_rd_translated = TranslateInfo.__fifo_rd_assocs[(expr as hw_exec_fifo_rd).fifo]!!
+            cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
+            run {
+                cyclix_gen.assign(ack_translated, cyclix_gen.fifo_rd(fifo_rd_translated, rdata_translated))
+            }; cyclix_gen.endif()
 
         } else if (expr.opcode == OP_MCOPIPE_REQ) {
 
@@ -1228,6 +1229,16 @@ open class pipeline(name_in : String) : hw_astc() {
             var new_global = cyclix_gen.global(("genpsticky_glbl_" + global.name), global.vartype, global.defval)
             var new_global_buf = cyclix_gen.local(("genpsticky_glbl_" + global.name + "_buf"), global.vartype, global.defval)
             TranslateInfo.__global_assocs.put(global, __global_info(new_global, new_global_buf))
+        }
+
+        // Processing FIFOs
+        for (fifo_out in fifo_outs) {
+            var new_fifo_out = cyclix_gen.fifo_out(fifo_out.name, fifo_out.vartype)
+            TranslateInfo.__fifo_wr_assocs.put(fifo_out, new_fifo_out)
+        }
+        for (fifo_in in fifo_ins) {
+            var new_fifo_in = cyclix_gen.fifo_in(fifo_in.name, fifo_in.vartype)
+            TranslateInfo.__fifo_rd_assocs.put(fifo_in, new_fifo_in)
         }
 
         // Generating mcopipes' resources //
@@ -1810,7 +1821,9 @@ open class pipeline(name_in : String) : hw_astc() {
                                 // having data to propagate
                                 if (local.key is hw_local) {
                                     // propagating locals
-                                    cyclix_gen.assign(StageAssocList[CUR_STAGE_INDEX+1].pContext_srcglbl_dict[local.key]!!, curStageAssoc.TranslateVar(local.key))
+                                    if (StageAssocList[CUR_STAGE_INDEX+1].pContext_srcglbl_dict.containsKey(local.key)) {
+                                        cyclix_gen.assign(StageAssocList[CUR_STAGE_INDEX+1].pContext_srcglbl_dict[local.key]!!, curStageAssoc.TranslateVar(local.key))
+                                    }
                                 } else {
                                     // propagating stickies
                                     cyclix_gen.assign(StageAssocList[CUR_STAGE_INDEX+1].pContext_local_dict[local.key]!!, curStageAssoc.TranslateVar(local.key))

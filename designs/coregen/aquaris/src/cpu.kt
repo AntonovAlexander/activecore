@@ -11,12 +11,12 @@ package aquaris
 import hwast.*
 import pipex.PSTAGE_MODE
 
-class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pipeline(name_in) {
+class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_in : Int, irq_width_in : Int) : pipex.pipeline(name_in) {
 
-    // @Suppress("UNUSED_PARAMETER")
-
-    val num_stages = num_stages_in
-    val START_ADDR = START_ADDR_in
+    val num_stages  = num_stages_in
+    val START_ADDR  = START_ADDR_in
+    val IRQ_ADDR    = IRQ_ADDR_in
+    val irq_width   = irq_width_in
 
     //// base opcodes ////
     val opcode_LOAD			= 0x03
@@ -40,6 +40,8 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
     val opcode_JALR			= 0x67
     val opcode_JAL			= 0x6f
     val opcode_SYSTEM		= 0x73
+
+    val instrcode_MRET        = 0x30200073
 
     // ALU opcodes
     val aluop_ADD		= 0
@@ -161,13 +163,16 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
     var mem_rdata       = ulocal("mem_rdata", 31, 0, "0")
     var mem_rshift      = ulocal("mem_rshift", 0, 0, "0")
 
+    var mret_req         = ulocal("mret_req", 0, 0, "0")
+
     var pc              = uglobal("pc", 31, 0, START_ADDR.toString())
     var rf_dim = hw_dim_static()
     var regfile         = uglobal("regfile", rf_dim, "0")
     var jump_req_cmd    = uglobal("jump_req_cmd", 0, 0, "0")
     var jump_vector_cmd = uglobal("jump_vector_cmd", 31, 0, "0")
 
-    // TODO: CSRs
+    // CSRs
+    var CSR_MCAUSE      = uglobal("CSR_MCAUSE", 7, 0, "0")
 
     //// interfaces ////
     var instr_mem = mcopipe_if("instr_mem",
@@ -184,6 +189,11 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
     var data_busreq = local("data_busreq", busreq_mem_struct)
     var data_req_done = ulocal_sticky("data_req_done", 0, 0, "0")
 
+    var irq_fifo    = ufifo_in("irq_fifo", irq_width-1, 0)
+    var irq_mcause  = ulocal_sticky("irq_mcause", irq_width-1, 0, "0")
+    var irq_recv    = ulocal_sticky("irq_recv", 0, 0, "0")
+    var MIRQEN      = uglobal("MIRQEN", 0, 0, "1")
+    var MRETADDR    = uglobal("MRETADDR", 31, 0, "0")
 
     //// RISC-V pipeline macro-operations ////
 
@@ -576,47 +586,38 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             // CSRRW
             begif(eq2(funct3, 0x1))
             run {
-                begif(neq2(rs1_addr, 0))
-                run {
-                    csrreq.assign(1)
-                    rs1_req.assign(1)
-                    rd_req.assign(1)
-                    rd_source.assign(RD_CSR)
-                    op1_source.assign(OP1_SRC_RS1)
-                    op2_source.assign(OP2_SRC_CSR)
-                }; endif()
+                csrreq.assign(1)
+                rs1_req.assign(1)
+                rd_req.assign(1)
+                rd_source.assign(RD_CSR)
+                op1_source.assign(OP1_SRC_RS1)
+                op2_source.assign(OP2_SRC_CSR)
             }; endif()
 
             // CSRRS
             begif(eq2(funct3, 0x2))
             run {
-                begif(neq2(rs1_addr, 0))
-                run {
-                    csrreq.assign(1)
-                    rs1_req.assign(1)
-                    rd_req.assign(1)
-                    rd_source.assign(RD_CSR)
-                    alu_req.assign(1)
-                    alu_opcode.assign(aluop_OR)
-                    op1_source.assign(OP1_SRC_RS1)
-                    op2_source.assign(OP2_SRC_CSR)
-                }; endif()
+                csrreq.assign(1)
+                rs1_req.assign(1)
+                rd_req.assign(1)
+                rd_source.assign(RD_CSR)
+                alu_req.assign(1)
+                alu_opcode.assign(aluop_OR)
+                op1_source.assign(OP1_SRC_RS1)
+                op2_source.assign(OP2_SRC_CSR)
             }; endif()
 
             // CSRRC
             begif(eq2(funct3, 0x3))
             run {
-                begif(neq2(rs1_addr, 0))
-                run {
-                    csrreq.assign(1)
-                    rs1_req.assign(1)
-                    rd_req.assign(1)
-                    rd_source.assign(RD_CSR)
-                    alu_req.assign(1)
-                    alu_opcode.assign(aluop_CLRB)
-                    op1_source.assign(OP1_SRC_RS1)
-                    op2_source.assign(OP2_SRC_CSR)
-                }; endif()
+                csrreq.assign(1)
+                rs1_req.assign(1)
+                rd_req.assign(1)
+                rd_source.assign(RD_CSR)
+                alu_req.assign(1)
+                alu_opcode.assign(aluop_CLRB)
+                op1_source.assign(OP1_SRC_RS1)
+                op2_source.assign(OP2_SRC_CSR)
             }; endif()
 
             // CSRRWI
@@ -655,6 +656,15 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
                 immediate.assign(zeroext(zimm, 32))
             }; endif()
 
+        }; endif()
+
+        begif(eq2(instr_code, instrcode_MRET))
+        run {
+            mret_req.assign(1)
+            jump_req.assign(1)
+            jump_req_cond.assign(0)
+            jump_src.assign(JMP_SRC_OP1)
+            op1_source.assign(OP1_SRC_IMM)
         }; endif()
 
         begif(eq2(rd_addr, 0))
@@ -776,6 +786,53 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
     }
 
+    fun process_irq() {
+        begif(MIRQEN)
+        run {
+            begif(!irq_recv)
+            run {
+                irq_recv.assign(fifo_rd(irq_fifo, irq_mcause))
+            }; endif()
+            begif(irq_recv)
+            run {
+                // control transfer signals
+                jump_req.assign(1)
+                jump_req_cond.assign(0)
+                jump_src.assign(JMP_SRC_OP1)
+
+                // regfile control signals
+                rs1_req.assign(0)
+                rs2_req.assign(0)
+                rd_req.assign(0)
+
+                immediate.assign(IRQ_ADDR)
+
+                fencereq.assign(0)
+                ecallreq.assign(0)
+                ebreakreq.assign(0)
+                csrreq.assign(0)
+
+                op1_source.assign(OP1_SRC_IMM)
+
+                // ALU control
+                alu_req.assign(0)
+
+                // data memory control
+                mem_req.assign(0)
+
+                MIRQEN.assign(0)
+                CSR_MCAUSE.assign(irq_mcause)
+                MRETADDR.assign(curinstr_addr)
+            }; endif()
+        }; endif()
+
+        begif(mret_req)
+        run {
+            MIRQEN.assign(1)
+            immediate.assign(MRETADDR)
+        }; endif()
+    }
+
     // ALU processing ##
     fun process_alu () {
 
@@ -805,12 +862,12 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
             alu_op2.assign(immediate)
         }; endif()
 
-        // begif(eq2(op2_source, OP2_SRC_CSR))
-        // run {
-        // TODO: reading CSRs
-        // }; endif()
+        begif(eq2(op2_source, OP2_SRC_CSR))
+        run {
+            alu_op2.assign(CSR_MCAUSE)
+        }; endif()
 
-        // acquiring wide operandes
+        // acquiring wide operands
         begif(alu_unsigned)
         run {
             alu_op1_wide.assign(zeroext(alu_op1, 33))
@@ -926,7 +983,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
     fun process_rd_csr_prev() {
         begif(eq2(rd_source, RD_CSR))
         run{
-            // TODO: fetching previous CSR data
+            rd_wdata.assign(CSR_MCAUSE)
         }; endif()
     }
 
@@ -1078,6 +1135,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
                 process_resp_instrmem()
                 process_decode()
                 process_regfetch()
+                process_irq()
                 process_alu()
                 process_rd_csr_prev()
                 process_curinstraddr_imm()
@@ -1114,6 +1172,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
                 process_decode()
                 process_regfetch()
 
+                process_irq()
                 process_alu()
                 process_rd_csr_prev()
                 process_curinstraddr_imm()
@@ -1150,6 +1209,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
                 process_decode()
                 process_regfetch()
+                process_irq()
                 forward_blk(MEMWB)
 
                 process_alu()
@@ -1197,6 +1257,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
             EXEC.begin()
             run {
+                process_irq()
                 forward_accum_blk(MEMWB)
                 process_alu()
                 process_rd_csr_prev()
@@ -1248,6 +1309,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
             EXEC.begin()
             run {
+                process_irq()
                 process_alu()
                 process_rd_csr_prev()
                 process_curinstraddr_imm()
@@ -1305,6 +1367,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int) : pipex.pi
 
             EXEC.begin()
             run {
+                process_irq()
                 process_alu()
                 process_rd_csr_prev()
 
