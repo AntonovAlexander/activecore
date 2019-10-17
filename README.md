@@ -22,11 +22,11 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **cyclix** (**cycli**c e**x**ecution) - generator of statically scheduled cycle-oriented processing hardware targeting RTL and HLS flows. Translates either to rtl MLIP or to Vivado HLS sources
 
-	* **pipex** (**pipe**lined e**x**ecution) - generator of dynamically scheduled pipelined structures. Translates to cyclix MLIP
+	* **pipex** (**pipe**lined e**x**ecution) - generator of dynamically scheduled scalar in-order pipelined structures. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
 
 * core generators based on MLIP cores (/designs/coregen):
 
-	* **aquaris** - RISC-V (RV32I) CPU generator with varying-length pipelines (1-6 stages), based on pipex MLIP core
+	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on pipex MLIP core
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 
@@ -36,7 +36,7 @@ The following demo designs for FPGA are available:
 
 * **magma** - MPSoC consisting of multiple aquaris RISC-V CPUs with dedicated scratchpad RAMs connected by ariele xbar. Location: /designs/rtl/magma
 
-Software is built using riscv-tools. Reset and software downloading is performed via UART using udm block.
+RISC-V CPU software is built using riscv-tools. Resetting and software downloading is performed via UART using udm block.
 
 ### Published works
 

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="15" />
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/clk_i" type="logic">
+      <obj_property name="ElementShortName">clk_i</obj_property>
+      <obj_property name="ObjectShortName">clk_i</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/rst_i" type="logic">
+      <obj_property name="ElementShortName">rst_i</obj_property>
+      <obj_property name="ObjectShortName">rst_i</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/rx_i" type="logic">
+      <obj_property name="ElementShortName">rx_i</obj_property>
+      <obj_property name="ObjectShortName">rx_i</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/tx_o" type="logic">
+      <obj_property name="ElementShortName">tx_o</obj_property>
+      <obj_property name="ObjectShortName">tx_o</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/rst_o" type="logic">
+      <obj_property name="ElementShortName">rst_o</obj_property>
+      <obj_property name="ObjectShortName">rst_o</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/bus_req_o" type="array">
+      <obj_property name="ElementShortName">bus_req_o[0:0]</obj_property>
+      <obj_property name="ObjectShortName">bus_req_o[0:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/bus_ack_i" type="array">
+      <obj_property name="ElementShortName">bus_ack_i[0:0]</obj_property>
+      <obj_property name="ObjectShortName">bus_ack_i[0:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/bus_we_o" type="array">
+      <obj_property name="ElementShortName">bus_we_o[0:0]</obj_property>
+      <obj_property name="ObjectShortName">bus_we_o[0:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/bus_addr_bo" type="array">
+      <obj_property name="ElementShortName">bus_addr_bo[31:0]</obj_property>
+      <obj_property name="ObjectShortName">bus_addr_bo[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/bus_be_bo" type="array">
+      <obj_property name="ElementShortName">bus_be_bo[3:0]</obj_property>
+      <obj_property name="ObjectShortName">bus_be_bo[3:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/bus_wdata_bo" type="array">
+      <obj_property name="ElementShortName">bus_wdata_bo[31:0]</obj_property>
+      <obj_property name="ObjectShortName">bus_wdata_bo[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/bus_resp_i" type="array">
+      <obj_property name="ElementShortName">bus_resp_i[0:0]</obj_property>
+      <obj_property name="ObjectShortName">bus_resp_i[0:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/DUT/udm_memsplit/bus_rdata_bi" type="array">
+      <obj_property name="ElementShortName">bus_rdata_bi[31:0]</obj_property>
+      <obj_property name="ObjectShortName">bus_rdata_bi[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/SW" type="array">
+      <obj_property name="ElementShortName">SW[15:0]</obj_property>
+      <obj_property name="ObjectShortName">SW[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" fp_name="/tb/LED" type="array">
+      <obj_property name="ElementShortName">LED[15:0]</obj_property>
+      <obj_property name="ObjectShortName">LED[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+</wave_config>

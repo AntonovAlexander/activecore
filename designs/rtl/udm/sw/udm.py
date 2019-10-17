@@ -43,7 +43,9 @@ class udm:
             print("Conection failed, response: ", hex(rdata[0]))
     
     def cc(self, com_num, baudrate):
+        print("Connecting COM port...")
         self.connect(com_num, baudrate)
+        print("COM port connected")
         self.check()
     
     def sendbyte(self, databyte):
