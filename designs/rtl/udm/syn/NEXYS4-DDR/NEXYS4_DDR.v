@@ -4,7 +4,7 @@ module NEXYS4_DDR
     , input   CPU_RESETN
     
     , input   [15:0] SW
-    , output  [15:0] LED
+    , output reg  [15:0] LED
 
     , input   UART_TXD_IN
     , output  UART_RXD_OUT
@@ -27,18 +27,27 @@ assign arst = !(CPU_RESETN & pll_locked);
 wire srst;
 reset_cntrl reset_cntrl
 (
-	.clk_i(clk_i),
+	.clk_i(clk_gen),
 	.arst_i(arst),
 	.srst_o(srst)
 );
 
+wire [0:0] udm_req;
+wire [0:0] udm_we;
+wire [31:0] udm_addr;
+wire [3:0] udm_be;
+wire [31:0] udm_wdata;
+wire [0:0] udm_ack;
+reg [0:0] udm_resp;
+reg [31:0] udm_rdata;
+
 udm_memsplit udm_memsplit
 (
-	.clk_i(clk_i)
+	.clk_i(clk_gen)
 	, .rst_i(srst)
 
-	, .rx_i(rx_i)
-	, .tx_o(tx_o)
+	, .rx_i(UART_TXD_IN)
+	, .tx_o(UART_RXD_OUT)
 
 	, .rst_o(udm_reset)
 	
@@ -51,5 +60,27 @@ udm_memsplit udm_memsplit
 	, .bus_resp_i(udm_resp)
 	, .bus_rdata_bi(udm_rdata)
 );
+
+assign udm_ack = udm_req;   // bus always ready to accept request
+// writing
+always @(posedge clk_gen)
+    begin
+    if (udm_req && udm_we)
+        begin
+        if (udm_addr == 0) LED <= udm_wdata;
+        end
+    end
+// reading
+always @(posedge clk_gen)
+    begin
+    udm_resp <= 1'b0;
+    udm_rdata <= 32'h0;
+    if (udm_req && udm_ack && !udm_we)
+        begin
+        udm_resp <= 1'b1;
+        if (udm_addr == 32'h0) udm_rdata <= LED;
+        if (udm_addr == 32'h4) udm_rdata <= SW;
+        end
+    end
 
 endmodule

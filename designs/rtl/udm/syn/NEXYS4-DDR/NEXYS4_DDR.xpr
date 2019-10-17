@@ -19,146 +19,78 @@
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/udm/hdl/udm_controller.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../hdl/udm_controller.v"/>
-          <Attr Name="ImportTime" Val="1570379259"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/udm/hdl/uart_tx.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../hdl/uart_tx.v"/>
-          <Attr Name="ImportTime" Val="1570379278"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/udm/hdl/uart_rx.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../hdl/uart_rx.v"/>
-          <Attr Name="ImportTime" Val="1570379228"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/udm/hdl/udm.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../hdl/udm.v"/>
-          <Attr Name="ImportTime" Val="1570379271"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/udm/hdl/udm_memsplit.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../hdl/udm_memsplit.v"/>
-          <Attr Name="ImportTime" Val="1570379254"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/reset_cntrl/reset_cntrl.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../../reset_cntrl/reset_cntrl.v"/>
-          <Attr Name="ImportTime" Val="1559744585"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/udm/syn/NEXYS4-DDR/NEXYS4_DDR.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/NEXYS4_DDR.v"/>
-          <Attr Name="ImportTime" Val="1571307009"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/ram/ram_dual.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../../ram/ram_dual.v"/>
-          <Attr Name="ImportTime" Val="1559744585"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/sigma/hw/riscv/coregen/riscv_1stage/sverilog/riscv_1stage.svh">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../../sigma/hw/riscv/coregen/riscv_1stage/sverilog/riscv_1stage.svh"/>
-          <Attr Name="ImportTime" Val="1565534586"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/ram/ram_dual_memsplit.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../../ram/ram_dual_memsplit.v"/>
-          <Attr Name="ImportTime" Val="1559744585"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/sigma/hw/riscv/coregen/riscv_5stage/sverilog/riscv_5stage.svh">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../../sigma/hw/riscv/coregen/riscv_5stage/sverilog/riscv_5stage.svh"/>
-          <Attr Name="ImportTime" Val="1565534588"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/sigma/hw/riscv/coregen/riscv_6stage/sverilog/riscv_6stage.svh">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../../sigma/hw/riscv/coregen/riscv_6stage/sverilog/riscv_6stage.svh"/>
-          <Attr Name="ImportTime" Val="1565534588"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/sigma/hw/riscv/coregen/riscv_2stage/sverilog/riscv_2stage.svh">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../../sigma/hw/riscv/coregen/riscv_2stage/sverilog/riscv_2stage.svh"/>
-          <Attr Name="ImportTime" Val="1565534587"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/sigma/hw/riscv/coregen/riscv_3stage/sverilog/riscv_3stage.svh">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../../sigma/hw/riscv/coregen/riscv_3stage/sverilog/riscv_3stage.svh"/>
-          <Attr Name="ImportTime" Val="1565534587"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/sigma/hw/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.svh">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../../sigma/hw/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.svh"/>
-          <Attr Name="ImportTime" Val="1565534587"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/imports/rtl/ram/ram.v">
-        <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../../ram/ram.v"/>
-          <Attr Name="ImportTime" Val="1559744585"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../../tb/tb.v">
         <FileInfo>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/NEXYS4_DDR.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../hdl/udm.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../hdl/uart_rx.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../hdl/udm_memsplit.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../hdl/udm_controller.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../hdl/uart_tx.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../reset_cntrl/reset_cntrl.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../ram/ram_dual_memsplit.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../ram/ram.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../ram/ram_dual.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
@@ -198,7 +130,7 @@
       </Config>
     </FileSet>
     <FileSet Name="sys_clk" Type="BlockSrcs" RelSrcDir="$PSRCDIR/sys_clk">
-      <File Path="$PSRCDIR/sources_1/ip/sys_clk_1/sys_clk.xci">
+      <File Path="$PSRCDIR/sources_1/ip/sys_clk/sys_clk.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -245,9 +177,7 @@
     </Run>
     <Run Id="sys_clk_synth_1" Type="Ft3:Synth" SrcSet="sys_clk" Part="xc7a100tcsg324-3" ConstrsSet="sys_clk" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/sys_clk_synth_1">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -269,9 +199,7 @@
     </Run>
     <Run Id="sys_clk_impl_1" Type="Ft2:EntireDesign" Part="xc7a100tcsg324-3" ConstrsSet="sys_clk" Description="Vivado Implementation Defaults" SynthRun="sys_clk_synth_1">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015">
-          <Desc>Vivado Implementation Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
