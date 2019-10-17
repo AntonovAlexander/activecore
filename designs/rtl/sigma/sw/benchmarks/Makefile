@@ -21,7 +21,8 @@ bmarks = \
 	heartbeat_variable \
 	median \
 	qsort \
-	rsort
+	rsort \
+	interrupt_counter \
 	#dhrystone 
 	#towers \
 	#vvadd \
@@ -49,7 +50,7 @@ objs  :=
 
 define compile_template
 $(1).riscv: $(wildcard $(src_dir)/$(1)/*) $(wildcard $(src_dir)/common/*)
-	$$(RISCV_GCC) $$(incs) $$(RISCV_GCC_OPTS) $$(RISCV_LINK_OPTS) -o $$@ $(wildcard $(src_dir)/$(1)/*.c) $(wildcard $(src_dir)/common/*.c) $(wildcard $(src_dir)/common/*.S)
+	$$(RISCV_GCC) $$(incs) $$(RISCV_GCC_OPTS) $$(RISCV_LINK_OPTS) -o $$@ $(wildcard $(src_dir)/$(1)/*.c) $(wildcard $(src_dir)/$(1)/*.S) $(wildcard $(src_dir)/common/*.c) $(wildcard $(src_dir)/common/*.S)
 	hexdump -ve '/4 "%08x" "\n"' $(1).riscv > $(1).riscv.hex
 endef
 

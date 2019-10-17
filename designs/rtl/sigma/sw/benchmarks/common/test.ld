@@ -20,6 +20,9 @@ ENTRY(_start)
 
 SECTIONS
 {
+  /* isr */
+  . = 0x00000080;
+  .text.isr : { *(.text.isr) }
 
   /* text: test code section */
   . = 0x00000200;
