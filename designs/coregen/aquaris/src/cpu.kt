@@ -64,11 +64,11 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     val OP2_SRC_CSR     = 2
 
     // rd sources
-    val RD_LUI		    = 2
-    val RD_ALU		    = 0
-    val RD_CF_COND	    = 4
+    val RD_LUI		    = 0
+    val RD_ALU		    = 1
+    val RD_CF_COND	    = 2
     val RD_OF_COND	    = 3
-    val RD_PC_INC	    = 1
+    val RD_PC_INC	    = 4
     val RD_MEM		    = 5
     val RD_CSR		    = 6
 
@@ -102,6 +102,8 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     var rs2_req         = ulocal("rs2_req", 0, 0, "0")
     var rs2_addr        = ulocal("rs2_addr", 4, 0, "0")
     var rs2_rdata       = ulocal_sticky("rs2_rdata", 31, 0, "0")
+
+    var csr_rdata       = ulocal("csr_rdata", 31, 0, "0")
 
     var rd_req          = ulocal("rd_req", 0, 0, "0")
     var rd_source       = ulocal("rd_source", 2, 0, RD_ALU.toString())
@@ -789,6 +791,17 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     }
 
     fun process_irq() {
+
+        begif(csrreq)
+        run {
+            csr_rdata.assign(CSR_MCAUSE)
+        }; endif()
+
+        begif(mret_req)
+        run {
+            immediate.assign(MRETADDR)
+        }; endif()
+
         begif(MIRQEN)
         run {
             begif(!irq_recv)
@@ -831,7 +844,6 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
         begif(mret_req)
         run {
             MIRQEN.assign(1)
-            immediate.assign(MRETADDR)
         }; endif()
     }
 
@@ -866,7 +878,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
 
         begif(eq2(op2_source, OP2_SRC_CSR))
         run {
-            alu_op2.assign(CSR_MCAUSE)
+            alu_op2.assign(csr_rdata)
         }; endif()
 
         // acquiring wide operands
@@ -980,12 +992,11 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             rd_wdata.assign(nextinstr_addr)
             rd_rdy.assign(1)
         }; endif()
-    }
 
-    fun process_rd_csr_prev() {
         begif(eq2(rd_source, RD_CSR))
-        run{
-            rd_wdata.assign(CSR_MCAUSE)
+        run {
+            rd_wdata.assign(csr_rdata)
+            rd_rdy.assign(1)
         }; endif()
     }
 
@@ -1139,7 +1150,6 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                 process_regfetch()
                 process_irq()
                 process_alu()
-                process_rd_csr_prev()
                 process_curinstraddr_imm()
                 process_jump()
                 process_setup_mem_reqdata()
@@ -1176,7 +1186,6 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
 
                 process_irq()
                 process_alu()
-                process_rd_csr_prev()
                 process_curinstraddr_imm()
                 process_jump()
                 process_setup_mem_reqdata()
@@ -1215,7 +1224,6 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                 forward_blk(MEMWB)
 
                 process_alu()
-                process_rd_csr_prev()
                 process_curinstraddr_imm()
                 process_jump()
                 process_setup_mem_reqdata()
@@ -1262,7 +1270,6 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                 process_irq()
                 forward_accum_blk(MEMWB)
                 process_alu()
-                process_rd_csr_prev()
                 process_curinstraddr_imm()
 
             }; endstage()
@@ -1313,7 +1320,6 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             run {
                 process_irq()
                 process_alu()
-                process_rd_csr_prev()
                 process_curinstraddr_imm()
                 process_jump()
                 process_setup_mem_reqdata()
@@ -1371,7 +1377,6 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             run {
                 process_irq()
                 process_alu()
-                process_rd_csr_prev()
 
             }; endstage()
 

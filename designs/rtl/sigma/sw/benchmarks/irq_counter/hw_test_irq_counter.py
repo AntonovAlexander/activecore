@@ -16,4 +16,5 @@ def hw_test_irq_counter(irq_counter_filename):
     udm.loadbin(irq_counter_filename)
     print("Test program written!")
     print("#### PRESS IRQ BUTTON TO TEST! ####")
+    print("")
     return

@@ -54,6 +54,7 @@ else:
     test_fail_counter = test_fail_counter + 1
 
 print("Total tests PASSED: ", test_succ_counter, ", total test FAILED: ", test_fail_counter)
+print("")
 
 reset_buf()
 hw_test_irq_counter('irq_counter.riscv')
