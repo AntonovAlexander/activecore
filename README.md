@@ -26,7 +26,7 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 * core generators based on MLIP cores (/designs/coregen):
 
-	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on pipex MLIP core
+	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages, with interrupts support), based on pipex MLIP core
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 

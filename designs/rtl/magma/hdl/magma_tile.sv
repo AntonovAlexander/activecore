@@ -81,6 +81,11 @@ module magma_tile
                 .clk_i(clk_i)
                 , .rst_i(rst_i)
                 
+                // interrupt bus
+                , .irq_fifo_genfifo_req_i(1'b0)
+                , .irq_fifo_genfifo_rdata_bi(0)
+                //, .irq_fifo_genfifo_ack_o()
+                
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)
                 , .genmcopipe_instr_mem_req_genfifo_wdata_bo(instr_mem_struct_bus)
@@ -123,6 +128,11 @@ module magma_tile
             riscv_2stage riscv (
                 .clk_i(clk_i)
                 , .rst_i(rst_i)
+                
+                // interrupt bus
+                , .irq_fifo_genfifo_req_i(1'b0)
+                , .irq_fifo_genfifo_rdata_bi(0)
+                //, .irq_fifo_genfifo_ack_o()
                 
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)
@@ -167,6 +177,11 @@ module magma_tile
                 .clk_i(clk_i)
                 , .rst_i(rst_i)
                 
+                // interrupt bus
+                , .irq_fifo_genfifo_req_i(1'b0)
+                , .irq_fifo_genfifo_rdata_bi(0)
+                //, .irq_fifo_genfifo_ack_o()
+                
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)
                 , .genmcopipe_instr_mem_req_genfifo_wdata_bo(instr_mem_struct_bus)
@@ -209,6 +224,11 @@ module magma_tile
             riscv_4stage riscv (
                 .clk_i(clk_i)
                 , .rst_i(rst_i)
+                
+                // interrupt bus
+                , .irq_fifo_genfifo_req_i(1'b0)
+                , .irq_fifo_genfifo_rdata_bi(0)
+                //, .irq_fifo_genfifo_ack_o()
                 
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)
@@ -253,6 +273,11 @@ module magma_tile
                 .clk_i(clk_i)
                 , .rst_i(rst_i)
                 
+                // interrupt bus
+                , .irq_fifo_genfifo_req_i(1'b0)
+                , .irq_fifo_genfifo_rdata_bi(0)
+                //, .irq_fifo_genfifo_ack_o()
+                
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)
                 , .genmcopipe_instr_mem_req_genfifo_wdata_bo(instr_mem_struct_bus)
@@ -295,6 +320,11 @@ module magma_tile
             riscv_6stage riscv (
                 .clk_i(clk_i)
                 , .rst_i(rst_i)
+                
+                // interrupt bus
+                , .irq_fifo_genfifo_req_i(1'b0)
+                , .irq_fifo_genfifo_rdata_bi(0)
+                //, .irq_fifo_genfifo_ack_o()
                 
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr_req)

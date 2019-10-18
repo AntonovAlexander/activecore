@@ -22,7 +22,7 @@ bmarks = \
 	median \
 	qsort \
 	rsort \
-	interrupt_counter \
+	irq_counter \
 	#dhrystone 
 	#towers \
 	#vvadd \

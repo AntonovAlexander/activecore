@@ -19,13 +19,17 @@ sys.path.append('rsort')
 import hw_test_rsort
 from hw_test_rsort import *
 
+sys.path.append('irq_counter')
+import hw_test_irq_counter
+from hw_test_irq_counter import *
+
 buf_addr = 0x6000
 buf_size = 8192
 
 test_succ_counter = 0
 test_fail_counter = 0
 
-udm.cc('COM8', 921600)
+udm.cc('COM6', 921600)
 print("")
 
 def reset_buf():
@@ -50,5 +54,8 @@ else:
     test_fail_counter = test_fail_counter + 1
 
 print("Total tests PASSED: ", test_succ_counter, ", total test FAILED: ", test_fail_counter)
+
+reset_buf()
+hw_test_irq_counter('irq_counter.riscv')
 
 udm.discon()
