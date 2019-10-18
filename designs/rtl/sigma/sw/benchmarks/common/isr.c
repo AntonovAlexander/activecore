@@ -1,12 +1,13 @@
 #include "io.h"
 #include "isr.h"
 
+#define DUMMY_ISR_PTR 0xffffffff
 #define ISR_SIZE 10
-void (*isr[ISR_SIZE])() = {0};
+void (*isr[ISR_SIZE])() = {[0 ... 9] = (void*)DUMMY_ISR_PTR};
 
 void __int_handler (int mcause)
 {
-  if ((isr[mcause] != 0) && (mcause < ISR_SIZE)) {
+  if ((isr[mcause] != (void*)DUMMY_ISR_PTR) && (mcause < ISR_SIZE)) {
     isr[mcause]();
   }
 }
