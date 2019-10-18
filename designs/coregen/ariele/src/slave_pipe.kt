@@ -11,7 +11,7 @@ class slave_pipe(name_in        : String,
     var master_ifs = ArrayList<hw_scopipe_if>()
     var master_handle = scopipe_handle("master", req_vartype, resp_vartype)
 
-    var slave_if = mcopipe_if("slave", req_vartype, resp_vartype)
+    var slave_if = mcopipe_if("slave", req_vartype, resp_vartype, 4)
     var slave_handle = mcopipe_handle(slave_if)
 
     var mreq_we       = ulocal_sticky("mreq_we", 0, 0, "0")

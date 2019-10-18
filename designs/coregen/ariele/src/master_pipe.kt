@@ -12,7 +12,7 @@ class master_pipe(name          : String,
     var master_handle = scopipe_handle(master_if)
 
     var slave_ifs = ArrayList<hw_mcopipe_if>()
-    var slave_handle = mcopipe_handle("slave", req_vartype, resp_vartype)
+    var slave_handle = mcopipe_handle("slave", req_vartype, resp_vartype, 4)
 
 
     var mreq_we         = ulocal_sticky("mreq_we", 0, 0, "0")
@@ -28,7 +28,7 @@ class master_pipe(name          : String,
     init {
 
         for (slave in map) {
-            slave_ifs.add(mcopipe_if("slave" + map.indexOf(slave), req_vartype, resp_vartype))
+            slave_ifs.add(mcopipe_if("slave" + map.indexOf(slave), req_vartype, resp_vartype, 4))
             slave_enb.add(ulocal_sticky("slave_enb" + map.indexOf(slave), 0, 0, "0"))
         }
 

@@ -45,12 +45,14 @@ open class hw_copipe(name_in: String,
 class hw_mcopipe_if(pipeline_in: pipeline,
                     name_in: String,
                     wdata_vartype_in: hw_type,
-                    rdata_vartype_in: hw_type)
+                    rdata_vartype_in: hw_type,
+                    trx_id_width_in: Int)
     : hw_copipe(name_in,
                 wdata_vartype_in,
                 rdata_vartype_in) {
 
     val pipeline = pipeline_in
+    var trx_id_width = trx_id_width_in
 
     fun req(mcopipe_handle : hw_mcopipe_handle, cmd : hw_param, wdata : hw_param) : hw_var {
         return pipeline.mcopipe_req(this, mcopipe_handle, cmd, wdata)
@@ -68,18 +70,21 @@ class hw_mcopipe_if(pipeline_in: pipeline,
 class hw_mcopipe_handle(pipeline_in: pipeline,
                         name_in: String,
                         wdata_vartype_in: hw_type,
-                        rdata_vartype_in: hw_type)
+                        rdata_vartype_in: hw_type,
+                        trx_id_width_in: Int)
             : hw_copipe(name_in,
                         wdata_vartype_in,
                         rdata_vartype_in) {
 
     val pipeline = pipeline_in
+    var trx_id_width = trx_id_width_in
 
     constructor(mcopipe_if : hw_mcopipe_if)
             : this(mcopipe_if.pipeline,
                 mcopipe_if.name,
                 mcopipe_if.wdata_vartype,
-                mcopipe_if.rdata_vartype)
+                mcopipe_if.rdata_vartype,
+                mcopipe_if.trx_id_width)
 
     fun resp(rdata : hw_var) : hw_var {
         return pipeline.mcopipe_resp(this, rdata)

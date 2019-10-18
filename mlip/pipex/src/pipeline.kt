@@ -634,11 +634,13 @@ open class pipeline(name_in : String) : hw_astc() {
 
     fun mcopipe_if(name: String,
                    wdata_vartype_in: hw_type,
-                   rdata_vartype_in: hw_type): hw_mcopipe_if {
+                   rdata_vartype_in: hw_type,
+                   trx_id_width_in: Int): hw_mcopipe_if {
         var new_mcopipe = hw_mcopipe_if(this,
             name,
             wdata_vartype_in,
-            rdata_vartype_in)
+            rdata_vartype_in,
+            trx_id_width_in)
         add_mcopipe_if(new_mcopipe)
         return new_mcopipe
     }
@@ -653,11 +655,13 @@ open class pipeline(name_in : String) : hw_astc() {
 
     fun mcopipe_handle(name: String,
                        wdata_vartype_in: hw_type,
-                       rdata_vartype_in: hw_type): hw_mcopipe_handle {
+                       rdata_vartype_in: hw_type,
+                       trx_id_width_in: Int): hw_mcopipe_handle {
         var new_mcopipe = hw_mcopipe_handle(this,
             name,
             wdata_vartype_in,
-            rdata_vartype_in)
+            rdata_vartype_in,
+            trx_id_width_in)
         add_mcopipe_handle(new_mcopipe)
         return new_mcopipe
     }
@@ -1250,10 +1254,10 @@ open class pipeline(name_in : String) : hw_astc() {
             var rd_done     = cyclix_gen.uglobal((mcopipe_name_prefix + "rd_done"), 0, 0, "0")
             var full_flag   = cyclix_gen.uglobal((mcopipe_name_prefix + "full_flag"), 0, 0, "0")
             var empty_flag  = cyclix_gen.uglobal((mcopipe_name_prefix + "empty_flag"), 0, 0, "1")
-            var wr_ptr      = cyclix_gen.uglobal((mcopipe_name_prefix + "wr_ptr"), (COPIPE_TRX_ID_WIDTH-1), 0, "0")
-            var rd_ptr      = cyclix_gen.uglobal((mcopipe_name_prefix + "rd_ptr"), (COPIPE_TRX_ID_WIDTH-1), 0, "0")
-            var wr_ptr_next = cyclix_gen.ulocal((mcopipe_name_prefix + "wr_ptr_next"), (COPIPE_TRX_ID_WIDTH-1), 0, "0")
-            var rd_ptr_next = cyclix_gen.ulocal((mcopipe_name_prefix + "rd_ptr_next"), (COPIPE_TRX_ID_WIDTH-1), 0, "0")
+            var wr_ptr      = cyclix_gen.uglobal((mcopipe_name_prefix + "wr_ptr"), (mcopipe_if.trx_id_width-1), 0, "0")
+            var rd_ptr      = cyclix_gen.uglobal((mcopipe_name_prefix + "rd_ptr"), (mcopipe_if.trx_id_width-1), 0, "0")
+            var wr_ptr_next = cyclix_gen.ulocal((mcopipe_name_prefix + "wr_ptr_next"), (mcopipe_if.trx_id_width-1), 0, "0")
+            var rd_ptr_next = cyclix_gen.ulocal((mcopipe_name_prefix + "rd_ptr_next"), (mcopipe_if.trx_id_width-1), 0, "0")
 
             var wr_struct = cyclix_gen.add_if_struct("genpmodule_" + name + "_" + mcopipe_name_prefix + "genstruct_fifo_wdata")
             wr_struct.addu("we", 0, 0, "0")
@@ -1292,7 +1296,7 @@ open class pipeline(name_in : String) : hw_astc() {
             var resp_done       = ulocal_sticky((name_prefix + "resp_done"), 0, 0, "0")
             var rdata           =  local_sticky((name_prefix + "rdata"), mcopipe_handle.rdata_vartype, "0")
             var rdreq_pending   = ulocal_sticky((name_prefix + "rdreq_pending"), 0, 0, "0")
-            var tid             = ulocal_sticky((name_prefix + "tid"), (COPIPE_TRX_ID_WIDTH-1), 0, "0")
+            var tid             = ulocal_sticky((name_prefix + "tid"), (mcopipe_handle.trx_id_width-1), 0, "0")
 
             TranslateInfo.__mcopipe_handle_assocs.put(mcopipe_handle, __mcopipe_handle_info(
                 if_id,

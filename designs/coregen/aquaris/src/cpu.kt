@@ -177,14 +177,16 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     //// interfaces ////
     var instr_mem = mcopipe_if("instr_mem",
         hw_type(busreq_mem_struct),
-        hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(31, 0)))
+        hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(31, 0)),
+        1)
     var instr_handle = mcopipe_handle(instr_mem)
     var instr_busreq = local("instr_busreq", busreq_mem_struct)
     var instr_req_done = ulocal_sticky("instr_req_done", 0, 0, "0")
 
     var data_mem = mcopipe_if("data_mem",
         hw_type(busreq_mem_struct),
-        hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(31, 0)))
+        hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(31, 0)),
+        1)
     var data_handle = mcopipe_handle(data_mem)
     var data_busreq = local("data_busreq", busreq_mem_struct)
     var data_req_done = ulocal_sticky("data_req_done", 0, 0, "0")
