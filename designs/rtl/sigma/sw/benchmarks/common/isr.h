@@ -1,1 +1,1 @@
-void ConnectISR( int cause_num, void (*new_isr)());
+int ConnectISR(int mcause, void (*new_isr)(int));

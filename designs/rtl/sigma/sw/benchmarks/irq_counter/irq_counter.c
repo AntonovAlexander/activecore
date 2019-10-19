@@ -17,7 +17,7 @@ void SetLED(int value) {
   IO_LED = value;
 }
 
-void int_handler() {
+void int_handler(int mcause) {
   SetLED(++led_counter);
 }
 
