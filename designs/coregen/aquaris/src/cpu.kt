@@ -482,6 +482,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
         begif(eq2(opcode, opcode_OP))
         run {
             rs1_req.assign(1)
+            rs2_req.assign(1)
             op1_source.assign(OP1_SRC_RS1)
             op2_source.assign(OP2_SRC_RS2)
             rd_req.assign(1)
@@ -705,84 +706,64 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
         begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
         run {
 
-            begif(eq2(fw_stage.readremote(rd_addr), rs1_addr))
+            begif(rs1_req)
             run {
-                begif(fw_stage.readremote(rd_rdy))
+                begif(eq2(fw_stage.readremote(rd_addr), rs1_addr))
                 run {
-                    rs1_rdata.assign(fw_stage.readremote(rd_wdata))
+                    begif(fw_stage.readremote(rd_rdy))
+                    run {
+                        rs1_rdata.assign(fw_stage.readremote(rd_wdata))
+                    }; endif()
                 }; endif()
             }; endif()
 
-            begif(eq2(fw_stage.readremote(rd_addr), rs2_addr))
+            begif(rs2_req)
             run {
-                begif(fw_stage.readremote(rd_rdy))
+                begif(eq2(fw_stage.readremote(rd_addr), rs2_addr))
                 run {
-                    rs2_rdata.assign(fw_stage.readremote(rd_wdata))
-                }; endif()
-            }; endif()
-
-        }; endif()
-    }
-
-    // blocking forwarding with accumulation
-    fun forward_accum_blk (fw_stage : pipex.hw_stage) {
-
-        begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
-        run {
-
-            begif(eq2(fw_stage.readremote(rd_addr), rs1_addr))
-            run {
-                begif(fw_stage.readremote(rd_rdy))
-                run {
-                    rs1_rdata.assign(fw_stage.readremote(rd_wdata))
-                }; endif()
-                begelse()
-                run {
-                    pstall()
-                }; endif()
-            }; endif()
-
-            begif(eq2(fw_stage.readremote(rd_addr), rs2_addr))
-            run {
-                begif(fw_stage.readremote(rd_rdy))
-                run {
-                    rs2_rdata.assign(fw_stage.readremote(rd_wdata))
-                }; endif()
-                begelse()
-                run {
-                    pstall()
+                    begif(fw_stage.readremote(rd_rdy))
+                    run {
+                        rs2_rdata.assign(fw_stage.readremote(rd_wdata))
+                    }; endif()
                 }; endif()
             }; endif()
 
         }; endif()
     }
 
+    // blocking forwarding
     fun forward_blk (fw_stage : pipex.hw_stage) {
 
         begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
         run {
 
-            begif(eq2(fw_stage.readremote(rd_addr), rs1_addr))
+            begif(rs1_req)
             run {
-                begif(fw_stage.readremote(rd_rdy))
+                begif(eq2(fw_stage.readremote(rd_addr), rs1_addr))
                 run {
-                    rs1_rdata.assign(fw_stage.readremote(rd_wdata))
-                }; endif()
-                begelse()
-                run {
-                    pstall()
+                    begif(fw_stage.readremote(rd_rdy))
+                    run {
+                        rs1_rdata.assign(fw_stage.readremote(rd_wdata))
+                    }; endif()
+                    begelse()
+                    run {
+                        pstall()
+                    }; endif()
                 }; endif()
             }; endif()
 
-            begif(eq2(fw_stage.readremote(rd_addr), rs2_addr))
+            begif(rs2_req)
             run {
-                begif(fw_stage.readremote(rd_rdy))
+                begif(eq2(fw_stage.readremote(rd_addr), rs2_addr))
                 run {
-                rs2_rdata.assign(fw_stage.readremote(rd_wdata))
-            }; endif()
-                begelse()
-                run {
-                    pstall()
+                    begif(fw_stage.readremote(rd_rdy))
+                    run {
+                        rs2_rdata.assign(fw_stage.readremote(rd_wdata))
+                    }; endif()
+                    begelse()
+                    run {
+                        pstall()
+                    }; endif()
                 }; endif()
             }; endif()
 
@@ -1268,7 +1249,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             EXEC.begin()
             run {
                 process_irq()
-                forward_accum_blk(MEMWB)
+                forward_blk(MEMWB)
                 process_alu()
                 process_curinstraddr_imm()
 
