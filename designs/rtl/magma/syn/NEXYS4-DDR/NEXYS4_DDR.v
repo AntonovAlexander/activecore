@@ -26,7 +26,7 @@ module NEXYS4_DDR
     
     magma #(
         .CPU("riscv_5stage")
-        , .mem_data("io_heartbeat_variable.hex")
+        , .mem_data("../magma/sw/io_heartbeat_variable.hex")
         , .mem_size(8096)
     ) magma (
         .clk_i(clk_gen)

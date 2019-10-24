@@ -32,6 +32,8 @@ reset_cntrl reset_cntrl
 	.srst_o(srst)
 );
 
+wire udm_reset;
+
 wire [0:0] udm_req;
 wire [0:0] udm_we;
 wire [31:0] udm_addr;
