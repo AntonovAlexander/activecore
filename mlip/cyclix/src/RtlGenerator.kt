@@ -17,8 +17,7 @@ class RtlGenerator(module_in : module) {
     class fifo_out_descr (val ext_req      : rtl.hw_port,
                           val ext_wdata    : rtl.hw_port,
                           val ext_ack      : rtl.hw_port,
-                          var reqbuf_req   : rtl.hw_sticky,
-                          var reqbuf_wdata : rtl.hw_sticky)
+                          var reqbuf_req   : hw_var)
 
     class fifo_in_descr  (val ext_req      : rtl.hw_port,
                           val ext_rdata    : rtl.hw_port,
@@ -156,35 +155,19 @@ class RtlGenerator(module_in : module) {
 
             rtl_gen.begif(rtl_gen.lnot(rst))
             run {
+                rtl_gen.assign(fifo.ext_req, 1)
                 rtl_gen.begif(fifo.reqbuf_req)
                 run {
-                    // fifo/reqbuf busy
+                    // fifo busy
                     rtl_gen.assign(fifo_rdy, 0)
                 }; rtl_gen.endif()
                 rtl_gen.begelse()
                 run {
-                    // fifo/reqbuf ready to consume request
-                    rtl_gen.assign(fifo_rdy, 1)
-                    rtl_gen.begif(fifo.ext_req)
-                    run {
-                        // bus busy - putting request in reqbuf
-                        rtl_gen.assign(fifo.reqbuf_req, 1)
-                        rtl_gen.assign(fifo.reqbuf_wdata, wdata_translated)
-                    }; rtl_gen.endif()
-                    rtl_gen.begelse()
-                    run {
-                        // bus free
-                        rtl_gen.assign(fifo.ext_req, 1)
-                        rtl_gen.assign(fifo.ext_wdata, wdata_translated)
-
-                        rtl_gen.begif(rtl_gen.lnot(fifo.ext_ack))
-                        run {
-                            // target busy - putting request in reqbuf
-                            rtl_gen.assign(fifo.reqbuf_req, 1)
-                            rtl_gen.assign(fifo.reqbuf_wdata, wdata_translated)
-                        }; rtl_gen.endif()
-                    }; rtl_gen.endif()
+                    // fifo ready to consume request
+                    rtl_gen.assign(fifo.ext_wdata, wdata_translated)
+                    rtl_gen.assign(fifo_rdy, fifo.ext_ack)
                 }; rtl_gen.endif()
+                rtl_gen.assign(fifo.reqbuf_req, 1)
             }; rtl_gen.endif()
 
         } else if (expr.opcode == OP_FIFO_RD) {
@@ -259,8 +242,7 @@ class RtlGenerator(module_in : module) {
                 rtl_gen.uoutput((fifo_out.name + "_genfifo_req_o"), 0, 0, "0"),
                 rtl_gen.port((fifo_out.name + "_genfifo_wdata_bo"), rtl.PORT_DIR.OUT, fifo_out.vartype, fifo_out.defval),
                 rtl_gen.uinput((fifo_out.name + "_genfifo_ack_i"), 0, 0, "1"),
-                rtl_gen.usticky((fifo_out.name + "_genfifo_reqbuf_req"), 0, 0, "0", clk, rst),
-                rtl_gen.sticky((fifo_out.name + "_genfifo_reqbuf_wdata"), fifo_out.vartype, fifo_out.defval, clk, rst)
+                rtl_gen.ucomb((fifo_out.name + "_genfifo_reqbuf_req"), 0, 0, "0")
             ))
         }
 
@@ -277,22 +259,6 @@ class RtlGenerator(module_in : module) {
 
         rtl_gen.cproc_begin()
         run {
-
-            // fifo_out reqbuf buffering
-            for (fifo_out in fifo_out_dict) {
-                rtl_gen.assign(fifo_out.value.ext_req, fifo_out.value.reqbuf_req)
-                rtl_gen.assign(fifo_out.value.ext_wdata, fifo_out.value.reqbuf_wdata)
-
-                rtl_gen.begif(fifo_out.value.reqbuf_req)
-                run {
-                    rtl_gen.begif(fifo_out.value.ext_ack)
-                    run {
-                        // clearing reqbuf
-                        rtl_gen.assign(fifo_out.value.reqbuf_req, 0)
-                        rtl_gen.assign(fifo_out.value.reqbuf_wdata, 0)
-                    }; rtl_gen.endif()
-                }; rtl_gen.endif()
-            }
 
             // fifo_in buffering
             for (fifo_in in fifo_in_dict) {
