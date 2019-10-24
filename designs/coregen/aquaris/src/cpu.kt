@@ -929,7 +929,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             alu_result.assign(alu_result_wide[31, 0])
             alu_CF.assign(alu_result_wide[32])
             alu_SF.assign(alu_result_wide[31])
-            alu_ZF.assign(eq2(alu_result, 0))
+            alu_ZF.assign(bnot(ror(alu_result)))
             alu_OF.assign(bor(eq2(alu_result_wide[32, 31], 0x2), eq2(alu_result_wide[32, 31], 0x1)))
 
             begif(alu_unsigned)

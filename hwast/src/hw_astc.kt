@@ -257,14 +257,20 @@ open class hw_astc() : ArrayList<hw_exec>() {
             if (params.size != 1) ERROR("params incorrect for operation " + opcode.default_string + " - number of params: " + params.size + ", expected: 1")
             var gen_dim = hw_dim_static()
 
-            if ((opcode == OP1_BITWISE_NOT) || (opcode == OP1_COMPLEMENT)) gen_dim = params[0].GetDimensions()
+            if ((opcode == OP1_BITWISE_NOT) || (opcode == OP1_COMPLEMENT)) {
+                for (param in params[0].GetDimensions()) {
+                    gen_dim.add(param)
+                }
+            }
             else if (opcode == OP1_LOGICAL_NOT) gen_dim.add(hw_dim_range_static(0, 0))
             else {
                 // TODO: vectored operations
                 if (params[0].GetDimensions().size != 1) ERROR("Reduct param dimensions error!")
-                gen_dim = params[0].GetDimensions()
+                for (param in params[0].GetDimensions()) {
+                    gen_dim.add(param)
+                }
                 gen_dim.removeAt(0)
-                gen_dim.add(hw_dim_range_static(0, 0))
+                gen_dim.add(0, hw_dim_range_static(0, 0))
             }
 
             var curVarType: VAR_TYPE
@@ -714,52 +720,28 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op2(OP2_BITWISE_XNOR, src0, src1)
     }
 
-    fun rand(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP1_REDUCT_AND, src0, src1)
+    fun rand(src0: hw_param): hw_var {
+        return AddExpr_op1(OP1_REDUCT_AND, src0)
     }
 
-    fun rand(src0: hw_param, src1: Int): hw_var {
-        return AddExpr_op2(OP1_REDUCT_AND, src0, src1)
+    fun rnand(src0: hw_param): hw_var {
+        return AddExpr_op1(OP1_REDUCT_NAND, src0)
     }
 
-    fun rnand(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP1_REDUCT_NAND, src0, src1)
+    fun ror(src0: hw_param): hw_var {
+        return AddExpr_op1(OP1_REDUCT_OR, src0)
     }
 
-    fun rnand(src0: hw_param, src1: Int): hw_var {
-        return AddExpr_op2(OP1_REDUCT_NAND, src0, src1)
+    fun rnor(src0: hw_param): hw_var {
+        return AddExpr_op1(OP1_REDUCT_NOR, src0)
     }
 
-    fun ror(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP1_REDUCT_OR, src0, src1)
+    fun rxor(src0: hw_param): hw_var {
+        return AddExpr_op1(OP1_REDUCT_XOR, src0)
     }
 
-    fun ror(src0: hw_param, src1: Int): hw_var {
-        return AddExpr_op2(OP1_REDUCT_OR, src0, src1)
-    }
-
-    fun rnor(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP1_REDUCT_NOR, src0, src1)
-    }
-
-    fun rnor(src0: hw_param, src1: Int): hw_var {
-        return AddExpr_op2(OP1_REDUCT_NOR, src0, src1)
-    }
-
-    fun rxor(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP1_REDUCT_XOR, src0, src1)
-    }
-
-    fun rxor(src0: hw_param, src1: Int): hw_var {
-        return AddExpr_op2(OP1_REDUCT_XOR, src0, src1)
-    }
-
-    fun rxnor(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP1_REDUCT_XNOR, src0, src1)
-    }
-
-    fun rxnor(src0: hw_param, src1: Int): hw_var {
-        return AddExpr_op2(OP1_REDUCT_XNOR, src0, src1)
+    fun rxnor(src0: hw_param): hw_var {
+        return AddExpr_op1(OP1_REDUCT_XNOR, src0)
     }
 
     fun indexed(src: hw_param, index: hw_param): hw_var {
