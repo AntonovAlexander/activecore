@@ -48,9 +48,9 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     val aluop_SUB		= 1
     val aluop_AND		= 2
     val aluop_OR		= 3
-    val aluop_SRA		= 4
-    val aluop_SLL		= 5
-    val aluop_SRL		= 6
+    val aluop_SLL		= 4
+    val aluop_SRL		= 5
+    val aluop_SRA		= 6
     val aluop_XOR		= 7
     val aluop_CLRB		= 8
 
@@ -146,8 +146,6 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     var alu_opcode      = ulocal("alu_opcode", 3, 0, "0")
     var alu_unsigned    = ulocal("alu_unsigned", 0, 0, "0")
 
-    var alu_op1_wide    = ulocal("alu_op1_wide", 32, 0, "0")
-    var alu_op2_wide    = ulocal("alu_op2_wide", 32, 0, "0")
     var alu_result_wide = ulocal("alu_result_wide", 32, 0, "0")
     var alu_result      = ulocal("alu_result", 31, 0, "0")
     var alu_CF          = ulocal("alu_CF", 0, 0, "0")
@@ -862,19 +860,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             alu_op2.assign(csr_rdata)
         }; endif()
 
-        // acquiring wide operands
-        begif(alu_unsigned)
-        run {
-            alu_op1_wide.assign(zeroext(alu_op1, 33))
-            alu_op2_wide.assign(zeroext(alu_op2, 33))
-        }; endif()
-        begelse()
-        run {
-            alu_op1_wide.assign(signext(alu_op1, 33))
-            alu_op2_wide.assign(signext(alu_op2, 33))
-        }; endif()
-
-        alu_result_wide.assign(alu_op1_wide)
+        alu_result_wide.assign(alu_op1)
 
         begif(alu_req)
         run {
@@ -882,42 +868,42 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             // computing result
             begif(eq2(alu_opcode, aluop_ADD))
             run {
-                alu_result_wide.assign(alu_op1_wide + alu_op2_wide)
+                alu_result_wide.assign(alu_op1 + alu_op2)
             }; endif()
 
             begif(eq2(alu_opcode, aluop_SUB))
             run {
-                alu_result_wide.assign(alu_op1_wide - alu_op2_wide)
+                alu_result_wide.assign(alu_op1 - alu_op2)
             }; endif()
 
             begif(eq2(alu_opcode, aluop_AND))
             run {
-                alu_result_wide.assign(band(alu_op1_wide, alu_op2_wide))
+                alu_result_wide.assign(band(alu_op1, alu_op2))
             }; endif()
 
             begif(eq2(alu_opcode, aluop_OR))
             run {
-                alu_result_wide.assign(bor(alu_op1_wide, alu_op2_wide))
-            }; endif()
-
-            begif(eq2(alu_opcode, aluop_XOR))
-            run {
-                alu_result_wide.assign(bxor(alu_op1_wide, alu_op2_wide))
-            }; endif()
-
-            begif(eq2(alu_opcode, aluop_SRL))
-            run {
-                alu_result_wide.assign(shr(alu_op1_wide, alu_op2_wide))
-            }; endif()
-
-            begif(eq2(alu_opcode, aluop_SRA))
-            run {
-                alu_result_wide.assign(sra(alu_op1_wide, alu_op2_wide))
+                alu_result_wide.assign(bor(alu_op1, alu_op2))
             }; endif()
 
             begif(eq2(alu_opcode, aluop_SLL))
             run {
-                alu_result_wide.assign(shl(alu_op1_wide, alu_op2_wide))
+                alu_result_wide.assign(shl(alu_op1, alu_op2))
+            }; endif()
+
+            begif(eq2(alu_opcode, aluop_SRL))
+            run {
+                alu_result_wide.assign(shr(alu_op1, alu_op2))
+            }; endif()
+
+            begif(eq2(alu_opcode, aluop_SRA))
+            run {
+                alu_result_wide.assign(sra(alu_op1, alu_op2))
+            }; endif()
+
+            begif(eq2(alu_opcode, aluop_XOR))
+            run {
+                alu_result_wide.assign(bxor(alu_op1, alu_op2))
             }; endif()
 
             begif(eq2(alu_opcode, aluop_CLRB))
