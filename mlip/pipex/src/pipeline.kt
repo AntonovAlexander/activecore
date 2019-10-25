@@ -1018,6 +1018,25 @@ open class pipeline(name_in : String) : hw_astc() {
                 }
             }; cyclix_gen.endif()
 
+        } else if (expr.opcode == OP1_CASE) {
+
+            cyclix_gen.begcase(curStageAssoc.TranslateParam(expr.params[0]))
+            run {
+                for (casebranch in expr.expressions) {
+                    if (casebranch.opcode != OP1_CASEBRANCH) ERROR("non-branch op in case")
+                    cyclix_gen.begbranch(curStageAssoc.TranslateParam(casebranch.params[0]))
+                    for (subexpr in casebranch.expressions) {
+                        reconstruct_expression(DEBUG_FLAG,
+                            cyclix_gen,
+                            subexpr,
+                            curStage,
+                            TranslateInfo,
+                            curStageAssoc)
+                    }
+                    cyclix_gen.endbranch()
+                }
+            }; cyclix_gen.endcase()
+
         } else if (expr.opcode == OP1_WHILE) {
 
             cyclix_gen.begwhile(curStageAssoc.TranslateParam(expr.params[0]))

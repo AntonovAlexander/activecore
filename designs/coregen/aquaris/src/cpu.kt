@@ -866,50 +866,53 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
         run {
 
             // computing result
-            begif(eq2(alu_opcode, aluop_ADD))
+            begcase(alu_opcode)
             run {
-                alu_result_wide.assign(alu_op1 + alu_op2)
-            }; endif()
+                begbranch(aluop_ADD)
+                run {
+                    alu_result_wide.assign(alu_op1 + alu_op2)
+                }; endbranch()
 
-            begif(eq2(alu_opcode, aluop_SUB))
-            run {
-                alu_result_wide.assign(alu_op1 - alu_op2)
-            }; endif()
+                begbranch(aluop_SUB)
+                run {
+                    alu_result_wide.assign(alu_op1 - alu_op2)
+                }; endbranch()
 
-            begif(eq2(alu_opcode, aluop_AND))
-            run {
-                alu_result_wide.assign(band(alu_op1, alu_op2))
-            }; endif()
+                begbranch(aluop_AND)
+                run {
+                    alu_result_wide.assign(band(alu_op1, alu_op2))
+                }; endbranch()
 
-            begif(eq2(alu_opcode, aluop_OR))
-            run {
-                alu_result_wide.assign(bor(alu_op1, alu_op2))
-            }; endif()
+                begbranch(aluop_OR)
+                run {
+                    alu_result_wide.assign(bor(alu_op1, alu_op2))
+                }; endbranch()
 
-            begif(eq2(alu_opcode, aluop_SLL))
-            run {
-                alu_result_wide.assign(shl(alu_op1, alu_op2))
-            }; endif()
+                begbranch(aluop_SLL)
+                run {
+                    alu_result_wide.assign(shl(alu_op1, alu_op2))
+                }; endbranch()
 
-            begif(eq2(alu_opcode, aluop_SRL))
-            run {
-                alu_result_wide.assign(shr(alu_op1, alu_op2))
-            }; endif()
+                begbranch(aluop_SRL)
+                run {
+                    alu_result_wide.assign(shr(alu_op1, alu_op2))
+                }; endbranch()
 
-            begif(eq2(alu_opcode, aluop_SRA))
-            run {
-                alu_result_wide.assign(sra(alu_op1, alu_op2))
-            }; endif()
+                begbranch(aluop_SRA)
+                run {
+                    alu_result_wide.assign(sra(alu_op1, alu_op2))
+                }; endbranch()
 
-            begif(eq2(alu_opcode, aluop_XOR))
-            run {
-                alu_result_wide.assign(bxor(alu_op1, alu_op2))
-            }; endif()
+                begbranch(aluop_XOR)
+                run {
+                    alu_result_wide.assign(bxor(alu_op1, alu_op2))
+                }; endbranch()
 
-            begif(eq2(alu_opcode, aluop_CLRB))
-            run {
-                alu_result_wide.assign(band(alu_op1, !alu_op2))
-            }; endif()
+                begbranch(aluop_CLRB)
+                run {
+                    alu_result_wide.assign(band(alu_op1, !alu_op2))
+                }; endbranch()
+            }; endcase()
 
             // formation of result and flags
             alu_result.assign(alu_result_wide[31, 0])

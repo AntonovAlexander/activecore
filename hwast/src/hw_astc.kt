@@ -1167,11 +1167,53 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun endif() {
+        if (last().opcode != OP1_IF) ERROR("endif without begif!")
         for (wrvar in last().wrvars) {
             for (cur_exec in this) {
                 cur_exec.AddIfTargetVar(wrvar)
             }
         }
+        removeAt(lastIndex)
+    }
+
+    fun begcase(cond : hw_param) {
+        var new_expr = hw_exec(OP1_CASE)
+        new_expr.AddRdParam(cond)
+        AddExpr(new_expr)
+        add(new_expr)
+    }
+
+    fun endcase() {
+        if (last().opcode != OP1_CASE) ERROR("endcase without begcase!")
+        for (wrvar in last().wrvars) {
+            for (cur_exec in this) {
+                cur_exec.AddIfTargetVar(wrvar)
+            }
+        }
+        removeAt(lastIndex)
+    }
+
+    fun begbranch(cond : hw_param) {
+        if (last().opcode != OP1_CASE) ERROR("begbranch without begcase!")
+        var new_expr = hw_exec(OP1_CASEBRANCH)
+        new_expr.AddRdParam(cond)
+        AddExpr(new_expr)
+        add(new_expr)
+    }
+
+    fun begbranch(cond : Int) {
+        begbranch(hw_imm(cond))
+    }
+
+    fun endbranch() {
+        if (last().opcode != OP1_CASEBRANCH) ERROR("endbranch without begbranch!")
+        /*
+        for (wrvar in last().wrvars) {
+            for (cur_exec in this) {
+                cur_exec.AddIfTargetVar(wrvar)
+            }
+        }
+        */
         removeAt(lastIndex)
     }
 
@@ -1184,6 +1226,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun endwhile() {
+        if (last().opcode != OP1_WHILE) ERROR("endwhile without begwhile!")
         removeAt(lastIndex)
     }
 }

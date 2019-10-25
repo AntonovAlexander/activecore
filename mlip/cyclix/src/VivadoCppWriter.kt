@@ -145,16 +145,16 @@ class VivadoCppWriter(module_in : module) {
         var dimstring = getDimString(expr.fractions)
 
         var opstring = ""
-        if (expr.opcode == OP1_ASSIGN) 	            opstring = ""
+        if (expr.opcode == OP1_ASSIGN) 	        opstring = ""
         else if (expr.opcode == OP1_COMPLEMENT) 	opstring = "-"
 
-        else if (expr.opcode == OP2_ARITH_ADD) 	    opstring = "+"
-        else if (expr.opcode == OP2_ARITH_SUB) 	    opstring = "-"
-        else if (expr.opcode == OP2_ARITH_MUL) 	    opstring = "*"
-        else if (expr.opcode == OP2_ARITH_DIV) 	    opstring = "/"
-        else if (expr.opcode == OP2_ARITH_SHL) 	    opstring = "<<"
-        else if (expr.opcode == OP2_ARITH_SHR) 	    opstring = ">>"
-        else if (expr.opcode == OP2_ARITH_SRA) 	    opstring = ">>"     // TODO: arith/logical cleanup
+        else if (expr.opcode == OP2_ARITH_ADD) 	opstring = "+"
+        else if (expr.opcode == OP2_ARITH_SUB) 	opstring = "-"
+        else if (expr.opcode == OP2_ARITH_MUL) 	opstring = "*"
+        else if (expr.opcode == OP2_ARITH_DIV) 	opstring = "/"
+        else if (expr.opcode == OP2_ARITH_SHL) 	opstring = "<<"
+        else if (expr.opcode == OP2_ARITH_SHR) 	opstring = ">>"
+        else if (expr.opcode == OP2_ARITH_SRA) 	opstring = ">>"     // TODO: arith/logical cleanup
 
         else if (expr.opcode == OP1_LOGICAL_NOT)  opstring = "!"
         else if (expr.opcode == OP2_LOGICAL_AND)  opstring = "&&"
@@ -176,22 +176,24 @@ class VivadoCppWriter(module_in : module) {
 
         else if (expr.opcode == OP1_REDUCT_AND) 	opstring = "&"
         else if (expr.opcode == OP1_REDUCT_NAND) 	opstring = "~&"
-        else if (expr.opcode == OP1_REDUCT_OR) 	    opstring = "|"
+        else if (expr.opcode == OP1_REDUCT_OR) 	opstring = "|"
         else if (expr.opcode == OP1_REDUCT_NOR) 	opstring = "~|"
         else if (expr.opcode == OP1_REDUCT_XOR) 	opstring = "^"
         else if (expr.opcode == OP1_REDUCT_XNOR) 	opstring = "^~"
 
         else if (expr.opcode == OP2_INDEXED) 	    opstring = ""
         else if (expr.opcode == OP3_RANGED) 	    opstring = ""
-        else if (expr.opcode == OP2_SUBSTRUCT) 	    opstring = ""
+        else if (expr.opcode == OP2_SUBSTRUCT) 	opstring = ""
         else if (expr.opcode == OPS_CNCT) 	        opstring = ""
         else if (expr.opcode == OP1_IF) 	        opstring = ""
-        else if (expr.opcode == OP1_WHILE) 	        opstring = ""
+        else if (expr.opcode == OP1_CASE) 	        opstring = ""
+        else if (expr.opcode == OP1_CASEBRANCH) 	opstring = ""
+        else if (expr.opcode == OP1_WHILE) 	    opstring = ""
 
         else if (expr.opcode == OP_FIFO_WR) 	    opstring = ""
         else if (expr.opcode == OP_FIFO_RD) 	    opstring = ""
 
-        else ERROR("operation" + expr.opcode.default_string + " not recognized")
+        else ERROR("operation " + expr.opcode.default_string + " not recognized")
 
         if ((expr.opcode == OP1_ASSIGN)
             || (expr.opcode == OP1_COMPLEMENT)
@@ -295,6 +297,26 @@ class VivadoCppWriter(module_in : module) {
             tab_Counter++
             for (child_expr in expr.expressions) {
                 export_expr(wrFile, child_expr)
+            }
+            tab_Counter--
+            PrintTab(wrFile)
+            wrFile.write("}\n")
+
+        } else if (expr.opcode == OP1_CASE) {
+
+            wrFile.write("switch (" + expr.params[0].GetString() + ") {\n")
+            tab_Counter++
+
+            for (casebranch in expr.expressions) {
+                PrintTab(wrFile)
+                wrFile.write("case " + casebranch.params[0].GetString() + ":\n")
+                tab_Counter++
+                for (child_expr in casebranch.expressions) {
+                    export_expr(wrFile, child_expr)
+                }
+                PrintTab(wrFile)
+                wrFile.write("break;\n")
+                tab_Counter--
             }
             tab_Counter--
             PrintTab(wrFile)

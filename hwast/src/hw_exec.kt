@@ -52,6 +52,8 @@ val OP3_RANGED          = hw_opcode("ranged")
 val OP2_SUBSTRUCT       = hw_opcode("subStruct")
 val OPS_CNCT            = hw_opcode("cnct")
 val OP1_IF              = hw_opcode("if")
+val OP1_CASE            = hw_opcode("case")
+val OP1_CASEBRANCH      = hw_opcode("casebrach")
 val OP1_WHILE           = hw_opcode("while")
 
 

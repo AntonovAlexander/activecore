@@ -138,6 +138,20 @@ class RtlGenerator(module_in : module) {
                 }
             }; rtl_gen.endif()
 
+        } else if (expr.opcode == OP1_CASE) {
+
+            rtl_gen.begcase(TranslateParam(expr.params[0]))
+            run {
+                for (casebranch in expr.expressions) {
+                    if (casebranch.opcode != OP1_CASEBRANCH) ERROR("non-branch op in case")
+                    rtl_gen.begbranch(TranslateParam(casebranch.params[0]))
+                    for (subexpr in casebranch.expressions) {
+                        export_expr(rtl_gen, subexpr, rst)
+                    }
+                    rtl_gen.endbranch()
+                }
+            }; rtl_gen.endcase()
+
         } else if (expr.opcode == OP1_WHILE) {
 
             rtl_gen.begwhile(TranslateParam(expr.params[0]))

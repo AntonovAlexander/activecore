@@ -163,9 +163,11 @@ class SvWriter(module_in : module) {
         else if (expr.opcode == OP2_SUBSTRUCT) 	opstring = ""
         else if (expr.opcode == OPS_CNCT) 	        opstring = ""
         else if (expr.opcode == OP1_IF) 	        opstring = ""
+        else if (expr.opcode == OP1_CASE) 	        opstring = ""
+        else if (expr.opcode == OP1_CASEBRANCH) 	opstring = ""
         else if (expr.opcode == OP1_WHILE) 	    opstring = ""
 
-        else ERROR("operation" + expr.opcode.default_string + " not recognized")
+        else ERROR("operation " + expr.opcode.default_string + " not recognized")
 
         if ((expr.opcode == OP1_ASSIGN)
                 || (expr.opcode == OP1_COMPLEMENT)
@@ -278,6 +280,28 @@ class SvWriter(module_in : module) {
             PrintTab(wrFile)
             wrFile.write("end\n")
             tab_Counter--
+
+        } else if (expr.opcode == OP1_CASE) {
+
+            wrFile.write("case (" + expr.params[0].GetString() + ")\n")
+            tab_Counter++
+
+            for (casebranch in expr.expressions) {
+                PrintTab(wrFile)
+                wrFile.write(casebranch.params[0].GetString() + ":\n")
+                tab_Counter++
+                PrintTab(wrFile)
+                wrFile.write("begin\n")
+                for (child_expr in casebranch.expressions) {
+                    export_expr(wrFile, child_expr)
+                }
+                PrintTab(wrFile)
+                wrFile.write("end\n")
+                tab_Counter--
+            }
+            tab_Counter--
+            PrintTab(wrFile)
+            wrFile.write("endcase\n")
 
         } else if (expr.opcode == OP1_WHILE) {
             wrFile.write("while (" + expr.params[0].GetString() + " == 1'b1)\n")
