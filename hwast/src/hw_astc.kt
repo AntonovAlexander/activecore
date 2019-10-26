@@ -1205,6 +1205,10 @@ open class hw_astc() : ArrayList<hw_exec>() {
         begbranch(hw_imm(cond))
     }
 
+    fun begbranch(cond : String) {
+        begbranch(hw_imm(cond))
+    }
+
     fun endbranch() {
         if (last().opcode != OP1_CASEBRANCH) ERROR("endbranch without begbranch!")
         /*
