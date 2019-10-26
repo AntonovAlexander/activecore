@@ -794,7 +794,31 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             }; endif()
 
         }; endif()
+    }
 
+    // interlocking
+    fun interlock (fw_stage : pipex.hw_stage) {
+
+        begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
+        run {
+
+            begif(rs1_req)
+            run {
+                begif(eq2(fw_stage.readremote(rd_addr), rs1_addr))
+                run {
+                    pstall()
+                }; endif()
+            }; endif()
+
+            begif(rs2_req)
+            run {
+                begif(eq2(fw_stage.readremote(rd_addr), rs2_addr))
+                run {
+                    pstall()
+                }; endif()
+            }; endif()
+
+        }; endif()
     }
 
     fun process_irq() {
