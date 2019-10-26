@@ -354,35 +354,6 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                 alu_req.assign(1)
                 mem_req.assign(1)
                 mem_cmd.assign(0)
-
-                begcase(funct3)
-                run {
-                    begbranch(0x0)
-                    run {
-                        mem_be.assign(0x1)
-                    }; endbranch()
-
-                    begbranch(0x1)
-                    run {
-                        mem_be.assign(0x3)
-                    }; endbranch()
-
-                    begbranch(0x2)
-                    run {
-                        mem_be.assign(0xf)
-                    }; endbranch()
-
-                    begbranch(0x4)
-                    run {
-                        mem_be.assign(0x1)
-                    }; endbranch()
-
-                    begbranch(0x5)
-                    run {
-                        mem_be.assign(0x3)
-                    }; endbranch()
-                }; endcase()
-
                 immediate.assign(immediate_I)
             }; endbranch()
 
@@ -395,22 +366,6 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                 alu_req.assign(1)
                 mem_req.assign(1)
                 mem_cmd.assign(1)
-
-                begif(eq2(funct3, 0x0))
-                run {
-                    mem_be.assign(0x1)
-                }; endif()
-
-                begif(eq2(funct3, 0x1))
-                run {
-                    mem_be.assign(0x3)
-                }; endif()
-
-                begif(eq2(funct3, 0x2))
-                run {
-                    mem_be.assign(0xf)
-                }; endif()
-
                 immediate.assign(immediate_S)
             }; endbranch()
 
@@ -518,6 +473,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                         run {
                             alu_opcode.assign(aluop_SUB)
                         }; endif()
+
                         // ADD
                         begelse()
                         run {
@@ -595,23 +551,23 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
 
             begbranch(opcode_SYSTEM)
             run {
-                // EBREAK/ECALL
-                begif(eq2(funct3, 0))
-                run {
-                    // EBREAK
-                    begif(instr_code[20])
-                    run {
-                        ebreakreq.assign(1)
-                    }; endif()
-                    // ECALL
-                    begelse()
-                    run {
-                        ecallreq.assign(1)
-                    }; endif()
-                }; endif()
-
                 begcase(funct3)
                 run {
+                    // EBREAK/ECALL
+                    begbranch(0x0)
+                    run {
+                        // EBREAK
+                        begif(instr_code[20])
+                        run {
+                            ebreakreq.assign(1)
+                        }; endif()
+                        // ECALL
+                        begelse()
+                        run {
+                            ecallreq.assign(1)
+                        }; endif()
+                    }; endbranch()
+
                     //CSRRW
                     begbranch(0x1)
                     run {
@@ -688,6 +644,37 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             }; endbranch()
 
         }; endcase()
+
+        begif(mem_req)
+        run {
+            begcase(funct3)
+            run {
+                begbranch(0x0)
+                run {
+                    mem_be.assign(0x1)
+                }; endbranch()
+
+                begbranch(0x1)
+                run {
+                    mem_be.assign(0x3)
+                }; endbranch()
+
+                begbranch(0x2)
+                run {
+                    mem_be.assign(0xf)
+                }; endbranch()
+
+                begbranch(0x4)
+                run {
+                    mem_be.assign(0x1)
+                }; endbranch()
+
+                begbranch(0x5)
+                run {
+                    mem_be.assign(0x3)
+                }; endbranch()
+            }; endcase()
+        }; endif()
 
         begif(eq2(instr_code, instrcode_MRET))
         run {
@@ -982,41 +969,45 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
         }; endif()
 
         // rd wdata processing
-        begif(eq2(rd_source, RD_LUI))
+        begcase(rd_source)
         run {
-            rd_wdata.assign(immediate)
-            rd_rdy.assign(1)
-        }; endif()
+            begbranch(RD_LUI)
+            run {
+                rd_wdata.assign(immediate)
+                rd_rdy.assign(1)
+            }; endbranch()
 
-        begif(eq2(rd_source, RD_ALU))
-        run {
-            rd_wdata.assign(alu_result)
-            rd_rdy.assign(1)
-        }; endif()
+            begbranch(RD_ALU)
+            run {
+                rd_wdata.assign(alu_result)
+                rd_rdy.assign(1)
+            }; endbranch()
 
-        begif(eq2(rd_source, RD_CF_COND))
-        run {
-            rd_wdata.assign(alu_CF)
-            rd_rdy.assign(1)
-        }; endif()
+            begbranch(RD_CF_COND)
+            run {
+                rd_wdata.assign(alu_CF)
+                rd_rdy.assign(1)
+            }; endbranch()
 
-        begif(eq2(rd_source, RD_OF_COND))
-        run {
-            rd_wdata.assign(alu_OF)
-            rd_rdy.assign(1)
-        }; endif()
+            begbranch(RD_OF_COND)
+            run {
+                rd_wdata.assign(alu_OF)
+                rd_rdy.assign(1)
+            }; endbranch()
 
-        begif(eq2(rd_source, RD_PC_INC))
-        run {
-            rd_wdata.assign(nextinstr_addr)
-            rd_rdy.assign(1)
-        }; endif()
+            begbranch(RD_PC_INC)
+            run {
+                rd_wdata.assign(nextinstr_addr)
+                rd_rdy.assign(1)
+            }; endbranch()
 
-        begif(eq2(rd_source, RD_CSR))
-        run {
-            rd_wdata.assign(csr_rdata)
-            rd_rdy.assign(1)
-        }; endif()
+            begbranch(RD_CSR)
+            run {
+                rd_wdata.assign(csr_rdata)
+                rd_rdy.assign(1)
+            }; endbranch()
+
+        }; endcase()
     }
 
     fun process_curinstraddr_imm () {
@@ -1024,58 +1015,86 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     }
 
     fun process_jump () {
-        begif(eq2(jump_src, JMP_SRC_OP1))
+        begcase(jump_src)
         run {
-            jump_vector.assign(alu_op1)
-        }; endif()
+            begbranch(JMP_SRC_OP1)
+            run {
+                jump_vector.assign(alu_op1)
+            }; endbranch()
 
-        begif(eq2(jump_src, JMP_SRC_ALU))
-        run {
-            jump_vector.assign(alu_result)
-        }; endif()
+            begbranch(JMP_SRC_ALU)
+            run {
+                jump_vector.assign(alu_result)
+            }; endbranch()
+
+        }; endcase()
 
         begif(jump_req_cond)
         run {
 
-            // BEQ
-            begif(eq2(funct3, 0x0))
+            begcase(funct3)
             run {
-                begif(alu_ZF)
+                // BEQ
+                begbranch(0x0)
                 run {
-                    jump_req.assign(1)
-                    jump_vector.assign(curinstraddr_imm)
-                }; endif()
-            }; endif()
+                    begif(alu_ZF)
+                    run {
+                        jump_req.assign(1)
+                        jump_vector.assign(curinstraddr_imm)
+                    }; endif()
+                }; endbranch()
 
-            // BNE
-            begif(eq2(funct3, 0x1))
-            run {
-                begif(!alu_ZF)
+                // BNE
+                begbranch(0x1)
                 run {
-                    jump_req.assign(1)
-                    jump_vector.assign(curinstraddr_imm)
-                }; endif()
-            }; endif()
+                    begif(!alu_ZF)
+                    run {
+                        jump_req.assign(1)
+                        jump_vector.assign(curinstraddr_imm)
+                    }; endif()
+                }; endbranch()
 
-            // BLT, BLTU
-            begif(bor(eq2(funct3, 0x4), eq2(funct3, 0x6)))
-            run {
-                begif(alu_CF)
+                // BLT
+                begbranch(0x4)
                 run {
-                    jump_req.assign(1)
-                    jump_vector.assign(curinstraddr_imm)
-                }; endif()
-            }; endif()
+                    begif(alu_CF)
+                    run {
+                        jump_req.assign(1)
+                        jump_vector.assign(curinstraddr_imm)
+                    }; endif()
+                }; endbranch()
 
-            // BGE, BGEU
-            begif(bor(eq2(funct3, 0x5), eq2(funct3, 0x7)))
-            run {
-                begif(!alu_CF)
+                // BGE
+                begbranch(0x5)
                 run {
-                    jump_req.assign(1)
-                    jump_vector.assign(curinstraddr_imm)
-                }; endif()
-            }; endif()
+                    begif(!alu_CF)
+                    run {
+                        jump_req.assign(1)
+                        jump_vector.assign(curinstraddr_imm)
+                    }; endif()
+                }; endbranch()
+
+                // BLTU
+                begbranch(0x6)
+                run {
+                    begif(alu_CF)
+                    run {
+                        jump_req.assign(1)
+                        jump_vector.assign(curinstraddr_imm)
+                    }; endif()
+                }; endbranch()
+
+                // BGEU
+                begbranch(0x7)
+                run {
+                    begif(!alu_CF)
+                    run {
+                        jump_req.assign(1)
+                        jump_vector.assign(curinstraddr_imm)
+                    }; endif()
+                }; endbranch()
+
+            }; endcase()
 
         }; endif()
     }
@@ -1157,6 +1176,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
         rf_dim.add(31, 0)
         rf_dim.add(31, 1)
 
+        // execution schedules
         if (num_stages == 1) {
 
             var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
