@@ -73,7 +73,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     val RD_CSR		    = 6
 
     // jmp sources
-    val JMP_SRC_OP1     = 0
+    val JMP_SRC_IMM     = 0
     val JMP_SRC_ALU     = 1
 
 
@@ -91,7 +91,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     // control transfer signals
     var jump_req        = ulocal("jump_req", 0, 0, "0")
     var jump_req_cond   = ulocal("jump_req_cond", 0, 0, "0")
-    var jump_src        = ulocal("jump_src", 0, 0, JMP_SRC_OP1.toString())
+    var jump_src        = ulocal("jump_src", 0, 0, JMP_SRC_IMM.toString())
     var jump_vector     = ulocal("jump_vector", 31, 0, "0")
 
     // regfile control signals
@@ -681,8 +681,8 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             mret_req.assign(1)
             jump_req.assign(1)
             jump_req_cond.assign(0)
-            jump_src.assign(JMP_SRC_OP1)
-            op1_source.assign(OP1_SRC_IMM)
+            jump_src.assign(JMP_SRC_IMM)
+            immediate.assign(MRETADDR)
         }; endif()
 
         begif(eq2(rd_addr, 0))
@@ -710,6 +710,11 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
         begif(eq2(rs2_addr, 0))
         run {
             rs2_rdata.assign(0)
+        }; endif()
+
+        begif(csrreq)
+        run {
+            csr_rdata.assign(CSR_MCAUSE)
         }; endif()
     }
 
@@ -808,66 +813,8 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
         }; endif()
     }
 
-    fun process_irq() {
-
-        begif(csrreq)
-        run {
-            csr_rdata.assign(CSR_MCAUSE)
-        }; endif()
-
-        begif(mret_req)
-        run {
-            immediate.assign(MRETADDR)
-        }; endif()
-
-        begif(MIRQEN)
-        run {
-            begif(!irq_recv)
-            run {
-                irq_recv.assign(fifo_rd(irq_fifo, irq_mcause))
-            }; endif()
-            begif(irq_recv)
-            run {
-                // control transfer signals
-                jump_req.assign(1)
-                jump_req_cond.assign(0)
-                jump_src.assign(JMP_SRC_OP1)
-
-                // regfile control signals
-                rs1_req.assign(0)
-                rs2_req.assign(0)
-                rd_req.assign(0)
-
-                immediate.assign(IRQ_ADDR)
-
-                fencereq.assign(0)
-                ecallreq.assign(0)
-                ebreakreq.assign(0)
-                csrreq.assign(0)
-
-                op1_source.assign(OP1_SRC_IMM)
-
-                // ALU control
-                alu_req.assign(0)
-
-                // data memory control
-                mem_req.assign(0)
-
-                MIRQEN.assign(0)
-                CSR_MCAUSE.assign(irq_mcause)
-                MRETADDR.assign(curinstr_addr)
-            }; endif()
-        }; endif()
-
-        begif(mret_req)
-        run {
-            MIRQEN.assign(1)
-        }; endif()
-    }
-
-    // ALU processing ##
-    fun process_alu () {
-
+    // ALU multiplexing
+    fun process_alu_mux() {
         // multiplexing alu ops
         alu_op1.assign(rs1_rdata)
         begcase(op1_source)
@@ -896,6 +843,55 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                 alu_op2.assign(csr_rdata)
             }; endbranch()
         }; endcase()
+    }
+
+    fun process_irq() {
+
+        begif(MIRQEN)
+        run {
+            begif(!irq_recv)
+            run {
+                irq_recv.assign(fifo_rd(irq_fifo, irq_mcause))
+            }; endif()
+            begif(irq_recv)
+            run {
+                // control transfer signals
+                jump_req.assign(1)
+                jump_req_cond.assign(0)
+                jump_src.assign(JMP_SRC_IMM)
+
+                // regfile control signals
+                rs1_req.assign(0)
+                rs2_req.assign(0)
+                rd_req.assign(0)
+
+                immediate.assign(IRQ_ADDR)
+
+                fencereq.assign(0)
+                ecallreq.assign(0)
+                ebreakreq.assign(0)
+                csrreq.assign(0)
+
+                // ALU control
+                alu_req.assign(0)
+
+                // data memory control
+                mem_req.assign(0)
+
+                MIRQEN.assign(0)
+                CSR_MCAUSE.assign(irq_mcause)
+                MRETADDR.assign(curinstr_addr)
+            }; endif()
+        }; endif()
+
+        begif(mret_req)
+        run {
+            MIRQEN.assign(1)
+        }; endif()
+    }
+
+    // ALU processing ##
+    fun process_alu () {
 
         alu_result_wide.assign(alu_op1)
         begif(alu_req)
@@ -1017,9 +1013,9 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     fun process_jump () {
         begcase(jump_src)
         run {
-            begbranch(JMP_SRC_OP1)
+            begbranch(JMP_SRC_IMM)
             run {
-                jump_vector.assign(alu_op1)
+                jump_vector.assign(immediate)
             }; endbranch()
 
             begbranch(JMP_SRC_ALU)
@@ -1187,6 +1183,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                 process_resp_instrmem()
                 process_decode()
                 process_regfetch()
+                process_alu_mux()
                 process_irq()
                 process_alu()
                 process_curinstraddr_imm()
@@ -1222,6 +1219,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
 
                 process_decode()
                 process_regfetch()
+                process_alu_mux()
 
                 process_irq()
                 process_alu()
@@ -1259,8 +1257,9 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
 
                 process_decode()
                 process_regfetch()
+                interlock(MEMWB)
+                process_alu_mux()
                 process_irq()
-                forward_blk(MEMWB)
 
                 process_alu()
                 process_curinstraddr_imm()
@@ -1300,14 +1299,15 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                 process_resp_instrmem()
                 process_decode()
                 process_regfetch()
-                forward_unblk(MEMWB)
+                forward_blk(MEMWB)
+                forward_blk(EXEC)
+                process_alu_mux()
 
             }; endstage()
 
             EXEC.begin()
             run {
                 process_irq()
-                forward_blk(MEMWB)
                 process_alu()
                 process_curinstraddr_imm()
 
@@ -1352,6 +1352,8 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                 forward_blk(WB)
                 forward_blk(MEM)
                 forward_blk(EXEC)
+
+                process_alu_mux()
 
             }; endstage()
 
@@ -1409,6 +1411,8 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                 forward_blk(WB)
                 forward_blk(MEM)
                 forward_blk(EXEC)
+
+                process_alu_mux()
 
             }; endstage()
 
