@@ -69,7 +69,7 @@ always @(posedge clk_gen)
     begin
     if (udm_req && udm_we)
         begin
-        if (udm_addr == 0) LED <= udm_wdata;
+        if (udm_addr == 32'h00000000) LED <= udm_wdata;
         end
     end
 // reading
@@ -80,8 +80,8 @@ always @(posedge clk_gen)
     if (udm_req && udm_ack && !udm_we)
         begin
         udm_resp <= 1'b1;
-        if (udm_addr == 32'h0) udm_rdata <= LED;
-        if (udm_addr == 32'h4) udm_rdata <= SW;
+        if (udm_addr == 32'h00000000) udm_rdata <= LED;
+        if (udm_addr == 32'h00000004) udm_rdata <= SW;
         end
     end
 
