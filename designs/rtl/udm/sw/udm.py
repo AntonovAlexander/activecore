@@ -4,6 +4,7 @@ from __future__ import division
 import struct
 import serial
 import os
+import random
 
 class udm:
     
@@ -167,6 +168,34 @@ class udm:
         self.rst()
         self.wrfile_le(0x0, filename)
         self.nrst()
+    
+    def memtest32(self, baseaddr, wsize):
+        print("")
+        print("---- memtest32 started, word size:", wsize, " ----");
+        
+        # generating test data
+        wrdata = []
+        for i in range(wsize):
+            wrdata.append(random.randint(0, ((1024*1024*1024*4)-1)))
+        
+        # writing test data
+        udm.wrarr(baseaddr, wrdata)
+            
+        #reading test data
+        rddata = udm.rdarr32(baseaddr, wsize)
+        
+        # checking test data
+        test_succ = True
+        for i in range(wsize):
+            if (rddata[i] != wrdata[i]):
+                print("memtest32 failed on address ", hex(baseaddr + (i << 2)), "expected data: ", hex(wrdata[i]), " data read: ", hex(rddata[i]))
+                test_succ = False
+        
+        if (test_succ):
+            print("---- memtest32 PASSED ----")
+        else:
+            print("---- memtest32 FAILED ----")
+        print("")
     
     
 udm = udm()
