@@ -1,3 +1,12 @@
+/*
+ * NEXYS4_DDR.v
+ *
+ *  Created on: 01.01.2020
+ *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+ *     License: See LICENSE file for details
+ */
+
+
 module NEXYS4_DDR
 (
 	input 	CLK100MHZ
@@ -63,26 +72,101 @@ udm_memsplit udm_memsplit
 	, .bus_rdata_bi(udm_rdata)
 );
 
+reg testmem_udm_we;
+reg [31:0] testmem_udm_addr, testmem_udm_wdata;
+wire [31:0] testmem_udm_rdata;
+
+wire testmem_p1_we;
+wire [31:0] testmem_p1_addr, testmem_p1_wdata;
+wire [31:0] testmem_p1_rdata;
+
+assign testmem_p1_we = 1'b0;
+assign testmem_p1_addr = 0;
+assign testmem_p1_wdata = 0;
+
+ram_dual #(
+    .mem_init("NO")
+    , .mem_data("nodata.hex")
+    , .dat_width(32)
+    , .adr_width(32)
+    , .mem_size(1024)
+) testmem (
+    .clk(clk_gen)
+    , .dat0_i(testmem_udm_wdata)
+    , .adr0_i(testmem_udm_addr)
+    , .we0_i(testmem_udm_we)
+    , .dat0_o(testmem_udm_rdata)
+
+    , .dat1_i(testmem_p1_wdata)
+    , .adr1_i(testmem_p1_addr)
+    , .we1_i(testmem_p1_we)
+    , .dat1_o(testmem_p1_rdata)
+);
+
 assign udm_ack = udm_req;   // bus always ready to accept request
-// writing
+reg csr_resp, testmem_resp, testmem_resp_dly;
+reg [31:0] csr_rdata;
+
+localparam CSR_LED_ADDR = 32'h00000000;
+localparam CSR_SW_ADDR  = 32'h00000004;
+localparam TESTMEM_ADDR = 32'h80000000;
+
+// bus request
 always @(posedge clk_gen)
     begin
-    if (udm_req && udm_we)
+    
+    testmem_udm_we <= 1'b0;
+    testmem_udm_addr <= 0;
+    testmem_udm_wdata <= 0;
+    
+    csr_resp <= 1'b0;
+    testmem_resp_dly <= 1'b0;
+    testmem_resp <= testmem_resp_dly;
+    
+    if (udm_req && udm_ack)
         begin
-        if (udm_addr == 32'h00000000) LED <= udm_wdata;
+        
+        if (udm_we)     // writing
+            begin
+            if (udm_addr == CSR_LED_ADDR) LED <= udm_wdata;
+            if (!(udm_addr < TESTMEM_ADDR))
+                begin
+                testmem_udm_we <= 1'b1;
+                testmem_udm_addr <= udm_addr[31:2];     // 4-byte aligned access only
+                testmem_udm_wdata <= udm_wdata;
+                end
+            end
+        
+        else            // reading
+            begin
+            if (udm_addr == CSR_LED_ADDR)
+                begin
+                csr_resp <= 1'b1;
+                csr_rdata <= LED;
+                end
+            if (udm_addr == CSR_SW_ADDR)
+                begin
+                csr_resp <= 1'b1;
+                csr_rdata <= SW;
+                end
+            if (!(udm_addr < TESTMEM_ADDR))
+                begin
+                testmem_udm_we <= 1'b0;
+                testmem_udm_addr <= udm_addr[31:2];     // 4-byte aligned access only
+                testmem_udm_wdata <= udm_wdata;
+                testmem_resp_dly <= 1'b1;
+                end
+            end
         end
     end
-// reading
-always @(posedge clk_gen)
+
+// bus response
+always @*
     begin
-    udm_resp <= 1'b0;
-    udm_rdata <= 32'h0;
-    if (udm_req && udm_ack && !udm_we)
-        begin
-        udm_resp <= 1'b1;
-        if (udm_addr == 32'h00000000) udm_rdata <= LED;
-        if (udm_addr == 32'h00000004) udm_rdata <= SW;
-        end
+    udm_resp = csr_resp | testmem_resp;
+    udm_rdata = 0;
+    if (csr_resp) udm_rdata = csr_rdata;
+    if (testmem_resp) udm_rdata = testmem_udm_rdata;
     end
 
 endmodule
