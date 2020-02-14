@@ -72,6 +72,14 @@ udm_memsplit udm_memsplit
 	, .bus_rdata_bi(udm_rdata)
 );
 
+localparam CSR_LED_ADDR	 	= 32'h00000000;
+localparam CSR_SW_ADDR  	= 32'h00000004;
+localparam TESTMEM_ADDR 	= 32'h80000000;
+localparam TESTMEM_WSIZE	= 1024;
+
+wire testmem_udm_enb;
+assign testmem_udm_enb = (!(udm_addr < TESTMEM_ADDR) && (udm_addr < (TESTMEM_ADDR + (TESTMEM_WSIZE*4))));
+
 reg testmem_udm_we;
 reg [31:0] testmem_udm_addr, testmem_udm_wdata;
 wire [31:0] testmem_udm_rdata;
@@ -80,6 +88,7 @@ wire testmem_p1_we;
 wire [31:0] testmem_p1_addr, testmem_p1_wdata;
 wire [31:0] testmem_p1_rdata;
 
+// deactivating port1 of testmem
 assign testmem_p1_we = 1'b0;
 assign testmem_p1_addr = 0;
 assign testmem_p1_wdata = 0;
@@ -89,9 +98,10 @@ ram_dual #(
     , .mem_data("nodata.hex")
     , .dat_width(32)
     , .adr_width(32)
-    , .mem_size(1024)
+    , .mem_size(TESTMEM_WSIZE)
 ) testmem (
     .clk(clk_gen)
+
     , .dat0_i(testmem_udm_wdata)
     , .adr0_i(testmem_udm_addr)
     , .we0_i(testmem_udm_we)
@@ -106,10 +116,6 @@ ram_dual #(
 assign udm_ack = udm_req;   // bus always ready to accept request
 reg csr_resp, testmem_resp, testmem_resp_dly;
 reg [31:0] csr_rdata;
-
-localparam CSR_LED_ADDR = 32'h00000000;
-localparam CSR_SW_ADDR  = 32'h00000004;
-localparam TESTMEM_ADDR = 32'h80000000;
 
 // bus request
 always @(posedge clk_gen)
@@ -129,7 +135,7 @@ always @(posedge clk_gen)
         if (udm_we)     // writing
             begin
             if (udm_addr == CSR_LED_ADDR) LED <= udm_wdata;
-            if (!(udm_addr < TESTMEM_ADDR))
+            if (testmem_udm_enb)
                 begin
                 testmem_udm_we <= 1'b1;
                 testmem_udm_addr <= udm_addr[31:2];     // 4-byte aligned access only
@@ -149,7 +155,7 @@ always @(posedge clk_gen)
                 csr_resp <= 1'b1;
                 csr_rdata <= SW;
                 end
-            if (!(udm_addr < TESTMEM_ADDR))
+            if (testmem_udm_enb)
                 begin
                 testmem_udm_we <= 1'b0;
                 testmem_udm_addr <= udm_addr[31:2];     // 4-byte aligned access only

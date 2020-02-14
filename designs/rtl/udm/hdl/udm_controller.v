@@ -56,14 +56,14 @@ always @(posedge clk_i)
 		begin
 		rx_req <= 1'b0;
 		rx_sync <= 1'b0;
-		r_data <= 8'hx;
+		r_data <= 8'h0;
 		escape_received <= 1'b0;
 		end
 	else 
 		begin
 		rx_req <= 1'b0;
 		rx_sync <= 1'b0;
-		r_data <= 8'hx;
+		r_data <= 8'h0;
 
 		if (escape_received == 1'b0)
 			begin
@@ -112,7 +112,6 @@ always @(posedge clk_i, posedge reset_i)
 	begin
 	if (reset_i == 1'b1)
 		begin
-		
 		rst_o <= 1'b0;
 
 		state <= IDLE;
@@ -120,9 +119,8 @@ always @(posedge clk_i, posedge reset_i)
 		
 		bus_enb_o <= 1'b0;
 		bus_we_o <= 1'bx;
-		bus_addr_bo <= 32'hxxxxxxxx;
-		bus_wdata_bo <= 32'hxxxxxxxx;
-
+		bus_addr_bo <= 32'h0;
+		bus_wdata_bo <= 32'h0;
 		end
 	else
 		begin
@@ -134,8 +132,8 @@ always @(posedge clk_i, posedge reset_i)
 		
 			bus_enb_o <= 1'b0;
 			bus_we_o <= 1'bx;
-			bus_addr_bo <= 32'hxxxxxxxx;
-			bus_wdata_bo <= 32'hxxxxxxxx;
+			bus_addr_bo <= 32'h0;
+			bus_wdata_bo <= 32'h0;
 			tr_length <= 32'h0;
 			end
 
@@ -240,7 +238,7 @@ always @(posedge clk_i, posedge reset_i)
 								begin
 								bus_enb_o <= 1'b1;
 								bus_we_o <= 1'b0;
-								bus_wdata_bo <= 32'hx;
+								bus_wdata_bo <= 32'h0;
 								state <= WAIT_ACCEPT;
 								counter <= 2'b00;
 								end
@@ -276,7 +274,7 @@ always @(posedge clk_i, posedge reset_i)
 						begin
 						bus_enb_o <= 1'b0;
 						bus_we_o <= 1'bx;
-						bus_wdata_bo <= 32'hx;
+						bus_wdata_bo <= 32'h0;
 						RD_DATA_reg <= bus_rdata_bi;
 						if (cmd_ff == 1'b0)
 							begin
@@ -317,7 +315,7 @@ always @(posedge clk_i, posedge reset_i)
 								if (autoinc_ff == 1'b1) bus_addr_bo <= bus_addr_bo + 32'h4;
 								bus_enb_o <= 1'b1;
 								bus_we_o <= 1'b0;
-								bus_wdata_bo <= 32'hx;
+								bus_wdata_bo <= 32'h0;
 								state <= WAIT_ACCEPT;
 								counter <= 2'b00;
 								end
