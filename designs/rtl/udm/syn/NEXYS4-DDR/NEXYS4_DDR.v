@@ -88,7 +88,7 @@ wire testmem_p1_we;
 wire [31:0] testmem_p1_addr, testmem_p1_wdata;
 wire [31:0] testmem_p1_rdata;
 
-// deactivating port1 of testmem
+// testmem's port1 is inactive
 assign testmem_p1_we = 1'b0;
 assign testmem_p1_addr = 0;
 assign testmem_p1_wdata = 0;

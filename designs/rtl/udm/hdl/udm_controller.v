@@ -8,6 +8,9 @@
 
 
 module udm_controller
+#(
+    parameter BUS_TIMEOUT=(1024*1024*100)
+)
 (
 	input clk_i, reset_i,
 
@@ -22,18 +25,24 @@ module udm_controller
 	
 	// bus
 	output reg rst_o,
-	output reg bus_enb_o,
+	output reg bus_req_o,
+	input bus_ack_i,
 	output reg bus_we_o,
 	output reg [31:0] bus_addr_bo,
     output reg [31:0] bus_wdata_bo,
 
-    input bus_ack_i,
+    input bus_resp_i,
     input [31:0] bus_rdata_bi
 );
 
 // control bytes
 localparam SYNC_BYTE = 8'h55;
 localparam ESCAPE_BYTE = 8'h5a;
+
+// trx status bytes
+localparam TRX_IRQ_BYTE         = 8'h00;
+localparam TRX_ERR_ACK_BYTE     = 8'h01;
+localparam TRX_ERR_RESP_BYTE    = 8'h02;
 
 // commands
 localparam IDCODE_CMD = 8'h00;		// check udm accessibility
@@ -45,10 +54,11 @@ localparam WR_NOINC_CMD = 8'h83;	// Write slave without autoincrement
 localparam RD_NOINC_CMD = 8'h84;	// Read slave without autoincrement
 
 
+reg [31:0] timeout_counter;
+
+// rx sync logic //
 reg rx_req, rx_sync;
 reg [7:0] r_data;
-
-// rx sync logic
 reg escape_received;
 always @(posedge clk_i)
 	begin
@@ -73,7 +83,7 @@ always @(posedge clk_i)
 					rx_sync <= 1'b1;
 				else if (rx_din_bi == ESCAPE_BYTE)
 					escape_received <= 1'b1;
-				else 
+				else
 					begin
 					rx_req <= 1'b1;
 					r_data <= rx_din_bi;
@@ -92,15 +102,97 @@ always @(posedge clk_i)
 		end
 	end
 
-// states
+// tx status logic //
+reg tx_sendbyte_start, tx_err_ack, tx_idcode_resp, tx_err_resp, tx_irq;
+reg [7:0] tx_sendbyte, tx_sendbyte_ff;
+reg tx_rdy, tx_escape;
+wire tx_rdy_comb;
+assign tx_rdy_comb = tx_rdy & (!tx_sendbyte_start);
+always @(posedge clk_i)
+    begin
+    tx_start_o <= 1'b0;
+    if (reset_i)
+        begin
+        tx_dout_bo <= 8'h0;
+        tx_rdy <= 1'b1;
+        tx_escape <= 1'b0;
+        end
+    else
+        begin
+        if (tx_rdy)
+            begin
+            
+            if (tx_idcode_resp)
+                begin
+                tx_start_o <= 1'b1;
+                tx_dout_bo <= SYNC_BYTE;
+                tx_rdy <= 1'b0;
+                end
+            
+            else if (tx_err_ack)
+                begin
+                tx_start_o <= 1'b1;
+                tx_dout_bo <= TRX_ERR_ACK_BYTE;
+                tx_rdy <= 1'b0;
+                end
+            
+            else if (tx_err_resp)
+                begin
+                tx_start_o <= 1'b1;
+                tx_dout_bo <= TRX_ERR_RESP_BYTE;
+                tx_rdy <= 1'b0;
+                end
+            
+            else if (tx_irq)
+                begin
+                tx_start_o <= 1'b1;
+                tx_dout_bo <= TRX_IRQ_BYTE;
+                tx_rdy <= 1'b0;
+                end
+            
+            else if (tx_sendbyte_start)
+                begin
+                tx_start_o <= 1'b1;
+                tx_rdy <= 1'b0;
+                tx_sendbyte_ff <= tx_sendbyte;
+                if ((tx_sendbyte == ESCAPE_BYTE) || (tx_sendbyte == TRX_IRQ_BYTE) || (tx_sendbyte == TRX_ERR_ACK_BYTE) || (tx_sendbyte == TRX_ERR_RESP_BYTE))
+                    begin
+                    tx_dout_bo <= ESCAPE_BYTE;
+                    tx_escape <= 1'b1;
+                    end
+                else
+                    begin
+                    tx_dout_bo <= tx_sendbyte;
+                    end
+                end
+                
+            end
+        else
+            begin
+            if (tx_done_tick_i)
+                begin
+                if (tx_escape)
+                    begin
+                    tx_start_o <= 1'b1;
+                    tx_dout_bo <= tx_sendbyte_ff;
+                    tx_escape <= 1'b0;
+                    end
+                else tx_rdy <= 1'b1;
+                end
+            end
+        end
+    end
+
+// main FSM //
 localparam IDLE = 8'h00;
 localparam FETCH_ADDR = 8'h01;
 localparam FETCH_LENGTH = 8'h02;
 localparam FETCH_DATA = 8'h03;
-localparam WAIT_ACCEPT = 8'h04;
+localparam WAIT_ACK = 8'h04;
 localparam RD_DATA = 8'h05;
-localparam TX_DATA = 8'h06;
+localparam TX_RDATA = 8'h06;
 localparam WAIT_TX = 8'h07;
+localparam WAIT_RESP = 8'h08;
 
 reg [7:0] state;
 reg [1:0] counter;
@@ -110,15 +202,21 @@ reg [31:0] tr_length;
 
 always @(posedge clk_i, posedge reset_i)
 	begin
-	if (reset_i == 1'b1)
+	
+	tx_sendbyte_start <= 1'b0;
+    tx_idcode_resp <= 1'b0;
+    tx_err_ack <= 1'b0;
+    tx_err_resp <= 1'b0;
+    tx_irq <= 1'b0;
+	
+	if (reset_i)
 		begin
 		rst_o <= 1'b0;
 
 		state <= IDLE;
-		tx_start_o <= 1'b0;
 		
-		bus_enb_o <= 1'b0;
-		bus_we_o <= 1'bx;
+		bus_req_o <= 1'b0;
+		bus_we_o <= 1'b0;
 		bus_addr_bo <= 32'h0;
 		bus_wdata_bo <= 32'h0;
 		end
@@ -128,10 +226,9 @@ always @(posedge clk_i, posedge reset_i)
 		if (rx_sync == 1'b1)
 			begin
 			state <= IDLE;
-			tx_start_o <= 1'b0;
 		
-			bus_enb_o <= 1'b0;
-			bus_we_o <= 1'bx;
+			bus_req_o <= 1'b0;
+			bus_we_o <= 1'b0;
 			bus_addr_bo <= 32'h0;
 			bus_wdata_bo <= 32'h0;
 			tr_length <= 32'h0;
@@ -139,8 +236,6 @@ always @(posedge clk_i, posedge reset_i)
 
 		else 
 			begin
-
-			tx_start_o <= 1'b0;
 			
 			case (state)
 			
@@ -152,8 +247,7 @@ always @(posedge clk_i, posedge reset_i)
 						
 							IDCODE_CMD:
 								begin
-								tx_start_o <= 1'b1;
-								tx_dout_bo <= SYNC_BYTE;
+								tx_idcode_resp <= 1'b1;
 								end
 								
 							RST_CMD:
@@ -236,10 +330,11 @@ always @(posedge clk_i, posedge reset_i)
 								end							
 							else
 								begin
-								bus_enb_o <= 1'b1;
+								bus_req_o <= 1'b1;
 								bus_we_o <= 1'b0;
 								bus_wdata_bo <= 32'h0;
-								state <= WAIT_ACCEPT;
+								state <= WAIT_ACK;
+								timeout_counter <= 0;
 								counter <= 2'b00;
 								end
 							end
@@ -257,9 +352,10 @@ always @(posedge clk_i, posedge reset_i)
 						bus_wdata_bo <= {r_data, bus_wdata_bo[31:8]};
 						if (counter == 2'b11)
 							begin
-							bus_enb_o <= 1'b1;
+							bus_req_o <= 1'b1;
 							bus_we_o <= 1'b1;
-							state <= WAIT_ACCEPT;
+							state <= WAIT_ACK;
+							timeout_counter <= 0;
 							end
 						else
 							begin
@@ -268,44 +364,70 @@ always @(posedge clk_i, posedge reset_i)
 						end
 					end
 				
-				WAIT_ACCEPT:
+				WAIT_ACK:
 					begin
-					if (bus_ack_i == 1'b1)
-						begin
-						bus_enb_o <= 1'b0;
-						bus_we_o <= 1'bx;
-						bus_wdata_bo <= 32'h0;
-						RD_DATA_reg <= bus_rdata_bi;
-						if (cmd_ff == 1'b0)
-							begin
-							state <= TX_DATA;
-							end
-						else
-							begin
-							if (tr_length == 32'h4) state <= IDLE;
-							else
-								begin
-								if (autoinc_ff == 1'b1) bus_addr_bo <= bus_addr_bo + 32'h4;
-								state <= FETCH_DATA;
-								counter <= 2'b00;
-								end
-							tr_length <= tr_length - 32'h4;
-							end
-						end
+					if (timeout_counter > BUS_TIMEOUT)
+					   begin
+					   tx_err_ack <= 1'b1;
+					   end
+				    else
+				        begin
+				        timeout_counter <= timeout_counter + 1;
+				        if (bus_ack_i)
+                            begin
+                            bus_req_o <= 1'b0;
+                            bus_we_o <= 1'b0;
+                            bus_wdata_bo <= 32'h0;
+                            
+                            if (cmd_ff == 1'b0)
+                                begin
+                                state <= WAIT_RESP;
+                                timeout_counter <= 0;
+                                end
+                            else
+                                begin
+                                if (tr_length == 32'h4) state <= IDLE;
+                                else
+                                    begin
+                                    if (autoinc_ff == 1'b1) bus_addr_bo <= bus_addr_bo + 32'h4;
+                                    state <= FETCH_DATA;
+                                    counter <= 2'b00;
+                                    end
+                                tr_length <= tr_length - 32'h4;
+                                end
+                            end
+				        end
 					end
 				
-				TX_DATA:
+				WAIT_RESP:
+				    begin
+				    if (timeout_counter > BUS_TIMEOUT)
+                       begin
+                       tx_err_resp <= 1'b1;
+                       end
+                    else
+                        begin
+                        timeout_counter <= timeout_counter + 1;
+                        if (bus_resp_i)
+                            begin
+                            RD_DATA_reg <= bus_rdata_bi;
+                            state <= TX_RDATA;
+                            end
+                        end
+				    end
+				
+				TX_RDATA:
 					begin
-					tx_start_o <= 1'b1;
-					tx_dout_bo <= RD_DATA_reg[7:0];
+					tx_sendbyte_start <= 1'b1;
+					tx_sendbyte <= RD_DATA_reg[7:0];
 					RD_DATA_reg <= {8'h0, RD_DATA_reg[31:8]};
 					counter <= 2'b00;
 					state <= WAIT_TX;
 					end
-
+                
 				WAIT_TX:
 					begin
-					if (tx_done_tick_i == 1'b1)
+					if (tx_rdy_comb)
 						begin
 						if (counter == 2'b11)
 							begin
@@ -313,18 +435,19 @@ always @(posedge clk_i, posedge reset_i)
 							else 
 								begin
 								if (autoinc_ff == 1'b1) bus_addr_bo <= bus_addr_bo + 32'h4;
-								bus_enb_o <= 1'b1;
+								bus_req_o <= 1'b1;
 								bus_we_o <= 1'b0;
 								bus_wdata_bo <= 32'h0;
-								state <= WAIT_ACCEPT;
+								state <= WAIT_ACK;
+								timeout_counter <= 0;
 								counter <= 2'b00;
 								end
 							tr_length <= tr_length - 32'h4;
 							end
 						else 
 							begin
-							tx_start_o <= 1'b1;
-							tx_dout_bo <= RD_DATA_reg[7:0];
+							tx_sendbyte_start <= 1'b1;
+							tx_sendbyte <= RD_DATA_reg[7:0];
 							RD_DATA_reg <= {8'h0, RD_DATA_reg[31:8]};
 							end
 						counter <= counter + 2'b01;

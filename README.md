@@ -32,7 +32,7 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 The following demo designs for FPGA are available:
 
-* **sigma** - minimalistic uC consisting of a single aquaris RISC-V CPU, on-chip RAM, UART-controllable bus master (UART Debug Module, udm) and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma
+* **sigma** - minimalistic MCU consisting of a single aquaris RISC-V CPU, on-chip RAM, UART-controllable bus master (UART Debug Module, udm) and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma
 
 * **magma** - MPSoC consisting of multiple aquaris RISC-V CPUs with dedicated scratchpad RAMs connected by ariele xbar. Location: /designs/rtl/magma
 

@@ -75,7 +75,7 @@ def hw_test_qsort(qsort_filename):
     time.sleep(1)
 
     print("Reading data buffer...")
-    rdarr = udm.rdarr32(0x6000, DATA_SIZE)
+    rdarr = udm.rdarr(0x6000, DATA_SIZE)
     print("Data buffer read!")
 
     test_succ_flag = 1

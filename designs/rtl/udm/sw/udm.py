@@ -18,6 +18,9 @@ class udm:
     wr_cmd_noinc    = 0x83
     rd_cmd_noinc    = 0x84
     
+    TRX_ERR_ACK_BYTE    = 0x01
+    TRX_ERR_RESP_BYTE   = 0x02
+    
     def connect(self, com_num, baudrate):
         self.ser = serial.Serial(com_num, baudrate, 8)   
     
@@ -31,7 +34,35 @@ class udm:
     def discon(self):
         self.disconnect()
     
+    def getbyte(self):
+        rdata = self.ser.read(1)
+        rdata = struct.unpack("B", rdata)
+        
+        if (rdata[0] == self.TRX_ERR_ACK_BYTE):
+            print("UDM BUS ERROR: <ack> not received!")
+            raise Exception()
+        
+        if (rdata[0] == self.TRX_ERR_RESP_BYTE):
+            print("UDM BUS ERROR: <resp> not received!")
+            raise Exception()
+        
+        if (rdata[0] == self.escape_byte):
+            rdata = self.ser.read(1)
+            rdata = struct.unpack("B", rdata)
+        
+        return rdata[0]
+    
+    def getword(self):
+        rdata=[]
+        rdata.append(self.getbyte())
+        rdata.append(self.getbyte())
+        rdata.append(self.getbyte())
+        rdata.append(self.getbyte())
+        rdataword = rdata[0] + (rdata[1] << 8) + (rdata[2] << 16) + (rdata[3] << 24)
+        return rdataword
+    
     def check(self):
+        self.ser.flush()
         wdata = (struct.pack('B', self.sync_byte))
         wdata = wdata + (struct.pack('B', self.idcode_cmd))
         self.ser.write(wdata)
@@ -41,7 +72,7 @@ class udm:
         if (rdata[0] == self.sync_byte):
             print("Connection established, response: ", hex(rdata[0]))
         else:
-            print("Conection failed, response: ", hex(rdata[0]))
+            print("Connection failed, response: ", hex(rdata[0]))
     
     def cc(self, com_num, baudrate):
         print("Connecting COM port...")
@@ -107,12 +138,9 @@ class udm:
         self.sendbyte(self.rd_cmd)
         self.sendword(address)
         self.sendword(4)
-        rdata = self.ser.read(4)
-        rdata = struct.unpack("BBBB", rdata)
-        rdataword = rdata[0] + (rdata[1] << 8) + (rdata[2] << 16) + (rdata[3] << 24)
-        return rdataword    
+        return self.getword() 
     
-    def rdarr32(self, address, length):
+    def rdarr(self, address, length):
         self.ser.flush()
         self.sendbyte(self.sync_byte)
         self.sendbyte(self.rd_cmd)
@@ -120,10 +148,7 @@ class udm:
         self.sendword(length << 2)
         rdatawords = []
         for i in range(length):
-            rdata = self.ser.read(4)
-            rdata = struct.unpack("BBBB", rdata)
-            rdataword = rdata[0] + (rdata[1] << 8) + (rdata[2] << 16) + (rdata[3] << 24)
-            rdatawords.append(rdataword)
+            rdatawords.append(self.getword())
         return rdatawords
     
     def wrfile_le(self, address, filename):
@@ -179,10 +204,10 @@ class udm:
             wrdata.append(random.randint(0, ((1024*1024*1024*4)-1)))
         
         # writing test data
-        udm.wrarr(baseaddr, wrdata)
+        self.wrarr(baseaddr, wrdata)
             
         #reading test data
-        rddata = udm.rdarr32(baseaddr, wsize)
+        rddata = self.rdarr(baseaddr, wsize)
         
         # checking test data
         test_succ = True
@@ -198,5 +223,8 @@ class udm:
         print("")
     
     
-udm = udm()
-
+    def __init__(self, com_num, baudrate):
+        self.cc(com_num, baudrate)
+    
+    def __del__(self):
+        self.discon()

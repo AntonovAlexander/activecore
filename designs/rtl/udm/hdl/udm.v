@@ -8,6 +8,9 @@
 
 
 module udm
+#(
+    parameter BUS_TIMEOUT=(1024*1024*100)
+)
 (
 	input clk_i, rst_i,
 
@@ -15,12 +18,13 @@ module udm
 	output tx_o,
 
 	output rst_o,
-	output bus_enb_o,
+	output bus_req_o,
+	input bus_ack_i,
 	output bus_we_o,
 	output [31:0] bus_addr_bo,
     output [31:0] bus_wdata_bo,
 
-    input bus_ack_i,
+    input bus_resp_i,
     input [31:0] bus_rdata_bi
 );
 
@@ -62,8 +66,10 @@ uart_tx uart_tx
 );
 
 
-udm_controller udm_controller
-(
+udm_controller
+#(
+    .BUS_TIMEOUT(BUS_TIMEOUT)
+) udm_controller (
 	.clk_i(clk_i),
 	.reset_i(rst_i),
 
@@ -78,12 +84,13 @@ udm_controller udm_controller
 	
 	// bus
 	.rst_o(rst_o),
-	.bus_enb_o(bus_enb_o),
+	.bus_req_o(bus_req_o),
+	.bus_ack_i(bus_ack_i),
 	.bus_we_o(bus_we_o),
 	.bus_addr_bo(bus_addr_bo),
     .bus_wdata_bo(bus_wdata_bo),
 
-    .bus_ack_i(bus_ack_i),
+    .bus_resp_i(bus_resp_i),
     .bus_rdata_bi(bus_rdata_bi)
 );
 
