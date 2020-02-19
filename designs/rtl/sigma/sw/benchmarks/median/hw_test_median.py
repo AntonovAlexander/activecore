@@ -9,7 +9,7 @@ import time
 import udm
 from udm import *
 
-def hw_test_median(median_filename):
+def hw_test_median(udm, median_filename):
     print("#### MEDIAN TEST STARTED ####");
     
     DATA_SIZE = 400

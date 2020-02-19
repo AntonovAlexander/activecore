@@ -9,7 +9,7 @@ import time
 import udm
 from udm import *
 
-def hw_test_qsort(qsort_filename):
+def hw_test_qsort(udm, qsort_filename):
     print("#### QSORT TEST STARTED ####");
     
     DATA_SIZE = 1024

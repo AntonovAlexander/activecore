@@ -9,7 +9,7 @@ import time
 import udm
 from udm import *
 
-def hw_test_irq_counter(irq_counter_filename):
+def hw_test_irq_counter(udm, irq_counter_filename):
     print("#### IRQ COUNTER TEST STARTED ####");
     
     print("Loading test program...")

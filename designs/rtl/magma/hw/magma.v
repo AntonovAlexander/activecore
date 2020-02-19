@@ -10,6 +10,7 @@
 module magma
 #(
 	parameter CPU = "none",
+	parameter mem_init="YES",
 	parameter mem_data = "data.hex",
 	parameter mem_size = 1024
 )
@@ -222,6 +223,7 @@ module magma
 	
 	magma_tile #(
 		.corenum(0)
+		, .mem_init(mem_init)
 		, .mem_data(mem_data)
 		, .mem_size(mem_size)
 		, .CPU(CPU)
@@ -250,6 +252,7 @@ module magma
 	
 	magma_tile #(
 		.corenum(1)
+		, .mem_init(mem_init)
 		, .mem_data(mem_data)
 		, .mem_size(mem_size)
 		, .CPU(CPU)
@@ -278,6 +281,7 @@ module magma
 	
 	magma_tile #(
 		.corenum(2)
+		, .mem_init(mem_init)
 		, .mem_data(mem_data)
 		, .mem_size(mem_size)
 		, .CPU(CPU)
@@ -306,6 +310,7 @@ module magma
 	
 	magma_tile #(
 		.corenum(3)
+		, .mem_init(mem_init)
 		, .mem_data(mem_data)
 		, .mem_size(mem_size)
 		, .CPU(CPU)
@@ -332,7 +337,7 @@ module magma
 		, .xbus_mem_rdata	(m3_rdata)
 	);
 	
-	udm_memsplit udm_memsplit
+	udm udm
 	(
 		.clk_i(clk_i)
 		, .rst_i(srst)

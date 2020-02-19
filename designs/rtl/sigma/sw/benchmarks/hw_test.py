@@ -29,26 +29,26 @@ buf_size = 8192
 test_succ_counter = 0
 test_fail_counter = 0
 
-udm.cc('COM6', 921600)
+udm = udm('COM10', 921600)
 print("")
 
 def reset_buf():
     udm.clr(buf_addr, buf_size)
 
 reset_buf()
-if (hw_test_median('median.riscv') == 1):
+if (hw_test_median(udm, 'median.riscv') == 1):
     test_succ_counter = test_succ_counter + 1
 else:
     test_fail_counter = test_fail_counter + 1
 
 reset_buf()
-if (hw_test_qsort('qsort.riscv') == 1):
+if (hw_test_qsort(udm, 'qsort.riscv') == 1):
     test_succ_counter = test_succ_counter + 1
 else:
     test_fail_counter = test_fail_counter + 1
 
 reset_buf()
-if (hw_test_rsort('rsort.riscv') == 1):
+if (hw_test_rsort(udm, 'rsort.riscv') == 1):
     test_succ_counter = test_succ_counter + 1
 else:
     test_fail_counter = test_fail_counter + 1
@@ -57,6 +57,6 @@ print("Total tests PASSED: ", test_succ_counter, ", total test FAILED: ", test_f
 print("")
 
 reset_buf()
-hw_test_irq_counter('irq_counter.riscv')
+hw_test_irq_counter(udm, 'irq_counter.riscv')
 
 udm.discon()

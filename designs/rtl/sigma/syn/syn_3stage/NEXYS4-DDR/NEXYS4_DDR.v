@@ -29,6 +29,7 @@ sigma
 #(
 	.CPU("riscv_3stage")
 	, .delay_test_flag(0)
+	, .mem_init("YES")
 	, .mem_data("../sigma/sw/benchmarks/heartbeat_variable.riscv.hex")
 	, .mem_size(8192)
 ) sigma

@@ -16,7 +16,7 @@
 
 module magma_tile
 #(
-	parameter corenum=0, mem_data="data.hex", mem_size=1024, CPU="none"
+	parameter corenum=0, mem_init="YES", mem_data="data.hex", mem_size=1024, CPU="none"
 )
 (
 	input [0:0] clk_i
@@ -511,7 +511,8 @@ module magma_tile
 	);
 	
 	ram_dual_memsplit #(
-		.mem_data		(mem_data)
+		.mem_init(mem_init)
+		, .mem_data		(mem_data)
 		, .dat_width	(32)
 		, .adr_width	(30)
 		, .mem_size		(mem_size)

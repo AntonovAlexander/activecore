@@ -9,7 +9,7 @@ import time
 import udm
 from udm import *
 
-def hw_test_rsort(rsort_filename):
+def hw_test_rsort(udm, rsort_filename):
     print("#### RSORT TEST STARTED ####");
     
     DATA_SIZE = 1024

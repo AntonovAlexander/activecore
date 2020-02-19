@@ -11,6 +11,7 @@ module sigma
 #(
 	parameter CPU = "none",
 	parameter delay_test_flag = 0,
+	parameter mem_init="YES",
 	parameter mem_data = "data.hex",
 	parameter mem_size = 1024
 )
@@ -179,7 +180,7 @@ always @*
 		end
 	end
 	
-udm_memsplit udm_memsplit
+udm udm
 (
 	.clk_i(clk_i)
 	, .rst_i(srst)
@@ -232,6 +233,7 @@ cpu_wrapper
 
 bus_unit_memsplit
 #(
+	.mem_init(mem_init),
 	.mem_data(mem_data),
 	.mem_size(mem_size)
 ) bus_unit

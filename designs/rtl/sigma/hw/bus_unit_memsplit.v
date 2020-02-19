@@ -9,7 +9,7 @@
 
 module bus_unit_memsplit
 #(
-    parameter mem_data="data.hex", mem_size=1024
+    parameter mem_init="YES", mem_data="data.hex", mem_size=1024
 )
 (
 	
@@ -147,6 +147,7 @@ always @*
 	
 ram_dual_memsplit
 #(
+	.mem_init(mem_init),
 	.mem_data(mem_data),
 	.dat_width(32),
 	.adr_width(30),
