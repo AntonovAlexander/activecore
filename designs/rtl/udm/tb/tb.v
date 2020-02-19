@@ -33,7 +33,10 @@ reg CLK_100MHZ, RST, rx;
 reg [15:0] SW;
 wire [15:0] LED;
 	
-NEXYS4_DDR DUT (
+NEXYS4_DDR
+#(
+	.SIM("YES")
+) DUT (
 	.CLK100MHZ(CLK_100MHZ)
     , .CPU_RESETN(!RST)
     
@@ -96,7 +99,7 @@ endtask
 
 ////Send byte to UART////
 
-task UART_SEND 
+task UART_SEND_SERIALIZE
 	(
 	 input reg [7:0] send_byte
 	 );
@@ -133,6 +136,19 @@ task UART_SEND
 	end
 endtask
 
+task UART_SEND 
+	(
+	 input reg [7:0] send_byte
+	 );
+	begin
+	@(posedge DUT.udm.uart_rx.clk_i)
+	DUT.udm.uart_rx.rx_done_tick_o <= 1'b1;
+	DUT.udm.uart_rx.dout_bo <= send_byte;
+	@(posedge DUT.udm.uart_rx.clk_i)
+	DUT.udm.uart_rx.rx_done_tick_o <= 1'b0;
+	DUT.udm.uart_rx.dout_bo <= 8'h0;
+	end
+endtask
 
 task udm_rst ();
 	begin
@@ -152,6 +168,13 @@ task udm_hreset ();
 	begin
 	udm_rst();
 	udm_nrst();
+	end
+endtask
+
+task udm_check ();
+	begin
+	UART_SEND(`SYNC_BYTE);
+	UART_SEND(`IDCODE_CMD);
 	end
 endtask
 
@@ -247,15 +270,10 @@ begin
 	RESET_ALL();
 	UART_CFG(`DIVIDER_115200, 2'b00);
 	WAIT(100);
-	UART_SEND(`SYNC_BYTE);
-	UART_SEND(`IDCODE_CMD);
-	
-	//udm_rst();
-	//udm_nrst();
+	udm_check();
+	udm_hreset();
 	
 	udm_wr_single(32'h00000000, 32'h33cc);
-	udm_rd_single(32'h00000004);
-	udm_rd_single(32'h00000004);
 	udm_rd_single(32'h00000004);
 	
 	WAIT(50000);

@@ -10,6 +10,7 @@
 module udm
 #(
     parameter BUS_TIMEOUT=(1024*1024*100)
+    , parameter RX_EXTERNAL_OVERRIDE = "NO"
 )
 (
 	input clk_i, rst_i,
@@ -22,6 +23,7 @@ module udm
 	input bus_ack_i,
 	output bus_we_o,
 	output [31:0] bus_addr_bo,
+    output [3:0] bus_be_bo,
     output [31:0] bus_wdata_bo,
 
     input bus_resp_i,
@@ -37,8 +39,10 @@ wire tx_done_tick;
 wire locked;
 wire [28:0] bitperiod;
 
-uart_rx uart_rx
-(
+uart_rx
+#(
+    .RX_EXTERNAL_OVERRIDE(RX_EXTERNAL_OVERRIDE)
+) uart_rx (
     .clk_i(clk_i),
     .rst_i(rst_i),
 
@@ -88,6 +92,7 @@ udm_controller
 	.bus_ack_i(bus_ack_i),
 	.bus_we_o(bus_we_o),
 	.bus_addr_bo(bus_addr_bo),
+    .bus_be_bo(bus_be_bo),
     .bus_wdata_bo(bus_wdata_bo),
 
     .bus_resp_i(bus_resp_i),

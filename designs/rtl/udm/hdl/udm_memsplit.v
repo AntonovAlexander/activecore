@@ -26,8 +26,6 @@ module udm_memsplit
 	input [0:0] bus_resp_i,
 	input [31:0] bus_rdata_bi
 );
-
-assign bus_be_bo = 4'hf;
 	
 udm udm
 (
@@ -43,6 +41,7 @@ udm udm
 	, .bus_ack_i(bus_ack_i)
 	, .bus_we_o(bus_we_o)
 	, .bus_addr_bo(bus_addr_bo)
+	, .bus_be_bo(bus_be_bo)
     , .bus_wdata_bo(bus_wdata_bo)
 
     , .bus_resp_i(bus_resp_i)

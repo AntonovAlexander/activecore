@@ -29,6 +29,7 @@ module udm_controller
 	input bus_ack_i,
 	output reg bus_we_o,
 	output reg [31:0] bus_addr_bo,
+	output [3:0] bus_be_bo,
     output reg [31:0] bus_wdata_bo,
 
     input bus_resp_i,
@@ -53,6 +54,7 @@ localparam RD_INC_CMD = 8'h82;		// Read slave with autoincrement
 localparam WR_NOINC_CMD = 8'h83;	// Write slave without autoincrement
 localparam RD_NOINC_CMD = 8'h84;	// Read slave without autoincrement
 
+assign bus_be_bo = 4'hf;
 
 reg [31:0] timeout_counter;
 
@@ -369,6 +371,7 @@ always @(posedge clk_i, posedge reset_i)
 					if (timeout_counter > BUS_TIMEOUT)
 					   begin
 					   tx_err_ack <= 1'b1;
+					   state <= IDLE;
 					   end
 				    else
 				        begin
@@ -404,6 +407,7 @@ always @(posedge clk_i, posedge reset_i)
 				    if (timeout_counter > BUS_TIMEOUT)
                        begin
                        tx_err_resp <= 1'b1;
+                       state <= IDLE;
                        end
                     else
                         begin

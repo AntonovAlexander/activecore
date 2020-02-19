@@ -8,6 +8,7 @@
 
 
 module NEXYS4_DDR
+#( parameter SIM = "NO" )
 (
 	input 	CLK100MHZ
     , input   CPU_RESETN
@@ -18,6 +19,9 @@ module NEXYS4_DDR
     , input   UART_TXD_IN
     , output  UART_RXD_OUT
 );
+
+localparam UDM_BUS_TIMEOUT = (SIM == "YES") ? 100 : (1024*1024*100);
+localparam UDM_RX_EXTERNAL_OVERRIDE = (SIM == "YES") ? "YES" : "NO";
 
 wire clk_gen;
 wire pll_locked;
@@ -52,8 +56,11 @@ wire [0:0] udm_ack;
 reg [0:0] udm_resp;
 reg [31:0] udm_rdata;
 
-udm_memsplit udm_memsplit
-(
+udm
+#(
+    .BUS_TIMEOUT(UDM_BUS_TIMEOUT)
+    , .RX_EXTERNAL_OVERRIDE(UDM_RX_EXTERNAL_OVERRIDE)
+)udm (
 	.clk_i(clk_gen)
 	, .rst_i(srst)
 
