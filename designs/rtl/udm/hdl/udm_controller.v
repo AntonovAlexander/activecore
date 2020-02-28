@@ -41,9 +41,10 @@ localparam SYNC_BYTE = 8'h55;
 localparam ESCAPE_BYTE = 8'h5a;
 
 // trx status bytes
-localparam TRX_IRQ_BYTE         = 8'h00;
+localparam TRX_WR_SUCC_BYTE     = 8'h00;
 localparam TRX_ERR_ACK_BYTE     = 8'h01;
 localparam TRX_ERR_RESP_BYTE    = 8'h02;
+localparam TRX_IRQ_BYTE         = 8'h80;
 
 // commands
 localparam IDCODE_CMD = 8'h00;		// check udm accessibility
@@ -389,7 +390,12 @@ always @(posedge clk_i, posedge reset_i)
                                 end
                             else
                                 begin
-                                if (tr_length == 32'h4) state <= IDLE;
+                                if (tr_length == 32'h4)
+                                    begin
+                                    tx_sendbyte_start <= 1'b1;
+                                    tx_sendbyte <= TRX_WR_SUCC_BYTE;
+                                    state <= IDLE;
+                                    end
                                 else
                                     begin
                                     if (autoinc_ff == 1'b1) bus_addr_bo <= bus_addr_bo + 32'h4;

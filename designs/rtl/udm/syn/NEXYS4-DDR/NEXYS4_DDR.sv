@@ -14,7 +14,7 @@ module NEXYS4_DDR
     , input   CPU_RESETN
     
     , input   [15:0] SW
-    , output reg  [15:0] LED
+    , output logic  [15:0] LED
 
     , input   UART_TXD_IN
     , output  UART_RXD_OUT
@@ -23,8 +23,8 @@ module NEXYS4_DDR
 localparam UDM_BUS_TIMEOUT = (SIM == "YES") ? 100 : (1024*1024*100);
 localparam UDM_RX_EXTERNAL_OVERRIDE = (SIM == "YES") ? "YES" : "NO";
 
-wire clk_gen;
-wire pll_locked;
+logic clk_gen;
+logic pll_locked;
 
 sys_clk sys_clk
 (
@@ -34,10 +34,10 @@ sys_clk sys_clk
     , .locked(pll_locked)
 );
 
-wire arst;
+logic arst;
 assign arst = !(CPU_RESETN & pll_locked);
 
-wire srst;
+logic srst;
 reset_cntrl reset_cntrl
 (
 	.clk_i(clk_gen),
@@ -45,22 +45,22 @@ reset_cntrl reset_cntrl
 	.srst_o(srst)
 );
 
-wire udm_reset;
+logic udm_reset;
 
-wire [0:0] udm_req;
-wire [0:0] udm_we;
-wire [31:0] udm_addr;
-wire [3:0] udm_be;
-wire [31:0] udm_wdata;
-wire [0:0] udm_ack;
-reg [0:0] udm_resp;
-reg [31:0] udm_rdata;
+logic [0:0] udm_req;
+logic [0:0] udm_we;
+logic [31:0] udm_addr;
+logic [3:0] udm_be;
+logic [31:0] udm_wdata;
+logic [0:0] udm_ack;
+logic [0:0] udm_resp;
+logic [31:0] udm_rdata;
 
 udm
 #(
     .BUS_TIMEOUT(UDM_BUS_TIMEOUT)
     , .RX_EXTERNAL_OVERRIDE(UDM_RX_EXTERNAL_OVERRIDE)
-)udm (
+) udm (
 	.clk_i(clk_gen)
 	, .rst_i(srst)
 
@@ -79,21 +79,25 @@ udm
 	, .bus_rdata_bi(udm_rdata)
 );
 
-localparam CSR_LED_ADDR	 	= 32'h00000000;
-localparam CSR_SW_ADDR  	= 32'h00000004;
-localparam TESTMEM_ADDR 	= 32'h80000000;
-localparam TESTMEM_WSIZE	= 1024;
+localparam CSR_LED_ADDR         = 32'h00000000;
+localparam CSR_SW_ADDR          = 32'h00000004;
+localparam TESTMEM_ADDR         = 32'h80000000;
 
-wire testmem_udm_enb;
+localparam TESTMEM_WSIZE_POW    = 10;
+localparam TESTMEM_WSIZE        = 2**TESTMEM_WSIZE_POW;
+
+logic testmem_udm_enb;
 assign testmem_udm_enb = (!(udm_addr < TESTMEM_ADDR) && (udm_addr < (TESTMEM_ADDR + (TESTMEM_WSIZE*4))));
 
-reg testmem_udm_we;
-reg [31:0] testmem_udm_addr, testmem_udm_wdata;
-wire [31:0] testmem_udm_rdata;
+logic testmem_udm_we;
+logic [TESTMEM_WSIZE_POW-1:0] testmem_udm_addr;
+logic [31:0] testmem_udm_wdata;
+logic [31:0] testmem_udm_rdata;
 
-wire testmem_p1_we;
-wire [31:0] testmem_p1_addr, testmem_p1_wdata;
-wire [31:0] testmem_p1_rdata;
+logic testmem_p1_we;
+logic [TESTMEM_WSIZE_POW-1:0] testmem_p1_addr;
+logic [31:0] testmem_p1_wdata;
+logic [31:0] testmem_p1_rdata;
 
 // testmem's port1 is inactive
 assign testmem_p1_we = 1'b0;
@@ -104,7 +108,7 @@ ram_dual #(
     .mem_init("NO")
     , .mem_data("nodata.hex")
     , .dat_width(32)
-    , .adr_width(32)
+    , .adr_width(TESTMEM_WSIZE_POW)
     , .mem_size(TESTMEM_WSIZE)
 ) testmem (
     .clk(clk_gen)
@@ -121,8 +125,8 @@ ram_dual #(
 );
 
 assign udm_ack = udm_req;   // bus always ready to accept request
-reg csr_resp, testmem_resp, testmem_resp_dly;
-reg [31:0] csr_rdata;
+logic csr_resp, testmem_resp, testmem_resp_dly;
+logic [31:0] csr_rdata;
 
 // bus request
 always @(posedge clk_gen)

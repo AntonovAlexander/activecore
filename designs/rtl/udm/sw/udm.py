@@ -18,8 +18,10 @@ class udm:
     wr_cmd_noinc    = 0x83
     rd_cmd_noinc    = 0x84
     
+    TRX_WR_SUCC_BYTE    = 0x00
     TRX_ERR_ACK_BYTE    = 0x01
     TRX_ERR_RESP_BYTE   = 0x02
+    TRX_IRQ_BYTE        = 0x80
     
     def connect(self, com_num, baudrate):
         self.ser = serial.Serial(com_num, baudrate, 8)   
@@ -37,27 +39,30 @@ class udm:
     def getbyte(self):
         rdata = self.ser.read(1)
         rdata = struct.unpack("B", rdata)
+        return rdata[0]
+    
+    def getdatabyte(self):
+        rdata = self.getbyte()
         
-        if (rdata[0] == self.TRX_ERR_ACK_BYTE):
+        if (rdata == self.TRX_ERR_ACK_BYTE):
             print("UDM BUS ERROR: <ack> not received!")
             raise Exception()
         
-        if (rdata[0] == self.TRX_ERR_RESP_BYTE):
+        if (rdata == self.TRX_ERR_RESP_BYTE):
             print("UDM BUS ERROR: <resp> not received!")
             raise Exception()
         
-        if (rdata[0] == self.escape_byte):
-            rdata = self.ser.read(1)
-            rdata = struct.unpack("B", rdata)
+        if (rdata == self.escape_byte):
+            rdata = self.getbyte()
         
-        return rdata[0]
+        return rdata
     
     def getword(self):
         rdata=[]
-        rdata.append(self.getbyte())
-        rdata.append(self.getbyte())
-        rdata.append(self.getbyte())
-        rdata.append(self.getbyte())
+        rdata.append(self.getdatabyte())
+        rdata.append(self.getdatabyte())
+        rdata.append(self.getdatabyte())
+        rdata.append(self.getdatabyte())
         rdataword = rdata[0] + (rdata[1] << 8) + (rdata[2] << 16) + (rdata[3] << 24)
         return rdataword
     
@@ -107,14 +112,28 @@ class udm:
         self.sendbyte((dataword >> 16) & 0xff)
         self.sendbyte((dataword >> 24) & 0xff)
     
+    def wr_finalize(self):
+        rdata = self.getbyte()
+        if (rdata == self.TRX_WR_SUCC_BYTE):
+            pass
+        elif (rdata == self.TRX_ERR_ACK_BYTE):
+            print("UDM BUS ERROR: <ack> not received!")
+            raise Exception()
+        else:
+            print("UDM BUS ERROR: response unknown!")
+            raise Exception()
+    
     def wr(self, address, dataword):
+        self.ser.flush()
         self.sendbyte(self.sync_byte)
         self.sendbyte(self.wr_cmd)
         self.sendword(address)     
         self.sendword(4)
         self.sendword(dataword)
+        self.wr_finalize()
     
     def wrarr(self, address, datawords):
+        self.ser.flush()
         self.sendbyte(self.sync_byte)
         self.sendbyte(self.wr_cmd)
         self.sendword(address)     
@@ -123,14 +142,13 @@ class udm:
         # write data
         for i in range(count):
             self.sendword(datawords[i])
+        self.wr_finalize()
     
     def clr(self, address, size):
-        self.sendbyte(self.sync_byte)
-        self.sendbyte(self.wr_cmd)
-        self.sendword(address)
-        self.sendword(size)
-        for i in range(size):
-            self.sendbyte(0x00)
+        padding_arr = []
+        for i in range(size >> 2):
+            padding_arr.append(0x00)
+        self.wrarr(address, padding_arr)
     
     def rd(self, address):
         self.ser.flush()
@@ -152,6 +170,7 @@ class udm:
         return rdatawords
     
     def wrfile_le(self, address, filename):
+        self.ser.flush()
         f = open(filename, "rb")
         self.sendbyte(self.sync_byte)
         self.sendbyte(self.wr_cmd)
@@ -188,6 +207,7 @@ class udm:
                     break      
         finally:
             f.close()
+            self.wr_finalize()
     
     def loadbin(self, filename):
         self.rst()
