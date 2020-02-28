@@ -124,25 +124,33 @@ class udm:
             raise Exception()
     
     def wr(self, address, dataword):
-        self.ser.flush()
-        self.sendbyte(self.sync_byte)
-        self.sendbyte(self.wr_cmd)
-        self.sendword(address)     
-        self.sendword(4)
-        self.sendword(dataword)
-        self.wr_finalize()
+        try:
+            self.ser.flush()
+            self.sendbyte(self.sync_byte)
+            self.sendbyte(self.wr_cmd)
+            self.sendword(address)     
+            self.sendword(4)
+            self.sendword(dataword)
+            self.wr_finalize()
+        except:
+            self.discon()
+            raise Exception()
     
     def wrarr(self, address, datawords):
-        self.ser.flush()
-        self.sendbyte(self.sync_byte)
-        self.sendbyte(self.wr_cmd)
-        self.sendword(address)     
-        count = len(datawords) 
-        self.sendword(count << 2)
-        # write data
-        for i in range(count):
-            self.sendword(datawords[i])
-        self.wr_finalize()
+        try:
+            self.ser.flush()
+            self.sendbyte(self.sync_byte)
+            self.sendbyte(self.wr_cmd)
+            self.sendword(address)     
+            count = len(datawords) 
+            self.sendword(count << 2)
+            # write data
+            for i in range(count):
+                self.sendword(datawords[i])
+            self.wr_finalize()
+        except:
+            self.discon()
+            raise Exception()
     
     def clr(self, address, size):
         padding_arr = []
@@ -151,23 +159,31 @@ class udm:
         self.wrarr(address, padding_arr)
     
     def rd(self, address):
-        self.ser.flush()
-        self.sendbyte(self.sync_byte)
-        self.sendbyte(self.rd_cmd)
-        self.sendword(address)
-        self.sendword(4)
-        return self.getword() 
+        try:
+            self.ser.flush()
+            self.sendbyte(self.sync_byte)
+            self.sendbyte(self.rd_cmd)
+            self.sendword(address)
+            self.sendword(4)
+            return self.getword()
+        except:
+            self.discon()
+            raise Exception()
     
     def rdarr(self, address, length):
-        self.ser.flush()
-        self.sendbyte(self.sync_byte)
-        self.sendbyte(self.rd_cmd)
-        self.sendword(address)
-        self.sendword(length << 2)
-        rdatawords = []
-        for i in range(length):
-            rdatawords.append(self.getword())
-        return rdatawords
+        try:
+            self.ser.flush()
+            self.sendbyte(self.sync_byte)
+            self.sendbyte(self.rd_cmd)
+            self.sendword(address)
+            self.sendword(length << 2)
+            rdatawords = []
+            for i in range(length):
+                rdatawords.append(self.getword())
+            return rdatawords
+        except:
+            self.discon()
+            raise Exception()
     
     def wrfile_le(self, address, filename):
         self.ser.flush()
