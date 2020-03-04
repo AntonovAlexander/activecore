@@ -21,7 +21,7 @@ module NEXYS4_DDR
 );
 
 localparam UDM_BUS_TIMEOUT = (SIM == "YES") ? 100 : (1024*1024*100);
-localparam UDM_RX_EXTERNAL_OVERRIDE = (SIM == "YES") ? "YES" : "NO";
+localparam UDM_RTX_EXTERNAL_OVERRIDE = (SIM == "YES") ? "YES" : "NO";
 
 logic clk_gen;
 logic pll_locked;
@@ -59,7 +59,7 @@ logic [31:0] udm_rdata;
 udm
 #(
     .BUS_TIMEOUT(UDM_BUS_TIMEOUT)
-    , .RX_EXTERNAL_OVERRIDE(UDM_RX_EXTERNAL_OVERRIDE)
+    , .RTX_EXTERNAL_OVERRIDE(UDM_RTX_EXTERNAL_OVERRIDE)
 ) udm (
 	.clk_i(clk_gen)
 	, .rst_i(srst)

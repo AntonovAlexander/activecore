@@ -233,7 +233,7 @@ class udm_driver;
         // data
         udm_sendword_le(wr_data);
         
-        $display("udm written: addr: 0x%8x, data: 0x%8x", wr_addr, wr_data);
+        $display("UDM WR: addr: 0x%8x, data: 0x%8x", wr_addr, wr_data);
     
         end
     endtask
@@ -256,7 +256,69 @@ class udm_driver;
         udm_sendword_le(32'h4);
         
         @(posedge DUT.udm.bus_resp_i)
-        $display("udm read:   addr: 0x%8x, data: 0x%8x", wr_addr, DUT.udm.bus_rdata_bi);
+        $display("UDM RD: addr: 0x%8x, data: 0x%8x", wr_addr, DUT.udm.bus_rdata_bi);
+    
+        end
+    endtask
+    
+    task wrarr
+        (
+            input logic [31:0] wr_addr,
+            input logic [31:0] wr_data []
+        );
+        begin
+        
+        integer i;
+    
+        // header
+        UART_SEND(`SYNC_BYTE);
+        UART_SEND(`WR_CMD);
+        
+        // address
+        udm_sendword_le(wr_addr);
+    
+        // length
+        udm_sendword_le(wr_data.size() * 4);
+        
+        // data
+        $display("-- UDM WRARR: addr: 0x%8x, length: %4d --", wr_addr, wr_data.size());
+        for (i=0; i<wr_data.size(); i=i+1)
+            begin
+            udm_sendword_le(wr_data[i]);   
+            $display("UDM WR: addr: 0x%8x, data[%4d]: 0x%8x", (wr_addr + i*4), i, wr_data[i]);
+            end
+        $display("-- UDM WRARR complete --");
+    
+        end
+    endtask
+    
+    task rdarr
+        (
+            input logic [31:0] wr_addr,
+            input integer size
+        );
+        begin
+        
+        integer i;
+    
+        // header
+        UART_SEND(`SYNC_BYTE);
+        UART_SEND(`RD_CMD);
+        
+        // address
+        udm_sendword_le(wr_addr);
+    
+        // length
+        udm_sendword_le(size * 4);
+        
+        // data
+        $display("-- UDM RDARR: addr: 0x%8x, length: %4d --", wr_addr, size);
+        for (i=0; i<size; i=i+1)
+            begin
+            @(posedge DUT.udm.bus_resp_i)
+            $display("UDM RD: addr: 0x%8x, data[%4d]: 0x%8x", (wr_addr + i*4), i, DUT.udm.bus_rdata_bi);
+            end
+        $display("-- UDM RDARR complete --");
     
         end
     endtask
@@ -267,8 +329,15 @@ endclass : udm_driver
 /////////////////////////
 // main test procesure //
 udm_driver udm;
+localparam CSR_LED_ADDR         = 32'h00000000;
+localparam CSR_SW_ADDR          = 32'h00000004;
+localparam TESTMEM_ADDR         = 32'h80000000;
+
 initial
-begin
+    begin
+    logic [31:0] wrdata [];
+    integer ARRSIZE=10;
+    
 	$display ("### SIMULATION STARTED ###");
 	
 	udm.cfg(`DIVIDER_115200, 2'b00);
@@ -279,14 +348,20 @@ begin
 	udm.check();
 	udm.hreset();
 	
-	udm.wr(32'h00000000, 32'h33cc);
-	udm.rd(32'h00000004);
+	udm.wr(CSR_LED_ADDR, 32'h33cc);
+	udm.rd(CSR_SW_ADDR);
+	
+	wrdata = new [ARRSIZE];
+	for (int i=0; i<ARRSIZE; i=i+1) wrdata[i] = i;
+	udm.wrarr(TESTMEM_ADDR, wrdata);
+	
+	udm.rdarr(TESTMEM_ADDR, ARRSIZE);
 	
 	WAIT(1000);
 
 	$display ("### TEST PROCEDURE FINISHED ###");
 	$stop;
-end
+    end
 
 
 endmodule

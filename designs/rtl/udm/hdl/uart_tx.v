@@ -8,6 +8,9 @@
 
 
 module uart_tx
+#(
+    parameter RTX_EXTERNAL_OVERRIDE = "NO"
+)
 (
 	input clk_i, rst_i,
 
@@ -44,7 +47,8 @@ always @(posedge clk_i)
 	else 
 		begin
 		
-		tx_done_tick_o <= 1'b0;
+		if (RTX_EXTERNAL_OVERRIDE == "NO") tx_done_tick_o <= 1'b0;
+		else tx_done_tick_o <= 1'b1;
 
 		case (state)
 

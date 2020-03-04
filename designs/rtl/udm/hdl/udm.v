@@ -10,7 +10,7 @@
 module udm
 #(
     parameter BUS_TIMEOUT=(1024*1024*100)
-    , parameter RX_EXTERNAL_OVERRIDE = "NO"
+    , parameter RTX_EXTERNAL_OVERRIDE = "NO"
 )
 (
 	input clk_i, rst_i,
@@ -41,7 +41,7 @@ wire [28:0] bitperiod;
 
 uart_rx
 #(
-    .RX_EXTERNAL_OVERRIDE(RX_EXTERNAL_OVERRIDE)
+    .RTX_EXTERNAL_OVERRIDE(RTX_EXTERNAL_OVERRIDE)
 ) uart_rx (
     .clk_i(clk_i),
     .rst_i(rst_i),
@@ -54,8 +54,10 @@ uart_rx
     .bitperiod_o(bitperiod)
 );
 
-uart_tx uart_tx
-(
+uart_tx
+#(
+    .RTX_EXTERNAL_OVERRIDE(RTX_EXTERNAL_OVERRIDE)
+) uart_tx (
     .clk_i(clk_i),
     .rst_i(rst_i),
 
