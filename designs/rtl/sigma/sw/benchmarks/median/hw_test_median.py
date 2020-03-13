@@ -9,6 +9,10 @@ import time
 import udm
 from udm import *
 
+sys.path.append('..')
+import sigma
+from sigma import *
+
 def hw_test_median(udm, median_filename):
     print("#### MEDIAN TEST STARTED ####");
     
@@ -37,7 +41,7 @@ def hw_test_median(udm, median_filename):
     ]
     
     print("Loading test program...")
-    udm.loadelf(median_filename)
+    loadelf(udm, median_filename)
     print("Test program written!")
 
     time.sleep(1)

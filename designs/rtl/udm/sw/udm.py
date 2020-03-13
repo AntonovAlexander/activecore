@@ -214,11 +214,6 @@ class udm:
             self.wrarr32(address, wrdataarr)
             f.close()
     
-    def loadbin(self, filename):
-        self.rst()
-        self.wrbin32_le(0x0, filename)
-        self.nrst()
-    
     def wrelf32(self, base_offset, filename):
         print("----------------")
         f = open(filename, "rb")
@@ -317,11 +312,6 @@ class udm:
         finally:
             f.close()
         print("----------------")
-    
-    def loadelf(self, filename):
-        self.rst()
-        self.wrelf32(0x0, filename)
-        self.nrst()
     
     def memtest32(self, baseaddr, wsize):
         print("")

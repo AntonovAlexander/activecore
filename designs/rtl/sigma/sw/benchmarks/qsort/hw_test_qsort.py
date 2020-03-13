@@ -9,6 +9,10 @@ import time
 import udm
 from udm import *
 
+sys.path.append('..')
+import sigma
+from sigma import *
+
 def hw_test_qsort(udm, qsort_filename):
     print("#### QSORT TEST STARTED ####");
     
@@ -69,7 +73,7 @@ def hw_test_qsort(udm, qsort_filename):
 	]
     
     print("Loading test program...")
-    udm.loadelf(qsort_filename)
+    loadelf(udm, qsort_filename)
     print("Test program written!")
 
     time.sleep(1)

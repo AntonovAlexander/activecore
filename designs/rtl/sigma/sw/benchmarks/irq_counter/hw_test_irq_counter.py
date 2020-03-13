@@ -9,11 +9,15 @@ import time
 import udm
 from udm import *
 
+sys.path.append('..')
+import sigma
+from sigma import *
+
 def hw_test_irq_counter(udm, irq_counter_filename):
     print("#### IRQ COUNTER TEST STARTED ####");
     
     print("Loading test program...")
-    udm.loadelf(irq_counter_filename)
+    loadelf(udm, irq_counter_filename)
     print("Test program written!")
     print("#### PRESS IRQ BUTTON TO TEST! ####")
     print("")

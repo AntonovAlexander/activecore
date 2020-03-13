@@ -9,6 +9,10 @@ import time
 import udm
 from udm import *
 
+sys.path.append('..')
+import sigma
+from sigma import *
+
 def hw_test_rsort(udm, rsort_filename):
     print("#### RSORT TEST STARTED ####");
     
@@ -69,7 +73,7 @@ def hw_test_rsort(udm, rsort_filename):
 	]
     
     print("Loading test program...")
-    udm.loadelf(rsort_filename)
+    loadelf(udm, rsort_filename)
     print("Test program written!")
 
     time.sleep(1)
