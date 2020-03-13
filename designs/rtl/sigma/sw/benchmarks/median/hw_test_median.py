@@ -37,13 +37,13 @@ def hw_test_median(udm, median_filename):
     ]
     
     print("Loading test program...")
-    udm.loadbin(median_filename)
+    udm.loadelf(median_filename)
     print("Test program written!")
 
     time.sleep(1)
 
     print("Reading data buffer...")
-    rdarr = udm.rdarr(0x6000, DATA_SIZE)
+    rdarr = udm.rdarr32(0x6000, DATA_SIZE)
     print("Data buffer read!")
 
     test_succ_flag = 1

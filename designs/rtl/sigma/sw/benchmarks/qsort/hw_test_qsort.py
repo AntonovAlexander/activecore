@@ -69,13 +69,13 @@ def hw_test_qsort(udm, qsort_filename):
 	]
     
     print("Loading test program...")
-    udm.loadbin(qsort_filename)
+    udm.loadelf(qsort_filename)
     print("Test program written!")
 
     time.sleep(1)
 
     print("Reading data buffer...")
-    rdarr = udm.rdarr(0x6000, DATA_SIZE)
+    rdarr = udm.rdarr32(0x6000, DATA_SIZE)
     print("Data buffer read!")
 
     test_succ_flag = 1
