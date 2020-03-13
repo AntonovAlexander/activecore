@@ -41,7 +41,7 @@ def hw_test_median(udm, median_filename):
     ]
     
     print("Loading test program...")
-    loadelf(udm, median_filename)
+    sigma.loadelf(udm, median_filename)
     print("Test program written!")
 
     time.sleep(1)

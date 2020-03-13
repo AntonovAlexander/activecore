@@ -187,7 +187,7 @@ class udm_driver;
     endtask
     
     
-    task udm_sendword_le
+    task udm_sendword32
         (
             input logic [31:0] dataword
         );
@@ -200,20 +200,7 @@ class udm_driver;
     endtask
     
     
-    task udm_sendword_be
-        (
-            input logic [31:0] dataword
-        );
-        begin
-        udm_sendbyte(dataword[31:24]);
-        udm_sendbyte(dataword[23:16]);
-        udm_sendbyte(dataword[15:8]);
-        udm_sendbyte(dataword[7:0]);
-        end
-    endtask
-    
-    
-    task wr
+    task wr32
         (
             input logic [31:0] wr_addr,
             input logic [31:0] wr_data
@@ -225,21 +212,21 @@ class udm_driver;
         UART_SEND(`WR_CMD);
         
         // address
-        udm_sendword_le(wr_addr);
+        udm_sendword32(wr_addr);
     
         // length
-        udm_sendword_le(32'h4);
+        udm_sendword32(32'h4);
         
         // data
-        udm_sendword_le(wr_data);
+        udm_sendword32(wr_data);
         
-        $display("UDM WR: addr: 0x%8x, data: 0x%8x", wr_addr, wr_data);
+        $display("UDM WR32: addr: 0x%8x, data: 0x%8x", wr_addr, wr_data);
     
         end
     endtask
     
     
-    task rd
+    task rd32
         (
             input logic [31:0] wr_addr
         );
@@ -250,18 +237,18 @@ class udm_driver;
         UART_SEND(`RD_CMD);
         
         // address
-        udm_sendword_le(wr_addr);
+        udm_sendword32(wr_addr);
     
         // length
-        udm_sendword_le(32'h4);
+        udm_sendword32(32'h4);
         
         @(posedge DUT.udm.bus_resp_i)
-        $display("UDM RD: addr: 0x%8x, data: 0x%8x", wr_addr, DUT.udm.bus_rdata_bi);
+        $display("UDM RD32: addr: 0x%8x, data: 0x%8x", wr_addr, DUT.udm.bus_rdata_bi);
     
         end
     endtask
     
-    task wrarr
+    task wrarr32
         (
             input logic [31:0] wr_addr,
             input logic [31:0] wr_data []
@@ -275,24 +262,24 @@ class udm_driver;
         UART_SEND(`WR_CMD);
         
         // address
-        udm_sendword_le(wr_addr);
+        udm_sendword32(wr_addr);
     
         // length
-        udm_sendword_le(wr_data.size() * 4);
+        udm_sendword32(wr_data.size() * 4);
         
         // data
-        $display("-- UDM WRARR: addr: 0x%8x, length: %4d --", wr_addr, wr_data.size());
+        $display("-- UDM WRARR32: addr: 0x%8x, length: %4d --", wr_addr, wr_data.size());
         for (i=0; i<wr_data.size(); i=i+1)
             begin
-            udm_sendword_le(wr_data[i]);   
-            $display("UDM WR: addr: 0x%8x, data[%4d]: 0x%8x", (wr_addr + i*4), i, wr_data[i]);
+            udm_sendword32(wr_data[i]);   
+            $display("UDM WR32: addr: 0x%8x, data[%4d]: 0x%8x", (wr_addr + i*4), i, wr_data[i]);
             end
-        $display("-- UDM WRARR complete --");
+        $display("-- UDM WRARR32 complete --");
     
         end
     endtask
     
-    task rdarr
+    task rdarr32
         (
             input logic [31:0] wr_addr,
             input integer size
@@ -306,19 +293,19 @@ class udm_driver;
         UART_SEND(`RD_CMD);
         
         // address
-        udm_sendword_le(wr_addr);
+        udm_sendword32(wr_addr);
     
         // length
-        udm_sendword_le(size * 4);
+        udm_sendword32(size * 4);
         
         // data
-        $display("-- UDM RDARR: addr: 0x%8x, length: %4d --", wr_addr, size);
+        $display("-- UDM RDARR32: addr: 0x%8x, length: %4d --", wr_addr, size);
         for (i=0; i<size; i=i+1)
             begin
             @(posedge DUT.udm.bus_resp_i)
-            $display("UDM RD: addr: 0x%8x, data[%4d]: 0x%8x", (wr_addr + i*4), i, DUT.udm.bus_rdata_bi);
+            $display("UDM RD32: addr: 0x%8x, data[%4d]: 0x%8x", (wr_addr + i*4), i, DUT.udm.bus_rdata_bi);
             end
-        $display("-- UDM RDARR complete --");
+        $display("-- UDM RDARR32 complete --");
     
         end
     endtask
@@ -348,14 +335,14 @@ initial
 	udm.check();
 	udm.hreset();
 	
-	udm.wr(CSR_LED_ADDR, 32'h33cc);
-	udm.rd(CSR_SW_ADDR);
+	udm.wr32(CSR_LED_ADDR, 32'h33cc);
+	udm.rd32(CSR_SW_ADDR);
 	
 	wrdata = new [ARRSIZE];
 	for (int i=0; i<ARRSIZE; i=i+1) wrdata[i] = i;
-	udm.wrarr(TESTMEM_ADDR, wrdata);
+	udm.wrarr32(TESTMEM_ADDR, wrdata);
 	
-	udm.rdarr(TESTMEM_ADDR, ARRSIZE);
+	udm.rdarr32(TESTMEM_ADDR, ARRSIZE);
 	
 	WAIT(1000);
 

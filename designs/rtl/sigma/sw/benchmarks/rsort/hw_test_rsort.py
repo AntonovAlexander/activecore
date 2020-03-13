@@ -73,7 +73,7 @@ def hw_test_rsort(udm, rsort_filename):
 	]
     
     print("Loading test program...")
-    loadelf(udm, rsort_filename)
+    sigma.loadelf(udm, rsort_filename)
     print("Test program written!")
 
     time.sleep(1)

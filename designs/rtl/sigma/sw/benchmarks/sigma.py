@@ -10,15 +10,17 @@ from udm import *
 buf_addr = 0x6000
 buf_size = 8192
 
-def reset_buf(udm):
-    udm.clr(buf_addr, buf_size)
+class sigma:
 
-def loadbin(udm, filename):
-    udm.rst()
-    udm.wrbin32_le(0x0, filename)
-    udm.nrst()
-
-def loadelf(udm, filename):
-    udm.rst()
-    udm.wrelf32(0x0, filename)
-    udm.nrst()
+    def reset_buf(udm):
+        udm.clr(buf_addr, buf_size)
+    
+    def loadbin(udm, filename):
+        udm.rst()
+        udm.wrbin32_le(0x0, filename)
+        udm.nrst()
+    
+    def loadelf(udm, filename):
+        udm.rst()
+        udm.wrelf32(0x0, filename)
+        udm.nrst()

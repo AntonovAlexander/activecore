@@ -73,7 +73,7 @@ def hw_test_qsort(udm, qsort_filename):
 	]
     
     print("Loading test program...")
-    loadelf(udm, qsort_filename)
+    sigma.loadelf(udm, qsort_filename)
     print("Test program written!")
 
     time.sleep(1)

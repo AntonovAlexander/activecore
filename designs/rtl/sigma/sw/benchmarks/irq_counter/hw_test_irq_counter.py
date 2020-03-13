@@ -17,7 +17,7 @@ def hw_test_irq_counter(udm, irq_counter_filename):
     print("#### IRQ COUNTER TEST STARTED ####");
     
     print("Loading test program...")
-    loadelf(udm, irq_counter_filename)
+    sigma.loadelf(udm, irq_counter_filename)
     print("Test program written!")
     print("#### PRESS IRQ BUTTON TO TEST! ####")
     print("")
