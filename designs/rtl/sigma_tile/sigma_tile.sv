@@ -358,7 +358,7 @@ module sigma_tile
 	);
 	
 	MemSplit32 dmem_data();
-    MemSplit32 sfr();
+    MemSplit32 sfr_data();
 	
 	arb_l2 arb_l2
 	(
@@ -367,7 +367,7 @@ module sigma_tile
 		
 		, .m(internal)
         , .s0(dmem_data)
-        , .s1(sfr)
+        , .s1(sfr_data)
 	);
 	
 	ram_dual_memsplit #(
@@ -407,7 +407,7 @@ module sigma_tile
 		.clk_i		(clk_i)
 		, .rst_i	(rst_i)
 		
-		, .host(sfr)
+		, .host(sfr_data)
 	);
 	
 

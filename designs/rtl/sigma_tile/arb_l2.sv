@@ -76,7 +76,7 @@ always @(posedge clk_i)
 
 		if (m.req && !s0_rd_inprogress && !s1_rd_inprogress)
 			begin
-			if (!m_addr[16])
+			if (!m.addr[16])
 				begin
 				s0.req 		= m.req;
 				s0.we 		= m.we;

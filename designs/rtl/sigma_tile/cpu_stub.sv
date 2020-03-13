@@ -10,11 +10,11 @@
 `include "sigma_tile.svh"
 
 module cpu_stub (
-	input [0:0] clk_i,
-	input [0:0] rst_i,
+	input [0:0] clk_i
+	, input [0:0] rst_i
 
-	MemSplit32.Master instr_mem
-	MemSplit32.Master data_mem
+	, MemSplit32.Master instr_mem
+	, MemSplit32.Master data_mem
 );
 
 assign instr_mem.req = 1'b0;

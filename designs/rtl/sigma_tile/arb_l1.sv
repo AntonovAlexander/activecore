@@ -42,7 +42,7 @@ module arb_l1
 		m0_rd_inprogress_next = m0_rd_inprogress;
 		m1_rd_inprogress_next = m1_rd_inprogress;
 
-		if (s_resp)
+		if (s.resp)
 			begin
 			if (m0_rd_inprogress_next) m0_rd_inprogress_next = 1'b0;
 			if (m1_rd_inprogress_next) m1_rd_inprogress_next = 1'b0;
