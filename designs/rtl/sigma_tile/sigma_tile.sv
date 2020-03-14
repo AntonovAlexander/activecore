@@ -18,7 +18,7 @@
 
 module sigma_tile
 #(
-	parameter corenum=0, mem_init="YES", mem_data="data.hex", mem_size=1024, CPU="none"
+	parameter corenum=0, mem_init="YES", mem_data="data.hex", mem_size=1024, CPU="none", PATH_THROUGH="YES"
 )
 (
 	input [0:0] clk_i
@@ -347,31 +347,92 @@ module sigma_tile
         
     endgenerate
 	
-	MemSplit32 cpu_internal();
-	
-	arb_1m2s
-    #(
-        .BITSEL(31)
-    ) arb_l0 (
-		.clk_i		(clk_i)
-		, .rst_i	(rst_i)
-
-        , .m(cpu_data)
-        , .s0(cpu_internal)
-        , .s1(xbus)
-	);
-	
 	MemSplit32 internal_if();
+    MemSplit32 cpu_internal();
+    
+    generate
+        if (PATH_THROUGH == "YES")
+            begin
 
-	arb_2m1s arb_l1
-	(
-		.clk_i		(clk_i)
-		, .rst_i	(rst_i)
-		
-		, .m0(cpu_internal)
-        , .m1(hpi)
-        , .s(internal_if)
-	);
+            MemSplit32 cpu_xbus();
+
+            arb_1m2s
+            #(
+                .BITSEL(31)
+            ) arb_cpu (
+                .clk_i      (clk_i)
+                , .rst_i    (rst_i)
+
+                , .m(cpu_data)
+                , .s0(cpu_internal)
+                , .s1(cpu_xbus)
+            );
+
+            MemSplit32 hpi_internal();
+            MemSplit32 hpi_xbus();
+
+            arb_1m2s
+            #(
+                .BITSEL(31)
+            ) arb_hpi (
+                .clk_i      (clk_i)
+                , .rst_i    (rst_i)
+
+                , .m(hpi)
+                , .s0(hpi_internal)
+                , .s1(hpi_xbus)
+            );
+
+            arb_2m1s arb_internal
+            (
+                .clk_i      (clk_i)
+                , .rst_i    (rst_i)
+                
+                , .m0(cpu_internal)
+                , .m1(hpi_internal)
+                , .s(internal_if)
+            );
+
+            arb_2m1s arb_xbus
+            (
+                .clk_i      (clk_i)
+                , .rst_i    (rst_i)
+                
+                , .m0(cpu_xbus)
+                , .m1(hpi_xbus)
+                , .s(xbus)
+            );
+
+            end
+
+        else
+            begin
+    
+            arb_1m2s
+            #(
+                .BITSEL(31)
+            ) arb_cpu (
+                .clk_i      (clk_i)
+                , .rst_i    (rst_i)
+
+                , .m(cpu_data)
+                , .s0(cpu_internal)
+                , .s1(xbus)
+            );
+
+            arb_2m1s arb_internal
+            (
+                .clk_i      (clk_i)
+                , .rst_i    (rst_i)
+                
+                , .m0(cpu_internal)
+                , .m1(hpi)
+                , .s(internal_if)
+            );
+            
+            end
+
+    endgenerate
 	
 	MemSplit32 dmem_if();
     MemSplit32 sfr_if();

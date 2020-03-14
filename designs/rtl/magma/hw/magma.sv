@@ -151,6 +151,7 @@ module magma
 		, .mem_data(mem_data)
 		, .mem_size(mem_size)
 		, .CPU(CPU)
+		, .PATH_THROUGH("NO")
 	) tile0 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
@@ -166,6 +167,7 @@ module magma
 		, .mem_data(mem_data)
 		, .mem_size(mem_size)
 		, .CPU(CPU)
+		, .PATH_THROUGH("NO")
 	) tile1 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
@@ -181,6 +183,7 @@ module magma
 		, .mem_data(mem_data)
 		, .mem_size(mem_size)
 		, .CPU(CPU)
+		, .PATH_THROUGH("NO")
 	) tile2 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
@@ -196,6 +199,7 @@ module magma
 		, .mem_data(mem_data)
 		, .mem_size(mem_size)
 		, .CPU(CPU)
+		, .PATH_THROUGH("NO")
 	) tile3 (
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
