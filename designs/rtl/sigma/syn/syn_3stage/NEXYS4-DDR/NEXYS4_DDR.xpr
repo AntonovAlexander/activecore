@@ -56,7 +56,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/irq_adapter.v">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/irq_adapter.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -112,47 +112,47 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/sigma_tile.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/sigma_tile.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/arb_1m2s.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/arb_2m1s.sv">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/arb_1m2s.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/cpu_stub.sv">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/arb_2m1s.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_3stage/sverilog/riscv_3stage.svh">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_3stage/sverilog/riscv_3stage.sv">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/cpu_stub.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/sfr.sv">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_3stage/sverilog/riscv_3stage.svh">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_3stage/sverilog/riscv_3stage.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/sfr.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -166,37 +166,37 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_6stage/sverilog/riscv_6stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_5stage/sverilog/riscv_5stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_2stage/sverilog/riscv_2stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_1stage/sverilog/riscv_1stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_5stage/sverilog/riscv_5stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_6stage/sverilog/riscv_6stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_1stage/sverilog/riscv_1stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_2stage/sverilog/riscv_2stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../hw/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/sigma_tile.sv">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/sigma_tile.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -218,7 +218,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/cpu_wrapper.sv">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/cpu_wrapper.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
