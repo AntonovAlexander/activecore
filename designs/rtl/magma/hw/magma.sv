@@ -155,6 +155,7 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
+		, .irq_debounced_i(0)
 		, .hpi(s0)
 		, .xbus(m0)
 	);
@@ -169,6 +170,7 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
+		, .irq_debounced_i(0)
 		, .hpi(s1)
 		, .xbus(m1)
 	);
@@ -183,6 +185,7 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
+		, .irq_debounced_i(0)
 		, .hpi(s2)
 		, .xbus(m2)
 	);
@@ -197,6 +200,7 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
+		, .irq_debounced_i(0)
 		, .hpi(s3)
 		, .xbus(m3)
 	);

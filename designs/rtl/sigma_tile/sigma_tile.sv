@@ -24,12 +24,26 @@ module sigma_tile
 	input [0:0] clk_i
 	, input [0:0] rst_i
 
+    , input irq_debounced_i
     , MemSplit32.Slave hpi
     , MemSplit32.Master xbus
 );
 
-	MemSplit32 cpu_instr();
+    MemSplit32 cpu_instr();
     MemSplit32 cpu_data();
+
+    logic cpu_irq_req;
+    logic [7:0] cpu_irq_code;
+    logic cpu_irq_ack;
+    irq_adapter irq_adapter
+    (
+        .clk_i(clk_i)
+        , .rst_i(rst_i)
+        , .irq_debounced_i(irq_debounced_i)
+        , .irq_req_o(cpu_irq_req)
+        , .irq_code_bo(cpu_irq_code)
+        , .irq_ack_i(cpu_irq_ack)
+    );
 	
 	// Processor core
     generate
@@ -54,9 +68,9 @@ module sigma_tile
                 , .rst_i(rst_i)
                 
                 // interrupt bus
-                , .irq_fifo_genfifo_req_i(1'b0)
-                , .irq_fifo_genfifo_rdata_bi(0)
-                //, .irq_fifo_genfifo_ack_o()
+                , .irq_fifo_genfifo_req_i(cpu_irq_req)
+                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
@@ -102,9 +116,9 @@ module sigma_tile
                 , .rst_i(rst_i)
                 
                 // interrupt bus
-                , .irq_fifo_genfifo_req_i(1'b0)
-                , .irq_fifo_genfifo_rdata_bi(0)
-                //, .irq_fifo_genfifo_ack_o()
+                , .irq_fifo_genfifo_req_i(cpu_irq_req)
+                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
@@ -118,12 +132,12 @@ module sigma_tile
     
                 // instr resp bus
                 , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
-                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr_rdata)
+                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
                 // , .genmcopipe_instr_mem_resp_genfifo_ack_o
     
                 // data resp bus
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
-                , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data_rdata)
+                , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
             );
     
@@ -150,9 +164,9 @@ module sigma_tile
                 , .rst_i(rst_i)
                 
                 // interrupt bus
-                , .irq_fifo_genfifo_req_i(1'b0)
-                , .irq_fifo_genfifo_rdata_bi(0)
-                //, .irq_fifo_genfifo_ack_o()
+                , .irq_fifo_genfifo_req_i(cpu_irq_req)
+                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
@@ -198,9 +212,9 @@ module sigma_tile
                 , .rst_i(rst_i)
                 
                 // interrupt bus
-                , .irq_fifo_genfifo_req_i(1'b0)
-                , .irq_fifo_genfifo_rdata_bi(0)
-                //, .irq_fifo_genfifo_ack_o()
+                , .irq_fifo_genfifo_req_i(cpu_irq_req)
+                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
@@ -246,9 +260,9 @@ module sigma_tile
                 , .rst_i(rst_i)
                 
                 // interrupt bus
-                , .irq_fifo_genfifo_req_i(1'b0)
-                , .irq_fifo_genfifo_rdata_bi(0)
-                //, .irq_fifo_genfifo_ack_o()
+                , .irq_fifo_genfifo_req_i(cpu_irq_req)
+                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
@@ -294,9 +308,9 @@ module sigma_tile
                 , .rst_i(rst_i)
                 
                 // interrupt bus
-                , .irq_fifo_genfifo_req_i(1'b0)
-                , .irq_fifo_genfifo_rdata_bi(0)
-                //, .irq_fifo_genfifo_ack_o()
+                , .irq_fifo_genfifo_req_i(cpu_irq_req)
+                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
