@@ -335,8 +335,10 @@ module sigma_tile
 	
 	MemSplit32 cpu_internal();
 	
-	arb_l0 arb_l0
-	(
+	arb_1m2s
+    #(
+        .BITSEL(31)
+    ) arb_l0 (
 		.clk_i		(clk_i)
 		, .rst_i	(rst_i)
 
@@ -345,29 +347,31 @@ module sigma_tile
         , .s1(xbus)
 	);
 	
-	MemSplit32 internal();
+	MemSplit32 internal_if();
 
-	arb_l1 arb_l1
+	arb_2m1s arb_l1
 	(
 		.clk_i		(clk_i)
 		, .rst_i	(rst_i)
 		
 		, .m0(cpu_internal)
         , .m1(hpi)
-        , .s(internal)
+        , .s(internal_if)
 	);
 	
-	MemSplit32 dmem_data();
-    MemSplit32 sfr_data();
+	MemSplit32 dmem_if();
+    MemSplit32 sfr_if();
 	
-	arb_l2 arb_l2
-	(
+	arb_1m2s
+    #(
+        .BITSEL(16)
+    ) arb_l2 (
 		.clk_i		(clk_i)
 		, .rst_i	(rst_i)
 		
-		, .m(internal)
-        , .s0(dmem_data)
-        , .s1(sfr_data)
+		, .m(internal_if)
+        , .s0(dmem_if)
+        , .s1(sfr_if)
 	);
 	
 	ram_dual_memsplit #(
@@ -390,15 +394,15 @@ module sigma_tile
 		, .bus0_resp_o	(cpu_instr.resp)
 		, .bus0_rdata_bo(cpu_instr.rdata)
 
-		, .bus1_req_i	(dmem_data.req)
-		, .bus1_we_i	(dmem_data.we)
-		, .bus1_addr_bi	(dmem_data.addr[31:2])
-		, .bus1_be_bi	(dmem_data.be)
-		, .bus1_wdata_bi(dmem_data.wdata)
-		, .bus1_ack_o	(dmem_data.ack)
+		, .bus1_req_i	(dmem_if.req)
+		, .bus1_we_i	(dmem_if.we)
+		, .bus1_addr_bi	(dmem_if.addr[31:2])
+		, .bus1_be_bi	(dmem_if.be)
+		, .bus1_wdata_bi(dmem_if.wdata)
+		, .bus1_ack_o	(dmem_if.ack)
 
-		, .bus1_resp_o	(dmem_data.resp)
-		, .bus1_rdata_bo(dmem_data.rdata)
+		, .bus1_resp_o	(dmem_if.resp)
+		, .bus1_rdata_bo(dmem_if.rdata)
 	);
 	
 	sfr #(
@@ -407,7 +411,7 @@ module sigma_tile
 		.clk_i		(clk_i)
 		, .rst_i	(rst_i)
 		
-		, .host(sfr_data)
+		, .host(sfr_if)
 	);
 	
 

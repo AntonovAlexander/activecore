@@ -9,7 +9,10 @@
 
 `include "sigma_tile.svh"
 
-module arb_l0
+module arb_1m2s
+#(
+	parameter BITSEL = 31
+)
 (
 	input [0:0] clk_i
 	, input [0:0] rst_i
@@ -46,11 +49,11 @@ always @(posedge clk_i)
 
 		if (m.req && (!m.we))
 			begin
-			if (!m.addr[31] && m.ack)
+			if (!m.addr[BITSEL] && m.ack)
 				begin
 				s0_rd_inprogress_next = 1'b1;
 				end
-			if (m.addr[31] && m.ack)
+			if (m.addr[BITSEL] && m.ack)
 				begin
 				s1_rd_inprogress_next = 1'b1;
 				end
@@ -76,7 +79,7 @@ always @(posedge clk_i)
 
 		if (m.req && !s0_rd_inprogress && !s1_rd_inprogress)
 			begin
-			if (!m.addr[31])
+			if (!m.addr[BITSEL])
 				begin
 				s0.req 		= m.req;
 				s0.we 		= m.we;

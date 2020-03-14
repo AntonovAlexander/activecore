@@ -9,7 +9,7 @@
 
 `include "sigma_tile.svh"
 
-module arb_l1
+module arb_2m1s
 (
 	input [0:0] clk_i
 	, input [0:0] rst_i
