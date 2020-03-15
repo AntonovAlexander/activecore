@@ -42,8 +42,20 @@ add wave -noupdate -expand -group {xbar s4 (gpio)} -radix hexadecimal /magma_tb/
 add wave -noupdate -expand -group {tile0 (cpu)} -radix hexadecimal /magma_tb/magma/tile0/clk_i
 add wave -noupdate -expand -group {tile0 (cpu)} -radix hexadecimal /magma_tb/magma/tile0/rst_i
 add wave -noupdate -expand -group {tile0 (cpu)} -radix hexadecimal /magma_tb/magma/tile0/corenum
+add wave -noupdate -radix hexadecimal /magma_tb/magma/tile0/cpu_reset
+add wave -noupdate -radix hexadecimal /magma_tb/magma/tile1/cpu_reset
+add wave -noupdate -radix hexadecimal /magma_tb/magma/tile2/cpu_reset
+add wave -noupdate -radix hexadecimal /magma_tb/magma/tile3/cpu_reset
+add wave -noupdate -expand -group {tile 0 irq_adapter} -radix hexadecimal /magma_tb/magma/tile0/irq_adapter/clk_i
+add wave -noupdate -expand -group {tile 0 irq_adapter} -radix hexadecimal /magma_tb/magma/tile0/irq_adapter/rst_i
+add wave -noupdate -expand -group {tile 0 irq_adapter} -radix hexadecimal /magma_tb/magma/tile0/irq_adapter/irq_debounced_i
+add wave -noupdate -expand -group {tile 0 irq_adapter} -radix hexadecimal /magma_tb/magma/tile0/irq_adapter/irq_req_o
+add wave -noupdate -expand -group {tile 0 irq_adapter} -radix hexadecimal /magma_tb/magma/tile0/irq_adapter/irq_code_bo
+add wave -noupdate -expand -group {tile 0 irq_adapter} -radix hexadecimal /magma_tb/magma/tile0/irq_adapter/irq_ack_i
+add wave -noupdate -expand -group {tile 0 irq_adapter} -radix hexadecimal /magma_tb/magma/tile0/irq_adapter/irq_buf
+add wave -noupdate -expand -group {tile 0 irq_adapter} -radix hexadecimal /magma_tb/magma/tile0/irq_adapter/irq_posedge
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {4280405 ps} 0}
+WaveRestoreCursors {{Cursor 1} {3799550 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 444
 configure wave -valuecolwidth 100
