@@ -17,8 +17,10 @@ module sfr
 	input [0:0] clk_i
 	, input [0:0] rst_i
 
-	, output reg msi_bo
 	, MemSplit32.Slave host
+
+	, output reg msi_req_o
+	, output reg [7:0] msi_code_bo
 );
 
 localparam CORENUM_ADDR = 8'h0;
@@ -29,17 +31,21 @@ always @(posedge clk_i)
 	if (rst_i)
 		begin
 		host.resp <= 1'b0;
-		msi_bo <= 0;
+		msi_req_o <= 0;
 		end
 	else
 		begin
 		host.resp <= 1'b0;
-		msi_bo <= 0;
+		msi_req_o <= 0;
 		if (host.req)
 			begin
 			if (host.we)
 				begin
-				if (host.addr[7:0] == MSI_ADDR) msi_bo <= 1;
+				if (host.addr[7:0] == MSI_ADDR)
+					begin
+					msi_req_o <= 1;
+					msi_code_bo <= host.wdata;
+					end
 				end
 			else
 				begin

@@ -11,7 +11,15 @@ module irq_adapter
 (
 	input clk_i
 	, input rst_i
+
+	// external interface
 	, input irq_debounced_i
+
+	// msi interface
+	, input msi_req_i
+	, input [7:0] msi_code_bi
+
+	// cpu interface
 	, output reg irq_req_o
 	, output reg [7:0] irq_code_bo
 	, input irq_ack_i
@@ -21,6 +29,7 @@ reg irq_buf, irq_posedge;
 always @*
 	begin
 	irq_posedge = 1'b0;
+	irq_posedge = msi_req_i;
 	if (!irq_buf && irq_debounced_i) irq_posedge = 1'b1;
 	end
 
