@@ -29,6 +29,9 @@ module sigma_tile
     , MemSplit32.Master xbus
 );
 
+    localparam XBUS_BITSEL  = 31;
+    localparam SFR_BITSEL   = 20;
+
     MemSplit32 cpu_instr();
     MemSplit32 cpu_data();
 
@@ -358,7 +361,7 @@ module sigma_tile
 
             arb_1m2s
             #(
-                .BITSEL(31)
+                .BITSEL(XBUS_BITSEL)
             ) arb_cpu (
                 .clk_i      (clk_i)
                 , .rst_i    (rst_i)
@@ -373,7 +376,7 @@ module sigma_tile
 
             arb_1m2s
             #(
-                .BITSEL(31)
+                .BITSEL(XBUS_BITSEL)
             ) arb_hpi (
                 .clk_i      (clk_i)
                 , .rst_i    (rst_i)
@@ -410,7 +413,7 @@ module sigma_tile
     
             arb_1m2s
             #(
-                .BITSEL(31)
+                .BITSEL(XBUS_BITSEL)
             ) arb_cpu (
                 .clk_i      (clk_i)
                 , .rst_i    (rst_i)
@@ -439,7 +442,7 @@ module sigma_tile
 	
     arb_1m2s
     #(
-        .BITSEL(16)
+        .BITSEL(SFR_BITSEL)
     ) arb_l2 (
         .clk_i		(clk_i)
         , .rst_i	(rst_i)
