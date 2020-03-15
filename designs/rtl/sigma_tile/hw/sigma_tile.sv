@@ -21,8 +21,8 @@ module sigma_tile
 	parameter corenum=0, mem_init="YES", mem_data="data.hex", mem_size=1024, CPU="none", PATH_THROUGH="YES"
 )
 (
-	input [0:0] clk_i
-	, input [0:0] rst_i
+    input [0:0] clk_i
+    , input [0:0] rst_i
 
     , input irq_debounced_i
     , MemSplit32.Slave hpi
@@ -347,7 +347,7 @@ module sigma_tile
         
     endgenerate
 	
-	MemSplit32 internal_if();
+    MemSplit32 internal_if();
     MemSplit32 cpu_internal();
     
     generate
@@ -434,17 +434,17 @@ module sigma_tile
 
     endgenerate
 	
-	MemSplit32 dmem_if();
+    MemSplit32 dmem_if();
     MemSplit32 sfr_if();
 	
-	arb_1m2s
+    arb_1m2s
     #(
         .BITSEL(16)
     ) arb_l2 (
-		.clk_i		(clk_i)
-		, .rst_i	(rst_i)
+        .clk_i		(clk_i)
+        , .rst_i	(rst_i)
 		
-		, .m(internal_if)
+        , .m(internal_if)
         , .s0(dmem_if)
         , .s1(sfr_if)
 	);
@@ -480,14 +480,14 @@ module sigma_tile
 		, .bus1_rdata_bo(dmem_if.rdata)
 	);
 	
-	sfr #(
-		.corenum(corenum)
-	) sfr(
-		.clk_i		(clk_i)
-		, .rst_i	(rst_i)
-		
-		, .host(sfr_if)
-	);
+    sfr #(
+        .corenum(corenum)
+    ) sfr(
+        .clk_i		(clk_i)
+        , .rst_i	(rst_i)
+
+        , .host(sfr_if)
+    );
 	
 
 endmodule

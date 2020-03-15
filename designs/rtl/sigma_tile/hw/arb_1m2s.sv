@@ -1,5 +1,5 @@
 /*
- * arb_l0.sv
+ * arb_1m2s.sv
  *
  *  Created on: 27.12.2017
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>

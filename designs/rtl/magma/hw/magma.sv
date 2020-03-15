@@ -1,5 +1,5 @@
 /*
- * magma.v
+ * magma.sv
  *
  *  Created on: 27.12.2017
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
