@@ -35,6 +35,7 @@ module sigma_tile
     MemSplit32 cpu_instr();
     MemSplit32 cpu_data();
 
+    logic msi;
     logic cpu_irq_req;
     logic [7:0] cpu_irq_code;
     logic cpu_irq_ack;
@@ -42,7 +43,7 @@ module sigma_tile
     (
         .clk_i(clk_i)
         , .rst_i(rst_i)
-        , .irq_debounced_i(irq_debounced_i)
+        , .irq_debounced_i(irq_debounced_i | msi)
         , .irq_req_o(cpu_irq_req)
         , .irq_code_bo(cpu_irq_code)
         , .irq_ack_i(cpu_irq_ack)
@@ -489,6 +490,7 @@ module sigma_tile
         .clk_i		(clk_i)
         , .rst_i	(rst_i)
 
+        , .msi_bo(msi)
         , .host(sfr_if)
     );
 	

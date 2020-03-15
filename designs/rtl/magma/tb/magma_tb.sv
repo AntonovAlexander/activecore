@@ -16,17 +16,6 @@
 `define DIVIDER_4800		32'd208333
 `define DIVIDER_2400		32'd416666
 
-// udm interface
-`define SYNC_BYTE			8'h55
-`define ESCAPE_BYTE			8'h5a
-`define IDCODE_CMD			8'h00	// check udm accessibility
-`define RST_CMD				8'h80	// Reset slave	
-`define nRST_CMD			8'hC0	// nReset slave	
-`define WR_CMD 				8'h81	// Write slave with autoincrement
-`define RD_CMD 				8'h82	// Read slave with autoincrement
-`define WR_CMD_NOINC 		8'h83	// Write slave without autoincrement
-`define RD_CMD_NOINC 		8'h84	// Read slave without autoincrement
-
 module magma_tb ();
 //
 reg CLK_50MHZ, RST, rx;
