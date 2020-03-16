@@ -36,10 +36,10 @@ class sigma:
     
     def __init__(self, udm):
         self.udm = udm
-        self.sigma_tile = sigma_tile(self.udm, self.sigma_addr)
+        self.tile = sigma_tile(self.udm, self.sigma_addr)
     
     def __del__(self):
-        self.sigma_tile.udm.discon()
+        self.tile.udm.discon()
     
     def reset_buf(self):
         self.udm.clr(self.buf_addr, self.buf_size)

@@ -44,13 +44,13 @@ def hw_test_median(sigma, median_filename):
     sigma.reset_buf()
     
     print("Loading test program...")
-    sigma.sigma_tile.loadelf(median_filename)
+    sigma.tile.loadelf(median_filename)
     print("Test program written!")
 
     time.sleep(1)
 
     print("Reading data buffer...")
-    rdarr = sigma.sigma_tile.udm.rdarr32(0x6000, DATA_SIZE)
+    rdarr = sigma.tile.udm.rdarr32(0x6000, DATA_SIZE)
     print("Data buffer read!")
 
     test_succ_flag = 1
