@@ -13,7 +13,7 @@ sys.path.append('..')
 import sigma
 from sigma import *
 
-def hw_test_rsort(udm, rsort_filename):
+def hw_test_rsort(sigma, rsort_filename):
     print("#### RSORT TEST STARTED ####");
     
     DATA_SIZE = 1024
@@ -72,14 +72,17 @@ def hw_test_rsort(udm, rsort_filename):
       2143324534, 2143343312, 2143968639, 2145930822
 	]
     
+    print("Clearing buffer")
+    sigma.reset_buf()
+    
     print("Loading test program...")
-    sigma.loadelf(udm, rsort_filename)
+    sigma.sigma_tile.loadelf(rsort_filename)
     print("Test program written!")
 
     time.sleep(1)
 
     print("Reading data buffer...")
-    rdarr = udm.rdarr32(0x6000, DATA_SIZE)
+    rdarr = sigma.sigma_tile.udm.rdarr32(0x6000, DATA_SIZE)
     print("Data buffer read!")
 
     test_succ_flag = 1

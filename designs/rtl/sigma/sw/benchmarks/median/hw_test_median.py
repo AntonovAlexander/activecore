@@ -13,7 +13,7 @@ sys.path.append('..')
 import sigma
 from sigma import *
 
-def hw_test_median(udm, median_filename):
+def hw_test_median(sigma, median_filename):
     print("#### MEDIAN TEST STARTED ####");
     
     DATA_SIZE = 400
@@ -40,14 +40,17 @@ def hw_test_median(udm, median_filename):
       153, 381, 121, 651, 412, 825, 412, 356, 236, 148, 148, 148, 423, 140, 216, 216, 621, 621, 361,   0
     ]
     
+    print("Clearing buffer")
+    sigma.reset_buf()
+    
     print("Loading test program...")
-    sigma.loadelf(udm, median_filename)
+    sigma.sigma_tile.loadelf(median_filename)
     print("Test program written!")
 
     time.sleep(1)
 
     print("Reading data buffer...")
-    rdarr = udm.rdarr32(0x6000, DATA_SIZE)
+    rdarr = sigma.sigma_tile.udm.rdarr32(0x6000, DATA_SIZE)
     print("Data buffer read!")
 
     test_succ_flag = 1

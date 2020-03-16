@@ -3,24 +3,67 @@ from __future__ import division
 
 import sys
 
-sys.path.append('../../../../rtl/udm/sw')
+sys.path.append('../../../udm/sw')
 import udm
 from udm import *
 
-buf_addr = 0x6000
-buf_size = 8192
+sys.path.append('../../../sigma_tile/sw')
+import sigma_tile
+from sigma_tile import *
+
+sys.path.append('median')
+import hw_test_median
+from hw_test_median import *
+
+sys.path.append('qsort')
+import hw_test_qsort
+from hw_test_qsort import *
+
+sys.path.append('rsort')
+import hw_test_rsort
+from hw_test_rsort import *
+
+sys.path.append('irq_counter')
+import hw_test_irq_counter
+from hw_test_irq_counter import *
+
 
 class sigma:
 
-    def reset_buf(udm):
-        udm.clr(buf_addr, buf_size)
+    sigma_addr = 0x0
+    buf_addr = 0x6000
+    buf_size = 8192
     
-    def loadbin(udm, filename):
-        udm.rst()
-        udm.wrbin32_le(0x0, filename)
-        udm.nrst()
+    def __init__(self, udm):
+        self.udm = udm
+        self.sigma_tile = sigma_tile(self.udm, self.sigma_addr)
     
-    def loadelf(udm, filename):
-        udm.rst()
-        udm.wrelf32(0x0, filename)
-        udm.nrst()
+    def __del__(self):
+        self.sigma_tile.udm.discon()
+    
+    def reset_buf(self):
+        self.udm.clr(self.buf_addr, self.buf_size)
+    
+    def runtests(self):
+        test_succ_counter = 0
+        test_fail_counter = 0
+        
+        if (hw_test_median(self, 'median.riscv') == 1):
+            test_succ_counter = test_succ_counter + 1
+        else:
+            test_fail_counter = test_fail_counter + 1
+        
+        if (hw_test_qsort(self, 'qsort.riscv') == 1):
+            test_succ_counter = test_succ_counter + 1
+        else:
+            test_fail_counter = test_fail_counter + 1
+        
+        if (hw_test_rsort(self, 'rsort.riscv') == 1):
+            test_succ_counter = test_succ_counter + 1
+        else:
+            test_fail_counter = test_fail_counter + 1
+        
+        print("Total tests PASSED: ", test_succ_counter, ", total test FAILED: ", test_fail_counter)
+        print("")
+        
+        hw_test_irq_counter(self, 'irq_counter.riscv')
