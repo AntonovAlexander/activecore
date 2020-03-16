@@ -31,8 +31,8 @@ module sigma_tile
     , input [0:0] rst_i
 
     , input irq_debounced_i
-    , MemSplit32.Slave hpi
-    , MemSplit32.Master xbus
+    , MemSplit32.Slave hpi      // host port interface
+    , MemSplit32.Master xbus    // expansion bus
 );
 
     localparam XBUS_BITSEL  = 31;

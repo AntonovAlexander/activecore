@@ -63,8 +63,8 @@ sigma_tile #(
 	, .rst_i(cpu_reset)
 
 	, .irq_debounced_i(irq_btn_debounced)
-    , .hpi(hpi)
-    , .xbus(xbus)
+	, .hpi(hpi)
+	, .xbus(xbus)
 );
 	
 udm udm
