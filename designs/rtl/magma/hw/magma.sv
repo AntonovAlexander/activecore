@@ -19,13 +19,20 @@ module magma
 (
 	input clk_i
 	, input arst_i
+
 	, input rx_i
 	, output tx_o
-	, input [31:0] gpio_bi
-	, output [31:0] gpio_bo
+
+	, input irq0_btn_i
+	, input irq1_btn_i
+	, input irq2_btn_i
+	, input irq3_btn_i
+
+	, input [15:0] gpio_bi
+	, output [15:0] gpio_bo
 );
 
-	wire srst;
+	logic srst;
 	reset_cntrl reset_cntrl
 	(
 		.clk_i(clk_i),
@@ -33,8 +40,8 @@ module magma
 		.srst_o(srst)
 	);
 
-	wire udm_reset;
-	wire cpu_reset;
+	logic udm_reset;
+	logic cpu_reset;
 	assign cpu_reset = srst | udm_reset;
 	
 	MemSplit32 m0();
@@ -145,6 +152,42 @@ module magma
 		, .s4_rdata_bi	(s4.rdata)
 	);
 	
+	logic irq0_debounced;
+	debouncer debouncer0
+	(
+		.clk_i(clk_i)
+		, .rst_i(srst)
+		, .in(irq0_btn_i)
+		, .out(irq0_debounced)
+	);
+
+	logic irq1_debounced;
+	debouncer debouncer1
+	(
+		.clk_i(clk_i)
+		, .rst_i(srst)
+		, .in(irq1_btn_i)
+		, .out(irq1_debounced)
+	);
+
+	logic irq2_debounced;
+	debouncer debouncer2
+	(
+		.clk_i(clk_i)
+		, .rst_i(srst)
+		, .in(irq2_btn_i)
+		, .out(irq2_debounced)
+	);
+
+	logic irq3_debounced;
+	debouncer debouncer3
+	(
+		.clk_i(clk_i)
+		, .rst_i(srst)
+		, .in(irq3_btn_i)
+		, .out(irq3_debounced)
+	);
+
 	sigma_tile #(
 		.corenum(0)
 		, .mem_init(mem_init)
@@ -157,7 +200,7 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(0)
+		, .irq_debounced_i(irq0_debounced)
 		, .hpi(s0)
 		, .xbus(m0)
 	);
@@ -174,7 +217,7 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(0)
+		, .irq_debounced_i(irq1_debounced)
 		, .hpi(s1)
 		, .xbus(m1)
 	);
@@ -191,7 +234,7 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(0)
+		, .irq_debounced_i(irq2_debounced)
 		, .hpi(s2)
 		, .xbus(m2)
 	);
@@ -208,7 +251,7 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(0)
+		, .irq_debounced_i(irq3_debounced)
 		, .hpi(s3)
 		, .xbus(m3)
 	);

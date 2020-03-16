@@ -21,11 +21,11 @@ module gpio
 	, output reg [0:0] 	bus_resp
 	, output reg [31:0]	bus_rdata
 
-	, input  [31:0]	gpio_bi
-	, output [31:0]	gpio_bo
+	, input  [15:0]	gpio_bi
+	, output [15:0]	gpio_bo
 );
 
-reg [7:0] led_register [3:0];
+reg [3:0] led_register [3:0];
 assign gpio_bo = {led_register[3], led_register[2], led_register[1], led_register[0]};
 
 always @(posedge clk_i)

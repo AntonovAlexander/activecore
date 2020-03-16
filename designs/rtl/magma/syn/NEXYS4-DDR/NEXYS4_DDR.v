@@ -3,6 +3,11 @@ module NEXYS4_DDR
 	input 	CLK100MHZ
     , input   CPU_RESETN
     
+    , input   BTNU
+    , input   BTNL
+    , input   BTNR
+    , input   BTND
+    
     , input   [15:0] SW
     , output  [15:0] LED
 
@@ -21,8 +26,8 @@ module NEXYS4_DDR
         , .locked(pll_locked)
     );
     
-    wire mpss_arst;
-    assign mpss_arst = !(CPU_RESETN & pll_locked);
+    wire magma_arst;
+    assign magma_arst = !(CPU_RESETN & pll_locked);
     
     magma #(
         .CPU("riscv_5stage")
@@ -31,10 +36,17 @@ module NEXYS4_DDR
         , .mem_size(8096)
     ) magma (
         .clk_i(clk_gen)
-        , .arst_i(mpss_arst)
+        , .arst_i(magma_arst)
+        
         , .rx_i(UART_TXD_IN)
         , .tx_o(UART_RXD_OUT)
-        , .gpio_bi({8'h0, SW, 8'h0})
+        
+        , .irq0_btn_i(BTNL)
+        , .irq1_btn_i(BTNU)
+        , .irq2_btn_i(BTNR)
+        , .irq3_btn_i(BTND)
+        
+        , .gpio_bi(SW)
         , .gpio_bo(LED)
     );
 

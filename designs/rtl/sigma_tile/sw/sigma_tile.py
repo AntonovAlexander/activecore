@@ -20,26 +20,26 @@ class sigma_tile:
         print()
         if (IDCODE != 0xdeadbeef):
             self.udm.discon()
-            raise Exception("sigma tile not found at addr " + hex(sigma_addr))
+            raise Exception("sigma tile not found at address " + hex(sigma_addr))
     
     def __del__(self):
         self.udm.discon()
     
-    def rst_assert(self):
+    def cpu_rst(self):
         self.udm.wr32((self.sigma_addr + 0x00100004), 0x01)
     
-    def rst_deassert(self):
+    def cpu_nrst(self):
         self.udm.wr32((self.sigma_addr + 0x00100004), 0x00)
     
     def loadbin(self, filename):
-        self.rst_assert()
+        self.cpu_rst()
         self.udm.wrbin32_le(self.sigma_addr, filename)
-        self.rst_deassert()
+        self.cpu_nrst()
     
     def loadelf(self, filename):
-        self.rst_assert()
+        self.cpu_rst()
         self.udm.wrelf32(self.sigma_addr, filename)
-        self.rst_deassert()
+        self.cpu_nrst()
     
     def msi(self, irq_num):
         self.udm.wr32((self.sigma_addr + 0x0010000C), irq_num)

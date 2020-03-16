@@ -30,8 +30,9 @@ class udm:
         self.connect(com_num, baudrate)
     
     def disconnect(self):
-        self.ser.close()
-        print("Connection dropped")
+        if self.ser.is_open:
+            self.ser.close()
+            print("Connection dropped")
     
     def discon(self):
         self.disconnect()
