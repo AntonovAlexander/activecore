@@ -26,9 +26,10 @@ module sfr
 	, output reg [7:0] msi_code_bo
 );
 
-localparam CTRL_ADDR 	= 8'h0;
-localparam CORENUM_ADDR = 8'h4;
-localparam MSI_ADDR 	= 8'h8;
+localparam IDCODE_ADDR 	= 8'h0;
+localparam CTRL_ADDR 	= 8'h4;
+localparam CORENUM_ADDR = 8'h8;
+localparam MSI_ADDR 	= 8'hC;
 
 reg cpu_reset;
 always @(posedge clk_i) cpu_reset_o <= rst_i | cpu_reset;
@@ -62,7 +63,8 @@ always @(posedge clk_i)
 			else
 				begin
 				host.resp <= 1'b1;
-				if (host.addr[7:0] == CTRL_ADDR) 	host.rdata <= {31'h0, cpu_reset};
+				if (host.addr[7:0] == IDCODE_ADDR)  host.rdata <= 32'hdeadbeef;
+				if (host.addr[7:0] == CTRL_ADDR)    host.rdata <= {31'h0, cpu_reset};
 				if (host.addr[7:0] == CORENUM_ADDR) host.rdata <= corenum;
 				end
 			end
