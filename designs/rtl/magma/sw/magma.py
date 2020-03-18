@@ -28,7 +28,7 @@ class magma:
         self.tile3 = sigma_tile(self.udm, self.tile3_addr)
     
     def __del__(self):
-        self.tile.udm.discon()
+        self.udm.discon()
     
     def setleds(self, led_num, data):
         self.udm.wr32((self.gpio_addr + (led_num << 2)), data)
