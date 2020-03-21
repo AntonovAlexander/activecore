@@ -30,22 +30,26 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 
-The following demo designs for FPGA are available:
+Other useful cores:
 
-* **sigma** - minimalistic MCU consisting of a single aquaris RISC-V CPU, on-chip RAM, UART-controllable bus master (UART Debug Module, udm) and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma
+* **udm** - bus transactor (master) managed via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 environment included. Location: /designs/rtl/udm
 
-* **magma** - MPSoC consisting of multiple aquaris RISC-V CPUs with dedicated scratchpad RAMs connected by ariele xbar. Location: /designs/rtl/magma
+* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V CPU, on-chip RAM, SFRs, host port interface and expansion bus. Location: /designs/rtl/sigma_tile
 
-RISC-V CPU software is built using riscv-tools. Resetting and software downloading is performed via UART using udm block.
+Demo FPGA-based SoCs (RISC-V software is built using riscv-tools and uploaded via udm):
+
+* **sigma** - minimalistic MCU consisting of a single sigma_tile module, udm and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma
+
+* **magma** - MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
 
 ### Published works
 
 * A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation, ITMO University, Saint-Petersburg, 28.12.2018. Thesis web page: http://fppo.ifmo.ru/dissertation/?number=63419
 
-* A. Antonov, P. Kustarev, S. Bykovskii, "Methods of Computational Process Scheduling for Synthesis of Hardware Microarchitecture", in Proc. 19th International Multidisciplinary Scientific GeoConference, SGEM 2019
+* A. Antonov, P. Kustarev, and S. Bikovsky, “MLIP Cores: Designing Hardware Generators with Programmable Microarchitectural Mechanisms,” in 2020 IEEE International Symposium on Circuits and Systems (ISCAS), 2020, accepted for publication
+
+* A. Antonov, P. Kustarev, S. Bykovskii, "Methods of Computational Process Scheduling for Synthesis of Hardware Microarchitecture", in Proc. 19th International Multidisciplinary Scientific GeoConference, SGEM 2019 - 2019, Vol. 19, No. 2.1, pp. 445-452
 
 * A. Antonov, P. Kustarev, S. Bikovsky, "Improving Microarchitecture Design and Hardware Generation using Micro-Language IP Cores", in Proc. IEEE Nordic Circuits and Systems Conference (NORCAS) / NORCHIP and International Symposium of System-on-Chip (SoC) - 2017, pp. 1-6
 
 * A. Antonov, P. Kustarev, "DSL-based approach to hardware pipelines design", in Proc. 17th International Multidisciplinary Scientific GeoConference, SGEM 2017 - 2017, Vol. 17, No. 21, pp. 287-294
-
-For questions, please contact antonov.alex.alex@gmail.com
