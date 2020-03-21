@@ -32,7 +32,7 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 Other useful cores:
 
-* **udm** - bus transactor (master) managed via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 environment included. Location: /designs/rtl/udm
+* **udm** - bus transactor (master) managed via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Location: /designs/rtl/udm
 
 * **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V CPU, on-chip RAM, SFRs, host port interface and expansion bus. Location: /designs/rtl/sigma_tile
 
@@ -46,7 +46,7 @@ Demo FPGA-based SoCs (RISC-V software is built using riscv-tools and uploaded vi
 
 * A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation, ITMO University, Saint-Petersburg, 28.12.2018. Thesis web page: http://fppo.ifmo.ru/dissertation/?number=63419
 
-* A. Antonov, P. Kustarev, and S. Bikovsky, “MLIP Cores: Designing Hardware Generators with Programmable Microarchitectural Mechanisms,” in 2020 IEEE International Symposium on Circuits and Systems (ISCAS), 2020, accepted for publication
+* A. Antonov, P. Kustarev, S. Bikovsky, “MLIP Cores: Designing Hardware Generators with Programmable Microarchitectural Mechanisms,” in 2020 IEEE International Symposium on Circuits and Systems (ISCAS), 2020 (accepted for publication)
 
 * A. Antonov, P. Kustarev, S. Bykovskii, "Methods of Computational Process Scheduling for Synthesis of Hardware Microarchitecture", in Proc. 19th International Multidisciplinary Scientific GeoConference, SGEM 2019 - 2019, Vol. 19, No. 2.1, pp. 445-452
 

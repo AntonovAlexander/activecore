@@ -1,4 +1,13 @@
 # -*- coding:utf-8 -*-
+
+#
+# udm.py
+#
+#  Created on: 17.04.2016
+#      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+#     License: See LICENSE file for details
+#
+
 from __future__ import division
 
 import struct

@@ -1,4 +1,13 @@
 # -*- coding:utf-8 -*-
+
+#
+# magma.py
+#
+#  Created on: 27.12.2017
+#      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
+#     License: See LICENSE file for details
+#
+
 from __future__ import division
 
 import sys
