@@ -34,7 +34,7 @@ Other useful cores:
 
 * **udm** - bus transactor (master) managed via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Location: /designs/rtl/udm
 
-* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V CPU, on-chip RAM, SFRs, host port interface and expansion bus. Location: /designs/rtl/sigma_tile
+* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled RAM, SFRs, host port interface and expansion bus. Location: /designs/rtl/sigma_tile
 
 Demo FPGA-based SoCs (RISC-V software is built using riscv-tools and uploaded via udm):
 
