@@ -360,61 +360,27 @@ module sigma_tile
             );
         
     endgenerate
-	
-    MemSplit32 internal_if();
-    MemSplit32 cpu_internal();
+
+    MemSplit32 dmem_if();
+    MemSplit32 sfr_if();
     
     generate
         if (PATH_THROUGH == "YES")
             begin
 
-            MemSplit32 cpu_xbus();
-
-            arb_1m2s
+            arb_2m3s
             #(
-                .BITSEL(XBUS_BITSEL)
+                .SFR_BITSEL(SFR_BITSEL)
+                , .XBUS_BITSEL(XBUS_BITSEL)
             ) arb_cpu (
                 .clk_i      (clk_i)
                 , .rst_i    (rst_i)
 
-                , .m(cpu_data)
-                , .s0(cpu_internal)
-                , .s1(cpu_xbus)
-            );
-
-            MemSplit32 hpi_internal();
-            MemSplit32 hpi_xbus();
-
-            arb_1m2s
-            #(
-                .BITSEL(XBUS_BITSEL)
-            ) arb_hpi (
-                .clk_i      (clk_i)
-                , .rst_i    (rst_i)
-
-                , .m(hpi)
-                , .s0(hpi_internal)
-                , .s1(hpi_xbus)
-            );
-
-            arb_2m1s arb_internal
-            (
-                .clk_i      (clk_i)
-                , .rst_i    (rst_i)
-                
-                , .m0(cpu_internal)
-                , .m1(hpi_internal)
-                , .s(internal_if)
-            );
-
-            arb_2m1s arb_xbus
-            (
-                .clk_i      (clk_i)
-                , .rst_i    (rst_i)
-                
-                , .m0(cpu_xbus)
-                , .m1(hpi_xbus)
-                , .s(xbus)
+                , .m0(hpi)
+                , .m1(cpu_data)
+                , .s0(dmem_if)
+                , .s1(sfr_if)
+                , .s2(xbus)
             );
 
             end
@@ -422,6 +388,9 @@ module sigma_tile
         else
             begin
     
+            MemSplit32 internal_if();
+            MemSplit32 cpu_internal();
+
             arb_1m2s
             #(
                 .BITSEL(XBUS_BITSEL)
@@ -443,25 +412,23 @@ module sigma_tile
                 , .m1(hpi)
                 , .s(internal_if)
             );
+
+            arb_1m2s
+            #(
+                .BITSEL(SFR_BITSEL)
+            ) arb_l2 (
+                .clk_i      (clk_i)
+                , .rst_i    (rst_i)
+                
+                , .m(internal_if)
+                , .s0(dmem_if)
+                , .s1(sfr_if)
+            );
             
             end
 
     endgenerate
-	
-    MemSplit32 dmem_if();
-    MemSplit32 sfr_if();
-	
-    arb_1m2s
-    #(
-        .BITSEL(SFR_BITSEL)
-    ) arb_l2 (
-        .clk_i		(clk_i)
-        , .rst_i	(rst_i)
-		
-        , .m(internal_if)
-        , .s0(dmem_if)
-        , .s1(sfr_if)
-	);
+    
 	
 	ram_dual_memsplit #(
 		.mem_init(mem_init)

@@ -42,7 +42,7 @@ Demo FPGA-based SoCs (RISC-V software is built using riscv-tools and uploaded vi
 
 * **magma** - MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
 
-### Published works
+### Publications
 
 * A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation, ITMO University, Saint-Petersburg, 28.12.2018. Thesis web page: http://fppo.ifmo.ru/dissertation/?number=63419
 
