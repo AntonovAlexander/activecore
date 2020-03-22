@@ -136,6 +136,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/arb_2m3s.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../../../../sigma_tile/hw/cpu_stub.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
