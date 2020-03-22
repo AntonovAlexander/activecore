@@ -22,22 +22,22 @@ module arb_1m2s
 	, MemSplit32.Master s1
 );
 
-logic s0_rd_inprogress, s1_rd_inprogress;
-logic s0_rd_inprogress_next, s1_rd_inprogress_next;
+	logic s0_rd_inprogress, s1_rd_inprogress;
+	logic s0_rd_inprogress_next, s1_rd_inprogress_next;
 
-always @(posedge clk_i)
-	begin
-	if (rst_i)
+	always @(posedge clk_i)
 		begin
-		s0_rd_inprogress <= 1'b0;
-		s1_rd_inprogress <= 1'b0;
+		if (rst_i)
+			begin
+			s0_rd_inprogress <= 1'b0;
+			s1_rd_inprogress <= 1'b0;
+			end
+		else
+			begin
+			s0_rd_inprogress <= s0_rd_inprogress_next;
+			s1_rd_inprogress <= s1_rd_inprogress_next;
+			end
 		end
-	else
-		begin
-		s0_rd_inprogress <= s0_rd_inprogress_next;
-		s1_rd_inprogress <= s1_rd_inprogress_next;
-		end
-	end
 
 	always @*
 		begin
@@ -47,16 +47,10 @@ always @(posedge clk_i)
 		if (s0.resp) s0_rd_inprogress_next = 1'b0;
 		if (s1.resp) s1_rd_inprogress_next = 1'b0;
 
-		if (m.req && (!m.we))
+		if (m.req && m.ack && (!m.we))
 			begin
-			if (!m.addr[BITSEL] && m.ack)
-				begin
-				s0_rd_inprogress_next = 1'b1;
-				end
-			if (m.addr[BITSEL] && m.ack)
-				begin
-				s1_rd_inprogress_next = 1'b1;
-				end
+			if (!m.addr[BITSEL]) s0_rd_inprogress_next = 1'b1;
+			else s1_rd_inprogress_next = 1'b1;
 			end
 
 		end
