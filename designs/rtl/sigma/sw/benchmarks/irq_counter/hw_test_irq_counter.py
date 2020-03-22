@@ -19,6 +19,23 @@ def hw_test_irq_counter(sigma, irq_counter_filename):
     print("Loading test program...")
     sigma.tile.loadelf(irq_counter_filename)
     print("Test program written!")
-    print("#### PRESS IRQ BUTTON TO TEST! ####")
+    print("#### PRESS IRQ BUTTON INCREMENT COUNTER! ####")
+    sigma.tile.msi(0x3)
+    sigma.tile.msi(0x3)
+    sigma.tile.msi(0x3)
+    sigma.tile.msi(0x3)
+    led_val = sigma.udm.rd32(0x80000000)
+    print("LEDs: ", led_val)
+    
+    test_succ_flag = 0
+    if (led_val == 5):
+        test_succ_flag = 1
+    
+    print("test_succ_flag: ", test_succ_flag)
+    if (test_succ_flag):
+        print("#### IRQ TEST PASSED! ####")
+    else:
+        print("#### IRQ TEST FAILED! ####")
+    
     print("")
-    return
+    return test_succ_flag

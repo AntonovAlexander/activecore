@@ -1,4 +1,4 @@
-### Address map
+### Sigma_tile address map
 
 HW block | Start address | End address | Size | Type | Description
 -------- | ------------- | ----------- | ---- | ---- | -----------

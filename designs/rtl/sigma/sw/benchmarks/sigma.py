@@ -72,7 +72,10 @@ class sigma:
         else:
             test_fail_counter = test_fail_counter + 1
         
-        print("Total tests PASSED: ", test_succ_counter, ", total test FAILED: ", test_fail_counter)
-        print("")
+        if (hw_test_irq_counter(self, 'irq_counter.riscv') == 1):
+            test_succ_counter = test_succ_counter + 1
+        else:
+            test_fail_counter = test_fail_counter + 1
         
-        hw_test_irq_counter(self, 'irq_counter.riscv')
+        print("Total tests PASSED: ", test_succ_counter, ", FAILED: ", test_fail_counter)
+        print("")
