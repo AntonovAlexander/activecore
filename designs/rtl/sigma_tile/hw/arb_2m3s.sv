@@ -60,9 +60,11 @@ module arb_2m3s
 	always @*
 		begin
 
+		m0.ack = 1'b0;
 		m0.resp = 1'b0;
 		m0.rdata = 0;
 
+		m1.ack = 1'b0;
 		m1.resp = 1'b0;
 		m1.rdata = 0;
 
