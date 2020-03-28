@@ -12,7 +12,7 @@ add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma
 add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/IRQ_NUM
 add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/clk_i
 add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/rst_i
-add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/irq_debounced_i
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/irq_debounced_bi
 add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/msi_req_i
 add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/msi_code_bi
 add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/irq_req_o
