@@ -1,25 +1,19 @@
 module reset_cntrl
+#(
+	parameter SYNC_STAGES = 4
+)
 (
 	input clk_i, arst_i,
-	output reg srst_o
+	output srst_o
 );
 
-reg [15:0] reset_counter;
+reg [SYNC_STAGES-1:0] reset_syncbuf;
+assign srst_o = reset_syncbuf[0];
 
 always @(posedge clk_i, posedge arst_i)
 	begin
-	if (arst_i)
-		begin
-		reset_counter <= 16'h0;
-		srst_o <= 1'b1;
-		end
-	else
-		begin
-		srst_o <= 1'b1;
-		reset_counter <= {1'b1, reset_counter[15:1]};
-		if (reset_counter == 16'hFFFF) srst_o <= 1'b0;
-		end
+	if (arst_i) reset_syncbuf <= {SYNC_STAGES{1'b1}};
+	else reset_syncbuf <= {1'b0, reset_syncbuf[SYNC_STAGES-1:1]};
 	end
-
 
 endmodule
