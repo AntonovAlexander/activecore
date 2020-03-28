@@ -16,7 +16,7 @@ module irq_adapter
     , input rst_i
 
     // external interface
-    , input [(2**IRQ_NUM_POW)-1:0] irq_debounced_i
+    , input [(2**IRQ_NUM_POW)-1:0] irq_debounced_bi
 
     // msi interface
     , input msi_req_i
@@ -72,7 +72,7 @@ always @(posedge clk_i)
         end
     else
         begin
-        irq_buf0 <= irq_debounced_i;
+        irq_buf0 <= irq_debounced_bi;
         irq_buf1 <= irq_buf0;
         
         irq_flags <= irq_flags | irq_posedge;               // ext irq detection

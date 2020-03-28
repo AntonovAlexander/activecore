@@ -25,12 +25,13 @@ module sigma_tile
     , CPU="none"
     , PATH_THROUGH="YES"
     , CPU_RESET_DEFAULT=0
+    , IRQ_NUM_POW=3
 )
 (
     input clk_i
     , input rst_i
 
-    , input irq_debounced_i
+    , input [(2**IRQ_NUM_POW)-1:0] irq_debounced_bi
     
     , MemSplit32.Slave hif     // host interface
     , MemSplit32.Master xif    // expansion interface
@@ -48,11 +49,12 @@ module sigma_tile
     logic cpu_irq_req;
     logic [7:0] cpu_irq_code;
     logic cpu_irq_ack;
-    irq_adapter irq_adapter
-    (
+    irq_adapter #(
+        .IRQ_NUM_POW(IRQ_NUM_POW)
+    ) irq_adapter (
         .clk_i(clk_i)
         , .rst_i(rst_i)
-        , .irq_debounced_i({0, irq_debounced_i, 3'h0})
+        , .irq_debounced_bi(irq_debounced_bi)
         , .msi_req_i(msi_req)
         , .msi_code_bi(msi_code)
         , .irq_req_o(cpu_irq_req)
@@ -465,6 +467,7 @@ module sigma_tile
     sfr #(
         .corenum(corenum)
         , .CPU_RESET_DEFAULT(CPU_RESET_DEFAULT)
+        , .IRQ_NUM_POW(IRQ_NUM_POW)
     ) sfr(
         .clk_i		(clk_i)
         , .rst_i	(rst_i)

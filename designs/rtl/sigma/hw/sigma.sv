@@ -62,7 +62,8 @@ sigma_tile #(
 	.clk_i(clk_i)
 	, .rst_i(cpu_reset)
 
-	, .irq_debounced_i(irq_btn_debounced)
+	, .irq_debounced_bi({0, irq_btn_debounced, 3'h0})
+	
 	, .hif(hif)
 	, .xif(xif)
 );

@@ -200,7 +200,8 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(irq0_debounced)
+		, .irq_debounced_bi(irq0_debounced)
+
 		, .hif(s0)
 		, .xif(m0)
 	);
@@ -217,7 +218,8 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(irq1_debounced)
+		, .irq_debounced_bi(irq1_debounced)
+
 		, .hif(s1)
 		, .xif(m1)
 	);
@@ -234,7 +236,8 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(irq2_debounced)
+		, .irq_debounced_bi(irq2_debounced)
+
 		, .hif(s2)
 		, .xif(m2)
 	);
@@ -251,7 +254,8 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(irq3_debounced)
+		, .irq_debounced_bi(irq3_debounced)
+		
 		, .hif(s3)
 		, .xif(m3)
 	);
