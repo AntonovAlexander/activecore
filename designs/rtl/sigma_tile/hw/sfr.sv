@@ -13,6 +13,7 @@ module sfr
 #(
 	parameter corenum=0
 	, parameter CPU_RESET_DEFAULT=0
+	, parameter IRQ_NUM_POW = 4
 )
 (
 	input [0:0] clk_i
@@ -23,7 +24,7 @@ module sfr
 	, output reg cpu_reset_o
 
 	, output reg msi_req_o
-	, output reg [7:0] msi_code_bo
+	, output reg [(2**IRQ_NUM_POW)-1:0] msi_code_bo
 );
 
 localparam IDCODE_ADDR 	= 8'h0;
@@ -41,6 +42,7 @@ always @(posedge clk_i)
 		host.resp <= 1'b0;
 		cpu_reset <= CPU_RESET_DEFAULT;
 		msi_req_o <= 0;
+		msi_code_bo <= 0;
 		end
 	else
 		begin

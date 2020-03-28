@@ -6,7 +6,7 @@ ActiveCore is a framework that demonstrates original hardware designing concept 
 
 MLIP core is a hardware generator that provides custom synthesizable execution kernel associated with certain microarchitectural template. Selective functions of the microarchitecture are exposed for design-time behavioral-style programming, with scheduling, communication and synchronization "services" of the microarchitecture manageable using MLIP-specific API. I.e., each MLIP core offers custom computational model that reflects computational process organization inside a hardware microarchitecture.
 
-MLIP core approach serves as an intermediate solution for codification of custom microarchitectures between configurable IP cores with fixed functionality and general-purpose HW design tools:
+MLIP core approach serves as intermediate solution for codification of custom microarchitectures between configurable IP cores with fixed functionality and general-purpose HW design tools:
 
 Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
 
@@ -32,15 +32,17 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 Other useful cores:
 
-* **udm** - bus transactor (master) managed via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Location: /designs/rtl/udm
+* **udm** - bus transactor (master) managed via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Location: /designs/rtl/udm. See doc subdirectory for udm bus protocol.
 
-* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM, SFRs, host port interface and expansion bus. Location: /designs/rtl/sigma_tile
+* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, special-purpose registers (SFRs), Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equal to udm bus. Location: /designs/rtl/sigma_tile
 
-Demo FPGA-based SoCs (RISC-V software is built using riscv-tools and uploaded via udm):
+Demo FPGA-based SoCs:
 
 * **sigma** - basic MCU consisting of a single sigma_tile module, udm and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma
 
 * **magma** - MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
+
+Embedded CPU software for demo SoCs is built using riscv-tools and programmed to system via udm.
 
 ### Publications
 

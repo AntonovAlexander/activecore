@@ -18,7 +18,7 @@
 
 module sigma_tile
 #(
-	parameter corenum=0
+    parameter corenum=0
     , mem_init="YES"
     , mem_data="data.hex"
     , mem_size=1024
@@ -27,10 +27,11 @@ module sigma_tile
     , CPU_RESET_DEFAULT=0
 )
 (
-    input [0:0] clk_i
-    , input [0:0] rst_i
+    input clk_i
+    , input rst_i
 
     , input irq_debounced_i
+    
     , MemSplit32.Slave hif     // host interface
     , MemSplit32.Master xif    // expansion interface
 );
@@ -51,7 +52,7 @@ module sigma_tile
     (
         .clk_i(clk_i)
         , .rst_i(rst_i)
-        , .irq_debounced_i(irq_debounced_i)
+        , .irq_debounced_i({0, irq_debounced_i, 3'h0})
         , .msi_req_i(msi_req)
         , .msi_code_bi(msi_code)
         , .irq_req_o(cpu_irq_req)
@@ -59,7 +60,7 @@ module sigma_tile
         , .irq_ack_i(cpu_irq_ack)
     );
 	
-	// Processor core
+    // Processor core
     generate
         if (CPU == "riscv_1stage")
             
