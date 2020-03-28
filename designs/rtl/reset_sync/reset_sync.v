@@ -1,4 +1,4 @@
-module reset_cntrl
+module reset_sync
 #(
 	parameter SYNC_STAGES = 4
 )

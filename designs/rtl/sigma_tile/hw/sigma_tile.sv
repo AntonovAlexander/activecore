@@ -31,8 +31,8 @@ module sigma_tile
     , input [0:0] rst_i
 
     , input irq_debounced_i
-    , MemSplit32.Slave hpi      // host port interface
-    , MemSplit32.Master xbus    // expansion bus
+    , MemSplit32.Slave hif     // host interface
+    , MemSplit32.Master xif    // expansion interface
 );
 
     localparam XBUS_BITSEL  = 31;
@@ -376,11 +376,11 @@ module sigma_tile
                 .clk_i      (clk_i)
                 , .rst_i    (rst_i)
 
-                , .m0(hpi)
+                , .m0(hif)
                 , .m1(cpu_data)
                 , .s0(dmem_if)
                 , .s1(sfr_if)
-                , .s2(xbus)
+                , .s2(xif)
             );
 
             end
@@ -400,7 +400,7 @@ module sigma_tile
 
                 , .m(cpu_data)
                 , .s0(cpu_internal)
-                , .s1(xbus)
+                , .s1(xif)
             );
 
             arb_2m1s arb_internal
@@ -409,7 +409,7 @@ module sigma_tile
                 , .rst_i    (rst_i)
                 
                 , .m0(cpu_internal)
-                , .m1(hpi)
+                , .m1(hif)
                 , .s(internal_if)
             );
 

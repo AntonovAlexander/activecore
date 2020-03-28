@@ -28,7 +28,7 @@ module sigma
 );
 
 wire srst;
-reset_cntrl reset_cntrl
+reset_sync reset_sync
 (
 	.clk_i(clk_i),
 	.arst_i(arst_i),
@@ -48,8 +48,8 @@ debouncer debouncer
 	, .out(irq_btn_debounced)
 );
 
-MemSplit32 hpi();
-MemSplit32 xbus();
+MemSplit32 hif();
+MemSplit32 xif();
 
 sigma_tile #(
 	.corenum(0)
@@ -63,8 +63,8 @@ sigma_tile #(
 	, .rst_i(cpu_reset)
 
 	, .irq_debounced_i(irq_btn_debounced)
-	, .hpi(hpi)
-	, .xbus(xbus)
+	, .hif(hif)
+	, .xif(xif)
 );
 	
 udm udm
@@ -77,14 +77,14 @@ udm udm
 
 	, .rst_o(udm_reset)
 	
-	, .bus_req_o(hpi.req)
-	, .bus_we_o(hpi.we)
-	, .bus_addr_bo(hpi.addr)
-	, .bus_be_bo(hpi.be)
-	, .bus_wdata_bo(hpi.wdata)
-	, .bus_ack_i(hpi.ack)
-	, .bus_resp_i(hpi.resp)
-	, .bus_rdata_bi(hpi.rdata)
+	, .bus_req_o(hif.req)
+	, .bus_we_o(hif.we)
+	, .bus_addr_bo(hif.addr)
+	, .bus_be_bo(hif.be)
+	, .bus_wdata_bo(hif.wdata)
+	, .bus_ack_i(hif.ack)
+	, .bus_resp_i(hif.resp)
+	, .bus_rdata_bi(hif.rdata)
 );
 
 
@@ -96,7 +96,7 @@ assign gpio_bo = gpio_bo_reg;
 logic [31:0] gpio_bi_reg;
 always @(posedge clk_i) gpio_bi_reg <= gpio_bi;
 
-assign xbus.ack = xbus.req;   // xbus always ready to accept request
+assign xif.ack = xif.req;   // xif always ready to accept request
 logic csr_resp;
 logic [31:0] csr_rdata;
 
@@ -106,22 +106,22 @@ always @(posedge clk_i)
     
     csr_resp <= 1'b0;
     
-    if (xbus.req && xbus.ack)
+    if (xif.req && xif.ack)
         begin
         
-        if (xbus.we)     // writing
+        if (xif.we)     // writing
             begin
-            if (xbus.addr == CSR_LED_ADDR) gpio_bo_reg <= xbus.wdata;
+            if (xif.addr == CSR_LED_ADDR) gpio_bo_reg <= xif.wdata;
             end
         
         else            // reading
             begin
-            if (xbus.addr == CSR_LED_ADDR)
+            if (xif.addr == CSR_LED_ADDR)
                 begin
                 csr_resp <= 1'b1;
                 csr_rdata <= gpio_bo_reg;
                 end
-            if (xbus.addr == CSR_SW_ADDR)
+            if (xif.addr == CSR_SW_ADDR)
                 begin
                 csr_resp <= 1'b1;
                 csr_rdata <= gpio_bi_reg;
@@ -133,9 +133,9 @@ always @(posedge clk_i)
 // bus response
 always @*
     begin
-    xbus.resp = csr_resp;
-    xbus.rdata = 0;
-    if (csr_resp) xbus.rdata = csr_rdata;
+    xif.resp = csr_resp;
+    xif.rdata = 0;
+    if (csr_resp) xif.rdata = csr_rdata;
     end
 
 endmodule
