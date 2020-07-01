@@ -30,9 +30,9 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 
-Other useful cores:
+Other reusable cores:
 
-* **udm** - bus transactor (master) managed via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Location: /designs/rtl/udm. See doc subdirectory for udm bus protocol.
+* **udm** - bus transactor (master) managed via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Location: /designs/rtl/udm. See doc subdirectory for udm bus protocol
 
 * **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, special-purpose registers (SFRs), Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equal to udm bus. Location: /designs/rtl/sigma_tile
 
@@ -48,10 +48,12 @@ Embedded CPU software for demo SoCs is built using riscv-tools and programmed to
 
 * A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation, ITMO University, Saint-Petersburg, 28.12.2018. Thesis web page: http://fppo.ifmo.ru/dissertation/?number=63419
 
+* A. Antonov, P. Kustarev, “Strategies of Computational Process Synthesis – a System-Level Model of HW/SW (Micro)Architectural Mechanisms,” in 2020 9th Mediterranean Conference on Embedded Computing (MECO), 2020
+
 * A. Antonov, P. Kustarev, S. Bikovsky, “MLIP Cores: Designing Hardware Generators with Programmable Microarchitectural Mechanisms,” in 2020 IEEE International Symposium on Circuits and Systems (ISCAS), 2020 (accepted for publication)
 
-* A. Antonov, P. Kustarev, S. Bykovskii, "Methods of Computational Process Scheduling for Synthesis of Hardware Microarchitecture", in Proc. 19th International Multidisciplinary Scientific GeoConference, SGEM 2019 - 2019, Vol. 19, No. 2.1, pp. 445-452
-
 * A. Antonov, P. Kustarev, S. Bikovsky, "Improving Microarchitecture Design and Hardware Generation using Micro-Language IP Cores", in Proc. IEEE Nordic Circuits and Systems Conference (NORCAS) / NORCHIP and International Symposium of System-on-Chip (SoC) - 2017, pp. 1-6
+
+* A. Antonov, P. Kustarev, S. Bykovskii, "Methods of Computational Process Scheduling for Synthesis of Hardware Microarchitecture", in Proc. 19th International Multidisciplinary Scientific GeoConference, SGEM 2019 - 2019, Vol. 19, No. 2.1, pp. 445-452
 
 * A. Antonov, P. Kustarev, "DSL-based approach to hardware pipelines design", in Proc. 17th International Multidisciplinary Scientific GeoConference, SGEM 2017 - 2017, Vol. 17, No. 21, pp. 287-294

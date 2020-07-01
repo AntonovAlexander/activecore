@@ -20,6 +20,10 @@ sys.path.append('../../../sigma_tile/sw')
 import sigma_tile
 from sigma_tile import *
 
+sys.path.append('mul_sw')
+import hw_test_mul_sw
+from hw_test_mul_sw import *
+
 sys.path.append('median')
 import hw_test_median
 from hw_test_median import *
@@ -56,6 +60,11 @@ class sigma:
     def runtests(self):
         test_succ_counter = 0
         test_fail_counter = 0
+        
+        if (hw_test_mul_sw(self, 'mul_sw.riscv') == 1):
+            test_succ_counter = test_succ_counter + 1
+        else:
+            test_fail_counter = test_fail_counter + 1
         
         if (hw_test_median(self, 'median.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
