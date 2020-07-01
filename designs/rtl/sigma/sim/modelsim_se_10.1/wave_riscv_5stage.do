@@ -8,22 +8,36 @@ add wave -noupdate -radix hexadecimal /riscv_tb/sigma/tx_o
 add wave -noupdate -radix hexadecimal /riscv_tb/sigma/cpu_reset
 add wave -noupdate -radix hexadecimal /riscv_tb/sigma/gpio_bi
 add wave -noupdate -radix hexadecimal -childformat {{{/riscv_tb/sigma/gpio_bo[31]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[30]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[29]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[28]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[27]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[26]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[25]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[24]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[23]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[22]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[21]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[20]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[19]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[18]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[17]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[16]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[15]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[14]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[13]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[12]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[11]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[10]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[9]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[8]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[7]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[6]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[5]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[4]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[3]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[2]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[1]} -radix hexadecimal} {{/riscv_tb/sigma/gpio_bo[0]} -radix hexadecimal}} -subitemconfig {{/riscv_tb/sigma/gpio_bo[31]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[30]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[29]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[28]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[27]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[26]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[25]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[24]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[23]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[22]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[21]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[20]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[19]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[18]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[17]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[16]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[15]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[14]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[13]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[12]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[11]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[10]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[9]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[8]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[7]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[6]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[5]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[4]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[3]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[2]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[1]} {-height 18 -radix hexadecimal} {/riscv_tb/sigma/gpio_bo[0]} {-height 18 -radix hexadecimal}} /riscv_tb/sigma/gpio_bo
-add wave -noupdate -expand -group hpi -radix hexadecimal /riscv_tb/sigma/hpi/req
-add wave -noupdate -expand -group hpi -radix hexadecimal /riscv_tb/sigma/hpi/ack
-add wave -noupdate -expand -group hpi -radix hexadecimal /riscv_tb/sigma/hpi/addr
-add wave -noupdate -expand -group hpi -radix hexadecimal /riscv_tb/sigma/hpi/we
-add wave -noupdate -expand -group hpi -radix hexadecimal /riscv_tb/sigma/hpi/wdata
-add wave -noupdate -expand -group hpi -radix hexadecimal /riscv_tb/sigma/hpi/be
-add wave -noupdate -expand -group hpi -radix hexadecimal /riscv_tb/sigma/hpi/resp
-add wave -noupdate -expand -group hpi -radix hexadecimal /riscv_tb/sigma/hpi/rdata
-add wave -noupdate -expand -group xbus -radix hexadecimal /riscv_tb/sigma/xbus/req
-add wave -noupdate -expand -group xbus -radix hexadecimal /riscv_tb/sigma/xbus/ack
-add wave -noupdate -expand -group xbus -radix hexadecimal /riscv_tb/sigma/xbus/addr
-add wave -noupdate -expand -group xbus -radix hexadecimal /riscv_tb/sigma/xbus/we
-add wave -noupdate -expand -group xbus -radix hexadecimal /riscv_tb/sigma/xbus/wdata
-add wave -noupdate -expand -group xbus -radix hexadecimal /riscv_tb/sigma/xbus/be
-add wave -noupdate -expand -group xbus -radix hexadecimal /riscv_tb/sigma/xbus/resp
-add wave -noupdate -expand -group xbus -radix hexadecimal /riscv_tb/sigma/xbus/rdata
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/IRQ_NUM_POW
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/IRQ_NUM
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/clk_i
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/rst_i
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/irq_debounced_bi
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/msi_req_i
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/msi_code_bi
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/irq_req_o
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/irq_code_bo
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/irq_ack_i
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/irq_buf0
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/irq_buf1
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/irq_posedge
+add wave -noupdate -expand -group irq_adapter -radix hexadecimal /riscv_tb/sigma/sigma_tile/irq_adapter/irq_flags
+add wave -noupdate -expand -group hif -radix hexadecimal /riscv_tb/sigma/hif/req
+add wave -noupdate -expand -group hif -radix hexadecimal /riscv_tb/sigma/hif/ack
+add wave -noupdate -expand -group hif -radix hexadecimal /riscv_tb/sigma/hif/addr
+add wave -noupdate -expand -group hif -radix hexadecimal /riscv_tb/sigma/hif/we
+add wave -noupdate -expand -group hif -radix hexadecimal /riscv_tb/sigma/hif/wdata
+add wave -noupdate -expand -group hif -radix hexadecimal /riscv_tb/sigma/hif/be
+add wave -noupdate -expand -group hif -radix hexadecimal /riscv_tb/sigma/hif/resp
+add wave -noupdate -expand -group hif -radix hexadecimal /riscv_tb/sigma/hif/rdata
+add wave -noupdate -expand -group xif -radix hexadecimal /riscv_tb/sigma/xif/req
+add wave -noupdate -expand -group xif -radix hexadecimal /riscv_tb/sigma/xif/ack
+add wave -noupdate -expand -group xif -radix hexadecimal /riscv_tb/sigma/xif/addr
+add wave -noupdate -expand -group xif -radix hexadecimal /riscv_tb/sigma/xif/we
+add wave -noupdate -expand -group xif -radix hexadecimal /riscv_tb/sigma/xif/wdata
+add wave -noupdate -expand -group xif -radix hexadecimal /riscv_tb/sigma/xif/be
+add wave -noupdate -expand -group xif -radix hexadecimal /riscv_tb/sigma/xif/resp
+add wave -noupdate -expand -group xif -radix hexadecimal /riscv_tb/sigma/xif/rdata
 add wave -noupdate -expand -group {udm bus} -radix hexadecimal /riscv_tb/sigma/udm_reset
 add wave -noupdate -expand -group inst_mem -radix hexadecimal /riscv_tb/sigma/sigma_tile/genblk1/riscv/genmcopipe_instr_mem_resp_genfifo_req_i
 add wave -noupdate -expand -group inst_mem -radix hexadecimal /riscv_tb/sigma/sigma_tile/genblk1/riscv/genmcopipe_instr_mem_resp_genfifo_ack_o
@@ -259,7 +273,7 @@ add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/sigma/sigma_t
 add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6207]}
 add wave -noupdate -expand -group io_buf -radix decimal {/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6208]}
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {99739784 ps} 0}
+WaveRestoreCursors {{Cursor 1} {8405738 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 1040
 configure wave -valuecolwidth 104
@@ -275,4 +289,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {99610348 ps} {100020508 ps}
+WaveRestoreZoom {0 ps} {21 us}

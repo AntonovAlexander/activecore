@@ -33,7 +33,7 @@ module magma
 );
 
 	logic srst;
-	reset_cntrl reset_cntrl
+	reset_sync reset_sync
 	(
 		.clk_i(clk_i),
 		.arst_i(arst_i),
@@ -200,9 +200,10 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(irq0_debounced)
-		, .hpi(s0)
-		, .xbus(m0)
+		, .irq_debounced_bi(irq0_debounced)
+
+		, .hif(s0)
+		, .xif(m0)
 	);
 	
 	sigma_tile #(
@@ -217,9 +218,10 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(irq1_debounced)
-		, .hpi(s1)
-		, .xbus(m1)
+		, .irq_debounced_bi(irq1_debounced)
+
+		, .hif(s1)
+		, .xif(m1)
 	);
 	
 	sigma_tile #(
@@ -234,9 +236,10 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(irq2_debounced)
-		, .hpi(s2)
-		, .xbus(m2)
+		, .irq_debounced_bi(irq2_debounced)
+
+		, .hif(s2)
+		, .xif(m2)
 	);
 	
 	sigma_tile #(
@@ -251,9 +254,10 @@ module magma
 		.clk_i(clk_i)
 		, .rst_i(cpu_reset)
 		
-		, .irq_debounced_i(irq3_debounced)
-		, .hpi(s3)
-		, .xbus(m3)
+		, .irq_debounced_bi(irq3_debounced)
+		
+		, .hif(s3)
+		, .xif(m3)
 	);
 	
 	udm udm

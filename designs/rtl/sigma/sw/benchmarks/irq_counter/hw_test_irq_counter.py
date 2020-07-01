@@ -31,7 +31,6 @@ def hw_test_irq_counter(sigma, irq_counter_filename):
     if (led_val == 5):
         test_succ_flag = 1
     
-    print("test_succ_flag: ", test_succ_flag)
     if (test_succ_flag):
         print("#### IRQ TEST PASSED! ####")
     else:

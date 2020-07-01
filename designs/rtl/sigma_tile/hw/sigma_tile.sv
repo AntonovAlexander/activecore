@@ -18,21 +18,23 @@
 
 module sigma_tile
 #(
-	parameter corenum=0
+    parameter corenum=0
     , mem_init="YES"
     , mem_data="data.hex"
     , mem_size=1024
     , CPU="none"
     , PATH_THROUGH="YES"
     , CPU_RESET_DEFAULT=0
+    , IRQ_NUM_POW=4
 )
 (
-    input [0:0] clk_i
-    , input [0:0] rst_i
+    input clk_i
+    , input rst_i
 
-    , input irq_debounced_i
-    , MemSplit32.Slave hpi      // host port interface
-    , MemSplit32.Master xbus    // expansion bus
+    , input [(2**IRQ_NUM_POW)-1:0] irq_debounced_bi
+    
+    , MemSplit32.Slave hif     // host interface
+    , MemSplit32.Master xif    // expansion interface
 );
 
     localparam XBUS_BITSEL  = 31;
@@ -43,15 +45,16 @@ module sigma_tile
     MemSplit32 cpu_data();
 
     logic msi_req;
-    logic [7:0] msi_code;
+    logic [IRQ_NUM_POW-1:0] msi_code;
     logic cpu_irq_req;
-    logic [7:0] cpu_irq_code;
+    logic [IRQ_NUM_POW-1:0] cpu_irq_code;
     logic cpu_irq_ack;
-    irq_adapter irq_adapter
-    (
+    irq_adapter #(
+        .IRQ_NUM_POW(IRQ_NUM_POW)
+    ) irq_adapter (
         .clk_i(clk_i)
         , .rst_i(rst_i)
-        , .irq_debounced_i(irq_debounced_i)
+        , .irq_debounced_bi(irq_debounced_bi)
         , .msi_req_i(msi_req)
         , .msi_code_bi(msi_code)
         , .irq_req_o(cpu_irq_req)
@@ -59,7 +62,7 @@ module sigma_tile
         , .irq_ack_i(cpu_irq_ack)
     );
 	
-	// Processor core
+    // Processor core
     generate
         if (CPU == "riscv_1stage")
             
@@ -83,7 +86,7 @@ module sigma_tile
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
-                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_rdata_bi({0, cpu_irq_code})
                 , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
@@ -131,7 +134,7 @@ module sigma_tile
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
-                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_rdata_bi({0, cpu_irq_code})
                 , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
@@ -179,7 +182,7 @@ module sigma_tile
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
-                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_rdata_bi({0, cpu_irq_code})
                 , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
@@ -227,7 +230,7 @@ module sigma_tile
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
-                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_rdata_bi({0, cpu_irq_code})
                 , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
@@ -275,7 +278,7 @@ module sigma_tile
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
-                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_rdata_bi({0, cpu_irq_code})
                 , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
@@ -323,7 +326,7 @@ module sigma_tile
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
-                , .irq_fifo_genfifo_rdata_bi(cpu_irq_code)
+                , .irq_fifo_genfifo_rdata_bi({0, cpu_irq_code})
                 , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
                 
                 // instr req bus
@@ -360,61 +363,27 @@ module sigma_tile
             );
         
     endgenerate
-	
-    MemSplit32 internal_if();
-    MemSplit32 cpu_internal();
+
+    MemSplit32 dmem_if();
+    MemSplit32 sfr_if();
     
     generate
         if (PATH_THROUGH == "YES")
             begin
 
-            MemSplit32 cpu_xbus();
-
-            arb_1m2s
+            arb_2m3s
             #(
-                .BITSEL(XBUS_BITSEL)
+                .SFR_BITSEL(SFR_BITSEL)
+                , .XBUS_BITSEL(XBUS_BITSEL)
             ) arb_cpu (
                 .clk_i      (clk_i)
                 , .rst_i    (rst_i)
 
-                , .m(cpu_data)
-                , .s0(cpu_internal)
-                , .s1(cpu_xbus)
-            );
-
-            MemSplit32 hpi_internal();
-            MemSplit32 hpi_xbus();
-
-            arb_1m2s
-            #(
-                .BITSEL(XBUS_BITSEL)
-            ) arb_hpi (
-                .clk_i      (clk_i)
-                , .rst_i    (rst_i)
-
-                , .m(hpi)
-                , .s0(hpi_internal)
-                , .s1(hpi_xbus)
-            );
-
-            arb_2m1s arb_internal
-            (
-                .clk_i      (clk_i)
-                , .rst_i    (rst_i)
-                
-                , .m0(cpu_internal)
-                , .m1(hpi_internal)
-                , .s(internal_if)
-            );
-
-            arb_2m1s arb_xbus
-            (
-                .clk_i      (clk_i)
-                , .rst_i    (rst_i)
-                
-                , .m0(cpu_xbus)
-                , .m1(hpi_xbus)
-                , .s(xbus)
+                , .m0(hif)
+                , .m1(cpu_data)
+                , .s0(dmem_if)
+                , .s1(sfr_if)
+                , .s2(xif)
             );
 
             end
@@ -422,6 +391,9 @@ module sigma_tile
         else
             begin
     
+            MemSplit32 internal_if();
+            MemSplit32 cpu_internal();
+
             arb_1m2s
             #(
                 .BITSEL(XBUS_BITSEL)
@@ -431,7 +403,7 @@ module sigma_tile
 
                 , .m(cpu_data)
                 , .s0(cpu_internal)
-                , .s1(xbus)
+                , .s1(xif)
             );
 
             arb_2m1s arb_internal
@@ -440,28 +412,26 @@ module sigma_tile
                 , .rst_i    (rst_i)
                 
                 , .m0(cpu_internal)
-                , .m1(hpi)
+                , .m1(hif)
                 , .s(internal_if)
+            );
+
+            arb_1m2s
+            #(
+                .BITSEL(SFR_BITSEL)
+            ) arb_l2 (
+                .clk_i      (clk_i)
+                , .rst_i    (rst_i)
+                
+                , .m(internal_if)
+                , .s0(dmem_if)
+                , .s1(sfr_if)
             );
             
             end
 
     endgenerate
-	
-    MemSplit32 dmem_if();
-    MemSplit32 sfr_if();
-	
-    arb_1m2s
-    #(
-        .BITSEL(SFR_BITSEL)
-    ) arb_l2 (
-        .clk_i		(clk_i)
-        , .rst_i	(rst_i)
-		
-        , .m(internal_if)
-        , .s0(dmem_if)
-        , .s1(sfr_if)
-	);
+    
 	
 	ram_dual_memsplit #(
 		.mem_init(mem_init)
@@ -497,6 +467,7 @@ module sigma_tile
     sfr #(
         .corenum(corenum)
         , .CPU_RESET_DEFAULT(CPU_RESET_DEFAULT)
+        , .IRQ_NUM_POW(IRQ_NUM_POW)
     ) sfr(
         .clk_i		(clk_i)
         , .rst_i	(rst_i)

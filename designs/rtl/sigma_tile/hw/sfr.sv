@@ -13,6 +13,7 @@ module sfr
 #(
 	parameter corenum=0
 	, parameter CPU_RESET_DEFAULT=0
+	, parameter IRQ_NUM_POW = 4
 )
 (
 	input [0:0] clk_i
@@ -20,10 +21,10 @@ module sfr
 
 	, MemSplit32.Slave host
 
-	, output reg cpu_reset_o
+	, output logic cpu_reset_o
 
-	, output reg msi_req_o
-	, output reg [7:0] msi_code_bo
+	, output logic msi_req_o
+	, output logic [IRQ_NUM_POW-1:0] msi_code_bo
 );
 
 localparam IDCODE_ADDR 	= 8'h0;
@@ -31,7 +32,7 @@ localparam CTRL_ADDR 	= 8'h4;
 localparam CORENUM_ADDR = 8'h8;
 localparam MSI_ADDR 	= 8'hC;
 
-reg cpu_reset;
+logic cpu_reset;
 always @(posedge clk_i) cpu_reset_o <= rst_i | cpu_reset;
 
 always @(posedge clk_i)
@@ -41,6 +42,7 @@ always @(posedge clk_i)
 		host.resp <= 1'b0;
 		cpu_reset <= CPU_RESET_DEFAULT;
 		msi_req_o <= 0;
+		msi_code_bo <= 0;
 		end
 	else
 		begin

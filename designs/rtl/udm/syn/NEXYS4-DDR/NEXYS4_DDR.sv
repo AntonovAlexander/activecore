@@ -38,7 +38,7 @@ logic arst;
 assign arst = !(CPU_RESETN & pll_locked);
 
 logic srst;
-reset_cntrl reset_cntrl
+reset_sync reset_sync
 (
 	.clk_i(clk_gen),
 	.arst_i(arst),
