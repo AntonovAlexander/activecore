@@ -19,10 +19,11 @@ instbasedir = $(UCB_VLSI_HOME)/install
 
 bmarks = \
 	heartbeat_variable \
+	mul_sw \
+	irq_counter \
 	median \
 	qsort \
 	rsort \
-	irq_counter \
 	#dhrystone 
 	#towers \
 	#vvadd \
