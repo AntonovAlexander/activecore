@@ -951,7 +951,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             alu_CF.assign(alu_result_wide[32])
             alu_SF.assign(alu_result_wide[31])
             alu_ZF.assign(bnot(ror(alu_result)))
-            alu_OF.assign(bor(eq2(alu_result_wide[32, 31], 0x2), eq2(alu_result_wide[32, 31], 0x1)))
+            alu_OF.assign(bor(band(!alu_op1[31], band(!alu_op2[31], alu_result[31])), band(alu_op1[31], band(alu_op2[31], !alu_result[31]))))
 
             begif(alu_unsigned)
             run {
