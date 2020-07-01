@@ -1,7 +1,7 @@
 // See LICENSE for license details.
 
 //**************************************************************************
-// Median filter (c version)
+// Software multiplication
 //--------------------------------------------------------------------------
 
 int mul_sw( int a, int b )

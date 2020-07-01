@@ -347,6 +347,10 @@ class VivadoCppWriter(module_in : module) {
         // TODO: restrict to interfaces
         File(pathname).mkdirs()
         val wrFileInterface = File(pathname + "/" + mod.name + ".hpp").writer()
+
+        // writing header
+        WriteGenSrcHeader(wrFileInterface, "HLS sources")
+
         wrFileInterface.write("#ifndef __" + mod.name +"_h_\n")
         wrFileInterface.write("#define __" + mod.name +"_h_\n")
         wrFileInterface.write("\n")
@@ -368,6 +372,10 @@ class VivadoCppWriter(module_in : module) {
 
         // writing module
         val wrFileModule = File(pathname + "/" + mod.name + ".cpp").writer()
+
+        // writing header
+        WriteGenSrcHeader(wrFileModule, "HLS sources")
+
         println("Exporting modules and ports...")
         wrFileModule.write("#include \"" + mod.name + ".hpp\"\n")
         wrFileModule.write("#include <ap_int.h>\n")

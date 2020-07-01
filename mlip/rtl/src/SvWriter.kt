@@ -325,6 +325,10 @@ class SvWriter(module_in : module) {
 
         File(pathname).mkdirs()
         val wrFileInterface = File(pathname + "/" + mod.name + ".svh").writer()
+
+        // writing header
+        WriteGenSrcHeader(wrFileInterface, "RTL")
+
         wrFileInterface.write("`ifndef __" + mod.name +"_h_\n")
         wrFileInterface.write("`define __" + mod.name +"_h_\n")
         wrFileInterface.write("\n")
@@ -342,6 +346,9 @@ class SvWriter(module_in : module) {
 
         // writing module
         val wrFileModule = File(pathname + "/" + mod.name + ".sv").writer()
+
+        // writing header
+        WriteGenSrcHeader(wrFileModule, "RTL")
 
         // Submodules
         println("Exporting submodules...")
