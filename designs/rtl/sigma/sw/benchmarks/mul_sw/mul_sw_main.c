@@ -1,23 +1,17 @@
 // See LICENSE for license details.
 
 //**************************************************************************
-// Median filter benchmark
+// Software multiplication
 //--------------------------------------------------------------------------
-//
-// This benchmark performs a 1D three element median filter. The
-// input data (and reference data) should be generated using the
-// median_gendata.pl perl script and dumped to a file named
-// dataset1.h.
 
 //#include "util.h"
 
-#include "median.h"
+#include "mul_sw.h"
 
 //--------------------------------------------------------------------------
 // Input/Reference Data
 
 #include "io.h"
-#include "dataset1.h"
 
 //--------------------------------------------------------------------------
 // Main
@@ -25,15 +19,13 @@
 int main( int argc, char* argv[] )
 {
   int * io_buf = (int*)IO_MEM_ADDR;
-
-  IO_LED = 0x0;
-
-  // Do the filter
-  median( DATA_SIZE, input_data, io_buf );
   
-  // Display status
+  // Initial status
+  io_buf[0] = 5;
+  io_buf[1] = 7;
   IO_LED = 0x55aa55aa;
 
-  // hang
-  while (1) {}
+  while (1) {
+    IO_LED = mul_sw(io_buf[0], io_buf[1]);
+  }
 }
