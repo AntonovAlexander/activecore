@@ -10,8 +10,8 @@ MLIP core approach serves as intermediate solution for codification of custom mi
 
 Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
 
-The aim of the project is to provide methodology and reusable components for explicit allocation of *“microarchitectural middleware”* design level in complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) incorporates expert knowledge about correct, optimized and scalable implementation of cross-cutting mechanisms in custom microarchitectures, addressing:
-* acceleration of rapid prototyping of various-purpose IP blocks with common microarchitectural mechanisms;
+The aim of the project is to provide methodology and reusable components for explicit allocation of *“microarchitectural middleware”* design level in complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) incorporates expert knowledge about cross-cutting internal mechanisms of custom microarchitectures, addressing:
+* rapid prototyping of various-purpose IP blocks with common microarchitectural mechanisms;
 * diversification of competence of IP design center engineers: implementation of key microarchitectural mechanisms can be charged to the core of leading engineers, while developers of final products can focus solely on application-specific functionality;
 * enabling IP design centers to package complex hardware templates with selectively programmable microarchitectural mechanisms as standalone deliverables.
 
@@ -37,7 +37,7 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 Other reusable cores:
 
-* **udm** - bus transactor (master) managed via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Location: /designs/rtl/udm. See doc subdirectory for udm bus protocol
+* **udm** - bus transactor (master) controlled via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Location: /designs/rtl/udm. See doc subdirectory for udm bus protocol
 
 * **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, special-purpose registers (SFRs), Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equal to udm bus. Location: /designs/rtl/sigma_tile
 
