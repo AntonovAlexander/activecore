@@ -23,8 +23,8 @@ module sfr
 
 	, output logic cpu_reset_o
 
-	, output logic msi_req_o
-	, output logic [IRQ_NUM_POW-1:0] msi_code_bo
+	, output logic sgi_req_o
+	, output logic [IRQ_NUM_POW-1:0] sgi_code_bo
 );
 
 localparam IDCODE_ADDR 	= 8'h0;
@@ -41,13 +41,13 @@ always @(posedge clk_i)
 		begin
 		host.resp <= 1'b0;
 		cpu_reset <= CPU_RESET_DEFAULT;
-		msi_req_o <= 0;
-		msi_code_bo <= 0;
+		sgi_req_o <= 0;
+		sgi_code_bo <= 0;
 		end
 	else
 		begin
 		host.resp <= 1'b0;
-		msi_req_o <= 0;
+		sgi_req_o <= 0;
 		if (host.req)
 			begin
 			if (host.we)
@@ -58,8 +58,8 @@ always @(posedge clk_i)
 					end
 				if (host.addr[7:0] == MSI_ADDR)
 					begin
-					msi_req_o <= 1;
-					msi_code_bo <= host.wdata;
+					sgi_req_o <= 1;
+					sgi_code_bo <= host.wdata;
 					end
 				end
 			else

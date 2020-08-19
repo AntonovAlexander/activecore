@@ -18,9 +18,9 @@ module irq_adapter
     // external interface
     , input [(2**IRQ_NUM_POW)-1:0] irq_debounced_bi
 
-    // msi interface
-    , input msi_req_i
-    , input [IRQ_NUM_POW-1:0] msi_code_bi
+    // sgi interface
+    , input sgi_req_i
+    , input [IRQ_NUM_POW-1:0] sgi_code_bi
 
     // cpu interface
     , output logic irq_req_o
@@ -87,7 +87,7 @@ always @(posedge clk_i)
             irq_code_bo <= irq_prior_code;
             end
         
-        if (msi_req_i) irq_flags[msi_code_bi] <= 1'b1;      // msi irq detection
+        if (sgi_req_i) irq_flags[sgi_code_bi] <= 1'b1;      // sgi irq detection
         end
     end
 
