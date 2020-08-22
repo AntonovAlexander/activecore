@@ -63,6 +63,15 @@ always @(posedge clk_i)
 		sgi_req_o <= 0;
 		irq_timer <= 1'b0;
 
+		if (cpu_reset_o)
+			begin
+			timer_inprogress <= 1'b0;
+			timer_reload <= 1'b0;
+			irq_timer <= 1'b0;
+			timer_period <= 0;
+			timer_value <= 0;
+			end
+
 		if (timer_inprogress)
 			begin
 			if (timer_value == timer_period)

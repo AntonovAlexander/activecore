@@ -56,7 +56,7 @@ module sigma_tile
         .IRQ_NUM_POW(IRQ_NUM_POW)
     ) irq_adapter (
         .clk_i(clk_i)
-        , .rst_i(rst_i)
+        , .rst_i(cpu_reset)
         , .irq_debounced_bi(irq_debounced_bi | (irq_timer << 1))
         , .sgi_req_i(sgi_req)
         , .sgi_code_bi(sgi_code)
