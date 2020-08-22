@@ -7,4 +7,4 @@
 
 #define static_assert(cond) switch(0) { case 0: case !!(long)(cond): ; }
 
-#endif //__UTIL_H
+#endif // __UTIL_H

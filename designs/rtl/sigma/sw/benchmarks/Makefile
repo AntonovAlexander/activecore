@@ -19,6 +19,7 @@ instbasedir = $(UCB_VLSI_HOME)/install
 
 bmarks = \
 	heartbeat_variable \
+	timer_test \
 	mul_sw \
 	irq_counter \
 	median \
