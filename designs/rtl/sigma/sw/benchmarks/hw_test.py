@@ -3,7 +3,7 @@ from __future__ import division
 
 import sys
 
-sys.path.append('../../../../rtl/udm/sw')
+sys.path.append('../../../udm/sw')
 import udm
 from udm import *
 
