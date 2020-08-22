@@ -19,36 +19,65 @@ from udm import *
 
 class sigma_tile:
 
-    sigma_addr = 0x0
+    __sigma_addr = 0x0
     
     def __init__(self, udm, sigma_addr):
         self.udm = udm
-        self.sigma_addr = sigma_addr
-        IDCODE = self.udm.rd32((self.sigma_addr + 0x00100000))
-        print("sigma_tile@0x{:08x}".format(self.sigma_addr) , ": IDCODE: ", hex(IDCODE))
+        self.__sigma_addr = sigma_addr
+        IDCODE = self.udm.rd32((self.__sigma_addr + 0x00100000))
+        print("sigma_tile@0x{:08x}".format(self.__sigma_addr) , ": IDCODE: ", hex(IDCODE))
         print()
         if (IDCODE != 0xdeadbeef):
             self.udm.discon()
-            raise Exception("sigma tile not found at address " + hex(sigma_addr))
+            raise Exception("sigma tile not found at address " + hex(__sigma_addr))
     
     def __del__(self):
         self.udm.discon()
     
     def sw_rst(self):
-        self.udm.wr32((self.sigma_addr + 0x00100004), 0x01)
+        """Description:
+            Assert software reset
+
+        """
+        self.udm.wr32((self.__sigma_addr + 0x00100004), 0x01)
     
     def sw_nrst(self):
-        self.udm.wr32((self.sigma_addr + 0x00100004), 0x00)
+        """Description:
+            Deassert software reset
+
+        """
+        self.udm.wr32((self.__sigma_addr + 0x00100004), 0x00)
     
     def loadbin(self, filename):
+        """Description:
+            Write data from binary file to local CPU RAM
+
+        Parameters:
+            filename (str): Binary file name
+
+        """
         self.sw_rst()
-        self.udm.wrbin32_le(self.sigma_addr, filename)
+        self.udm.wrbin32_le(self.__sigma_addr, filename)
         self.sw_nrst()
     
     def loadelf(self, filename):
+        """Description:
+            Write elf file to local CPU RAM
+
+        Parameters:
+            filename (str): Elf file name
+
+        """
         self.sw_rst()
-        self.udm.wrelf32(self.sigma_addr, filename)
+        self.udm.wrelf32(self.__sigma_addr, filename)
         self.sw_nrst()
     
     def sgi(self, irq_num):
-        self.udm.wr32((self.sigma_addr + 0x0010000C), irq_num)
+        """Description:
+            Fire software generated interrupt
+
+        Parameters:
+            irq_num (int): Interrupt number
+
+        """
+        self.udm.wr32((self.__sigma_addr + 0x0010000C), irq_num)
