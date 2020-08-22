@@ -31,7 +31,7 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 * core generators based on MLIP cores (/designs/coregen):
 
-	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages, with interrupts support), based on pipex MLIP core
+	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on pipex MLIP core
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 
@@ -39,7 +39,7 @@ Other reusable cores:
 
 * **udm** - bus transactor (master) controlled via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Location: /designs/rtl/udm
 
-* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, special-function registers (SFRs), Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equal to udm bus protocol. Location: /designs/rtl/sigma_tile
+* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, interrupt controller, timer, Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equal to udm bus protocol. Location: /designs/rtl/sigma_tile
 
 Demo FPGA-based SoCs:
 
