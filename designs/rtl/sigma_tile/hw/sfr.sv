@@ -12,8 +12,8 @@
 module sfr
 #(
 	parameter corenum=0
-	, parameter CPU_RESET_DEFAULT=0
-	, parameter IRQ_NUM_POW = 4
+	, parameter SW_RESET_DEFAULT=0
+	, parameter IRQ_NUM_POW=4
 )
 (
 	input [0:0] clk_i
@@ -21,7 +21,7 @@ module sfr
 
 	, MemSplit32.Slave host
 
-	, output logic cpu_reset_o
+	, output logic sw_reset_o
 
 	, output logic irq_timer
 
@@ -36,8 +36,8 @@ localparam SGI_ADDR 			= 8'h0C;
 localparam TIMER_CTRL_ADDR 		= 8'h10;
 localparam TIMER_PERIOD_ADDR 	= 8'h14;
 
-logic cpu_reset;
-always @(posedge clk_i) cpu_reset_o <= rst_i | cpu_reset;
+logic sw_reset;
+always @(posedge clk_i) sw_reset_o <= rst_i | sw_reset;
 
 logic timer_inprogress, timer_reload;
 logic [31:0] timer_period;
@@ -48,7 +48,7 @@ always @(posedge clk_i)
 	if (rst_i)
 		begin
 		host.resp <= 1'b0;
-		cpu_reset <= CPU_RESET_DEFAULT;
+		sw_reset <= SW_RESET_DEFAULT;
 		irq_timer <= 1'b0;
 		sgi_req_o <= 0;
 		sgi_code_bo <= 0;
@@ -63,7 +63,7 @@ always @(posedge clk_i)
 		sgi_req_o <= 0;
 		irq_timer <= 1'b0;
 
-		if (cpu_reset_o)
+		if (sw_reset_o)
 			begin
 			timer_inprogress <= 1'b0;
 			timer_reload <= 1'b0;
@@ -89,7 +89,7 @@ always @(posedge clk_i)
 				begin
 				if (host.addr[7:0] == CTRL_ADDR)
 					begin
-					cpu_reset <= host.wdata[0];
+					sw_reset <= host.wdata[0];
 					end
 				if (host.addr[7:0] == SGI_ADDR)
 					begin
@@ -111,7 +111,7 @@ always @(posedge clk_i)
 				begin
 				host.resp <= 1'b1;
 				if (host.addr[7:0] == IDCODE_ADDR)  		host.rdata <= 32'hdeadbeef;
-				if (host.addr[7:0] == CTRL_ADDR)    		host.rdata <= {31'h0, cpu_reset};
+				if (host.addr[7:0] == CTRL_ADDR)    		host.rdata <= {31'h0, sw_reset};
 				if (host.addr[7:0] == CORENUM_ADDR) 		host.rdata <= corenum;
 				if (host.addr[7:0] == TIMER_CTRL_ADDR) 		host.rdata <= {30'h0, timer_reload, timer_inprogress};
 				if (host.addr[7:0] == TIMER_PERIOD_ADDR) 	host.rdata <= timer_period;

@@ -24,7 +24,7 @@ module sigma_tile
     , mem_size=1024
     , CPU="none"
     , PATH_THROUGH="YES"
-    , CPU_RESET_DEFAULT=0
+    , SW_RESET_DEFAULT=0
     , IRQ_NUM_POW=4
 )
 (
@@ -40,7 +40,7 @@ module sigma_tile
     localparam XBUS_BITSEL  = 31;
     localparam SFR_BITSEL   = 20;
 
-    logic cpu_reset;
+    logic sw_reset;
     MemSplit32 cpu_instr();
     MemSplit32 cpu_data();
 
@@ -56,7 +56,7 @@ module sigma_tile
         .IRQ_NUM_POW(IRQ_NUM_POW)
     ) irq_adapter (
         .clk_i(clk_i)
-        , .rst_i(cpu_reset)
+        , .rst_i(sw_reset)
         , .irq_debounced_bi(irq_debounced_bi | (irq_timer << 1))
         , .sgi_req_i(sgi_req)
         , .sgi_code_bi(sgi_code)
@@ -85,7 +85,7 @@ module sigma_tile
     
             riscv_1stage riscv (
                 .clk_i(clk_i)
-                , .rst_i(cpu_reset)
+                , .rst_i(sw_reset)
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
@@ -133,7 +133,7 @@ module sigma_tile
     
             riscv_2stage riscv (
                 .clk_i(clk_i)
-                , .rst_i(cpu_reset)
+                , .rst_i(sw_reset)
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
@@ -181,7 +181,7 @@ module sigma_tile
     
             riscv_3stage riscv (
                 .clk_i(clk_i)
-                , .rst_i(cpu_reset)
+                , .rst_i(sw_reset)
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
@@ -229,7 +229,7 @@ module sigma_tile
     
             riscv_4stage riscv (
                 .clk_i(clk_i)
-                , .rst_i(cpu_reset)
+                , .rst_i(sw_reset)
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
@@ -277,7 +277,7 @@ module sigma_tile
     
             riscv_5stage riscv (
                 .clk_i(clk_i)
-                , .rst_i(cpu_reset)
+                , .rst_i(sw_reset)
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
@@ -325,7 +325,7 @@ module sigma_tile
     
             riscv_6stage riscv (
                 .clk_i(clk_i)
-                , .rst_i(cpu_reset)
+                , .rst_i(sw_reset)
                 
                 // interrupt bus
                 , .irq_fifo_genfifo_req_i(cpu_irq_req)
@@ -359,7 +359,7 @@ module sigma_tile
     
             cpu_stub cpu_stub (
                 .clk_i(clk_i)
-                , .rst_i(cpu_reset)
+                , .rst_i(sw_reset)
                 
                 , .instr_mem(cpu_instr)
                 , .data_mem(cpu_data)
@@ -469,7 +469,7 @@ module sigma_tile
 	
     sfr #(
         .corenum(corenum)
-        , .CPU_RESET_DEFAULT(CPU_RESET_DEFAULT)
+        , .SW_RESET_DEFAULT(SW_RESET_DEFAULT)
         , .IRQ_NUM_POW(IRQ_NUM_POW)
     ) sfr(
         .clk_i		(clk_i)
@@ -477,7 +477,7 @@ module sigma_tile
 
         , .host(sfr_if)
 
-        , .cpu_reset_o(cpu_reset)
+        , .sw_reset_o(sw_reset)
 
         , .irq_timer(irq_timer)
 

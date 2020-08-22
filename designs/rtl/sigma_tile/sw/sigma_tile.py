@@ -34,21 +34,21 @@ class sigma_tile:
     def __del__(self):
         self.udm.discon()
     
-    def cpu_rst(self):
+    def sw_rst(self):
         self.udm.wr32((self.sigma_addr + 0x00100004), 0x01)
     
-    def cpu_nrst(self):
+    def sw_nrst(self):
         self.udm.wr32((self.sigma_addr + 0x00100004), 0x00)
     
     def loadbin(self, filename):
-        self.cpu_rst()
+        self.sw_rst()
         self.udm.wrbin32_le(self.sigma_addr, filename)
-        self.cpu_nrst()
+        self.sw_nrst()
     
     def loadelf(self, filename):
-        self.cpu_rst()
+        self.sw_rst()
         self.udm.wrelf32(self.sigma_addr, filename)
-        self.cpu_nrst()
+        self.sw_nrst()
     
-    def msi(self, irq_num):
+    def sgi(self, irq_num):
         self.udm.wr32((self.sigma_addr + 0x0010000C), irq_num)
