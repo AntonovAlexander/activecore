@@ -12,7 +12,7 @@
 module arb_2m3s
 #(
 	parameter SFR_BITSEL = 16
-	, parameter XBUS_BITSEL = 31
+	, parameter XIF_BITSEL = 31
 )
 (
 	input [0:0] clk_i
@@ -147,7 +147,7 @@ module arb_2m3s
 
 		if (m0.req)
 			begin
-			if (m0.addr[XBUS_BITSEL])
+			if (m0.addr[XIF_BITSEL])
 				begin
 				if (!s2_busy && !m0_s2_rd_inprogress_next)
 					begin
@@ -190,7 +190,7 @@ module arb_2m3s
 
 		if (m1.req)
 			begin
-			if (m1.addr[XBUS_BITSEL])
+			if (m1.addr[XIF_BITSEL])
 				begin
 				if (!s2_busy && !m1_s2_rd_inprogress_next)
 					begin

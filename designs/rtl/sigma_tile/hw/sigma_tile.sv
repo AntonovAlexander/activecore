@@ -37,8 +37,8 @@ module sigma_tile
     , MemSplit32.Master xif    // expansion interface
 );
 
-    localparam XBUS_BITSEL  = 31;
-    localparam SFR_BITSEL   = 20;
+    localparam XIF_BITSEL  = 31;
+    localparam SFR_BITSEL  = 20;
 
     logic sw_reset;
     MemSplit32 cpu_instr();
@@ -377,7 +377,7 @@ module sigma_tile
             arb_2m3s
             #(
                 .SFR_BITSEL(SFR_BITSEL)
-                , .XBUS_BITSEL(XBUS_BITSEL)
+                , .XIF_BITSEL(XIF_BITSEL)
             ) arb_cpu (
                 .clk_i      (clk_i)
                 , .rst_i    (rst_i)
@@ -399,7 +399,7 @@ module sigma_tile
 
             arb_1m2s
             #(
-                .BITSEL(XBUS_BITSEL)
+                .BITSEL(XIF_BITSEL)
             ) arb_cpu (
                 .clk_i      (clk_i)
                 , .rst_i    (rst_i)
