@@ -37,17 +37,15 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 Other reusable cores:
 
-* **udm** - bus transactor (master) controlled via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Location: /designs/rtl/udm
+* **udm** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Reference lab work manual included. Location: /designs/rtl/udm
 
 * **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, interrupt controller, timer, Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equal to udm bus protocol. Location: /designs/rtl/sigma_tile
 
 Demo FPGA-based SoCs:
 
-* **sigma** - basic MCU consisting of a single sigma_tile module, udm and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma
+* **SIGMA** - basic MCU consisting of a single sigma_tile module, udm and GPIO controller. Reference lab work manual included. Location: /designs/rtl/sigma
 
-* **magma** - MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
-
-Embedded CPU software for demo SoCs is built using riscv-tools and programmed to system via udm.
+* **MAGMA** - MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
 
 ### Publications
 
