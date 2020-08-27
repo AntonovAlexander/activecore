@@ -10,7 +10,7 @@ MLIP core approach serves as intermediate solution for codification of custom mi
 
 Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
 
-The aim of the project is to provide methodology and reusable components for explicit allocation of *“microarchitectural middleware”* design level in complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) incorporates expert knowledge about cross-cutting internal mechanisms of custom microarchitectures, addressing:
+The aim of the project is to provide methodology and reusable components for explicit allocation of intermediate *“microarchitectural middleware”* design level for complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) incorporates expert knowledge about cross-cutting internal mechanisms of custom microarchitectures, addressing:
 * rapid prototyping of various-purpose IP blocks with common microarchitectural mechanisms;
 * diversification of competence of IP design center engineers: implementation of key microarchitectural mechanisms can be charged to the core of leading engineers, while developers of final products can focus solely on application-specific functionality;
 * enabling IP design centers to package complex hardware templates with selectively programmable microarchitectural mechanisms as standalone deliverables.
@@ -43,9 +43,9 @@ Other reusable cores:
 
 Demo FPGA-based SoCs:
 
-* **SIGMA** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Reference lab work manual included. Location: /designs/rtl/sigma
+* **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Reference lab work manual included. Location: /designs/rtl/sigma
 
-* **MAGMA** - MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
+* **Magma** - MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
 
 ### Publications
 

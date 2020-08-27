@@ -1,4 +1,4 @@
-### MAGMA MPSoC address map
+### Magma MPSoC address map
 
 HW block | Start address | End address | Size | Type | Description
 -------- | ------------- | ----------- | ---- | ---- | -----------
