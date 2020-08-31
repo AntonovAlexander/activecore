@@ -43,21 +43,29 @@ from hw_test_irq_counter import *
 
 class sigma:
 
-    sigma_addr = 0x0
-    buf_addr = 0x6000
-    buf_size = 8192
+    __sigma_addr = 0x0
+    __buf_addr = 0x6000
+    __buf_size = 8192
     
     def __init__(self, udm):
         self.udm = udm
-        self.tile = sigma_tile(self.udm, self.sigma_addr)
+        self.tile = sigma_tile(self.udm, self.__sigma_addr)
     
     def __del__(self):
         self.tile.udm.discon()
     
     def reset_buf(self):
-        self.udm.clr(self.buf_addr, self.buf_size)
+        """Description:
+            Reset memory region allocated for I/O
+
+        """
+        self.udm.clr(self.__buf_addr, self.__buf_size)
     
     def runtests(self):
+        """Description:
+            Run automated hardware tests
+
+        """
         test_succ_counter = 0
         test_fail_counter = 0
         

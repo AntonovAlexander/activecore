@@ -10,7 +10,7 @@ MLIP core approach serves as intermediate solution for codification of custom mi
 
 Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
 
-The aim of the project is to provide methodology and reusable components for explicit allocation of *“microarchitectural middleware”* design level in complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) incorporates expert knowledge about cross-cutting internal mechanisms of custom microarchitectures, addressing:
+The aim of the project is to provide methodology and reusable components for explicit allocation of intermediate *“microarchitectural middleware”* design level for complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) incorporates expert knowledge about cross-cutting internal mechanisms of custom microarchitectures, addressing:
 * rapid prototyping of various-purpose IP blocks with common microarchitectural mechanisms;
 * diversification of competence of IP design center engineers: implementation of key microarchitectural mechanisms can be charged to the core of leading engineers, while developers of final products can focus solely on application-specific functionality;
 * enabling IP design centers to package complex hardware templates with selectively programmable microarchitectural mechanisms as standalone deliverables.
@@ -37,17 +37,15 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 Other reusable cores:
 
-* **udm** - bus transactor (master) controlled via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Location: /designs/rtl/udm
+* **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Drivers for Python 3 included. Reference lab work manual included. Location: /designs/rtl/udm
 
-* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, interrupt controller, timer, Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equal to udm bus protocol. Location: /designs/rtl/sigma_tile
+* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, interrupt controller, timer, Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equal to UDM bus protocol. Location: /designs/rtl/sigma_tile
 
 Demo FPGA-based SoCs:
 
-* **sigma** - basic MCU consisting of a single sigma_tile module, udm and GPIO controller. Tests are run by /designs/rtl/sigma/sw/benchmarks/hw_test.py. Location: /designs/rtl/sigma
+* **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Reference lab work manual included. Location: /designs/rtl/sigma
 
-* **magma** - MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
-
-Embedded CPU software for demo SoCs is built using riscv-tools and programmed to system via udm.
+* **Magma** - MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
 
 ### Publications
 

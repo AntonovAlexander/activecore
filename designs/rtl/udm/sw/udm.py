@@ -17,116 +17,161 @@ import random
 
 class udm:
     
-    sync_byte       = 0x55
-    escape_byte     = 0x5a
-    idcode_cmd      = 0x00
-    rst_cmd         = 0x80
-    nrst_cmd        = 0xc0
-    wr_cmd          = 0x81
-    rd_cmd          = 0x82
-    wr_cmd_noinc    = 0x83
-    rd_cmd_noinc    = 0x84
+    __sync_byte       = 0x55
+    __escape_byte     = 0x5a
+    __idcode_cmd      = 0x00
+    __rst_cmd         = 0x80
+    __nrst_cmd        = 0xc0
+    __wr_cmd          = 0x81
+    __rd_cmd          = 0x82
+    __wr_cmd_noinc    = 0x83
+    __rd_cmd_noinc    = 0x84
     
-    TRX_WR_SUCC_BYTE    = 0x00
-    TRX_ERR_ACK_BYTE    = 0x01
-    TRX_ERR_RESP_BYTE   = 0x02
-    TRX_IRQ_BYTE        = 0x80
+    __TRX_WR_SUCC_BYTE    = 0x00
+    __TRX_ERR_ACK_BYTE    = 0x01
+    __TRX_ERR_RESP_BYTE   = 0x02
+    __TRX_IRQ_BYTE        = 0x80
     
     def connect(self, com_num, baudrate):
+        """Description:
+            Connect to COM port
+
+        Parameters:
+            com_num (str): COM port name
+            baudrate (int): baudrate
+
+        """
         self.ser = serial.Serial(com_num, baudrate, 8)   
     
     def con(self, com_num, baudrate):
+        """Description:
+            Same as connect(self, com_num, baudrate)
+
+        """
         self.connect(com_num, baudrate)
     
     def disconnect(self):
+        """Description:
+            Disconnect from COM port
+
+        """
         if self.ser.is_open:
             self.ser.close()
             print("Connection dropped")
     
     def discon(self):
+        """Description:
+            Same as disconnect(self)
+
+        """
         self.disconnect()
     
-    def getbyte(self):
+    def __getbyte(self):
         rdata = self.ser.read(1)
         rdata = struct.unpack("B", rdata)
         return rdata[0]
     
-    def getdatabyte(self):
-        rdata = self.getbyte()
+    def __getdatabyte(self):
+        rdata = self.__getbyte()
         
-        if (rdata == self.TRX_ERR_ACK_BYTE):
+        if (rdata == self.__TRX_ERR_ACK_BYTE):
             print("UDM BUS ERROR: <ack> not received!")
             raise Exception()
         
-        if (rdata == self.TRX_ERR_RESP_BYTE):
+        if (rdata == self.__TRX_ERR_RESP_BYTE):
             print("UDM BUS ERROR: <resp> not received!")
             raise Exception()
         
-        if (rdata == self.escape_byte):
-            rdata = self.getbyte()
+        if (rdata == self.__escape_byte):
+            rdata = self.__getbyte()
         
         return rdata
     
-    def getdataword32(self):
+    def __getdataword32(self):
         rdata=[]
-        rdata.append(self.getdatabyte())
-        rdata.append(self.getdatabyte())
-        rdata.append(self.getdatabyte())
-        rdata.append(self.getdatabyte())
+        rdata.append(self.__getdatabyte())
+        rdata.append(self.__getdatabyte())
+        rdata.append(self.__getdatabyte())
+        rdata.append(self.__getdatabyte())
         rdataword = rdata[0] + (rdata[1] << 8) + (rdata[2] << 16) + (rdata[3] << 24)
         return rdataword
     
     def check(self):
+        """Description:
+            Check UDM response
+
+        """
         self.ser.flush()
-        wdata = (struct.pack('B', self.sync_byte))
-        wdata = wdata + (struct.pack('B', self.idcode_cmd))
+        wdata = (struct.pack('B', self.__sync_byte))
+        wdata = wdata + (struct.pack('B', self.__idcode_cmd))
         self.ser.write(wdata)
         rdata = self.ser.read()
         rdata = struct.unpack('B', rdata)
         
-        if (rdata[0] == self.sync_byte):
+        if (rdata[0] == self.__sync_byte):
             print("Connection established, response: ", hex(rdata[0]))
         else:
             print("Connection failed, response: ", hex(rdata[0]))
+            raise Exception()
     
     def cc(self, com_num, baudrate):
+        """Description:
+            Connect to COM port and check UDM response
+
+        Parameters:
+            com_num (str): COM port name
+            baudrate (int): baudrate
+
+        """
         print("Connecting COM port...")
         self.connect(com_num, baudrate)
         print("COM port connected")
         self.check()
     
-    def sendbyte(self, databyte):
-        if ((databyte == self.sync_byte) or (databyte == self.escape_byte)):
-            wdata = (struct.pack('B', self.escape_byte))
+    def __sendbyte(self, databyte):
+        if ((databyte == self.__sync_byte) or (databyte == self.__escape_byte)):
+            wdata = (struct.pack('B', self.__escape_byte))
             self.ser.write(wdata)
         wdata = (struct.pack('B', databyte))
         self.ser.write(wdata)
     
     def rst(self):
-        wdata = (struct.pack('B', self.sync_byte))
-        wdata = wdata + (struct.pack('B', self.rst_cmd))
+        """Description:
+            Assert UDM driven reset
+
+        """
+        wdata = (struct.pack('B', self.__sync_byte))
+        wdata = wdata + (struct.pack('B', self.__rst_cmd))
         self.ser.write(wdata)
     
     def nrst(self):
-        wdata = (struct.pack('B', self.sync_byte))
-        wdata = wdata + (struct.pack('B', self.nrst_cmd))
+        """Description:
+            Deassert UDM driven reset
+
+        """
+        wdata = (struct.pack('B', self.__sync_byte))
+        wdata = wdata + (struct.pack('B', self.__nrst_cmd))
         self.ser.write(wdata)
     
     def hreset(self):
+        """Description:
+            Assert and deassert UDM driven reset
+
+        """
         self.rst()
         self.nrst()
     
-    def sendword32(self, dataword):
-        self.sendbyte((dataword >> 0) & 0xff)
-        self.sendbyte((dataword >> 8) & 0xff)
-        self.sendbyte((dataword >> 16) & 0xff)
-        self.sendbyte((dataword >> 24) & 0xff)
+    def __sendword32(self, dataword):
+        self.__sendbyte((dataword >> 0) & 0xff)
+        self.__sendbyte((dataword >> 8) & 0xff)
+        self.__sendbyte((dataword >> 16) & 0xff)
+        self.__sendbyte((dataword >> 24) & 0xff)
     
-    def wr_finalize(self):
-        rdata = self.getbyte()
-        if (rdata == self.TRX_WR_SUCC_BYTE):
+    def __wr_finalize(self):
+        rdata = self.__getbyte()
+        if (rdata == self.__TRX_WR_SUCC_BYTE):
             pass
-        elif (rdata == self.TRX_ERR_ACK_BYTE):
+        elif (rdata == self.__TRX_ERR_ACK_BYTE):
             print("UDM BUS ERROR: <ack> not received!")
             raise Exception()
         else:
@@ -134,68 +179,121 @@ class udm:
             raise Exception()
     
     def wr32(self, address, dataword):
+        """Description:
+            Write data word to address
+
+        Parameters:
+            address (int): Write address
+            dataword (int): Data word
+
+        """
         try:
             self.ser.flush()
-            self.sendbyte(self.sync_byte)
-            self.sendbyte(self.wr_cmd)
-            self.sendword32(address)     
-            self.sendword32(4)
-            self.sendword32(dataword)
-            self.wr_finalize()
+            self.__sendbyte(self.__sync_byte)
+            self.__sendbyte(self.__wr_cmd)
+            self.__sendword32(address)     
+            self.__sendword32(4)
+            self.__sendword32(dataword)
+            self.__wr_finalize()
         except:
             self.discon()
             raise Exception()
     
     def wrarr32(self, address, datawords):
+        """Description:
+            Burst write of array
+
+        Parameters:
+            address (int): Starting address
+            datawords (int[]): Data words
+
+        """
         try:
             self.ser.flush()
-            self.sendbyte(self.sync_byte)
-            self.sendbyte(self.wr_cmd)
-            self.sendword32(address)     
+            self.__sendbyte(self.__sync_byte)
+            self.__sendbyte(self.__wr_cmd)
+            self.__sendword32(address)     
             count = len(datawords) 
-            self.sendword32(count << 2)
+            self.__sendword32(count << 2)
             # write data
             for i in range(count):
-                self.sendword32(datawords[i])
-            self.wr_finalize()
+                self.__sendword32(datawords[i])
+            self.__wr_finalize()
         except:
             self.discon()
             raise Exception()
     
     def clr(self, address, size):
+        """Description:
+            Pad memory with zeroes
+
+        Parameters:
+            address (int): Start address
+            size (int): Number of bytes
+
+        """
         padding_arr = []
         for i in range(size >> 2):
             padding_arr.append(0x00)
         self.wrarr32(address, padding_arr)
     
     def rd32(self, address):
+        """Description:
+            Read data word from address
+
+        Parameters:
+            address (int): Read address
+
+        Returns:
+            int: Read data
+
+        """
         try:
             self.ser.flush()
-            self.sendbyte(self.sync_byte)
-            self.sendbyte(self.rd_cmd)
-            self.sendword32(address)
-            self.sendword32(4)
-            return self.getdataword32()
+            self.__sendbyte(self.__sync_byte)
+            self.__sendbyte(self.__rd_cmd)
+            self.__sendword32(address)
+            self.__sendword32(4)
+            return self.__getdataword32()
         except:
             self.discon()
             raise Exception()
     
     def rdarr32(self, address, length):
+        """Description:
+            Burst read into array
+
+        Parameters:
+            address (int): Starting address
+            length (int): Number of data words
+
+        Returns:
+            int[]: Read data
+
+        """
         try:
             self.ser.flush()
-            self.sendbyte(self.sync_byte)
-            self.sendbyte(self.rd_cmd)
-            self.sendword32(address)
-            self.sendword32(length << 2)
+            self.__sendbyte(self.__sync_byte)
+            self.__sendbyte(self.__rd_cmd)
+            self.__sendword32(address)
+            self.__sendword32(length << 2)
             rdatawords = []
             for i in range(length):
-                rdatawords.append(self.getdataword32())
+                rdatawords.append(self.__getdataword32())
             return rdatawords
         except:
             self.discon()
             raise Exception()
     
     def wrbin32_le(self, address, filename):
+        """Description:
+            Write data from binary file to memory beginning from address
+
+        Parameters:
+            address (int): Start address
+            filename (str): Binary file name
+
+        """
         wrdataarr = []
         f = open(filename, "rb")
         try:
@@ -225,6 +323,14 @@ class udm:
             f.close()
     
     def wrelf32(self, base_offset, filename):
+        """Description:
+            Write elf file to memory
+
+        Parameters:
+            base_offset (int): Write offset
+            filename (str): Elf file name
+
+        """
         print("----------------")
         f = open(filename, "rb")
         try:
@@ -324,6 +430,14 @@ class udm:
         print("----------------")
     
     def memtest32(self, baseaddr, wsize):
+        """Description:
+            Read/write RAM test
+
+        Parameters:
+            baseaddr (int): Base address of tested memory region
+            wsize (int): Number of data words in tested memory region
+
+        """
         print("")
         print("---- memtest32 started, word size:", wsize, " ----");
         
