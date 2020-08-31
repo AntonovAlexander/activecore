@@ -4,6 +4,7 @@
 // Test program for interrupt controller
 //--------------------------------------------------------------------------
 
+#include "sfr.h"
 #include "io.h"
 #include "isr.h"
 
@@ -25,6 +26,7 @@ int main( int argc, char* argv[] )
 {
   led_counter = 1;
   SetLED(led_counter);
-  ConnectISR(0x3, &int_handler);
+  ConnectISR(BTN_IRQ_NUM, &int_handler);
+  SFR_IRQ_EN = 0x1 << BTN_IRQ_NUM;
   while (1) {}
 }
