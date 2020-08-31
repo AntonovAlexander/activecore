@@ -23,6 +23,7 @@ module sfr
 
 	, output logic sw_reset_o
 
+	, output logic [(2**IRQ_NUM_POW)-1:0] irq_en_bo
 	, output logic irq_timer
 
 	, output logic sgi_req_o
@@ -32,9 +33,12 @@ module sfr
 localparam IDCODE_ADDR 			= 8'h00;
 localparam CTRL_ADDR 			= 8'h04;
 localparam CORENUM_ADDR 		= 8'h08;
-localparam SGI_ADDR 			= 8'h0C;
-localparam TIMER_CTRL_ADDR 		= 8'h10;
-localparam TIMER_PERIOD_ADDR 	= 8'h14;
+
+localparam IRQ_EN_ADDR 			= 8'h10;
+localparam SGI_ADDR 			= 8'h14;
+
+localparam TIMER_CTRL_ADDR 		= 8'h20;
+localparam TIMER_PERIOD_ADDR 	= 8'h24;
 
 logic sw_reset;
 always @(posedge clk_i) sw_reset_o <= rst_i | sw_reset;
@@ -49,6 +53,7 @@ always @(posedge clk_i)
 		begin
 		host.resp <= 1'b0;
 		sw_reset <= SW_RESET_DEFAULT;
+		irq_en_bo <= 0;
 		irq_timer <= 1'b0;
 		sgi_req_o <= 0;
 		sgi_code_bo <= 0;
@@ -91,6 +96,10 @@ always @(posedge clk_i)
 					begin
 					sw_reset <= host.wdata[0];
 					end
+				if (host.addr[7:0] == IRQ_EN_ADDR)
+					begin
+					irq_en_bo <= host.wdata;
+					end
 				if (host.addr[7:0] == SGI_ADDR)
 					begin
 					sgi_req_o <= 1;
@@ -113,6 +122,7 @@ always @(posedge clk_i)
 				if (host.addr[7:0] == IDCODE_ADDR)  		host.rdata <= 32'hdeadbeef;
 				if (host.addr[7:0] == CTRL_ADDR)    		host.rdata <= {31'h0, sw_reset};
 				if (host.addr[7:0] == CORENUM_ADDR) 		host.rdata <= corenum;
+				if (host.addr[7:0] == IRQ_EN_ADDR) 			host.rdata <= irq_en_bo;
 				if (host.addr[7:0] == TIMER_CTRL_ADDR) 		host.rdata <= {30'h0, timer_reload, timer_inprogress};
 				if (host.addr[7:0] == TIMER_PERIOD_ADDR) 	host.rdata <= timer_period;
 				end

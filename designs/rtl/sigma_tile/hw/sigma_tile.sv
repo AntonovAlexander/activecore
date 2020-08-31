@@ -44,6 +44,7 @@ module sigma_tile
     MemSplit32 cpu_instr();
     MemSplit32 cpu_data();
 
+    logic [(2**IRQ_NUM_POW)-1:0] irq_en;
     logic irq_timer;
     logic sgi_req;
     logic [IRQ_NUM_POW-1:0] sgi_code;
@@ -57,7 +58,7 @@ module sigma_tile
     ) irq_adapter (
         .clk_i(clk_i)
         , .rst_i(sw_reset)
-        , .irq_debounced_bi(irq_debounced_bi | (irq_timer << 1))
+        , .irq_debounced_bi((irq_debounced_bi | (irq_timer << 1)) & irq_en)
         , .sgi_req_i(sgi_req)
         , .sgi_code_bi(sgi_code)
         , .irq_req_o(cpu_irq_req)
@@ -479,6 +480,7 @@ module sigma_tile
 
         , .sw_reset_o(sw_reset)
 
+        , .irq_en_bo(irq_en)
         , .irq_timer(irq_timer)
 
         , .sgi_req_o(sgi_req)

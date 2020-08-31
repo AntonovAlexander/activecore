@@ -80,4 +80,4 @@ class sigma_tile:
             irq_num (int): Interrupt number
 
         """
-        self.udm.wr32((self.__sigma_addr + 0x0010000C), irq_num)
+        self.udm.wr32((self.__sigma_addr + 0x00100014), irq_num)
