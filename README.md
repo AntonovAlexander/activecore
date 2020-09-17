@@ -29,6 +29,8 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **pipex** (**pipe**lined e**x**ecution) - generator of dynamically scheduled scalar in-order pipelined structures. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
 
+	* **reordex** (**reorde**red e**x**ecution, *in development*) - generator of dynamically scheduled multi-pipeline structures with loosely ordered execution. Translates to cyclix MLIP
+
 * core generators based on MLIP cores (/designs/coregen):
 
 	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on pipex MLIP core
