@@ -6,12 +6,10 @@
  *     License: See LICENSE file for details
  */
 
-package cyclix
-
-import hwast.*
+package hwast
 
 enum class PORT_DIR {
-    IN,	OUT
+    IN,	OUT, INOUT
 }
 
 class hw_port(name : String, port_dir_in : PORT_DIR, vartype : hw_type, defval : String)

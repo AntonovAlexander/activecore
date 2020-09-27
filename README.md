@@ -47,7 +47,7 @@ Demo FPGA-based SoCs:
 
 * **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Reference lab work manual included. Location: /designs/rtl/sigma
 
-* **Magma** - MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
+* **Magma** - NUMA MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
 
 ### Publications
 

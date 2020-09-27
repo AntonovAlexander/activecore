@@ -6,9 +6,7 @@
  *     License: See LICENSE file for details
  */
 
-package cyclix
-
-import hwast.*
+package hwast
 
 val OP_FIFO_WR = hw_opcode("fifo_wr")
 val OP_FIFO_RD = hw_opcode("fifo_rd")

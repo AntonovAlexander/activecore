@@ -23,8 +23,8 @@ data class __mcopipe_if_info(   val wr_done : hw_var,
                                 val rd_ptr : hw_var,
                                 val wr_ptr_next : hw_var,
                                 val rd_ptr_next : hw_var,
-                                val req_fifo : cyclix.hw_fifo_out,
-                                var resp_fifo : cyclix.hw_fifo_in )
+                                val req_fifo : hw_fifo_out,
+                                var resp_fifo : hw_fifo_in )
 
 data class __mcopipe_handle_info(val if_id : hw_var,
                                  val resp_done : hw_var,
@@ -32,8 +32,8 @@ data class __mcopipe_handle_info(val if_id : hw_var,
                                  val rdreq_pending : hw_var,
                                  val tid : hw_var)
 
-data class __scopipe_if_info(val req_fifo : cyclix.hw_fifo_in,
-                             var resp_fifo : cyclix.hw_fifo_out)
+data class __scopipe_if_info(val req_fifo : hw_fifo_in,
+                             var resp_fifo : hw_fifo_out)
 
 data class __scopipe_handle_info(val if_id : hw_var,
                                  val we : hw_var)
@@ -121,8 +121,8 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
 class __TranslateInfo() {
     var __global_assocs = mutableMapOf<hw_var, __global_info>()
 
-    var __fifo_wr_assocs = mutableMapOf<hw_fifo_out, cyclix.hw_fifo_out>()
-    var __fifo_rd_assocs = mutableMapOf<hw_fifo_in, cyclix.hw_fifo_in>()
+    var __fifo_wr_assocs = mutableMapOf<hw_fifo_out, hw_fifo_out>()
+    var __fifo_rd_assocs = mutableMapOf<hw_fifo_in, hw_fifo_in>()
 
     var __mcopipe_if_assocs = mutableMapOf<hw_mcopipe_if, __mcopipe_if_info>()
     var __mcopipe_handle_assocs = mutableMapOf<hw_mcopipe_handle, __mcopipe_handle_info>()
