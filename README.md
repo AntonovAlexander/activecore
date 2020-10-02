@@ -23,13 +23,13 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 * MLIP cores based on hwast (/mlip):
 
-	* **rtl** - generator of behavioral RTL (in SystemVerilog HDL)
+	* **rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
 
 	* **cyclix** (**cycli**c e**x**ecution) - generator of statically scheduled cyclic processing hardware targeting RTL and HLS flows. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Vivado HLS
 
 	* **pipex** (**pipe**lined e**x**ecution) - generator of dynamically scheduled scalar in-order pipelined structures. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
 
-	* **reordex** (**reorde**red e**x**ecution, *in development*) - generator of dynamically scheduled multi-pipeline structures with loosely ordered execution. Translates to cyclix MLIP
+	* **reordex** (**reorde**red e**x**ecution, *in development*) - generator of dynamically scheduled multi-pipeline structures with loosely ordered execution (superscalar, dataflow, etc). Translates to cyclix MLIP
 
 * core generators based on MLIP cores (/designs/coregen):
 
@@ -55,7 +55,7 @@ Demo FPGA-based SoCs:
 
 * A. Antonov, P. Kustarev, “Strategies of Computational Process Synthesis – a System-Level Model of HW/SW (Micro)Architectural Mechanisms,” in 2020 9th Mediterranean Conference on Embedded Computing (MECO), 2020. URL: https://ieeexplore.ieee.org/document/9134071 Preprint downloadable from: http://programme.meconet.me/documents/PAPERS/MECO_2020_paper_26.pdf
 
-* A. Antonov, P. Kustarev, S. Bikovsky, “MLIP Cores: Designing Hardware Generators with Programmable Microarchitectural Mechanisms,” in 2020 IEEE International Symposium on Circuits and Systems (ISCAS), 2020 (accepted for publication)
+* A. Antonov, P. Kustarev, S. Bikovsky, “MLIP Cores: Designing Hardware Generators with Programmable Microarchitectural Mechanisms,” in 2020 IEEE International Symposium on Circuits and Systems (ISCAS), 2020. URL: https://ieeexplore.ieee.org/document/9180593
 
 * A. Antonov, P. Kustarev, S. Bikovsky, "Improving Microarchitecture Design and Hardware Generation using Micro-Language IP Cores", in Proc. IEEE Nordic Circuits and Systems Conference (NORCAS) / NORCHIP and International Symposium of System-on-Chip (SoC) - 2017, pp. 1-6. URL: https://ieeexplore.ieee.org/document/8124952
 
