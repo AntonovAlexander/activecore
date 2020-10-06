@@ -14,10 +14,9 @@
 //-----------------------------------------------------------------------
 
 #define RV_COMPLIANCE_HALT                                                    \
-        .globl codasip_syscall;                                               \
-        codasip_syscall:                                                      \
-        add x15, x0, 1;                                                       \
-        sw x15, codasip_syscall, t0;                                          \
+        .globl halt;                                                          \
+        halt:                                                                 \
+        j   halt;                                                             \
 
 #define RV_COMPLIANCE_RV32M                                                   \
                                                                               \
