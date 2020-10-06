@@ -12,6 +12,8 @@ from __future__ import division
 
 import sys
 
+import time
+
 sys.path.append('../../udm/sw')
 import udm
 from udm import *
@@ -19,6 +21,10 @@ from udm import *
 sys.path.append('../../sigma_tile/sw')
 import sigma_tile
 from sigma_tile import *
+
+sys.path.append('riscv-compliance')
+import hw_test_riscv_compliance
+from hw_test_riscv_compliance import *
 
 sys.path.append('benchmarks/mul_sw')
 import hw_test_mul_sw
@@ -60,6 +66,36 @@ class sigma:
 
         """
         self.udm.clr(self.__buf_addr, self.__buf_size)
+    
+    def hw_test_generic(self, sigma, test_name, firmware_filename, sleep_secs, verify_data):
+        print("#### " + test_name + " TEST STARTED ####");
+        
+        print("Clearing buffer")
+        sigma.reset_buf()
+        
+        print("Loading test program...")
+        sigma.tile.loadelf(firmware_filename)
+        print("Test program written!")
+    
+        time.sleep(sleep_secs)
+        
+        print("Reading data buffer...")
+        rdarr = sigma.tile.udm.rdarr32(0x6000, len(verify_data))
+        print("Data buffer read!")
+    
+        test_succ_flag = 1
+        for i in range(len(verify_data)):
+            if (verify_data[i] != rdarr[i]):
+                test_succ_flag = 0
+                print("Test failed on data ", i, "! Expected: ", hex(verify_data[i]), ", received: ", hex(rdarr[i]))
+        
+        if (test_succ_flag):
+            print("#### " + test_name + " TEST PASSED! ####");
+        else:
+            print("#### " + test_name + " TEST FAILED! ####")
+        
+        print("")    
+        return test_succ_flag
     
     def runtests(self):
         """Description:

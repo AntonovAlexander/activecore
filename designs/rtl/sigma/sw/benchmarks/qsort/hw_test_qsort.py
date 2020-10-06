@@ -13,10 +13,8 @@ sys.path.append('..')
 import sigma
 from sigma import *
 
-def hw_test_qsort(sigma, qsort_filename):
-    print("#### QSORT TEST STARTED ####");
+def hw_test_qsort(sigma, firmware_filename):
     
-    DATA_SIZE = 1024
     verify_data = [
         900852, 2196420, 2530146, 3159407, 3522194, 3794415, 5309142, 9736243, 12937811, 13887419, 14125900, 16411608, 19227407, 20643769, 22136821, 22762734, 25885333, 26687179, 27377406, 28256901, 
       30992839, 31153367, 31574181, 31596852, 35859252, 37141933, 41714278, 42021322, 47036070, 47452797, 47463938, 58217952, 62209567, 64795664, 66579049, 69118708, 70003859, 70894786, 72802865, 72939206, 
@@ -72,29 +70,4 @@ def hw_test_qsort(sigma, qsort_filename):
       2143324534, 2143343312, 2143968639, 2145930822
 	]
     
-    print("Clearing buffer")
-    sigma.reset_buf()
-    
-    print("Loading test program...")
-    sigma.tile.loadelf(qsort_filename)
-    print("Test program written!")
-
-    time.sleep(1)
-
-    print("Reading data buffer...")
-    rdarr = sigma.tile.udm.rdarr32(0x6000, DATA_SIZE)
-    print("Data buffer read!")
-
-    test_succ_flag = 1
-    for i in range(DATA_SIZE):
-        if (verify_data[i] != rdarr[i]):
-            test_succ_flag = 0
-            print("Test failed on data ", i, "! Expected: ", hex(verify_data[i]), ", received: ", hex(rdarr[i]))
-    
-    if (test_succ_flag):
-        print("#### QSORT TEST PASSED! ####");
-    else:
-        print("#### QSORT TEST FAILED! ####")
-    
-    print("")    
-    return test_succ_flag
+    return sigma.hw_test_generic(sigma, "QSORT", firmware_filename, 1, verify_data)

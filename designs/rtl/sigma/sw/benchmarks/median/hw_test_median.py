@@ -13,10 +13,8 @@ sys.path.append('..')
 import sigma
 from sigma import *
 
-def hw_test_median(sigma, median_filename):
-    print("#### MEDIAN TEST STARTED ####");
+def hw_test_median(sigma, firmware_filename):
     
-    DATA_SIZE = 400
     verify_data = [
         0, 454, 454, 564, 335, 187, 187, 749, 749, 365, 365, 350, 132, 132, 153, 584, 216, 584, 216, 621,
       210, 210, 210, 572, 572, 890, 593, 593, 593, 694, 694, 694, 228, 110, 110, 116, 750, 296, 646, 426,
@@ -40,29 +38,4 @@ def hw_test_median(sigma, median_filename):
       153, 381, 121, 651, 412, 825, 412, 356, 236, 148, 148, 148, 423, 140, 216, 216, 621, 621, 361,   0
     ]
     
-    print("Clearing buffer")
-    sigma.reset_buf()
-    
-    print("Loading test program...")
-    sigma.tile.loadelf(median_filename)
-    print("Test program written!")
-
-    time.sleep(1)
-
-    print("Reading data buffer...")
-    rdarr = sigma.tile.udm.rdarr32(0x6000, DATA_SIZE)
-    print("Data buffer read!")
-
-    test_succ_flag = 1
-    for i in range(DATA_SIZE):
-        if (verify_data[i] != rdarr[i]):
-            test_succ_flag = 0
-            print("Test failed on data ", i, "! Expected: ", hex(verify_data[i]), ", received: ", hex(rdarr[i]))
-    
-    if (test_succ_flag):
-        print("#### MEDIAN TEST PASSED! ####")
-    else:
-        print("#### MEDIAN TEST FAILED! ####")
-    
-    print("")
-    return test_succ_flag
+    return sigma.hw_test_generic(sigma, "MEDIAN", firmware_filename, 1, verify_data)
