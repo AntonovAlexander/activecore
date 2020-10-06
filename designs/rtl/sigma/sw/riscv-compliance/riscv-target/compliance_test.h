@@ -32,6 +32,7 @@
                                                                               \
 
 #define RV_COMPLIANCE_DATA_BEGIN                                              \
+        .section .io_buf;                                                     \
         .align 4;                                                             \
         .global codasip_signature_start;                                      \
         codasip_signature_start:                                              \

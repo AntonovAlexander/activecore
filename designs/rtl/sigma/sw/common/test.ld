@@ -60,7 +60,9 @@ SECTIONS
     *(.tbss.end)
   }
 
+  . = 0x000006000;
+  .io_buf : { }
+
   /* End of uninitalized data segement */
   _end = .;
 }
-
