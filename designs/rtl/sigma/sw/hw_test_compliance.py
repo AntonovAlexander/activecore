@@ -3,7 +3,7 @@ from __future__ import division
 
 import sys
 
-sys.path.append('../../../udm/sw')
+sys.path.append('../../udm/sw')
 import udm
 from udm import *
 
@@ -13,7 +13,7 @@ from sigma import *
 
 sys.path.append('../riscv-compliance')
 
-udm = udm('COM12', 921600)
+udm = udm('COM4', 921600)
 print("")
 
 def hw_test_riscv_compliance_ADD(sigma, test_filename):
@@ -89,4 +89,4 @@ def hw_test_riscv_compliance_ADD(sigma, test_filename):
 sigma = sigma(udm)
 #sigma.runtests()
 
-hw_test_riscv_compliance_ADD(sigma, "../riscv-compliance/I-ADD-01.riscv")
+hw_test_riscv_compliance_ADD(sigma, "riscv-compliance/I-ADD-01.riscv")

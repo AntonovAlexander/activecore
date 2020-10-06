@@ -3,7 +3,7 @@ from __future__ import division
 
 import sys
 
-sys.path.append('../../../udm/sw')
+sys.path.append('../../udm/sw')
 import udm
 from udm import *
 
@@ -11,8 +11,9 @@ import sigma
 from sigma import *
 
 
-udm = udm('COM10', 921600)
+udm = udm('COM4', 921600)
 print("")
 
 sigma = sigma(udm)
 sigma.runtests()
+#sigma.tile.loadelf('D:/git_projects/activecore/designs/rtl/sigma/sw/benchmarks/timer_test.riscv')
