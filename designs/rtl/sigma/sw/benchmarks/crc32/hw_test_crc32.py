@@ -13,7 +13,7 @@ sys.path.append('..')
 import sigma
 from sigma import *
 
-def hw_test_make_hash_sw(sigma, crc32_sw_filename):
+def hw_test_crc32(sigma, crc32_sw_filename):
     print("#### CRC32_SW TEST STARTED ####")
     crc = sigma.udm.rd32(0x80000000)
     print('ishod %X'%crc)

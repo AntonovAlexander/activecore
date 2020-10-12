@@ -42,6 +42,10 @@ sys.path.append('benchmarks/rsort')
 import hw_test_rsort
 from hw_test_rsort import *
 
+sys.path.append('benchmarks/crc32')
+import hw_test_crc32
+from hw_test_crc32 import *
+
 sys.path.append('benchmarks/irq_counter')
 import hw_test_irq_counter
 from hw_test_irq_counter import *
@@ -121,6 +125,11 @@ class sigma:
             test_fail_counter = test_fail_counter + 1
         
         if (hw_test_rsort(self, 'benchmarks/rsort.riscv') == 1):
+            test_succ_counter = test_succ_counter + 1
+        else:
+            test_fail_counter = test_fail_counter + 1
+        
+        if (hw_test_crc32(self, 'benchmarks/crc32.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
