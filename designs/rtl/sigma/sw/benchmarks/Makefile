@@ -22,6 +22,7 @@ bmarks = \
 	median \
 	qsort \
 	rsort \
+	crc32 \
 	#dhrystone 
 	#towers \
 	#vvadd \
