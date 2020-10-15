@@ -1,12 +1,12 @@
 #include <stdio.h>
-#include "make_hash.h" 
+#include "crc32.h" 
 
 #include "io.h"
 
 int main(int argc, char* argv[])
 {
    
-    IO_LED = make_hash(INPUT, LEN);
+    IO_LED = crc32(INPUT, LEN);
         
     while (1) {}
 }

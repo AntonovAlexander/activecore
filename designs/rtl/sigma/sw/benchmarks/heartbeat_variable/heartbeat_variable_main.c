@@ -1,16 +1,8 @@
 // See LICENSE for license details.
 
 //**************************************************************************
-// Median filter bencmark
+// HeartBeat with switches-controllable delay
 //--------------------------------------------------------------------------
-//
-// This benchmark performs a 1D three element median filter. The
-// input data (and reference data) should be generated using the
-// median_gendata.pl perl script and dumped to a file named
-// dataset1.h.
-
-//--------------------------------------------------------------------------
-// Input/Reference Data
 
 #define IO_LED          (*(volatile unsigned int *)(0x80000000))
 #define IO_SW            (*(volatile unsigned int *)(0x80000004))

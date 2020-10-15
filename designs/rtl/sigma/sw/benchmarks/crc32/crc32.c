@@ -1,9 +1,6 @@
-
-//unsigned int make_hash(unsigned char *buf, size_t len);
-
 #include "io.h"
 
-unsigned int make_hash(unsigned int * buf, int len)
+unsigned int crc32(unsigned int * buf, int len)
 {
 	unsigned int crc;
 	int i;
