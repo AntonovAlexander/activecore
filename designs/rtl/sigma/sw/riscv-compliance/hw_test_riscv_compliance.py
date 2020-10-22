@@ -13,134 +13,21 @@ sys.path.append('..')
 import sigma
 from sigma import *
 
-def hw_test_riscv_compliance_ADD(sigma, firmware_filename):
+def hw_test_riscv_compliance_template(sigma, instr_name):
     
-    verify_data = [
-        0x00000000,
-        0xfffff802,
-        0xffffffff,
-        0xfffff5cb,
-        0x80000000,
-        0x00001a34,
-        0x07654320,
-        0x80000000,
-        0x80000000,
-        0x07654320,
-        0x00001a34,
-        0x80000000,
-        0xfffff5cb,
-        0xfffffffe,
-        0xfffff802,
-        0x00000000,
-        0xffffffff,
-        0xfffff802,
-        0xffffffff,
-        0xfffff5cb,
-        0x80000000,
-        0x00001a34,
-        0x07654320,
-        0x80000000,
-        0x80000000,
-        0x07654320,
-        0x00001a34,
-        0x80000000,
-        0xfffff5cb,
-        0xfffffffe,
-        0xfffff802,
-        0x00000000,
-        0xffffffff,
-        0xffffffff,
-        0xffffffff,
-        0x00000000
-	]
-    
-    return sigma.hw_test_generic(sigma, "ADD", firmware_filename, 1, verify_data)
+    f = open("riscv-compliance/references/I-" + instr_name + "-01.reference_output", "r")
 
-def hw_test_riscv_compliance_ADDI(sigma, firmware_filename):
+    verify_data = []
     
-    verify_data = [
-        0x00000000,
-        0xfffff802,
-        0xffffffff,
-        0xffffffff,
-        0xfffff800,
-        0x00000000,
-        0x07653b21,
-        0x80000000,
-        0xfffff801,
-        0xfffff7ff,
-        0x00000a34,
-        0x80000000,
-        0xfffff5cb,
-        0xfffffffe,
-        0xfffff802,
-        0x00000000,
-        0xffffffff,
-        0xfffff802,
-        0xffffffff,
-        0xffffffff,
-        0xfffff800,
-        0x00000000,
-        0x07653b21,
-        0x80000000,
-        0xfffff801,
-        0xfffff7ff,
-        0x00000a34,
-        0x80000000,
-        0xfffff5cb,
-        0xfffffffe,
-        0xfffff802,
-        0x00000000,
-        0xffffffff,
-        0xffffffff,
-        0xffffffff,
-        0x00000000
-	]
+    while True:
+    	verify_dataword = f.readline()
+    	if (verify_dataword):
+    		verify_data.append(int(verify_dataword, 16))
+    	else:
+    		break
     
-    return sigma.hw_test_generic(sigma, "ADDI", firmware_filename, 1, verify_data)
+    return sigma.hw_test_generic(sigma, instr_name, "riscv-compliance/I-" + instr_name + "-01.riscv", 1, verify_data)
 
-def hw_test_riscv_compliance_JALR(sigma, firmware_filename):
-    
-    verify_data = [
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x0000cccc,
-        0x00000000,
-        0xffffffff,
-        0xffffffff,
-        0xffffffff,
-        0x00000000
-	]
-    
-    return sigma.hw_test_generic(sigma, "JALR", firmware_filename, 1, verify_data)
 
 def hw_test_riscv_compliance(sigma):
     
@@ -153,22 +40,63 @@ def hw_test_riscv_compliance(sigma):
     test_succ_counter = 0
     test_fail_counter = 0
     
-    if (hw_test_riscv_compliance_ADD(sigma, "riscv-compliance/I-ADD-01.riscv") == 1):
-        test_succ_counter = test_succ_counter + 1
-    else:
-        test_fail_counter = test_fail_counter + 1
+    TESTS = ["ADD",
+             "ADDI",
+             "AND",
+             "ANDI",
+             "AUIPC",
+             "BEQ",
+             "BGE",
+             "BGEU",
+             "BLT",
+             "BLTU",
+             "BNE",
+             "JAL",
+             "JALR",
+             "LB",
+             "LBU",
+             "LH",
+             "LHU",
+             "LUI",
+             "LW",
+             "OR",
+             "ORI",
+             "SB",
+             "SH",
+             "SLL",
+             "SLLI",
+             "SLT",
+             "SLTI",
+             "SLTIU",
+             "SLTU",
+             "SRA",
+             "SRAI",
+             "SRL",
+             "SRLI",
+             "SUB",
+             "SW",
+             "XOR",
+             "XORI"]
     
-    if (hw_test_riscv_compliance_ADDI(sigma, "riscv-compliance/I-ADDI-01.riscv") == 1):
-        test_succ_counter = test_succ_counter + 1
-    else:
-        test_fail_counter = test_fail_counter + 1
+    TESTS_SUCC = []
+    TESTS_FAIL = []
     
-    if (hw_test_riscv_compliance_JALR(sigma, "riscv-compliance/I-JALR-01.riscv") == 1):
-        test_succ_counter = test_succ_counter + 1
-    else:
-        test_fail_counter = test_fail_counter + 1
+    for TEST in TESTS:
+        if (hw_test_riscv_compliance_template(sigma, TEST) == 1):
+            TESTS_SUCC.append(TEST)
+            test_succ_counter = test_succ_counter + 1
+        else:
+            TESTS_FAIL.append(TEST)
+            test_fail_counter = test_fail_counter + 1
     
     print("Total tests PASSED: ", test_succ_counter, ", FAILED: ", test_fail_counter)
+    
+    TESTS_FAIL_STR = ""
+    for TEST in TESTS_FAIL:
+        TESTS_FAIL_STR = TESTS_FAIL_STR + " " + TEST
+    if (len(TESTS_FAIL) > 0):
+        print("Failed tests:" + TESTS_FAIL_STR)
+    
     print("")
     print("#################################################################################")
     print("")
