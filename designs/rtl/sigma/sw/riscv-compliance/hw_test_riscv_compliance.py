@@ -170,3 +170,5 @@ def hw_test_riscv_compliance(sigma):
     
     print("Total tests PASSED: ", test_succ_counter, ", FAILED: ", test_fail_counter)
     print("")
+    print("#################################################################################")
+    print("")
