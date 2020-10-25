@@ -20,6 +20,7 @@ module sigma_tile
 #(
     parameter corenum=0
     , mem_init="YES"
+    , mem_type="elf"
     , mem_data="data.hex"
     , mem_size=1024
     , CPU="none"
@@ -439,6 +440,7 @@ module sigma_tile
 	
 	ram_dual_memsplit #(
 		.mem_init(mem_init)
+		, .mem_type(mem_type)
 		, .mem_data		(mem_data)
 		, .dat_width	(32)
 		, .adr_width	(30)

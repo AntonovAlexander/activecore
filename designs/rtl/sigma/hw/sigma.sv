@@ -14,6 +14,7 @@ module sigma
 	parameter CPU = "none",
 	parameter delay_test_flag = 0,
 	parameter mem_init="YES",
+	parameter mem_type="elf",
 	parameter mem_data = "data.hex",
 	parameter mem_size = 1024
 )
@@ -54,6 +55,7 @@ MemSplit32 xif();
 sigma_tile #(
 	.corenum(0)
 	, .mem_init(mem_init)
+	, .mem_type(mem_type)
 	, .mem_data(mem_data)
 	, .mem_size(mem_size)
 	, .CPU(CPU)

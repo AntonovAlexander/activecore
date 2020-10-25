@@ -420,9 +420,6 @@ class udm:
                 f.seek(offset)
                 dbs = f.read(size)
                 dbs = struct.unpack('{}L'.format(len(dbs)>>2), dbs)
-                #print("dbs len: ", len(dbs))
-                #print("dbs[0]: ", hex(dbs[0]))
-                #print("dbs[1]: ", hex(dbs[1]))
                 self.wrarr32((base_offset + vaddr), dbs)
     
         finally:
