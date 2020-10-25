@@ -15,6 +15,4 @@ udm = udm('COM4', 921600)
 print("")
 
 sigma = sigma(udm)
-#sigma.runtests()
-
-hw_test_riscv_compliance(sigma)
+sigma.run_compliance_tests()

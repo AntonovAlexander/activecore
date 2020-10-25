@@ -101,7 +101,10 @@ class sigma:
         print("")    
         return test_succ_flag
     
-    def runtests(self):
+    def run_compliance_tests(self):
+        hw_test_riscv_compliance(self)
+    
+    def run_app_tests(self):
         """Description:
             Run automated hardware tests
 

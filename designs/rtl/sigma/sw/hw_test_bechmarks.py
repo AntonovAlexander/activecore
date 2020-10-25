@@ -15,5 +15,4 @@ udm = udm('COM4', 921600)
 print("")
 
 sigma = sigma(udm)
-sigma.runtests()
-#sigma.tile.loadelf('D:/git_projects/activecore/designs/rtl/sigma/sw/benchmarks/timer_test.riscv')
+sigma.run_app_tests()
