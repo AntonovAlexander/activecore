@@ -97,8 +97,12 @@ class SvWriter(module_in : module) {
                 for (DIM_INDEX in 1 until structvar.vartype.dimensions.size) {
                     dimstring += (" [" + structvar.vartype.dimensions[DIM_INDEX].msb + ":" + structvar.vartype.dimensions[DIM_INDEX].lsb + "]")
                 }
+                var sign_string = ""
+                if (structvar.vartype.VarType == VAR_TYPE.UNSIGNED) sign_string = "unsigned "
+                else sign_string = "signed "
                 wrFile.write(preambule_uncond
                         + preambule_cond
+                        + sign_string
                         + "["
                         + structvar.vartype.dimensions[0].msb.toString()
                         + ":"

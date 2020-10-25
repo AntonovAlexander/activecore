@@ -143,6 +143,8 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     var alu_req         = ulocal("alu_req", 0, 0, "0")
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op2         = ulocal("alu_op2", 31, 0, "0")
+    var alu_op1_wide    = ulocal("alu_op1_wide", 32, 0, "0")
+    var alu_op2_wide    = ulocal("alu_op2_wide", 32, 0, "0")
     var alu_opcode      = ulocal("alu_opcode", 3, 0, "0")
     var alu_unsigned    = ulocal("alu_unsigned", 0, 0, "0")
 
@@ -399,7 +401,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                     begbranch(0x2)
                     run {
                         alu_opcode.assign(aluop_SUB)
-                        rd_source.assign(RD_OF_COND)
+                        rd_source.assign(RD_CF_COND)
                     }; endbranch()
 
                     // SLTIU
@@ -486,14 +488,14 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                     begbranch(0x1)
                     run {
                         alu_opcode.assign(aluop_SLL)
-                        rd_source.assign(RD_OF_COND)
+                        rd_source.assign(RD_ALU)
                     }; endbranch()
 
                     // SLT
                     begbranch(0x2)
                     run {
                         alu_opcode.assign(aluop_SUB)
-                        rd_source.assign(RD_OF_COND)
+                        rd_source.assign(RD_CF_COND)
                     }; endbranch()
 
                     // SLTU
@@ -843,6 +845,17 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
                 alu_op2.assign(csr_rdata)
             }; endbranch()
         }; endcase()
+
+        begif(alu_unsigned)
+        run {
+            alu_op1_wide.assign(zeroext(alu_op1, 33))
+            alu_op2_wide.assign(zeroext(alu_op2, 33))
+        }; endif()
+        begelse()
+        run {
+            alu_op1_wide.assign(signext(alu_op1, 33))
+            alu_op2_wide.assign(signext(alu_op2, 33))
+        }; endif()
     }
 
     fun process_irq() {
@@ -893,7 +906,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     // ALU processing ##
     fun process_alu () {
 
-        alu_result_wide.assign(alu_op1)
+        alu_result_wide.assign(alu_op1_wide)
         begif(alu_req)
         run {
 
@@ -902,47 +915,47 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             run {
                 begbranch(aluop_ADD)
                 run {
-                    alu_result_wide.assign(alu_op1 + alu_op2)
+                    alu_result_wide.assign(alu_op1_wide + alu_op2_wide)
                 }; endbranch()
 
                 begbranch(aluop_SUB)
                 run {
-                    alu_result_wide.assign(alu_op1 - alu_op2)
+                    alu_result_wide.assign(alu_op1_wide - alu_op2_wide)
                 }; endbranch()
 
                 begbranch(aluop_AND)
                 run {
-                    alu_result_wide.assign(band(alu_op1, alu_op2))
+                    alu_result_wide.assign(band(alu_op1_wide, alu_op2_wide))
                 }; endbranch()
 
                 begbranch(aluop_OR)
                 run {
-                    alu_result_wide.assign(bor(alu_op1, alu_op2))
+                    alu_result_wide.assign(bor(alu_op1_wide, alu_op2_wide))
                 }; endbranch()
 
                 begbranch(aluop_SLL)
                 run {
-                    alu_result_wide.assign(shl(alu_op1, alu_op2))
+                    alu_result_wide.assign(shl(alu_op1_wide, alu_op2_wide))
                 }; endbranch()
 
                 begbranch(aluop_SRL)
                 run {
-                    alu_result_wide.assign(shr(alu_op1, alu_op2))
+                    alu_result_wide.assign(shr(zeroext(alu_op1_wide[31, 0], 64), alu_op2_wide[4, 0]))
                 }; endbranch()
 
                 begbranch(aluop_SRA)
                 run {
-                    alu_result_wide.assign(sra(alu_op1, alu_op2))
+                    alu_result_wide.assign(sra(signext(alu_op1_wide[31, 0], 64), alu_op2_wide[4, 0]))
                 }; endbranch()
 
                 begbranch(aluop_XOR)
                 run {
-                    alu_result_wide.assign(bxor(alu_op1, alu_op2))
+                    alu_result_wide.assign(bxor(alu_op1_wide, alu_op2_wide))
                 }; endbranch()
 
                 begbranch(aluop_CLRB)
                 run {
-                    alu_result_wide.assign(band(alu_op1, !alu_op2))
+                    alu_result_wide.assign(band(alu_op1_wide, !alu_op2_wide))
                 }; endbranch()
             }; endcase()
 
