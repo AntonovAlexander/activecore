@@ -26,17 +26,18 @@ reg irq_btn;
 	
 sigma
 #(
-	.CPU("riscv_1stage"),
-	//.CPU("riscv_2stage"),
-	//.CPU("riscv_3stage"),
-	//.CPU("riscv_4stage"),
-	//.CPU("riscv_5stage"),
-	//.CPU("riscv_6stage"),
+	.CPU("riscv_1stage")
+	//.CPU("riscv_2stage")
+	//.CPU("riscv_3stage")
+	//.CPU("riscv_4stage")
+	//.CPU("riscv_5stage")
+	//.CPU("riscv_6stage")
 
-	.delay_test_flag(0),
-
-	.mem_data("../../sw/benchmarks/heartbeat_variable.riscv"),
-	.mem_size(8192)
+	, .delay_test_flag(0)
+    
+    , .mem_type("elf")
+	, .mem_data("../../sw/benchmarks/heartbeat_variable.riscv")
+	, .mem_size(8192)
 ) sigma
 (
 	.clk_i(CLK_100MHZ)
