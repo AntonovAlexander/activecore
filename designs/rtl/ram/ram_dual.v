@@ -49,12 +49,15 @@ begin
     if (mem_type == "hex") $readmemh(mem_data, ram, 0);
     else if (mem_type == "elf")
         begin
+        
         File_ID = $fopen(mem_data, "rb");
         Rd_Status = $fread(File_Rdata, File_ID);
+        if (Rd_Status == 0) $fatal("File %s not found!", mem_data);
+        
         $display("##################################");
         $display("#### Loading elf file: %s ####", mem_data);
         $display("Rdata: 0x%x", File_Rdata[0]);
-        if ((File_Rdata[0] != 8'h7f) || (File_Rdata[1] != 8'h45) || (File_Rdata[2] != 8'h4c) || (File_Rdata[3] != 8'h46)) $fatal("elf format incorrect!");
+        if ((File_Rdata[0] != 8'h7f) || (File_Rdata[1] != 8'h45) || (File_Rdata[2] != 8'h4c) || (File_Rdata[3] != 8'h46)) $fatal("%s: elf format incorrect!", mem_data);
         $display("Loading elf file: %s", mem_data);
         
         e_phnum = File_Rdata[44] + (File_Rdata[45] << 8);
@@ -112,7 +115,7 @@ begin
                 end
             end
         $display("##################################\n");
-        $fclose(mem_data);
+        $fclose(File_ID);
         end
     else $fatal("mem_type parameter incorrect!");
     end

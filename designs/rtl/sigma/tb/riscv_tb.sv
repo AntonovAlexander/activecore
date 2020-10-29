@@ -34,8 +34,8 @@ sigma
 	//.CPU("riscv_6stage")
 
 	, .delay_test_flag(0)
-    
-    , .mem_type("elf")
+	
+	, .mem_type("elf")
 	, .mem_data("../../sw/benchmarks/heartbeat_variable.riscv")
 	, .mem_size(8192)
 ) sigma
