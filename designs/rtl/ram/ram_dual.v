@@ -56,17 +56,17 @@ begin
         
         $display("##################################");
         $display("#### Loading elf file: %s ####", mem_data);
-        $display("Rdata: 0x%x", File_Rdata[0]);
-        if ((File_Rdata[0] != 8'h7f) || (File_Rdata[1] != 8'h45) || (File_Rdata[2] != 8'h4c) || (File_Rdata[3] != 8'h46)) $fatal("%s: elf format incorrect!", mem_data);
-        $display("Loading elf file: %s", mem_data);
         
+        // parsing ELF header
+        if ((File_Rdata[0] != 8'h7f) || (File_Rdata[1] != 8'h45) || (File_Rdata[2] != 8'h4c) || (File_Rdata[3] != 8'h46)) $fatal("%s: elf format incorrect!", mem_data);
         e_phnum = File_Rdata[44] + (File_Rdata[45] << 8);
         $display("e_phnum: 0x%x", e_phnum);
         
         File_ptr = 52;
         for (header_idx = 0; header_idx < e_phnum; header_idx = header_idx + 1)
             begin
-            // parsing headers
+            
+            // parsing program header
             $display("\nHEADER: %d", header_idx);
             
             elf_param = File_Rdata[File_ptr] + (File_Rdata[File_ptr+1] << 8) + (File_Rdata[File_ptr+2] << 16) + (File_Rdata[File_ptr+3] << 24);
@@ -101,7 +101,7 @@ begin
             $display("p_align: 0x%x", elf_param);
             File_ptr = File_ptr + 4;
             
-            // loading to memory
+            // loading segment to memory
             bytes_in_word = dat_width / 8;
             for (load_byte_counter = 0; load_byte_counter < p_filesz; load_byte_counter = load_byte_counter + bytes_in_word)
                 begin
