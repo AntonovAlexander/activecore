@@ -225,7 +225,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         }
 
         // SHIFT //
-        else if ((opcode == OP2_ARITH_SHL) || (opcode == OP2_ARITH_SHR) || (opcode == OP2_ARITH_SRA)) {
+        else if ((opcode == OP2_ARITH_SLL) || (opcode == OP2_ARITH_SRL) || (opcode == OP2_ARITH_SRA)) {
             if (dim1.size != 1) ERROR("Dimensions incorrect")
             for (i in 0 until dim0.size) gen_dim.add(dim0[i])
         }
@@ -283,8 +283,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
                 || (opcode == OP2_ARITH_MUL)
                 || (opcode == OP2_ARITH_DIV)
                 || (opcode == OP2_ARITH_MOD)
-                || (opcode == OP2_ARITH_SHL)
-                || (opcode == OP2_ARITH_SHR)
+                || (opcode == OP2_ARITH_SLL)
+                || (opcode == OP2_ARITH_SRL)
                 || (opcode == OP2_ARITH_SRA)
 
                 || (opcode == OP2_LOGICAL_AND)
@@ -315,8 +315,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     || (opcode == OP2_ARITH_MUL)
                     || (opcode == OP2_ARITH_DIV)
                     || (opcode == OP2_ARITH_MOD)
-                    || (opcode == OP2_ARITH_SHL)
-                    || (opcode == OP2_ARITH_SHR)
+                    || (opcode == OP2_ARITH_SLL)
+                    || (opcode == OP2_ARITH_SRL)
                     || (opcode == OP2_ARITH_SRA)) {
                 for (param in params) {
                     if (param.type == PARAM_TYPE.VAR) {
@@ -576,20 +576,20 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op2(OP2_ARITH_MOD, src0, src1)
     }
 
-    fun shl(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP2_ARITH_SHL, src0, src1)
+    fun sll(src0: hw_param, src1: hw_param): hw_var {
+        return AddExpr_op2(OP2_ARITH_SLL, src0, src1)
     }
 
-    fun shl(src0: hw_param, src1: Int): hw_var {
-        return AddExpr_op2(OP2_ARITH_SHL, src0, src1)
+    fun sll(src0: hw_param, src1: Int): hw_var {
+        return AddExpr_op2(OP2_ARITH_SLL, src0, src1)
     }
 
-    fun shr(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP2_ARITH_SHR, src0, src1)
+    fun srl(src0: hw_param, src1: hw_param): hw_var {
+        return AddExpr_op2(OP2_ARITH_SRL, src0, src1)
     }
 
-    fun shr(src0: hw_param, src1: Int): hw_var {
-        return AddExpr_op2(OP2_ARITH_SHR, src0, src1)
+    fun srl(src0: hw_param, src1: Int): hw_var {
+        return AddExpr_op2(OP2_ARITH_SRL, src0, src1)
     }
 
     fun sra(src0: hw_param, src1: hw_param): hw_var {
@@ -850,20 +850,20 @@ open class hw_astc() : ArrayList<hw_exec>() {
         AddExpr_op2_gen(OP2_ARITH_MOD, tgt, src0, src1)
     }
 
-    fun shl_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_ARITH_SHL, tgt, src0, src1)
+    fun sll_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_ARITH_SLL, tgt, src0, src1)
     }
 
-    fun shl_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_ARITH_SHL, tgt, src0, src1)
+    fun sll_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_ARITH_SLL, tgt, src0, src1)
     }
 
-    fun shr_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_ARITH_SHR, tgt, src0, src1)
+    fun srl_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_ARITH_SRL, tgt, src0, src1)
     }
 
-    fun shr_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_ARITH_SHR, tgt, src0, src1)
+    fun srl_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_ARITH_SRL, tgt, src0, src1)
     }
 
     fun sra_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {

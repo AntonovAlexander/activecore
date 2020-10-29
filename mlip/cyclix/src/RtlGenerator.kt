@@ -82,8 +82,8 @@ class RtlGenerator(module_in : module) {
             || (expr.opcode == OP2_ARITH_SUB)
             || (expr.opcode == OP2_ARITH_MUL)
             || (expr.opcode == OP2_ARITH_DIV)
-            || (expr.opcode == OP2_ARITH_SHL)
-            || (expr.opcode == OP2_ARITH_SHR)
+            || (expr.opcode == OP2_ARITH_SLL)
+            || (expr.opcode == OP2_ARITH_SRL)
             || (expr.opcode == OP2_ARITH_SRA)
 
             || (expr.opcode == OP1_LOGICAL_NOT)

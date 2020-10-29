@@ -133,8 +133,8 @@ class SvWriter(module_in : module) {
         else if (expr.opcode == OP2_ARITH_SUB) 	    opstring = "-"
         else if (expr.opcode == OP2_ARITH_MUL) 	    opstring = "*"
         else if (expr.opcode == OP2_ARITH_DIV) 	    opstring = "/"
-        else if (expr.opcode == OP2_ARITH_SHL) 	    opstring = "<<"
-        else if (expr.opcode == OP2_ARITH_SHR) 	    opstring = ">>"
+        else if (expr.opcode == OP2_ARITH_SLL) 	    opstring = "<<"
+        else if (expr.opcode == OP2_ARITH_SRL) 	    opstring = ">>"
         else if (expr.opcode == OP2_ARITH_SRA) 	    opstring = ">>>"
 
         else if (expr.opcode == OP1_LOGICAL_NOT)  opstring = "!"
@@ -206,8 +206,8 @@ class SvWriter(module_in : module) {
                 || (expr.opcode == OP2_ARITH_SUB)
                 || (expr.opcode == OP2_ARITH_MUL)
                 || (expr.opcode == OP2_ARITH_DIV)
-                || (expr.opcode == OP2_ARITH_SHL)
-                || (expr.opcode == OP2_ARITH_SHR)
+                || (expr.opcode == OP2_ARITH_SLL)
+                || (expr.opcode == OP2_ARITH_SRL)
                 || (expr.opcode == OP2_ARITH_SRA)
 
                 || (expr.opcode == OP2_LOGICAL_AND)

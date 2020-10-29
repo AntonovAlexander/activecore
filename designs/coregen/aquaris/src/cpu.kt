@@ -935,12 +935,12 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
 
                 begbranch(aluop_SLL)
                 run {
-                    alu_result_wide.assign(shl(alu_op1_wide, alu_op2_wide))
+                    alu_result_wide.assign(sll(alu_op1_wide, alu_op2_wide))
                 }; endbranch()
 
                 begbranch(aluop_SRL)
                 run {
-                    alu_result_wide.assign(shr(zeroext(alu_op1_wide[31, 0], 64), alu_op2_wide[4, 0]))
+                    alu_result_wide.assign(srl(zeroext(alu_op1_wide[31, 0], 64), alu_op2_wide[4, 0]))
                 }; endbranch()
 
                 begbranch(aluop_SRA)
