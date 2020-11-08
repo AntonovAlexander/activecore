@@ -94,6 +94,7 @@ class hw_fraction_SubStruct (val substruct_name_in : String) : hw_fraction(FRAC_
     }
 }
 
+// container for variable fractures to take
 class hw_fractions() : ArrayList<hw_fraction>() {
     constructor(index : Int) : this() {
         this.add(hw_fraction_C(index))

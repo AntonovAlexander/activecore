@@ -2,7 +2,7 @@
 
 ### Project description
 
-ActiveCore is a framework that demonstrates original hardware designing concept based on "Micro-Language IP" (MLIP) cores.
+ActiveCore is a framework that demonstrates original hardware designing concept based on **"Micro-Language IP" (MLIP) cores**.
 
 MLIP core is a hardware generator that provides custom synthesizable execution kernel associated with certain microarchitectural template. Selective functions of the microarchitecture are exposed for design-time behavioral-style programming, with scheduling, communication and synchronization "services" of the microarchitecture manageable using MLIP-specific API. I.e., each MLIP core offers custom computational model that reflects computational process organization inside a hardware microarchitecture.
 

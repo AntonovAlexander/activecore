@@ -474,7 +474,7 @@ module sigma_tile
         .corenum(corenum)
         , .SW_RESET_DEFAULT(SW_RESET_DEFAULT)
         , .IRQ_NUM_POW(IRQ_NUM_POW)
-    ) sfr(
+    ) sfr (
         .clk_i		(clk_i)
         , .rst_i	(rst_i)
 

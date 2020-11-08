@@ -12,6 +12,7 @@ enum class VAR_TYPE {
     SIGNED, UNSIGNED, STRUCTURED
 }
 
+// container for generic hardware types
 data class hw_type(var VarType : VAR_TYPE, var src_struct: hw_struct, var dimensions : hw_dim_static) {
     constructor(VarType: VAR_TYPE, dimensions_in : hw_dim_static) : this(VarType, DUMMY_STRUCT, dimensions_in) {
         if (VarType == VAR_TYPE.STRUCTURED) ERROR("hw_type incorrect!")
@@ -32,6 +33,7 @@ data class hw_type(var VarType : VAR_TYPE, var src_struct: hw_struct, var dimens
     }
 }
 
+// container for named variables
 open class hw_structvar(name_in: String, vartype_in : hw_type, defval_in : String) : hw_param(PARAM_TYPE.VAR, vartype_in, defval_in) {
 
     var defval = defval_in
@@ -47,6 +49,7 @@ open class hw_structvar(name_in: String, vartype_in : hw_type, defval_in : Strin
     constructor(name_in: String, src_struct_in : hw_struct) : this(name_in, hw_type(src_struct_in), "0")
 }
 
+// container for structs
 class hw_struct(name_in: String) : ArrayList<hw_structvar>() {
     var name = name_in
 

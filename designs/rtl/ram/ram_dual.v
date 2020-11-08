@@ -54,8 +54,8 @@ begin
         Rd_Status = $fread(File_Rdata, File_ID);
         if (Rd_Status == 0) $fatal("File %s not found!", mem_data);
         
-        $display("##################################");
-        $display("#### Loading elf file: %s ####", mem_data);
+        $display("\n##################################");
+        $display("#### Loading elf file: %s", mem_data);
         
         // parsing ELF header
         if ((File_Rdata[0] != 8'h7f) || (File_Rdata[1] != 8'h45) || (File_Rdata[2] != 8'h4c) || (File_Rdata[3] != 8'h46)) $fatal("%s: elf format incorrect!", mem_data);
@@ -67,7 +67,7 @@ begin
             begin
             
             // parsing program header
-            $display("\nHEADER: %d", header_idx);
+            $display("---- HEADER: %0d ----", header_idx);
             
             elf_param = File_Rdata[File_ptr] + (File_Rdata[File_ptr+1] << 8) + (File_Rdata[File_ptr+2] << 16) + (File_Rdata[File_ptr+3] << 24);
             $display("p_type: 0x%x", elf_param);

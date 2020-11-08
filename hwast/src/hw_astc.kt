@@ -8,6 +8,7 @@
 
 package hwast
 
+// AST constructor for behavioral HW specifications
 open class hw_astc() : ArrayList<hw_exec>() {
 
     var GenCounter      = 0
