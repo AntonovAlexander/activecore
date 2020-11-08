@@ -64,7 +64,7 @@ class RtlGenerator(module_in : module) {
         // for (wrvar in expr.wrvars) println("wrvar: " + wrvar.name)
 
         var fractions = hw_fractions()
-        for (src_fraction in expr.fractions) {
+        for (src_fraction in expr.assign_tgt_fractured.depow_fractions) {
             if (src_fraction is hw_fraction_C) fractions.add(src_fraction)
             else if (src_fraction is hw_fraction_V) fractions.add(hw_fraction_V(TranslateVar(src_fraction.index)))
             else if (src_fraction is hw_fraction_CC) fractions.add(src_fraction)

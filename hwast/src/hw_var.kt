@@ -202,3 +202,5 @@ open class hw_var(name_in : String, vartype_in : hw_type, defval_in : String) : 
         return hw_type(ret_vartype, ret_struct, ret_dim)
     }
 }
+
+var DUMMY_VAR = hw_var("DUMMY_VAR", hw_type(VAR_TYPE.UNSIGNED, 0, 0), "0")

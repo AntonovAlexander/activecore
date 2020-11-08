@@ -12,6 +12,11 @@ package hwast
 class hw_fractured (src_in: hw_var, depow_fractions_in: hw_fractions) {
 
     val src = src_in
-    val depow_fractions = depow_fractions_in
-    val type_depowered = src_in.GetDepowered(depow_fractions)
+    var depow_fractions = hw_fractions()
+    var depowered_fractions = hw_type(DUMMY_STRUCT)
+
+    init {
+        for (frac in depow_fractions_in) depow_fractions.add(frac)
+        depowered_fractions = src.GetDepowered(depow_fractions)
+    }
 }

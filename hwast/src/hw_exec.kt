@@ -57,6 +57,7 @@ val OP1_CASEBRANCH      = hw_opcode("casebrach")
 val OP1_WHILE           = hw_opcode("while")
 
 
+// container for operation
 open class hw_exec(opcode_in : hw_opcode) {
 
     val opcode      = opcode_in
@@ -68,7 +69,7 @@ open class hw_exec(opcode_in : hw_opcode) {
 
     var expressions     = ArrayList<hw_exec>()
 
-    var fractions               = hw_fractions()
+    var assign_tgt_fractured    = hw_fractured(DUMMY_VAR, hw_fractions())
     var subStructvar_name       = "UNDEF"
     var iftargets   = ArrayList<hw_var>()
     var priority_conditions  = ArrayList<hw_param>()

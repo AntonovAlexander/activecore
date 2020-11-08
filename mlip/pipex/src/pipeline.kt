@@ -432,7 +432,7 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
         var new_expr = hw_exec(OP_ASSIGN_SUCC)
         new_expr.AddWrVar(tgt)
         new_expr.AddRdParam(src)
-        new_expr.fractions = depow_fractions
+        new_expr.assign_tgt_fractured = hw_fractured(tgt, depow_fractions)
         AddExpr(new_expr)
     }
 
@@ -577,7 +577,7 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
                                curStageAssoc : __pstage_info) {
 
         var fractions = hw_fractions()
-        for (src_fraction in expr.fractions) {
+        for (src_fraction in expr.assign_tgt_fractured.depow_fractions) {
             if (src_fraction is hw_fraction_C) fractions.add(src_fraction)
             else if (src_fraction is hw_fraction_V) fractions.add(hw_fraction_V(curStageAssoc.TranslateVar(src_fraction.index)))
             else if (src_fraction is hw_fraction_CC) fractions.add(src_fraction)

@@ -142,7 +142,7 @@ class VivadoCppWriter(module_in : module) {
     {
         PrintTab(wrFile)
 
-        var dimstring = getDimString(expr.fractions)
+        var dimstring = getDimString(expr.assign_tgt_fractured.depow_fractions)
 
         var opstring = ""
         if (expr.opcode == OP1_ASSIGN) 	        opstring = ""
@@ -206,7 +206,7 @@ class VivadoCppWriter(module_in : module) {
             || (expr.opcode == OP1_REDUCT_XOR)
             || (expr.opcode == OP1_REDUCT_XNOR))
         {
-            var var_descr = expr.wrvars[0].GetDepowered(expr.fractions)
+            var var_descr = expr.wrvars[0].GetDepowered(expr.assign_tgt_fractured.depow_fractions)
             if ((var_descr.VarType == VAR_TYPE.STRUCTURED) && (expr.params[0].type == PARAM_TYPE.VAL)) {
                 if (opstring == "") {
                     wrFile.write(expr.wrvars[0].name +

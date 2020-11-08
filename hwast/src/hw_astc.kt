@@ -441,9 +441,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         var new_expr = hw_exec(OP1_ASSIGN)
         new_expr.AddRdParam(src)
         new_expr.AddWrVar(tgt)
-        var new_depow_fractions = hw_fractions()
-        for (frac in depow_fractions) new_depow_fractions.add(frac)
-        new_expr.fractions = new_depow_fractions
+        new_expr.assign_tgt_fractured = hw_fractured(tgt, depow_fractions)
         AddExpr(new_expr)
     }
 
