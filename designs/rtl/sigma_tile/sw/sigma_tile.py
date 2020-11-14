@@ -48,6 +48,13 @@ class sigma_tile:
         """
         self.udm.wr32((self.__sigma_addr + 0x00100004), 0x00)
     
+    def sw_rst_autoclr(self):
+        """Description:
+            Assert auto-clearable software reset
+
+        """
+        self.udm.wr32((self.__sigma_addr + 0x00100004), 0x03)
+    
     def loadbin(self, filename):
         """Description:
             Write data from binary file to local CPU RAM

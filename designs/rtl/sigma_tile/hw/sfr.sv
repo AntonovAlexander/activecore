@@ -40,7 +40,7 @@ localparam SGI_ADDR 			= 8'h14;
 localparam TIMER_CTRL_ADDR 		= 8'h20;
 localparam TIMER_PERIOD_ADDR 	= 8'h24;
 
-logic sw_reset;
+logic sw_reset, sw_reset_autoclr;
 always @(posedge clk_i) sw_reset_o <= rst_i | sw_reset;
 
 logic timer_inprogress, timer_reload;
@@ -53,6 +53,7 @@ always @(posedge clk_i)
 		begin
 		host.resp <= 1'b0;
 		sw_reset <= SW_RESET_DEFAULT;
+		sw_reset_autoclr <= 1'b0;
 		irq_en_bo <= 0;
 		irq_timer <= 1'b0;
 		sgi_req_o <= 0;
@@ -67,6 +68,8 @@ always @(posedge clk_i)
 		host.resp <= 1'b0;
 		sgi_req_o <= 0;
 		irq_timer <= 1'b0;
+
+		if (sw_reset && sw_reset_autoclr) sw_reset <= 1'b0;
 
 		if (sw_reset_o)
 			begin
@@ -95,6 +98,7 @@ always @(posedge clk_i)
 				if (host.addr[7:0] == CTRL_ADDR)
 					begin
 					sw_reset <= host.wdata[0];
+					sw_reset_autoclr <= host.wdata[1];
 					end
 				if (host.addr[7:0] == IRQ_EN_ADDR)
 					begin

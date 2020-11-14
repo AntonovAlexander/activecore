@@ -19,7 +19,7 @@ def hw_test_irq_counter(sigma, irq_counter_filename):
     print("Loading test program...")
     sigma.tile.loadelf(irq_counter_filename)
     print("Test program written!")
-    print("#### PRESS IRQ BUTTON INCREMENT COUNTER! ####")
+    print("#### PRESS IRQ BUTTON TO INCREMENT LED COUNTER! ####")
     sigma.tile.sgi(0x3)
     sigma.tile.sgi(0x3)
     sigma.tile.sgi(0x3)
