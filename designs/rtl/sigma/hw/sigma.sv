@@ -12,6 +12,8 @@
 module sigma
 #(
 	parameter CPU = "none",
+	parameter UDM_BUS_TIMEOUT = (1024*1024*100),
+	parameter UDM_RTX_EXTERNAL_OVERRIDE = "NO",
 	parameter delay_test_flag = 0,
 	parameter mem_init="YES",
 	parameter mem_type="elf",
@@ -70,8 +72,10 @@ sigma_tile #(
 	, .xif(xif)
 );
 	
-udm udm
-(
+udm #(
+    .BUS_TIMEOUT(UDM_BUS_TIMEOUT)
+    , .RTX_EXTERNAL_OVERRIDE(UDM_RTX_EXTERNAL_OVERRIDE)
+) udm (
 	.clk_i(clk_i)
 	, .rst_i(srst)
 

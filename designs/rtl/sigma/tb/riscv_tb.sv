@@ -33,8 +33,10 @@ sigma
 	//.CPU("riscv_5stage")
 	//.CPU("riscv_6stage")
 
+	, .UDM_RTX_EXTERNAL_OVERRIDE("YES")
 	, .delay_test_flag(0)
 	
+	, .mem_init("YES")
 	, .mem_type("elf")
 	, .mem_data("../../sw/benchmarks/heartbeat_variable.riscv")
 	, .mem_size(8192)
