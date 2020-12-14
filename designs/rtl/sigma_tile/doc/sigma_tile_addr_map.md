@@ -10,4 +10,5 @@ SFR: IRQ_EN | 0x00100010 | 0x00100010 | 4 B | rw | 0x00000000 | Interrupt enable
 SFR: SGI | 0x00100014 | 0x00100014 | 4 B | w | Undefined | Software generated interrupt: [3:0] - interrupt number
 SFR: TIMER_CTRL | 0x00100020 | 0x00100020 | 4 B | rw | 0x00000000 | Timer control register: [0] - start; [1] - autoreload
 SFR: TIMER_PERIOD | 0x00100024 | 0x00100024 | 4 B | rw | 0x00000000 | Timer period
+SFR: TIMER_VALUE | 0x00100028 | 0x00100028 | 4 B | rw | 0x00000000 | Timer value
 XIF | 0x80000000 | 0xFFFFFFFF | 2 GB | rw | Undefined | Expansion interface
