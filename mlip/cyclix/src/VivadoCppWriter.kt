@@ -89,9 +89,9 @@ class VivadoCppWriter(module_in : module) {
                     + postString)
         } else {
             if (structvar.vartype.dimensions.size > 0) {
-                if (structvar.vartype.dimensions[0].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is no 0!")
+                if (structvar.vartype.dimensions[0].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is not 0!")
                 for (DIM_INDEX in 1 until structvar.vartype.dimensions.size) {
-                    if (structvar.vartype.dimensions[DIM_INDEX].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is no 0!")
+                    if (structvar.vartype.dimensions[DIM_INDEX].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is not 0!")
                     dimstring += (" [" + (structvar.vartype.dimensions[DIM_INDEX].msb + 1) + "]")
                 }
 

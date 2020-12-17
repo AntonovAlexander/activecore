@@ -1278,10 +1278,12 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
             }
 
             // Forming mcopipe_handles_last list
-            MSG(DEBUG_FLAG ,"Detecting last mcopipes")
+            MSG(DEBUG_FLAG ,"Detecting last mcopipe handles")
             for (mcopipe_handle in curStageAssoc.mcopipe_handles) {
-                if (CUR_STAGE_INDEX != StageList.lastIndex) {
-                    if (!StageAssocList[CUR_STAGE_INDEX].mcopipe_handles_last.contains(mcopipe_handle)) {
+                if (CUR_STAGE_INDEX == StageList.lastIndex) {
+                    curStageAssoc.mcopipe_handles_last.add(mcopipe_handle)
+                } else {
+                    if (!StageAssocList[CUR_STAGE_INDEX+1].mcopipe_handles_last.contains(mcopipe_handle)) {
                         curStageAssoc.mcopipe_handles_last.add(mcopipe_handle)
                     }
                 }
@@ -1427,7 +1429,7 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
             }
 
             // forming nevictable pctrl
-            for (mcopipe_handle in curStageAssoc.mcopipe_handles) {
+            for (mcopipe_handle in curStageAssoc.mcopipe_handles_last) {
                 cyclix_gen.lor_gen(curStageAssoc.pctrl_nevictable, curStageAssoc.pctrl_nevictable, curStageAssoc.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.rdreq_pending))
             }
 

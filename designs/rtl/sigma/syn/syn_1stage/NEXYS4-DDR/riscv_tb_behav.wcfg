@@ -63,6 +63,12 @@
       <obj_property name="ObjectShortName">genpstage_EXEC_curinstr_addr[31:0]</obj_property>
       <obj_property name="label">CPU instruction address</obj_property>
    </wvobject>
+   <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_instr_code" type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">genpstage_EXEC_instr_code[31:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_EXEC_instr_code[31:0]</obj_property>
+      <obj_property name="label">CPU instruction code</obj_property>
+   </wvobject>
    <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile" type="array">
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">genpsticky_glbl_regfile[31:1][31:0]</obj_property>
