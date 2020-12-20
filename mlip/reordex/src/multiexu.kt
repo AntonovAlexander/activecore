@@ -1,5 +1,5 @@
 /*
- * multieu.kt
+ * multiexu.kt
  *
  *  Created on: 05.06.2019
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
@@ -10,7 +10,7 @@ package reordex
 
 import hwast.*
 
-open class multieu(name_in : String) : hw_astc_stdif() {
+open class multiexu(name_in : String) : hw_astc_stdif() {
 
     val name = name_in
 
@@ -30,14 +30,14 @@ open class multieu(name_in : String) : hw_astc_stdif() {
         return new_exec_unit
     }
 
-    fun begeu(eu : hw_exec_unit) {
+    fun begexu(eu : hw_exec_unit) {
         if (FROZEN_FLAG) ERROR("Failed to begin stage " + eu.name + ": ASTC frozen")
         if (this.size != 0) ERROR("reordex ASTC inconsistent!")
         // TODO: validate stage presence
         add(eu)
     }
 
-    fun endeu() {
+    fun endexu() {
         if (FROZEN_FLAG) ERROR("Failed to end stage: ASTC frozen")
         if (this.size != 1) ERROR("Stage ASTC inconsistent!")
         if (this[0].opcode != OP_STAGE) ERROR("Stage ASTC inconsistent!")
@@ -240,5 +240,16 @@ open class multieu(name_in : String) : hw_astc_stdif() {
         var ret_var = hw_global(name, hw_type(VAR_TYPE.SIGNED, defval), defval)
         add_global(ret_var)
         return ret_var
+    }
+
+    fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.module {
+
+        MSG("Translating to cyclix: beginning")
+
+        var cyclix_gen = cyclix.module(name)
+
+        cyclix_gen.end()
+        MSG(DEBUG_FLAG, "Translating to cyclix: complete")
+        return cyclix_gen
     }
 }

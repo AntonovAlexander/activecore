@@ -11,7 +11,7 @@ package citadel
 import hwast.*
 import reordex.*
 
-class ex_unit(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_in : Int, irq_width_in : Int) : reordex.multieu(name_in) {
+class ex_unit(name_in : String) : reordex.multiexu(name_in) {
 
     // ALU control
     var alu_req         = ulocal("alu_req", 0, 0, "0")
@@ -36,7 +36,7 @@ class ex_unit(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_AD
         EU_INTEGER.begin()
         run {
             alu_result_wide.assign(alu_op1_wide + alu_op2_wide)
-        }; endeu()
+        }; endexu()
     }
 
 }
