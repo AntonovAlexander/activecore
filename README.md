@@ -38,6 +38,8 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 
+	* **citadel** (*in development*) - generator of multi-pipeline functional blocks with register renaming based on Tomasulo algorithm, based on reordex MLIP core
+
 Other reusable cores:
 
 * **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Reference lab work manual included. Location: /designs/rtl/udm

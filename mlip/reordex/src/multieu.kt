@@ -1,5 +1,5 @@
 /*
- * multipipeline.kt
+ * multieu.kt
  *
  *  Created on: 05.06.2019
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
@@ -10,7 +10,7 @@ package reordex
 
 import hwast.*
 
-open class multipipeline(name_in : String) : hw_astc_stdif() {
+open class multieu(name_in : String) : hw_astc_stdif() {
 
     val name = name_in
 
@@ -21,23 +21,23 @@ open class multipipeline(name_in : String) : hw_astc_stdif() {
 
     var ExecUnits  = mutableMapOf<String, hw_exec_unit>()
 
-    fun exec_unit(name_in : String) : hw_exec_unit {
+    fun exec_unit(name_in : String, delay : Int) : hw_exec_unit {
         if (FROZEN_FLAG) ERROR("Failed to add stage " + name_in + ": ASTC frozen")
-        var new_stage = hw_exec_unit(name_in, this)
-        if (ExecUnits.put(new_stage.name, new_stage) != null) {
+        var new_exec_unit = hw_exec_unit(name_in, this)
+        if (ExecUnits.put(new_exec_unit.name, new_exec_unit) != null) {
             ERROR("Stage addition problem!")
         }
-        return new_stage
+        return new_exec_unit
     }
 
-    fun begstage(stage : hw_exec_unit) {
-        if (FROZEN_FLAG) ERROR("Failed to begin stage " + stage.name + ": ASTC frozen")
+    fun begeu(eu : hw_exec_unit) {
+        if (FROZEN_FLAG) ERROR("Failed to begin stage " + eu.name + ": ASTC frozen")
         if (this.size != 0) ERROR("reordex ASTC inconsistent!")
         // TODO: validate stage presence
-        add(stage)
+        add(eu)
     }
 
-    fun endstage() {
+    fun endeu() {
         if (FROZEN_FLAG) ERROR("Failed to end stage: ASTC frozen")
         if (this.size != 1) ERROR("Stage ASTC inconsistent!")
         if (this[0].opcode != OP_STAGE) ERROR("Stage ASTC inconsistent!")
