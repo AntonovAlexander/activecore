@@ -1,10 +1,8 @@
 #include "io.h"
 
-void main (void)
+int main( int argc, char* argv[] )
 {
-  int count = 0;
-  while(1)
-  {
-    IO_LED = ++count;
-  }
+  IO_LED = 0xaabb55aa;
+
+  while (1) {}
 }

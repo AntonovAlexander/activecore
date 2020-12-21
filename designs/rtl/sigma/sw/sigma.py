@@ -46,6 +46,10 @@ sys.path.append('benchmarks/crc32')
 import hw_test_crc32
 from hw_test_crc32 import *
 
+sys.path.append('benchmarks/bootloader')
+import hw_test_bootloader
+from hw_test_bootloader import *
+
 sys.path.append('benchmarks/irq_counter')
 import hw_test_irq_counter
 from hw_test_irq_counter import *
@@ -98,7 +102,7 @@ class sigma:
         else:
             print("#### " + test_name + " TEST FAILED! ####")
         
-        print("")    
+        print("")
         return test_succ_flag
     
     def run_compliance_tests(self):
@@ -111,6 +115,11 @@ class sigma:
         """
         test_succ_counter = 0
         test_fail_counter = 0
+        
+        if (hw_test_bootloader(self, 'benchmarks/bootloader.riscv', 'benchmarks/bootloader_testapp.riscv') == 1):
+            test_succ_counter = test_succ_counter + 1
+        else:
+            test_fail_counter = test_fail_counter + 1
         
         if (hw_test_mul_sw(self, 'benchmarks/mul_sw.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
