@@ -4,8 +4,6 @@ unsigned int crc32(unsigned int * buf, int len)
 {
 	unsigned int crc;
 	int i;
-	
-	unsigned int *myBuf = (unsigned int*)IO_MEM_ADDR;
 
   unsigned int crc_table[256] = {
   0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
@@ -79,12 +77,12 @@ unsigned int crc32(unsigned int * buf, int len)
     
     for (i = 0; i < len; i+=1)
     {        
-        myBuf[i] = crc; // for debug
-        myBuf[i+9] = buf[i]; // for debug
+        io_buf_uint[i] = crc; // for debug
+        io_buf_uint[i+9] = buf[i]; // for debug
                 
         crc = crc_table[(crc ^ buf[i]) & 0xFF] ^ (crc >> 8);
         
-        myBuf[i+18] = crc; // for debug
+        io_buf_uint[i+18] = crc; // for debug
     }
 
     return crc ^ 0xFFFFFFFF;

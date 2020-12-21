@@ -137,7 +137,6 @@ void sort(size_t n, type arr[])
 
 int main( int argc, char* argv[] )
 {
-  int * io_buf = (int*)IO_MEM_ADDR;
   int i;
 
   IO_LED = 0x0;
@@ -145,7 +144,7 @@ int main( int argc, char* argv[] )
   // Do the sort
   sort( DATA_SIZE, input_data );
 
-  for (i = 0; i < DATA_SIZE; i++) io_buf[i] = input_data[i];
+  for (i = 0; i < DATA_SIZE; i++) io_buf_int[i] = input_data[i];
 
   // Display status
   IO_LED = 0x55aa55aa;

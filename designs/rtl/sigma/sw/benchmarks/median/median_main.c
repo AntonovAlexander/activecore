@@ -24,12 +24,10 @@
 
 int main( int argc, char* argv[] )
 {
-  int * io_buf = (int*)IO_MEM_ADDR;
-
   IO_LED = 0x0;
 
   // Do the filter
-  median( DATA_SIZE, input_data, io_buf );
+  median( DATA_SIZE, input_data, io_buf_int );
   
   // Display status
   IO_LED = 0x55aa55aa;

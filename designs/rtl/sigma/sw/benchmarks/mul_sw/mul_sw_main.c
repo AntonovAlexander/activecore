@@ -18,14 +18,12 @@
 
 int main( int argc, char* argv[] )
 {
-  int * io_buf = (int*)IO_MEM_ADDR;
-  
   // Initial status
-  io_buf[0] = 5;
-  io_buf[1] = 7;
+  io_buf_int[0] = 5;
+  io_buf_int[1] = 7;
   IO_LED = 0x55aa55aa;
 
   while (1) {
-    IO_LED = mul_sw(io_buf[0], io_buf[1]);
+    IO_LED = mul_sw(io_buf_int[0], io_buf_int[1]);
   }
 }
