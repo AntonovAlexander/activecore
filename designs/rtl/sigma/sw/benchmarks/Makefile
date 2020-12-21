@@ -41,9 +41,9 @@ bmarks = \
 RISCV_PREFIX ?= riscv$(XLEN)-unknown-elf-
 RISCV_GCC ?= $(RISCV_PREFIX)gcc
 RISCV_GCC_OPTS ?= -mcmodel=medany -static -std=gnu99 -O2 -march=rv32i -mabi=ilp32
-RISCV_LINK ?= $(RISCV_GCC) -T $(src_dir)/../common/test.ld $(incs)
-RISCV_LINK_OPTS ?= -static -nostdlib -nostartfiles -lgcc -T $(src_dir)/../common/test.ld
-RISCV_LINK_OPTS_TESTAPP ?= -static -nostdlib -nostartfiles -lgcc -T $(src_dir)/../common/test_testapp.ld
+RISCV_LINK ?= $(RISCV_GCC) -T $(src_dir)/../common/sigma.ld $(incs)
+RISCV_LINK_OPTS ?= -static -nostdlib -nostartfiles -lgcc -T $(src_dir)/../common/sigma.ld
+RISCV_LINK_OPTS_TESTAPP ?= -static -nostdlib -nostartfiles -lgcc -T $(src_dir)/bootloader_testapp/bootloader_testapp.ld
 RISCV_OBJDUMP ?= $(RISCV_PREFIX)objdump --disassemble-all --disassemble-zeroes -h
 
 incs  += -I$(src_dir)/../env -I$(src_dir)/../common $(addprefix -I$(src_dir)/, $(bmarks))
