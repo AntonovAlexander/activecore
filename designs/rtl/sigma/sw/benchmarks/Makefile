@@ -23,6 +23,7 @@ bmarks = \
 	qsort \
 	rsort \
 	crc32 \
+	bootloader \
 	#dhrystone 
 	#towers \
 	#vvadd \
@@ -42,6 +43,7 @@ RISCV_GCC ?= $(RISCV_PREFIX)gcc
 RISCV_GCC_OPTS ?= -mcmodel=medany -static -std=gnu99 -O2 -march=rv32i -mabi=ilp32
 RISCV_LINK ?= $(RISCV_GCC) -T $(src_dir)/../common/test.ld $(incs)
 RISCV_LINK_OPTS ?= -static -nostdlib -nostartfiles -lgcc -T $(src_dir)/../common/test.ld
+RISCV_LINK_OPTS_TESTAPP ?= -static -nostdlib -nostartfiles -lgcc -T $(src_dir)/../common/test_testapp.ld
 RISCV_OBJDUMP ?= $(RISCV_PREFIX)objdump --disassemble-all --disassemble-zeroes -h
 
 incs  += -I$(src_dir)/../env -I$(src_dir)/../common $(addprefix -I$(src_dir)/, $(bmarks))
@@ -53,15 +55,22 @@ $(1).riscv: $(wildcard $(src_dir)/$(1)/*) $(wildcard $(src_dir)/../common/*)
 	hexdump -ve '/4 "%08x" "\n"' $(1).riscv > $(1).riscv.hex
 endef
 
+define compile_template_testapp
+$(1).riscv: $(wildcard $(src_dir)/$(1)/*) $(wildcard $(src_dir)/../common/*)
+	$$(RISCV_GCC) $$(incs) $$(RISCV_GCC_OPTS) $$(RISCV_LINK_OPTS_TESTAPP) -o $$@ $(wildcard $(src_dir)/$(1)/*.c) $(wildcard $(src_dir)/$(1)/*.S) $(wildcard $(src_dir)/../common/*.c) $(wildcard $(src_dir)/../common/*.S)
+	hexdump -ve '/4 "%08x" "\n"' $(1).riscv > $(1).riscv.hex
+endef
+
 $(foreach bmark,$(bmarks),$(eval $(call compile_template,$(bmark))))
+$(eval $(call compile_template_testapp,bootloader_testapp))
 
 #------------------------------------------------------------
 # Build and run benchmarks on riscv simulator
 
-bmarks_riscv_bin  = $(addsuffix .riscv,  $(bmarks))
-bmarks_riscv_dump = $(addsuffix .riscv.dump, $(bmarks))
-bmarks_riscv_out  = $(addsuffix .riscv.out,  $(bmarks))
-bmarks_riscv_hex  = $(addsuffix .riscv.hex,  $(bmarks))
+bmarks_riscv_bin  = $(addsuffix .riscv,      $(bmarks) bootloader_testapp)
+bmarks_riscv_dump = $(addsuffix .riscv.dump, $(bmarks) bootloader_testapp)
+bmarks_riscv_out  = $(addsuffix .riscv.out,  $(bmarks) bootloader_testapp)
+bmarks_riscv_hex  = $(addsuffix .riscv.hex,  $(bmarks) bootloader_testapp)
 
 $(bmarks_riscv_dump): %.riscv.dump: %.riscv
 	$(RISCV_OBJDUMP) $< > $@
