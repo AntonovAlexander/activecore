@@ -445,13 +445,15 @@ module sigma_tile
 		, .dat_width	(32)
 		, .adr_width	(30)
 		, .mem_size		(mem_size)
+		, .P0_RD_ALIGHED("YES")
+		, .P1_RD_ALIGHED("NO")
 	) ram (
 		.clk_i(clk_i)
 		, .rst_i(rst_i)
 
 		, .bus0_req_i	(cpu_instr.req)
 		, .bus0_we_i	(cpu_instr.we)
-		, .bus0_addr_bi	(cpu_instr.addr[31:2])
+		, .bus0_addr_bi	(cpu_instr.addr)
 		, .bus0_be_bi	(cpu_instr.be)
 		, .bus0_wdata_bi(cpu_instr.wdata)
 		, .bus0_ack_o	(cpu_instr.ack)
@@ -461,7 +463,7 @@ module sigma_tile
 
 		, .bus1_req_i	(dmem_if.req)
 		, .bus1_we_i	(dmem_if.we)
-		, .bus1_addr_bi	(dmem_if.addr[31:2])
+		, .bus1_addr_bi	(dmem_if.addr)
 		, .bus1_be_bi	(dmem_if.be)
 		, .bus1_wdata_bi(dmem_if.wdata)
 		, .bus1_ack_o	(dmem_if.ack)
