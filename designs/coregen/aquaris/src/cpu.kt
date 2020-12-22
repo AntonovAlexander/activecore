@@ -1135,7 +1135,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
             begif(!data_req_done)
             run {
                 data_busreq.assign(hw_fractions("addr"), mem_addr)
-                data_busreq.assign(hw_fractions("be"), 0xf)
+                data_busreq.assign(hw_fractions("be"), mem_be)
                 data_busreq.assign(hw_fractions("wdata"), mem_wdata)
 
                 data_req_done.assign(data_mem.req(data_handle, mem_cmd, data_busreq))

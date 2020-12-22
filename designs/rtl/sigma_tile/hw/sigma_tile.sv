@@ -445,8 +445,8 @@ module sigma_tile
 		, .dat_width	(32)
 		, .adr_width	(30)
 		, .mem_size		(mem_size)
-		, .P0_RD_ALIGHED("YES")
-		, .P1_RD_ALIGHED("NO")
+		, .P0_FRAC("NO")
+		, .P1_FRAC("YES")
 	) ram (
 		.clk_i(clk_i)
 		, .rst_i(rst_i)
