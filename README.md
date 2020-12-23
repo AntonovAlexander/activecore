@@ -38,13 +38,13 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 
-	* **citadel** (*in development*) - generator of multi-pipeline functional blocks with register renaming based on Tomasulo algorithm, based on reordex MLIP core
+	* **citadel** (*in development*) - generator of multi-pipeline computational blocks with register renaming based on Tomasulo algorithm, based on reordex MLIP core
 
 Other reusable cores:
 
 * **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Reference lab work manual included. Location: /designs/rtl/udm
 
-* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, interrupt controller, timer, Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equal to UDM bus protocol. Location: /designs/rtl/sigma_tile
+* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, interrupt controller, timer, Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equivalent to UDM bus protocol. Location: /designs/rtl/sigma_tile
 
 Demo FPGA-based SoCs:
 

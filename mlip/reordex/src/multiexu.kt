@@ -10,9 +10,11 @@ package reordex
 
 import hwast.*
 
-open class multiexu(name_in : String) : hw_astc_stdif() {
+open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int) : hw_astc_stdif() {
 
     val name = name_in
+    val mem_addr_width = hwast.GetWidthToContain(mem_size_in)
+    val mem_data_width = mem_data_width_in
 
     override var GenNamePrefix   = "reordex"
 
@@ -247,6 +249,22 @@ open class multiexu(name_in : String) : hw_astc_stdif() {
         MSG("Translating to cyclix: beginning")
 
         var cyclix_gen = cyclix.module(name)
+
+        //// Generating interfaces ////
+        // cmd (sequential instruction stream) //
+        var cmd_req_struct = cyclix_gen.add_if_struct(name + "_cmd_req_struct")
+        cmd_req_struct.addu("exec",     0, 0, "0")
+        cmd_req_struct.addu("rf_we",       0,  0, "0")
+        cmd_req_struct.addu("rf_addr",    mem_addr_width-1, 0, "0")
+        cmd_req_struct.addu("rf_wdata",    mem_data_width-1, 0, "0")
+        cmd_req_struct.addu("fu_id",    hwast.GetWidthToContain(ExecUnits.size)-1, 0, "0")
+        cmd_req_struct.addu("fu_rs0",    mem_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_rs1",    mem_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_rd",    mem_addr_width-1, 0, "0")
+        var cmd_req = cyclix_gen.fifo_in("cmd_req",  hw_type(cmd_req_struct))
+        var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(mem_data_width-1, 0)))
+
+        // TODO: memory interface?
 
         cyclix_gen.end()
         MSG(DEBUG_FLAG, "Translating to cyclix: complete")
