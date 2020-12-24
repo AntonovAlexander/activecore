@@ -274,22 +274,30 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
 
         val TAG_WIDTH = GetWidthToContain(MAX_INSTR_NUM)
 
-        var uop_struct = cyclix_gen.add_struct(name + "uop_struct")
+        var uop_struct = cyclix_gen.add_struct("uop_struct")
         uop_struct.addu("enb",     0, 0, "0")
         uop_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
         uop_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
-        uop_struct.addu("rd_wdata",     mem_data_width-1, 0, "0")
         uop_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
+        uop_struct.addu("rd_wdata",     mem_data_width-1, 0, "0")
 
-        var rs_struct = cyclix_gen.add_struct(name + "rs_struct")
+        var rs_struct = cyclix_gen.add_struct("rs_struct")
         rs_struct.addu("enb",     0, 0, "0")
         rs_struct.addu("rs0_ready",     0, 0, "0")
+        rs_struct.addu("rs0_tag",     TAG_WIDTH-1, 0, "0")
         rs_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
         rs_struct.addu("rs1_ready",     0, 0, "0")
+        rs_struct.addu("rs1_tag",     TAG_WIDTH-1, 0, "0")
         rs_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
+
+        var cdb_struct = cyclix_gen.add_struct("cdb_struct")
+        cdb_struct.addu("enb",     0, 0, "0")
+        cdb_struct.addu("tag",     TAG_WIDTH-1, 0, "0")
+        cdb_struct.addu("wdata",     mem_data_width-1, 0, "0")
 
         for (ExUnit in ExecUnits) {
             var rs = cyclix_gen.global("genexu_" + ExUnit.value.name + "_rs", rs_struct, ExUnit.value.rs_num-1, 0)
+            var cdb = cyclix_gen.global("genexu_" + ExUnit.value.name + "_cdb", cdb_struct, ExUnit.value.exu_num-1, 0)
         }
 
         cyclix_gen.end()
