@@ -386,6 +386,16 @@ class VivadoCppWriter(module_in : module) {
 
         println("done")
 
+        for (hw_struct in mod.hw_structs) {
+            if (hw_struct.value.IsInInterface == false) {
+                wrFileModule.write("typedef struct {\n")
+                for (structvar in hw_struct.value) {
+                    export_structvar("\t", "", structvar, ";\n", wrFileModule)
+                }
+                wrFileModule.write("} " + hw_struct.value.name + ";\n\n")
+            }
+        }
+
         tab_Counter++
 
         // globals

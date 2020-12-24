@@ -402,6 +402,17 @@ class SvWriter(module_in : module) {
 
         println("done")
 
+        for (hw_struct in mod.hw_structs) {
+            if (hw_struct.value.IsInInterface == false) {
+                wrFileModule.write("typedef struct packed {\n")
+                for (structvar in hw_struct.value) {
+                    export_structvar("\t", "logic ", ";\n", structvar, wrFileModule)
+                }
+                wrFileModule.write("} " + hw_struct.value.name + ";\n\n")
+            }
+        }
+        wrFileModule.write("\n")
+
         tab_Counter++
 
         println("Exporting combinationals...")

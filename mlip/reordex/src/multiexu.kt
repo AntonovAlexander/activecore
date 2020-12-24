@@ -13,7 +13,8 @@ import hwast.*
 open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int) : hw_astc_stdif() {
 
     val name = name_in
-    val mem_addr_width = hwast.GetWidthToContain(mem_size_in)
+    val mem_size = mem_size_in
+    val mem_addr_width = GetWidthToContain(mem_size_in)
     val mem_data_width = mem_data_width_in
 
     override var GenNamePrefix   = "reordex"
@@ -23,9 +24,9 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
 
     var ExecUnits  = mutableMapOf<String, hw_exec_unit>()
 
-    fun exec_unit(name_in : String, delay : Int) : hw_exec_unit {
+    fun add_exu(name_in : String, exu_num_in: Int, stage_num_in: Int, rs_num_in: Int) : hw_exec_unit {
         if (FROZEN_FLAG) ERROR("Failed to add stage " + name_in + ": ASTC frozen")
-        var new_exec_unit = hw_exec_unit(name_in, this)
+        var new_exec_unit = hw_exec_unit(name_in, exu_num_in, stage_num_in, rs_num_in, this)
         if (ExecUnits.put(new_exec_unit.name, new_exec_unit) != null) {
             ERROR("Stage addition problem!")
         }
@@ -257,7 +258,7 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
         cmd_req_struct.addu("rf_we",       0,  0, "0")
         cmd_req_struct.addu("rf_addr",    mem_addr_width-1, 0, "0")
         cmd_req_struct.addu("rf_wdata",    mem_data_width-1, 0, "0")
-        cmd_req_struct.addu("fu_id",    hwast.GetWidthToContain(ExecUnits.size)-1, 0, "0")
+        cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size)-1, 0, "0")
         cmd_req_struct.addu("fu_rs0",    mem_addr_width-1, 0, "0")
         cmd_req_struct.addu("fu_rs1",    mem_addr_width-1, 0, "0")
         cmd_req_struct.addu("fu_rd",    mem_addr_width-1, 0, "0")
@@ -265,6 +266,27 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
         var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(mem_data_width-1, 0)))
 
         // TODO: memory interface?
+
+        var MAX_INSTR_NUM = mem_size
+        for (ExecUnit in ExecUnits) {
+            MAX_INSTR_NUM += (ExecUnit.value.exu_num * ExecUnit.value.stage_num) + ExecUnit.value.rs_num
+        }
+
+        val TAG_WIDTH = GetWidthToContain(MAX_INSTR_NUM)
+
+        var uop_struct = cyclix_gen.add_struct(name + "uop_struct")
+        uop_struct.addu("enb",     0, 0, "0")
+        uop_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
+        uop_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
+        uop_struct.addu("rd_wdata",     mem_data_width-1, 0, "0")
+        uop_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
+
+        var rs_struct = cyclix_gen.add_struct(name + "rs_struct")
+        rs_struct.addu("enb",     0, 0, "0")
+        rs_struct.addu("rs0_ready",     0, 0, "0")
+        rs_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
+        rs_struct.addu("rs1_ready",     0, 0, "0")
+        rs_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
 
         cyclix_gen.end()
         MSG(DEBUG_FLAG, "Translating to cyclix: complete")

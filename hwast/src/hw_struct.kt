@@ -52,7 +52,16 @@ open class hw_structvar(name_in: String, vartype_in : hw_type, defval_in : Strin
 // container for structs
 class hw_struct(name_in: String) : ArrayList<hw_structvar>() {
     var name = name_in
-    open var IsInInterface = false
+    var IsInInterface = false
+
+    fun MarkStructInterface() {
+        IsInInterface = true
+        for (structvar in this) {
+            if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                structvar.vartype.src_struct.MarkStructInterface()
+            }
+        }
+    }
 
     fun add(name_in: String, vartype_in : hw_type, defval : String) {
         add(hw_structvar(name_in, vartype_in, defval))

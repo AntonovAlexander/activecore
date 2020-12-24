@@ -30,7 +30,7 @@ class ex_unit(name_in : String) : reordex.multiexu(name_in, 32, 32) {
     var alu_OF          = ulocal("alu_OF", 0, 0, "0")
     var alu_overflow    = ulocal("alu_overflow", 0, 0, "0")
 
-    var EU_INTEGER = exec_unit("INTEGER", 3)
+    var EU_INTEGER = add_exu("INTEGER", 1, 3, 4)
 
     init {
         EU_INTEGER.begin()

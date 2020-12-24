@@ -161,13 +161,6 @@ open class module(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
-    fun end() {
-        for (genvar in proc.genvars) {
-            genvar.name = GetGenName("var")
-            add_local(genvar)
-        }
-    }
-
     fun validate() {
         for (wrvar in wrvars) {
             if (!wrvar.value.write_done) WARNING("signal " + wrvar.value.name + " is not initialized")
@@ -177,6 +170,30 @@ open class module(name_in : String) : hw_astc_stdif() {
         }
     }
 
+    fun end() {
+        for (genvar in proc.genvars) {
+            genvar.name = GetGenName("var")
+            add_local(genvar)
+        }
+        for (port in Ports) {
+            if (port.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                port.vartype.src_struct.MarkStructInterface()
+            }
+        }
+        for (fifo in fifo_ins) {
+            if (fifo.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                fifo.vartype.src_struct.MarkStructInterface()
+            }
+        }
+        for (fifo in fifo_outs) {
+            if (fifo.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                fifo.vartype.src_struct.MarkStructInterface()
+            }
+        }
+        validate()
+        freeze()
+    }
+
     fun export_to_rtl() : rtl.module {
 
         println("###########################################")
@@ -184,7 +201,6 @@ open class module(name_in : String) : hw_astc_stdif() {
         println("###########################################")
 
         validate()
-        freeze()
 
         var rtl_generator = RtlGenerator(this)
         var rtl_gen = rtl_generator.generate()
