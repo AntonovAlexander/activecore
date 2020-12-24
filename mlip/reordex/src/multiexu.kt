@@ -295,9 +295,48 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
         cdb_struct.addu("tag",     TAG_WIDTH-1, 0, "0")
         cdb_struct.addu("wdata",     mem_data_width-1, 0, "0")
 
+        var TranslateInfo = __TranslateInfo()
+
         for (ExUnit in ExecUnits) {
-            var rs = cyclix_gen.global("genexu_" + ExUnit.value.name + "_rs", rs_struct, ExUnit.value.rs_num-1, 0)
-            var cdb = cyclix_gen.global("genexu_" + ExUnit.value.name + "_cdb", cdb_struct, ExUnit.value.exu_num-1, 0)
+            var exu_info = __exu_info(
+                cyclix_gen.global("genexu_" + ExUnit.value.name + "_rs", rs_struct, ExUnit.value.rs_num-1, 0),
+                cyclix_gen.global("genexu_" + ExUnit.value.name + "_cdb", cdb_struct, ExUnit.value.exu_num-1, 0)
+            )
+            TranslateInfo.exu_assocs.put(ExUnit.value, exu_info)
+        }
+
+        // broadcasting CDB data to RSs
+        for (exu_cdb in TranslateInfo.exu_assocs) {
+            for (exu_cdb_inst_idx in 0 until exu_cdb.key.exu_num) {
+                var exu_cdb_inst = cyclix_gen.indexed(exu_cdb.value.cdb, exu_cdb_inst_idx)
+                exu_cdb_inst.DisplayType()
+                cyclix_gen.begif(cyclix_gen.subStruct(exu_cdb_inst, "enb"))
+                run {
+                    /*
+                    for (exu_rs in TranslateInfo.exu_assocs) {
+                        for (exu_rs_inst_idx in 0 until exu_cdb.key.rs_num) {
+                            var exu_rs_inst = cyclix_gen.indexed(exu_rs.value.rs, exu_rs_inst_idx)
+                            cyclix_gen.begif(!cyclix_gen.subStruct(exu_rs_inst, "rs0_ready"))
+                            run {
+
+                                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(exu_rs_inst, "rs0_tag"), cyclix_gen.subStruct(exu_cdb_inst, "tag")))
+                                run {
+                                    var rs0_ready_frac = hw_fractions()
+                                    rs0_ready_frac.add(hw_fraction_C(exu_rs_inst_idx))
+                                    rs0_ready_frac.add(hw_fraction_SubStruct("rs0_ready"))
+
+                                    var rs0_rdata_frac = hw_fractions()
+                                    rs0_rdata_frac.add(hw_fraction_C(exu_rs_inst_idx))
+                                    rs0_rdata_frac.add(hw_fraction_SubStruct("rs0_rdata"))
+
+                                    cyclix_gen.assign(rs0_rdata_frac, exu_rs.value.rs, cyclix_gen.subStruct(exu_cdb_inst, "wdata"))
+                                }; endif()
+                            }; endif()
+                        }
+                    }
+                   */
+                }; endif()
+            }
         }
 
         cyclix_gen.end()

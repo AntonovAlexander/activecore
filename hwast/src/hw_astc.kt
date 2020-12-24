@@ -255,9 +255,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
                 gen_dim.add(0, hw_dim_range_static(0, 0))
             }
 
-            var curVarType: VAR_TYPE
+            var curVarType = VAR_TYPE.UNSIGNED
             if (params[0].type == PARAM_TYPE.VAR) curVarType = (params[0] as hw_var).vartype.VarType
-            else curVarType = VAR_TYPE.UNSIGNED
 
             return hw_var(GetGenName("var"), curVarType, gen_dim, "0")
         } else if ((opcode == OP2_ARITH_ADD)
@@ -291,7 +290,11 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
             var gendim = op2_gen_dimensions(opcode, params[0].GetDimensions(), params[1].GetDimensions())
 
+            // by default: unsigned
             var curVarType = VAR_TYPE.UNSIGNED
+            var curStruct = DUMMY_STRUCT
+
+            // if any operand for arith - signed
             if ((opcode == OP2_ARITH_ADD)
                     || (opcode == OP2_ARITH_SUB)
                     || (opcode == OP2_ARITH_MUL)
@@ -307,7 +310,17 @@ open class hw_astc() : ArrayList<hw_exec>() {
                 }
             }
 
-            return hw_var(GetGenName("var"), curVarType, gendim, "0")
+            // if indexed of struct array - assert struct
+            if (opcode == OP2_INDEXED) {
+                if (params[0].type == PARAM_TYPE.VAR) {
+                    if ((params[0] as hw_var).vartype.VarType == VAR_TYPE.STRUCTURED) {
+                        curVarType = VAR_TYPE.STRUCTURED
+                        curStruct = (params[0] as hw_var).vartype.src_struct
+                    }
+                }
+            }
+
+            return hw_var(GetGenName("var"), hw_type(curVarType, curStruct, gendim), "0")
         } else if (opcode == OP3_RANGED) {
             if (params.size != 3) ERROR("params incorrect for operation " + opcode.default_string + " - number of params: " + params.size + ", expected: 3")
             if ((params[0].GetDimensions().size != 1) || (params[1].GetDimensions().size != 1) || (params[2].GetDimensions().size != 1))
@@ -752,7 +765,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     fun get_subStruct_type(src: hw_var, subStruct_name: String): hw_type {
 
         if (!src.vartype.dimensions.isSingle()) ERROR("Attempting to take substruct of array")
-        if (src.vartype.VarType != VAR_TYPE.STRUCTURED) ERROR("Attempting to take substruct non-structured variable")
+        if (src.vartype.VarType != VAR_TYPE.STRUCTURED) ERROR("Attempting to take substruct non-structured variable " + src.name + " (substruct: " + subStruct_name + ")")
 
         var structvar_found = false
         for (structvar in src.vartype.src_struct)

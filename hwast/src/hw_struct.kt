@@ -30,6 +30,7 @@ data class hw_type(var VarType : VAR_TYPE, var src_struct: hw_struct, var dimens
     fun Print() {
         if (VarType == VAR_TYPE.STRUCTURED) println("Vartype: structured, src_struct: " + src_struct.name)
         else println("Vartype: unstructured")
+        dimensions.Print()
     }
 }
 
@@ -47,6 +48,12 @@ open class hw_structvar(name_in: String, vartype_in : hw_type, defval_in : Strin
     constructor(name_in: String, VarType_in : VAR_TYPE, msb: Int, lsb: Int, defval : String) : this(name_in, hw_type(VarType_in, msb, lsb), defval)
     constructor(name_in: String, VarType_in : VAR_TYPE, defval : String) : this(name_in, hw_type(VarType_in, hw_dim_static(defval)), defval)
     constructor(name_in: String, src_struct_in : hw_struct) : this(name_in, hw_type(src_struct_in), "0")
+
+    fun DisplayType() {
+        print("#### Variable: " + name + " ####\n")
+        vartype.Print()
+        print("########################\n")
+    }
 }
 
 // container for structs

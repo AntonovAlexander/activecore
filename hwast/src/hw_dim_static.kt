@@ -46,4 +46,12 @@ class hw_dim_static() : ArrayList<hw_dim_range_static>() {
         }
         return false;
     }
+
+    fun Print() {
+        print("dimensions:")
+        for (dim_range_static in this) {
+            print(" [" + dim_range_static.msb + ":" + dim_range_static.lsb + "]")
+        }
+        print("\n")
+    }
 }
