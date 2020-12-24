@@ -288,6 +288,10 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
         rs_struct.addu("rs1_ready",     0, 0, "0")
         rs_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
 
+        for (ExUnit in ExecUnits) {
+            var rs = cyclix_gen.global("genexu_" + ExUnit.value.name + "_rs", rs_struct, ExUnit.value.rs_num-1, 0)
+        }
+
         cyclix_gen.end()
         MSG(DEBUG_FLAG, "Translating to cyclix: complete")
         return cyclix_gen

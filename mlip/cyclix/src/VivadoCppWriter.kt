@@ -401,7 +401,7 @@ class VivadoCppWriter(module_in : module) {
         // globals
         println("Exporting globals...")
         for (global in mod.globals) {
-            export_structvar("\t", "", global, ";\n", wrFileModule)
+            export_structvar("", "", global, ";\n", wrFileModule)
         }
         wrFileModule.write("\n")
         println("done")

@@ -113,8 +113,14 @@ open class module(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
-    fun global(name : String, src_struct_in : hw_struct ,dimensions : hw_dim_static) : hw_var {
+    fun global(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_var {
         var ret_var = hw_var(name, src_struct_in, dimensions)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun global(name : String, src_struct_in : hw_struct, msb: Int, lsb: Int) : hw_var {
+        var ret_var = hw_var(name, src_struct_in, msb, lsb)
         add_global(ret_var)
         return ret_var
     }
