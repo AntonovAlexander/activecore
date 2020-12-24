@@ -337,12 +337,14 @@ class SvWriter(module_in : module) {
         wrFileInterface.write("`define __" + mod.name +"_h_\n")
         wrFileInterface.write("\n")
 
-        for (hw_struct in mod.hw_if_structs) {
-            wrFileInterface.write("typedef struct packed {\n")
-            for (structvar in hw_struct) {
-                export_structvar("\t", "logic ", ";\n", structvar, wrFileInterface)
+        for (hw_struct in mod.hw_structs) {
+            if (hw_struct.value.IsInInterface) {
+                wrFileInterface.write("typedef struct packed {\n")
+                for (structvar in hw_struct.value) {
+                    export_structvar("\t", "logic ", ";\n", structvar, wrFileInterface)
+                }
+                wrFileInterface.write("} " + hw_struct.value.name + ";\n\n")
             }
-            wrFileInterface.write("} " + hw_struct.name + ";\n\n")
         }
         wrFileInterface.write("`endif\n")
         wrFileInterface.close()

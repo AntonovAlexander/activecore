@@ -543,14 +543,30 @@ open class module(name_in : String) : hw_astc() {
         println("Validation complete!")
     }
 
+    fun MarkStructInterface(struct : hw_struct) {
+        struct.IsInInterface = true
+        for (structvar in struct) {
+            if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                MarkStructInterface(structvar.vartype.src_struct)
+            }
+        }
+    }
+
+    fun end() {
+        for (hw_struct in hw_structs) {
+            MarkStructInterface(hw_struct.value)
+        }
+        validate()
+        freeze()
+    }
+
     fun export_to_sv(pathname : String) {
 
         println("############################################")
         println("#### rtl: starting SystemVerilog export ####")
         println("############################################")
 
-        validate()
-        freeze()
+        end()
 
         var writer = SvWriter(this)
         writer.write(pathname)

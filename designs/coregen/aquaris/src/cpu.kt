@@ -78,7 +78,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
 
 
     //// signals ////
-    var busreq_mem_struct = add_if_struct(name + "_busreq_mem_struct")
+    var busreq_mem_struct = add_struct(name + "_busreq_mem_struct")
 
     var reset_active    = ulocal("reset_active", 0, 0, "0")
     var curinstr_addr   = ulocal("curinstr_addr", 31, 0, "0")

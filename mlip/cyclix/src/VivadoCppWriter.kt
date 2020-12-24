@@ -359,12 +359,14 @@ class VivadoCppWriter(module_in : module) {
 
         println("Exporting structs...")
 
-        for (hw_struct in mod.hw_if_structs) {
-            wrFileInterface.write("typedef struct {\n")
-            for (structvar in hw_struct) {
-                export_structvar("\t", "", structvar, ";\n", wrFileInterface)
+        for (hw_struct in mod.hw_structs) {
+            if (hw_struct.value.IsInInterface) {
+                wrFileInterface.write("typedef struct {\n")
+                for (structvar in hw_struct.value) {
+                    export_structvar("\t", "", structvar, ";\n", wrFileInterface)
+                }
+                wrFileInterface.write("} " + hw_struct.value.name + ";\n\n")
             }
-            wrFileInterface.write("} " + hw_struct.name + ";\n\n")
         }
         wrFileInterface.write("#endif\n")
         wrFileInterface.close()

@@ -252,7 +252,7 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
 
         //// Generating interfaces ////
         // cmd (sequential instruction stream) //
-        var cmd_req_struct = cyclix_gen.add_if_struct(name + "_cmd_req_struct")
+        var cmd_req_struct = cyclix_gen.add_struct(name + "_cmd_req_struct")
         cmd_req_struct.addu("exec",     0, 0, "0")
         cmd_req_struct.addu("rf_we",       0,  0, "0")
         cmd_req_struct.addu("rf_addr",    mem_addr_width-1, 0, "0")

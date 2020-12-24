@@ -23,8 +23,6 @@ open class hw_astc() : ArrayList<hw_exec>() {
     protected var FROZEN_FLAG = false
 
     var hw_structs          = mutableMapOf<String, hw_struct>()
-    var hw_if_structs       = ArrayList<hw_struct>()
-    var hw_private_structs  = ArrayList<hw_struct>()
 
     fun WARNING(err_string : String) {
         println("ActiveCore (" + GenNamePrefix + ") WARNING: " + err_string)
@@ -50,35 +48,18 @@ open class hw_astc() : ArrayList<hw_exec>() {
         FROZEN_FLAG = true
     }
 
-    fun add_if_struct(new_struct : hw_struct) {
-        if (FROZEN_FLAG) ERROR("Failed to add if struct " + new_struct.name + ": ASTC frozen")
-        if (hw_structs.containsKey(new_struct.name)) {
-            ERROR("Name conflict for struct: " + new_struct.name)
-        } else {
-            hw_structs.put(new_struct.name, new_struct)
-            hw_if_structs.add(new_struct)
-        }
-    }
-
-    fun add_if_struct(new_struct_name : String) : hw_struct {
-        var new_struct = hw_struct(new_struct_name)
-        add_if_struct(new_struct)
-        return new_struct
-    }
-
-    fun add_private_struct(new_struct : hw_struct) {
+    fun add_struct(new_struct : hw_struct) {
         if (FROZEN_FLAG) ERROR("Failed to add private struct " + new_struct.name + ": ASTC frozen")
         if (hw_structs.containsKey(new_struct.name)) {
             ERROR("Name conflict for struct: " + new_struct.name)
         } else {
             hw_structs.put(new_struct.name, new_struct)
-            hw_private_structs.add(new_struct)
         }
     }
 
-    fun add_private_struct(new_struct_name : String) : hw_struct {
+    fun add_struct(new_struct_name : String) : hw_struct {
         var new_struct = hw_struct(new_struct_name)
-        add_private_struct(new_struct)
+        add_struct(new_struct)
         return new_struct
     }
 

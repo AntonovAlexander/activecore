@@ -230,12 +230,8 @@ class RtlGenerator(module_in : module) {
         var rtl_gen = rtl.module(mod.name)
 
         // Adding structs
-        for (if_struct in mod.hw_if_structs) {
-            rtl_gen.add_if_struct(if_struct)
-        }
-
-        for (private_struct in mod.hw_private_structs) {
-            rtl_gen.add_private_struct(private_struct)
+        for (struct in mod.hw_structs) {
+            rtl_gen.add_struct(struct.value)
         }
 
         // Generating ports
@@ -286,6 +282,8 @@ class RtlGenerator(module_in : module) {
             }
 
         }; rtl_gen.cproc_end()
+
+        rtl_gen.end()
 
         return rtl_gen
     }
