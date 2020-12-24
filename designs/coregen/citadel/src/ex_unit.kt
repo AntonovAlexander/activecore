@@ -32,7 +32,7 @@ class ex_unit(name_in : String) : reordex.multiexu(name_in, 32, 32) {
 
     var EXU_INTEGER = add_exu("INTEGER", 2, 3, 4)
     var EXU_MUL = add_exu("MUL", 1, 3, 2)
-    var EXU_DIV = add_exu("DIV", 1, 10, 2)
+    var EXU_DIV = add_exu("DIV", 1, 10, 1)
 
     init {
         EXU_INTEGER.begin()

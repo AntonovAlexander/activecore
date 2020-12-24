@@ -312,7 +312,6 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
                 exu_cdb_inst.DisplayType()
                 cyclix_gen.begif(cyclix_gen.subStruct(exu_cdb_inst, "enb"))
                 run {
-                    /*
                     for (exu_rs in TranslateInfo.exu_assocs) {
                         for (exu_rs_inst_idx in 0 until exu_cdb.key.rs_num) {
                             var exu_rs_inst = cyclix_gen.indexed(exu_rs.value.rs, exu_rs_inst_idx)
@@ -330,12 +329,27 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
                                     rs0_rdata_frac.add(hw_fraction_SubStruct("rs0_rdata"))
 
                                     cyclix_gen.assign(rs0_rdata_frac, exu_rs.value.rs, cyclix_gen.subStruct(exu_cdb_inst, "wdata"))
-                                }; endif()
-                            }; endif()
+                                    cyclix_gen.assign(rs0_ready_frac, exu_rs.value.rs, 1)
+                                }; cyclix_gen.endif()
+
+                                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(exu_rs_inst, "rs1_tag"), cyclix_gen.subStruct(exu_cdb_inst, "tag")))
+                                run {
+                                    var rs1_ready_frac = hw_fractions()
+                                    rs1_ready_frac.add(hw_fraction_C(exu_rs_inst_idx))
+                                    rs1_ready_frac.add(hw_fraction_SubStruct("rs1_ready"))
+
+                                    var rs1_rdata_frac = hw_fractions()
+                                    rs1_rdata_frac.add(hw_fraction_C(exu_rs_inst_idx))
+                                    rs1_rdata_frac.add(hw_fraction_SubStruct("rs1_rdata"))
+
+                                    cyclix_gen.assign(rs1_rdata_frac, exu_rs.value.rs, cyclix_gen.subStruct(exu_cdb_inst, "wdata"))
+                                    cyclix_gen.assign(rs1_ready_frac, exu_rs.value.rs, 1)
+                                }; cyclix_gen.endif()
+
+                            }; cyclix_gen.endif()
                         }
                     }
-                   */
-                }; endif()
+                }; cyclix_gen.endif()
             }
         }
 
