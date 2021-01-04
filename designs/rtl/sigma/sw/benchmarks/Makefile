@@ -16,6 +16,7 @@ src_dir = .
 
 bmarks = \
 	heartbeat_variable \
+	md5 \
 	timer_test \
 	mul_sw \
 	irq_counter \
