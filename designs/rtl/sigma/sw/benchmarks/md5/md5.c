@@ -2,10 +2,8 @@
 #include <string.h>
 
 #include "io.h"
+#include "md5.h"
 
-typedef struct {
-	unsigned int v[4];
-} md5s;
 
 typedef union uwb {
 	unsigned int w;
@@ -183,17 +181,4 @@ md5s md5(const char* input, int length)
 	}
 
 	return packed;
-}
-
-int main(int argc, char* argv[])
-{
-	char* testStr = "Hello World!";
-	int length = strlen(testStr);
-	md5s result = md5(testStr, length);
-	
-	for ( int i = 0; i < 4; ++i ){
-		io_buf_uint[i] = result.v[i];
-	}
-        
-    while (1) {}
 }
