@@ -46,6 +46,10 @@ sys.path.append('benchmarks/crc32')
 import hw_test_crc32
 from hw_test_crc32 import *
 
+sys.path.append('benchmarks/md5')
+import hw_test_md5
+from hw_test_md5 import *
+
 sys.path.append('benchmarks/bootloader')
 import hw_test_bootloader
 from hw_test_bootloader import *
@@ -142,6 +146,11 @@ class sigma:
             test_fail_counter = test_fail_counter + 1
         
         if (hw_test_crc32(self, 'benchmarks/crc32.riscv') == 1):
+            test_succ_counter = test_succ_counter + 1
+        else:
+            test_fail_counter = test_fail_counter + 1
+        
+        if (hw_test_md5(self, 'benchmarks/md5.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1

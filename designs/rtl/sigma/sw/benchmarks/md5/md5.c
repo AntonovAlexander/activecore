@@ -187,17 +187,13 @@ md5s md5(const char* input, int length)
 
 int main(int argc, char* argv[])
 {
-   
-    IO_LED = 0xF0F0;
-	char* testStr = "";
+	char* testStr = "Hello World!";
 	int length = strlen(testStr);
 	md5s result = md5(testStr, length);
 	
 	for ( int i = 0; i < 4; ++i ){
-		IO_LED = result.v[i];
+		io_buf_uint[i] = result.v[i];
 	}
-	
-	IO_LED = 0x0F0F;
         
     while (1) {}
 }
