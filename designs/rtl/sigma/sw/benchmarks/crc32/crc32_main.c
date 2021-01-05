@@ -1,7 +1,6 @@
-#include <stdio.h>
+#include "io.h"
 #include "crc32.h" 
 
-#include "io.h"
 
 int main(int argc, char* argv[])
 {

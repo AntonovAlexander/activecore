@@ -1,7 +1,4 @@
-#include <stdio.h>
 #include <string.h>
-
-#include "io.h"
 #include "md5.h"
 
 
@@ -10,7 +7,7 @@ typedef union uwb {
 	unsigned char b[4];
 } MD5union;
 	
-unsigned int concat(char a, char b, char c, char d) {	
+unsigned int concat(char a, char b, char c, char d) {
 
 
 	MD5union un;
@@ -127,34 +124,27 @@ md5s md5(const char* input, int length)
 		for (int i = 0; i < 64; ++i) {
 			unsigned int F, g;
 			if (0 <= i && i <= 15) {
-				//printf("1 %04x %04x %04x %04x\n", A, B, C, D);
 				F = (B & C) | (~B & D);
 				g = i;
 			}
 			else if (16 <= i && i <= 31) {
-				//printf("2 %04x %04x %04x %04x\n", A, B, C, D);
 				F = (D & B) | ((~D) & C);
 				g = (5 * i + 1) % 16;
 			}
 			else if (32 <= i && i <= 47) {
-				//printf("3 %04x %04x %04x %04x\n", A, B, C, D);
 				F = B ^ C ^ D;
 				g = (3 * i + 5) % 16;
 			}
 			else if (48 <= i && i <= 63) {
-				//printf("4 %04x %04x %04x %04x\n", A, B, C, D);
 				F = C ^ (B | (~D));
 				g = (7 * i) % 16;
 			}
 			// Be wary of the below definitions of a,b,c,d
-			//std::cout << std::hex << "THIS - " << A << ' ' << F << ' ' << K[i] << ' ' << M[g] << ' ' << g << std::endl;
 			F = F + A + K[i] + M[g];  // M[g] must be a 32-bits block
 			A = D;
 			D = C;
 			C = B;
-			//std::cout << std::hex << "TEST - " << F << ' ' << s[i] << ' ' << leftrotate(F, s[i]) << std::endl;
 			B = B + leftrotate(F, s[i]);
-			//std::cout << std::hex << A << ' ' << B << ' ' << C << ' ' << D << std::endl;
 		}
 		// Add this chunk's hash to result so far:
 		a0 = a0 + A;
