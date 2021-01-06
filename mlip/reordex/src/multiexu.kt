@@ -320,6 +320,7 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
         }
 
         // issuing operations from ROB to FUs
+        MSG("Translating: issuing operations from ROB to FUs")
         var rob_iter = cyclix_gen.begforall(rob)
         run {
             cyclix_gen.begif(cyclix_gen.subStruct(rob_iter.iter_elem, "enb"))
@@ -327,46 +328,68 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                 cyclix_gen.begif(cyclix_gen.band(cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_ready"), cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_ready")))
                 run {
                     // asserting op to FU req bus
+                    var req_ndone = cyclix_gen.ulocal(GetGenName("req_ndone"), 0, 0, "0")
+                    cyclix_gen.assign(req_ndone, 1)
+                    var fu_id = 0
                     for (exu_assoc in TranslateInfo.exu_assocs) {
-                        var req_bus_iter = cyclix_gen.begforall(exu_assoc.value.req_bus)
+                        cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "fu_id"), fu_id))
                         run {
-                            var req_enb_frac = hw_fractions()
-                            req_enb_frac.add(hw_fraction_V(req_bus_iter.iter_num))
-                            req_enb_frac.add(hw_fraction_SubStruct("enb"))
-                            cyclix_gen.assign(req_enb_frac, exu_assoc.value.req_bus, 1)
-
-                            var req_opcode_frac = hw_fractions()
-                            req_opcode_frac.add(hw_fraction_V(req_bus_iter.iter_num))
-                            req_opcode_frac.add(hw_fraction_SubStruct("opcode"))
-                            cyclix_gen.assign(req_opcode_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "opcode"))
-
-                            var req_rs0_rdata_frac = hw_fractions()
-                            req_rs0_rdata_frac.add(hw_fraction_V(req_bus_iter.iter_num))
-                            req_rs0_rdata_frac.add(hw_fraction_SubStruct("rs0_rdata"))
-                            cyclix_gen.assign(req_rs0_rdata_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdata"))
-
-                            var req_rs1_rdata_frac = hw_fractions()
-                            req_rs1_rdata_frac.add(hw_fraction_V(req_bus_iter.iter_num))
-                            req_rs1_rdata_frac.add(hw_fraction_SubStruct("rs1_rdata"))
-                            cyclix_gen.assign(req_rs1_rdata_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdata"))
-
-                            var req_rd_tag_frac = hw_fractions()
-                            req_rd_tag_frac.add(hw_fraction_V(req_bus_iter.iter_num))
-                            req_rd_tag_frac.add(hw_fraction_SubStruct("rd_tag"))
-                            cyclix_gen.assign(req_rd_tag_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"))
-
-                            cyclix_gen.begif(cyclix_gen.subStruct(req_bus_iter.iter_elem, "rdy"))
+                            var req_bus_iter = cyclix_gen.begforall(exu_assoc.value.req_bus)
                             run {
-                                // clearing op from ROB
-                                // moving ops
-                            }; cyclix_gen.endif()
-                        }; cyclix_gen.endwhile()
+                                var req_enb_frac = hw_fractions()
+                                req_enb_frac.add(hw_fraction_V(req_bus_iter.iter_num))
+                                req_enb_frac.add(hw_fraction_SubStruct("enb"))
+                                cyclix_gen.assign(req_enb_frac, exu_assoc.value.req_bus, req_ndone)
+
+                                var req_opcode_frac = hw_fractions()
+                                req_opcode_frac.add(hw_fraction_V(req_bus_iter.iter_num))
+                                req_opcode_frac.add(hw_fraction_SubStruct("opcode"))
+                                cyclix_gen.assign(req_opcode_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "opcode"))
+
+                                var req_rs0_rdata_frac = hw_fractions()
+                                req_rs0_rdata_frac.add(hw_fraction_V(req_bus_iter.iter_num))
+                                req_rs0_rdata_frac.add(hw_fraction_SubStruct("rs0_rdata"))
+                                cyclix_gen.assign(req_rs0_rdata_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdata"))
+
+                                var req_rs1_rdata_frac = hw_fractions()
+                                req_rs1_rdata_frac.add(hw_fraction_V(req_bus_iter.iter_num))
+                                req_rs1_rdata_frac.add(hw_fraction_SubStruct("rs1_rdata"))
+                                cyclix_gen.assign(req_rs1_rdata_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdata"))
+
+                                var req_rd_tag_frac = hw_fractions()
+                                req_rd_tag_frac.add(hw_fraction_V(req_bus_iter.iter_num))
+                                req_rd_tag_frac.add(hw_fraction_SubStruct("rd_tag"))
+                                cyclix_gen.assign(req_rd_tag_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"))
+
+                                cyclix_gen.begif(cyclix_gen.band(req_ndone, cyclix_gen.subStruct(req_bus_iter.iter_elem, "rdy")))
+                                run {
+                                    cyclix_gen.assign(req_ndone, 0)
+
+                                    // shifting ops
+                                    var rob_shift_index_next = cyclix_gen.ulocal(GetGenName("rob_shift_index"), GetWidthToContain(rob.vartype.dimensions.last().GetWidth())-1, 0, "0")
+                                    var rob_shift_iter = cyclix_gen.begforrange(rob, hw_imm(rob.vartype.dimensions.last().lsb), hw_imm(rob.vartype.dimensions.last().msb))
+                                    run {
+                                        cyclix_gen.add_gen(rob_shift_index_next, rob_shift_iter.iter_num, 1)
+
+                                        // writing op
+                                        var rob_rd_frac = hw_fractions()
+                                        rob_rd_frac.add(hw_fraction_V(rob_shift_iter.iter_num))
+                                        cyclix_gen.assign(rob_rd_frac, rob, cyclix_gen.indexed(rob, rob_shift_index_next))
+
+                                        cyclix_gen.assign(rob_shift_iter.iter_num, rob_shift_index_next)
+                                    }; cyclix_gen.endwhile()
+
+                                }; cyclix_gen.endif()
+                            }; cyclix_gen.endwhile()
+                        }; cyclix_gen.endif()
+                        fu_id++
                     }
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
         }; cyclix_gen.endwhile()
 
         // broadcasting FU results to ROB
+        MSG("Translating: broadcasting FU results to ROB")
         for (exu_assoc in TranslateInfo.exu_assocs) {
             var resp_bus_iter = cyclix_gen.begforall(exu_assoc.value.resp_bus)
             run {

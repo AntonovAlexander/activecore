@@ -1229,7 +1229,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     data class for_loop_iteration(var iter_num : hw_var, var iter_elem: hw_var)
 
-    fun begforrange(elements : hw_var, start: Int, end: Int) : for_loop_iteration {
+    fun begforrange(elements : hw_var, start: hw_param, end: hw_param) : for_loop_iteration {
+
         var new_expr = hw_exec(OP1_WHILE)
 
         val iterations = elements.GetWidth()
@@ -1253,7 +1254,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun begforall(elements : hw_var) : for_loop_iteration {
-        return begforrange(elements, elements.vartype.dimensions.last().lsb, elements.vartype.dimensions.last().msb)
+        return begforrange(elements, hw_imm(elements.vartype.dimensions.last().lsb), hw_imm(elements.vartype.dimensions.last().msb))
     }
 
     fun begforall(elements : hw_var, depth : Int) : for_loop_iteration {
