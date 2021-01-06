@@ -1227,26 +1227,36 @@ open class hw_astc() : ArrayList<hw_exec>() {
         removeAt(lastIndex)
     }
 
-    data class forall_iteration(var iter_num : hw_var, var iter_elem: hw_var)
+    data class for_loop_iteration(var iter_num : hw_var, var iter_elem: hw_var)
 
-    fun begforall(elements : hw_var) : forall_iteration {
+    fun begforrange(elements : hw_var, start: Int, end: Int) : for_loop_iteration {
         var new_expr = hw_exec(OP1_WHILE)
 
         val iterations = elements.GetWidth()
         val genvar_iter_num = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        assign(genvar_iter_num, start)
         new_expr.AddGenVar(genvar_iter_num)
-        new_expr.AddRdParam(genvar_iter_num)
+
+        val genvar_iter_cont = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
+        assign(genvar_iter_cont, 1)
+        new_expr.AddGenVar(genvar_iter_cont)
+        new_expr.AddRdParam(genvar_iter_cont)
 
         AddExpr(new_expr)
         add(new_expr)
 
         val genvar_iter_elem = indexed(elements, genvar_iter_num)
         add_gen(genvar_iter_num, genvar_iter_num, 1)
+        assign(genvar_iter_cont, leq(genvar_iter_num, end))
 
-        return forall_iteration(genvar_iter_num, genvar_iter_elem)
+        return for_loop_iteration(genvar_iter_num, genvar_iter_elem)
     }
 
-    fun begforall(elements : hw_var, depth : Int) : forall_iteration {
+    fun begforall(elements : hw_var) : for_loop_iteration {
+        return begforrange(elements, elements.vartype.dimensions.last().lsb, elements.vartype.dimensions.last().msb)
+    }
+
+    fun begforall(elements : hw_var, depth : Int) : for_loop_iteration {
 
         if (depth > 1) {
             // TODO
