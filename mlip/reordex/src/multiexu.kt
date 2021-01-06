@@ -277,6 +277,7 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
 
         var uop_struct = cyclix_gen.add_struct("uop_struct")
         uop_struct.addu("enb",     0, 0, "0")
+        uop_struct.addu("opcode",     0, 0, "0")
         uop_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
         uop_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
         uop_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
@@ -284,45 +285,98 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
 
         var rob_struct = cyclix_gen.add_struct("rob_struct")
         rob_struct.addu("enb",     0, 0, "0")
+        rob_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size)-1, 0, "0")
+        rob_struct.addu("opcode",     0, 0, "0")
         rob_struct.addu("rs0_ready",     0, 0, "0")
         rob_struct.addu("rs0_tag",     TAG_WIDTH-1, 0, "0")
         rob_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
         rob_struct.addu("rs1_ready",     0, 0, "0")
         rob_struct.addu("rs1_tag",     TAG_WIDTH-1, 0, "0")
         rob_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
+        rob_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
 
-        var cdb_struct = cyclix_gen.add_struct("cdb_struct")
-        cdb_struct.addu("enb",     0, 0, "0")
-        cdb_struct.addu("tag",     TAG_WIDTH-1, 0, "0")
-        cdb_struct.addu("wdata",     mem_data_width-1, 0, "0")
+        var req_struct = cyclix_gen.add_struct("req_struct")
+        req_struct.addu("enb",     0, 0, "0")
+        req_struct.addu("opcode",     0, 0, "0")
+        req_struct.addu("rdy",     0, 0, "0")
+        req_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
+        req_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
+        req_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
+
+        var resp_struct = cyclix_gen.add_struct("resp_struct")
+        resp_struct.addu("enb",     0, 0, "0")
+        resp_struct.addu("tag",     TAG_WIDTH-1, 0, "0")
+        resp_struct.addu("wdata",     mem_data_width-1, 0, "0")
 
         var TranslateInfo = __TranslateInfo()
 
         var rob = cyclix_gen.global("genexu_" + name + "_rob", rob_struct, rob_size-1, 0)
         for (ExUnit in ExecUnits) {
             var exu_info = __exu_info(
-                cyclix_gen.global("genexu_" + ExUnit.value.name + "_cdb", cdb_struct, ExUnit.value.exu_num-1, 0)
+                cyclix_gen.global("genexu_" + ExUnit.value.name + "_req", req_struct, ExUnit.value.exu_num-1, 0),
+                cyclix_gen.global("genexu_" + ExUnit.value.name + "_resp", resp_struct, ExUnit.value.exu_num-1, 0)
             )
             TranslateInfo.exu_assocs.put(ExUnit.value, exu_info)
         }
 
-        // issuing operations to FUs
+        // issuing operations from ROB to FUs
         var rob_iter = cyclix_gen.begforall(rob)
         run {
+            cyclix_gen.begif(cyclix_gen.subStruct(rob_iter.iter_elem, "enb"))
+            run {
+                cyclix_gen.begif(cyclix_gen.band(cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_ready"), cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_ready")))
+                run {
+                    // asserting op to FU req bus
+                    for (exu_assoc in TranslateInfo.exu_assocs) {
+                        var req_bus_iter = cyclix_gen.begforall(exu_assoc.value.req_bus)
+                        run {
+                            var req_enb_frac = hw_fractions()
+                            req_enb_frac.add(hw_fraction_V(req_bus_iter.iter_num))
+                            req_enb_frac.add(hw_fraction_SubStruct("enb"))
+                            cyclix_gen.assign(req_enb_frac, exu_assoc.value.req_bus, 1)
 
+                            var req_opcode_frac = hw_fractions()
+                            req_opcode_frac.add(hw_fraction_V(req_bus_iter.iter_num))
+                            req_opcode_frac.add(hw_fraction_SubStruct("opcode"))
+                            cyclix_gen.assign(req_opcode_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "opcode"))
+
+                            var req_rs0_rdata_frac = hw_fractions()
+                            req_rs0_rdata_frac.add(hw_fraction_V(req_bus_iter.iter_num))
+                            req_rs0_rdata_frac.add(hw_fraction_SubStruct("rs0_rdata"))
+                            cyclix_gen.assign(req_rs0_rdata_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdata"))
+
+                            var req_rs1_rdata_frac = hw_fractions()
+                            req_rs1_rdata_frac.add(hw_fraction_V(req_bus_iter.iter_num))
+                            req_rs1_rdata_frac.add(hw_fraction_SubStruct("rs1_rdata"))
+                            cyclix_gen.assign(req_rs1_rdata_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdata"))
+
+                            var req_rd_tag_frac = hw_fractions()
+                            req_rd_tag_frac.add(hw_fraction_V(req_bus_iter.iter_num))
+                            req_rd_tag_frac.add(hw_fraction_SubStruct("rd_tag"))
+                            cyclix_gen.assign(req_rd_tag_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"))
+
+                            cyclix_gen.begif(cyclix_gen.subStruct(req_bus_iter.iter_elem, "rdy"))
+                            run {
+                                // clearing op from ROB
+                                // moving ops
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endwhile()
+                    }
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
         }; cyclix_gen.endwhile()
 
-        // broadcasting CDB data to ROB
-        for (exu_cdb in TranslateInfo.exu_assocs) {
-            var cdb_iter = cyclix_gen.begforall(exu_cdb.value.cdb)
+        // broadcasting FU results to ROB
+        for (exu_assoc in TranslateInfo.exu_assocs) {
+            var resp_bus_iter = cyclix_gen.begforall(exu_assoc.value.resp_bus)
             run {
-                cyclix_gen.begif(cyclix_gen.subStruct(cdb_iter.iter_elem, "enb"))
+                cyclix_gen.begif(cyclix_gen.subStruct(resp_bus_iter.iter_elem, "enb"))
                 run {
                     var rob_iter = cyclix_gen.begforall(rob)
                     run {
                         cyclix_gen.begif(!cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_ready"))
                         run {
-                            cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_tag"), cyclix_gen.subStruct(cdb_iter.iter_elem, "tag")))
+                            cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_tag"), cyclix_gen.subStruct(resp_bus_iter.iter_elem, "tag")))
                             run {
                                 // setting rs0 ROB entry ready
                                 var rs0_ready_frac = hw_fractions()
@@ -333,11 +387,11 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                                 rs0_rdata_frac.add(hw_fraction_V(rob_iter.iter_num))
                                 rs0_rdata_frac.add(hw_fraction_SubStruct("rs0_rdata"))
 
-                                cyclix_gen.assign(rs0_rdata_frac, rob, cyclix_gen.subStruct(cdb_iter.iter_elem, "wdata"))
+                                cyclix_gen.assign(rs0_rdata_frac, rob, cyclix_gen.subStruct(resp_bus_iter.iter_elem, "wdata"))
                                 cyclix_gen.assign(rs0_ready_frac, rob, 1)
                             }; cyclix_gen.endif()
 
-                            cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_tag"), cyclix_gen.subStruct(cdb_iter.iter_elem, "tag")))
+                            cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_tag"), cyclix_gen.subStruct(resp_bus_iter.iter_elem, "tag")))
                             run {
                                 // setting rs1 ROB entry ready
                                 var rs1_ready_frac = hw_fractions()
@@ -348,7 +402,7 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                                 rs1_rdata_frac.add(hw_fraction_V(rob_iter.iter_num))
                                 rs1_rdata_frac.add(hw_fraction_SubStruct("rs1_rdata"))
 
-                                cyclix_gen.assign(rs1_rdata_frac, rob, cyclix_gen.subStruct(cdb_iter.iter_elem, "wdata"))
+                                cyclix_gen.assign(rs1_rdata_frac, rob, cyclix_gen.subStruct(resp_bus_iter.iter_elem, "wdata"))
                                 cyclix_gen.assign(rs1_ready_frac, rob, 1)
                             }; cyclix_gen.endif()
 
