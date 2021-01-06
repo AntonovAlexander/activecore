@@ -1226,6 +1226,39 @@ open class hw_astc() : ArrayList<hw_exec>() {
         if (last().opcode != OP1_WHILE) ERROR("endwhile without begwhile!")
         removeAt(lastIndex)
     }
+
+    data class forall_iteration(var iter_num : hw_var, var iter_elem: hw_var)
+
+    fun begforall(elements : hw_var) : forall_iteration {
+        var new_expr = hw_exec(OP1_WHILE)
+
+        val iterations = elements.GetWidth()
+        val genvar_iter_num = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        new_expr.AddGenVar(genvar_iter_num)
+        new_expr.AddRdParam(genvar_iter_num)
+
+        AddExpr(new_expr)
+        add(new_expr)
+
+        val genvar_iter_elem = indexed(elements, genvar_iter_num)
+        add_gen(genvar_iter_num, genvar_iter_num, 1)
+
+        return forall_iteration(genvar_iter_num, genvar_iter_elem)
+    }
+
+    fun begforall(elements : hw_var, depth : Int) : forall_iteration {
+
+        if (depth > 1) {
+            // TODO
+            var new_depth = depth-1
+            ERROR("Deep bigforall not currently supported!")
+            throw Exception()
+        } else {
+            // TODO
+            ERROR("Deep bigforall not currently supported!")
+            throw Exception()
+        }
+    }
 }
 
 open class hw_astc_stdif() : hw_astc() {

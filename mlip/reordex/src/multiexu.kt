@@ -10,12 +10,13 @@ package reordex
 
 import hwast.*
 
-open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int) : hw_astc_stdif() {
+open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int, rob_size_in : Int) : hw_astc_stdif() {
 
     val name = name_in
     val mem_size = mem_size_in
     val mem_addr_width = GetWidthToContain(mem_size_in)
     val mem_data_width = mem_data_width_in
+    val rob_size = rob_size_in
 
     override var GenNamePrefix   = "reordex"
 
@@ -24,9 +25,9 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
 
     var ExecUnits  = mutableMapOf<String, hw_exec_unit>()
 
-    fun add_exu(name_in : String, exu_num_in: Int, stage_num_in: Int, rs_num_in: Int) : hw_exec_unit {
+    fun add_exu(name_in : String, exu_num_in: Int, stage_num_in: Int) : hw_exec_unit {
         if (FROZEN_FLAG) ERROR("Failed to add stage " + name_in + ": ASTC frozen")
-        var new_exec_unit = hw_exec_unit(name_in, exu_num_in, stage_num_in, rs_num_in, this)
+        var new_exec_unit = hw_exec_unit(name_in, exu_num_in, stage_num_in, this)
         if (ExecUnits.put(new_exec_unit.name, new_exec_unit) != null) {
             ERROR("Stage addition problem!")
         }
@@ -267,9 +268,9 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
 
         // TODO: memory interface?
 
-        var MAX_INSTR_NUM = mem_size
+        var MAX_INSTR_NUM = mem_size + rob_size
         for (ExecUnit in ExecUnits) {
-            MAX_INSTR_NUM += (ExecUnit.value.exu_num * ExecUnit.value.stage_num) + ExecUnit.value.rs_num
+            MAX_INSTR_NUM += ExecUnit.value.exu_num * ExecUnit.value.stage_num
         }
 
         val TAG_WIDTH = GetWidthToContain(MAX_INSTR_NUM)
@@ -281,14 +282,14 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
         uop_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
         uop_struct.addu("rd_wdata",     mem_data_width-1, 0, "0")
 
-        var rs_struct = cyclix_gen.add_struct("rs_struct")
-        rs_struct.addu("enb",     0, 0, "0")
-        rs_struct.addu("rs0_ready",     0, 0, "0")
-        rs_struct.addu("rs0_tag",     TAG_WIDTH-1, 0, "0")
-        rs_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
-        rs_struct.addu("rs1_ready",     0, 0, "0")
-        rs_struct.addu("rs1_tag",     TAG_WIDTH-1, 0, "0")
-        rs_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
+        var rob_struct = cyclix_gen.add_struct("rob_struct")
+        rob_struct.addu("enb",     0, 0, "0")
+        rob_struct.addu("rs0_ready",     0, 0, "0")
+        rob_struct.addu("rs0_tag",     TAG_WIDTH-1, 0, "0")
+        rob_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
+        rob_struct.addu("rs1_ready",     0, 0, "0")
+        rob_struct.addu("rs1_tag",     TAG_WIDTH-1, 0, "0")
+        rob_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
 
         var cdb_struct = cyclix_gen.add_struct("cdb_struct")
         cdb_struct.addu("enb",     0, 0, "0")
@@ -297,60 +298,64 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int)
 
         var TranslateInfo = __TranslateInfo()
 
+        var rob = cyclix_gen.global("genexu_" + name + "_rob", rob_struct, rob_size-1, 0)
         for (ExUnit in ExecUnits) {
             var exu_info = __exu_info(
-                cyclix_gen.global("genexu_" + ExUnit.value.name + "_rs", rs_struct, ExUnit.value.rs_num-1, 0),
                 cyclix_gen.global("genexu_" + ExUnit.value.name + "_cdb", cdb_struct, ExUnit.value.exu_num-1, 0)
             )
             TranslateInfo.exu_assocs.put(ExUnit.value, exu_info)
         }
 
-        // broadcasting CDB data to RSs
+        // issuing operations to FUs
+        var rob_iter = cyclix_gen.begforall(rob)
+        run {
+
+        }; cyclix_gen.endwhile()
+
+        // broadcasting CDB data to ROB
         for (exu_cdb in TranslateInfo.exu_assocs) {
-            for (exu_cdb_inst_idx in 0 until exu_cdb.key.exu_num) {
-                var exu_cdb_inst = cyclix_gen.indexed(exu_cdb.value.cdb, exu_cdb_inst_idx)
-                exu_cdb_inst.DisplayType()
-                cyclix_gen.begif(cyclix_gen.subStruct(exu_cdb_inst, "enb"))
+            var cdb_iter = cyclix_gen.begforall(exu_cdb.value.cdb)
+            run {
+                cyclix_gen.begif(cyclix_gen.subStruct(cdb_iter.iter_elem, "enb"))
                 run {
-                    for (exu_rs in TranslateInfo.exu_assocs) {
-                        for (exu_rs_inst_idx in 0 until exu_cdb.key.rs_num) {
-                            var exu_rs_inst = cyclix_gen.indexed(exu_rs.value.rs, exu_rs_inst_idx)
-                            cyclix_gen.begif(!cyclix_gen.subStruct(exu_rs_inst, "rs0_ready"))
+                    var rob_iter = cyclix_gen.begforall(rob)
+                    run {
+                        cyclix_gen.begif(!cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_ready"))
+                        run {
+                            cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_tag"), cyclix_gen.subStruct(cdb_iter.iter_elem, "tag")))
                             run {
+                                // setting rs0 ROB entry ready
+                                var rs0_ready_frac = hw_fractions()
+                                rs0_ready_frac.add(hw_fraction_V(rob_iter.iter_num))
+                                rs0_ready_frac.add(hw_fraction_SubStruct("rs0_ready"))
 
-                                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(exu_rs_inst, "rs0_tag"), cyclix_gen.subStruct(exu_cdb_inst, "tag")))
-                                run {
-                                    var rs0_ready_frac = hw_fractions()
-                                    rs0_ready_frac.add(hw_fraction_C(exu_rs_inst_idx))
-                                    rs0_ready_frac.add(hw_fraction_SubStruct("rs0_ready"))
+                                var rs0_rdata_frac = hw_fractions()
+                                rs0_rdata_frac.add(hw_fraction_V(rob_iter.iter_num))
+                                rs0_rdata_frac.add(hw_fraction_SubStruct("rs0_rdata"))
 
-                                    var rs0_rdata_frac = hw_fractions()
-                                    rs0_rdata_frac.add(hw_fraction_C(exu_rs_inst_idx))
-                                    rs0_rdata_frac.add(hw_fraction_SubStruct("rs0_rdata"))
-
-                                    cyclix_gen.assign(rs0_rdata_frac, exu_rs.value.rs, cyclix_gen.subStruct(exu_cdb_inst, "wdata"))
-                                    cyclix_gen.assign(rs0_ready_frac, exu_rs.value.rs, 1)
-                                }; cyclix_gen.endif()
-
-                                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(exu_rs_inst, "rs1_tag"), cyclix_gen.subStruct(exu_cdb_inst, "tag")))
-                                run {
-                                    var rs1_ready_frac = hw_fractions()
-                                    rs1_ready_frac.add(hw_fraction_C(exu_rs_inst_idx))
-                                    rs1_ready_frac.add(hw_fraction_SubStruct("rs1_ready"))
-
-                                    var rs1_rdata_frac = hw_fractions()
-                                    rs1_rdata_frac.add(hw_fraction_C(exu_rs_inst_idx))
-                                    rs1_rdata_frac.add(hw_fraction_SubStruct("rs1_rdata"))
-
-                                    cyclix_gen.assign(rs1_rdata_frac, exu_rs.value.rs, cyclix_gen.subStruct(exu_cdb_inst, "wdata"))
-                                    cyclix_gen.assign(rs1_ready_frac, exu_rs.value.rs, 1)
-                                }; cyclix_gen.endif()
-
+                                cyclix_gen.assign(rs0_rdata_frac, rob, cyclix_gen.subStruct(cdb_iter.iter_elem, "wdata"))
+                                cyclix_gen.assign(rs0_ready_frac, rob, 1)
                             }; cyclix_gen.endif()
-                        }
-                    }
+
+                            cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_tag"), cyclix_gen.subStruct(cdb_iter.iter_elem, "tag")))
+                            run {
+                                // setting rs1 ROB entry ready
+                                var rs1_ready_frac = hw_fractions()
+                                rs1_ready_frac.add(hw_fraction_V(rob_iter.iter_num))
+                                rs1_ready_frac.add(hw_fraction_SubStruct("rs1_ready"))
+
+                                var rs1_rdata_frac = hw_fractions()
+                                rs1_rdata_frac.add(hw_fraction_V(rob_iter.iter_num))
+                                rs1_rdata_frac.add(hw_fraction_SubStruct("rs1_rdata"))
+
+                                cyclix_gen.assign(rs1_rdata_frac, rob, cyclix_gen.subStruct(cdb_iter.iter_elem, "wdata"))
+                                cyclix_gen.assign(rs1_ready_frac, rob, 1)
+                            }; cyclix_gen.endif()
+
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endwhile()
                 }; cyclix_gen.endif()
-            }
+            }; cyclix_gen.endwhile()
         }
 
         cyclix_gen.end()

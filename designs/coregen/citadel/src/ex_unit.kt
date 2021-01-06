@@ -11,7 +11,7 @@ package citadel
 import hwast.*
 import reordex.*
 
-class ex_unit(name_in : String) : reordex.multiexu(name_in, 32, 32) {
+class ex_unit(name_in : String) : reordex.multiexu(name_in, 32, 32, 16) {
 
     // ALU control
     var alu_req         = ulocal("alu_req", 0, 0, "0")
@@ -30,9 +30,9 @@ class ex_unit(name_in : String) : reordex.multiexu(name_in, 32, 32) {
     var alu_OF          = ulocal("alu_OF", 0, 0, "0")
     var alu_overflow    = ulocal("alu_overflow", 0, 0, "0")
 
-    var EXU_INTEGER = add_exu("INTEGER", 2, 3, 4)
-    var EXU_MUL = add_exu("MUL", 1, 3, 2)
-    var EXU_DIV = add_exu("DIV", 1, 10, 1)
+    var EXU_INTEGER = add_exu("INTEGER", 2, 4)
+    var EXU_MUL = add_exu("MUL", 1, 2)
+    var EXU_DIV = add_exu("DIV", 1, 1)
 
     init {
         EXU_INTEGER.begin()

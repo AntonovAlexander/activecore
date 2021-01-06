@@ -27,4 +27,8 @@ open class hw_param (val type : PARAM_TYPE, vartype_in : hw_type, var token_prin
     fun isDimSingle(): Boolean {
         return vartype.dimensions.isSingle()
     }
+
+    fun GetWidth() : Int {
+        return vartype.dimensions.last().GetWidth()
+    }
 }
