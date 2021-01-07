@@ -10,7 +10,7 @@ package reordex
 
 import hwast.*
 
-open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int, rob_size_in : Int) : hw_astc_stdif() {
+open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int, rob_size_in : Int) : hw_astc_stdif() {
 
     val name = name_in
     val mem_size = mem_size_in
@@ -336,30 +336,26 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                         run {
                             var req_bus_iter = cyclix_gen.begforall(exu_assoc.value.req_bus)
                             run {
-                                var req_enb_frac = hw_fractions()
-                                req_enb_frac.add(hw_fraction_V(req_bus_iter.iter_num))
-                                req_enb_frac.add(hw_fraction_SubStruct("enb"))
-                                cyclix_gen.assign(req_enb_frac, exu_assoc.value.req_bus, req_ndone)
-
-                                var req_opcode_frac = hw_fractions()
-                                req_opcode_frac.add(hw_fraction_V(req_bus_iter.iter_num))
-                                req_opcode_frac.add(hw_fraction_SubStruct("opcode"))
-                                cyclix_gen.assign(req_opcode_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "opcode"))
-
-                                var req_rs0_rdata_frac = hw_fractions()
-                                req_rs0_rdata_frac.add(hw_fraction_V(req_bus_iter.iter_num))
-                                req_rs0_rdata_frac.add(hw_fraction_SubStruct("rs0_rdata"))
-                                cyclix_gen.assign(req_rs0_rdata_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdata"))
-
-                                var req_rs1_rdata_frac = hw_fractions()
-                                req_rs1_rdata_frac.add(hw_fraction_V(req_bus_iter.iter_num))
-                                req_rs1_rdata_frac.add(hw_fraction_SubStruct("rs1_rdata"))
-                                cyclix_gen.assign(req_rs1_rdata_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdata"))
-
-                                var req_rd_tag_frac = hw_fractions()
-                                req_rd_tag_frac.add(hw_fraction_V(req_bus_iter.iter_num))
-                                req_rd_tag_frac.add(hw_fraction_SubStruct("rd_tag"))
-                                cyclix_gen.assign(req_rd_tag_frac, exu_assoc.value.req_bus, cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"))
+                                cyclix_gen.assign(
+                                    exu_assoc.value.req_bus,
+                                    hw_fractions(hw_fraction_V(req_bus_iter.iter_num), hw_fraction_SubStruct("enb")),
+                                    req_ndone)
+                                cyclix_gen.assign(
+                                    exu_assoc.value.req_bus,
+                                    hw_fractions(hw_fraction_V(req_bus_iter.iter_num), hw_fraction_SubStruct("opcode")),
+                                    cyclix_gen.subStruct(rob_iter.iter_elem, "opcode"))
+                                cyclix_gen.assign(
+                                    exu_assoc.value.req_bus,
+                                    hw_fractions(hw_fraction_V(req_bus_iter.iter_num), hw_fraction_SubStruct("rs0_rdata")),
+                                    cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdata"))
+                                cyclix_gen.assign(
+                                    exu_assoc.value.req_bus,
+                                    hw_fractions(hw_fraction_V(req_bus_iter.iter_num), hw_fraction_SubStruct("rs1_rdata")),
+                                    cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdata"))
+                                cyclix_gen.assign(
+                                    exu_assoc.value.req_bus,
+                                    hw_fractions(hw_fraction_V(req_bus_iter.iter_num), hw_fraction_SubStruct("rd_tag")),
+                                    cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"))
 
                                 cyclix_gen.begif(cyclix_gen.band(req_ndone, cyclix_gen.subStruct(req_bus_iter.iter_elem, "rdy")))
                                 run {
@@ -372,9 +368,7 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                                         cyclix_gen.add_gen(rob_shift_index_next, rob_shift_iter.iter_num, 1)
 
                                         // writing op
-                                        var rob_rd_frac = hw_fractions()
-                                        rob_rd_frac.add(hw_fraction_V(rob_shift_iter.iter_num))
-                                        cyclix_gen.assign(rob_rd_frac, rob, cyclix_gen.indexed(rob, rob_shift_index_next))
+                                        cyclix_gen.assign(rob, hw_fractions(hw_fraction_V(rob_shift_iter.iter_num)), cyclix_gen.indexed(rob, rob_shift_index_next))
 
                                         cyclix_gen.assign(rob_shift_iter.iter_num, rob_shift_index_next)
                                     }; cyclix_gen.endwhile()
@@ -402,31 +396,27 @@ open class multiexu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                             cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_tag"), cyclix_gen.subStruct(resp_bus_iter.iter_elem, "tag")))
                             run {
                                 // setting rs0 ROB entry ready
-                                var rs0_ready_frac = hw_fractions()
-                                rs0_ready_frac.add(hw_fraction_V(rob_iter.iter_num))
-                                rs0_ready_frac.add(hw_fraction_SubStruct("rs0_ready"))
-
-                                var rs0_rdata_frac = hw_fractions()
-                                rs0_rdata_frac.add(hw_fraction_V(rob_iter.iter_num))
-                                rs0_rdata_frac.add(hw_fraction_SubStruct("rs0_rdata"))
-
-                                cyclix_gen.assign(rs0_rdata_frac, rob, cyclix_gen.subStruct(resp_bus_iter.iter_elem, "wdata"))
-                                cyclix_gen.assign(rs0_ready_frac, rob, 1)
+                                cyclix_gen.assign(
+                                    rob,
+                                    hw_fractions(hw_fraction_V(rob_iter.iter_num), hw_fraction_SubStruct("rs0_rdata")),
+                                    cyclix_gen.subStruct(resp_bus_iter.iter_elem, "wdata"))
+                                cyclix_gen.assign(
+                                    rob,
+                                    hw_fractions(hw_fraction_V(rob_iter.iter_num), hw_fraction_SubStruct("rs0_ready")),
+                                    1)
                             }; cyclix_gen.endif()
 
                             cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_tag"), cyclix_gen.subStruct(resp_bus_iter.iter_elem, "tag")))
                             run {
                                 // setting rs1 ROB entry ready
-                                var rs1_ready_frac = hw_fractions()
-                                rs1_ready_frac.add(hw_fraction_V(rob_iter.iter_num))
-                                rs1_ready_frac.add(hw_fraction_SubStruct("rs1_ready"))
-
-                                var rs1_rdata_frac = hw_fractions()
-                                rs1_rdata_frac.add(hw_fraction_V(rob_iter.iter_num))
-                                rs1_rdata_frac.add(hw_fraction_SubStruct("rs1_rdata"))
-
-                                cyclix_gen.assign(rs1_rdata_frac, rob, cyclix_gen.subStruct(resp_bus_iter.iter_elem, "wdata"))
-                                cyclix_gen.assign(rs1_ready_frac, rob, 1)
+                                cyclix_gen.assign(
+                                    rob,
+                                    hw_fractions(hw_fraction_V(rob_iter.iter_num), hw_fraction_SubStruct("rs1_rdata")),
+                                    cyclix_gen.subStruct(resp_bus_iter.iter_elem, "wdata"))
+                                cyclix_gen.assign(
+                                    rob,
+                                    hw_fractions(hw_fraction_V(rob_iter.iter_num), hw_fraction_SubStruct("rs1_ready")),
+                                    1)
                             }; cyclix_gen.endif()
 
                         }; cyclix_gen.endif()

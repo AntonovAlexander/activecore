@@ -600,11 +600,11 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
                 run {
                     cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
                     run {
-                        cyclix_gen.assign(fractions, curStageAssoc.TranslateVar(expr.wrvars[0]), curStageAssoc.TranslateParam(expr.params[0]))
+                        cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, curStageAssoc.TranslateParam(expr.params[0]))
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
             } else {
-                cyclix_gen.assign(fractions, curStageAssoc.TranslateVar(expr.wrvars[0]), curStageAssoc.TranslateParam(expr.params[0]))
+                cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, curStageAssoc.TranslateParam(expr.params[0]))
             }
 
         } else if ((expr.opcode == OP2_ARITH_ADD)
@@ -715,14 +715,14 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
             curStageAssoc.pflush_cmd_internal(cyclix_gen)
 
         } else if (expr.opcode == OP_RD_PREV) {
-            cyclix_gen.assign(fractions, curStageAssoc.TranslateVar(expr.wrvars[0]), TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
+            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
 
         } else if (expr.opcode == OP_ASSIGN_SUCC) {
             cyclix_gen.assign(curStageAssoc.assign_succ_assocs[expr.wrvars[0]]!!.req, 1)
-            cyclix_gen.assign(fractions, curStageAssoc.assign_succ_assocs[expr.wrvars[0]]!!.buf, curStageAssoc.TranslateParam(expr.params[0]))
+            cyclix_gen.assign(curStageAssoc.assign_succ_assocs[expr.wrvars[0]]!!.buf, fractions, curStageAssoc.TranslateParam(expr.params[0]))
 
         } else if (expr.opcode == OP_RD_REMOTE) {
-            cyclix_gen.assign(fractions, curStageAssoc.TranslateVar(expr.wrvars[0]), TranslateInfo.__stage_assocs[(expr as hw_exec_read_remote).stage]!!.TranslateVar(expr.remote_var))
+            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, TranslateInfo.__stage_assocs[(expr as hw_exec_read_remote).stage]!!.TranslateVar(expr.remote_var))
 
         } else if (expr.opcode == OP_ISACTIVE) {
             cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_active_glbl)
@@ -791,8 +791,8 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
                         mcopipe_if_assoc.req_fifo.vartype,
                         mcopipe_if_assoc.req_fifo.defval)
 
-                    cyclix_gen.assign(hw_fractions("we"), req_struct, cmd_translated)
-                    cyclix_gen.assign(hw_fractions("wdata"), req_struct, wdata_translated)
+                    cyclix_gen.assign(req_struct, hw_fractions("we"), cmd_translated)
+                    cyclix_gen.assign(req_struct, hw_fractions("wdata"), wdata_translated)
 
                     cyclix_gen.begif(cyclix_gen.fifo_wr(mcopipe_if_assoc.req_fifo, req_struct))
                     run {

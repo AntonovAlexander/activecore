@@ -430,7 +430,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         }
     }
 
-    private fun assign_gen(depow_fractions: hw_fractions, tgt: hw_var, src: hw_param) {
+    private fun assign_gen(tgt: hw_var, depow_fractions: hw_fractions, src: hw_param) {
         process_depow_fractions(depow_fractions, tgt)
         var new_expr = hw_exec(OP1_ASSIGN)
         new_expr.AddRdParam(src)
@@ -440,11 +440,10 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     private fun assign_gen(tgt: hw_var, src: hw_param) {
-        var depow_fractions = hw_fractions()
-        assign_gen(depow_fractions, tgt, src)
+        assign_gen(tgt, hw_fractions(), src)
     }
 
-    fun assign(depow_fractions: hw_fractions, tgt: hw_var, src: hw_param) {
+    fun assign(tgt: hw_var, depow_fractions: hw_fractions, src: hw_param) {
         //if (src is hw_var)
         //    println("ASSIGNMENT! tgt: " + tgt.name + " (struct: " + tgt.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.src_struct.name + ")")
 
@@ -478,7 +477,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                         ERROR("assignment of inequally structured variables! tgt: " + tgt.name + " (struct: " + tgt_DePow_descr.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
                     }
                 }
-                assign_gen(depow_fractions, tgt, src)
+                assign_gen(tgt, depow_fractions, src)
 
             } else {
                 for (i in 0 until tgt.vartype.dimensions.last().GetWidth()) {
@@ -495,30 +494,29 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
                     var indexed_src = AddExpr_op(OP2_INDEXED, new_srcs)
 
-                    assign(depow_fractions, tgt, indexed_src)
+                    assign(tgt, depow_fractions, indexed_src)
 
                     depow_fractions.removeAt(depow_fractions.lastIndex)
                 }
             }
         } else if (src.type == PARAM_TYPE.VAL) {
-            if (tgt_DePowered_Power == 1) assign_gen(depow_fractions, tgt, src)
+            if (tgt_DePowered_Power == 1) assign_gen(tgt, depow_fractions, src)
             else {
                 for (i in 0 until tgt.vartype.dimensions.get(tgt_DePowered_Power - 1).GetWidth()) {
                     depow_fractions.add(0, hw_fraction_C(i + tgt.vartype.dimensions.last().lsb))
-                    assign(depow_fractions, tgt, src)
+                    assign(tgt, depow_fractions, src)
                     depow_fractions.removeAt(0)
                 }
             }
         }
     }
 
-    fun assign(depow_fractions: hw_fractions, tgt: hw_var, src: Int) {
-        assign(depow_fractions, tgt, hw_imm(src))
+    fun assign(tgt: hw_var, depow_fractions: hw_fractions, src: Int) {
+        assign(tgt, depow_fractions, hw_imm(src))
     }
 
     fun assign(tgt: hw_var, src: hw_param) {
-        var depow_fractions = hw_fractions()
-        assign(depow_fractions, tgt, src)
+        assign(tgt, hw_fractions(), src)
     }
 
     fun assign(tgt: hw_var, src: Int) {

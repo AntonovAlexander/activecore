@@ -76,7 +76,7 @@ class RtlGenerator(module_in : module) {
         }
 
         if ((expr.opcode == OP1_ASSIGN)) {
-            rtl_gen.assign(fractions, TranslateVar(expr.wrvars[0]), TranslateParam(expr.params[0]))
+            rtl_gen.assign(TranslateVar(expr.wrvars[0]), fractions, TranslateParam(expr.params[0]))
 
         } else if ((expr.opcode == OP2_ARITH_ADD)
             || (expr.opcode == OP2_ARITH_SUB)

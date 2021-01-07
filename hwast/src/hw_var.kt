@@ -41,11 +41,11 @@ open class hw_var(name_in : String, vartype_in : hw_type, defval_in : String) : 
             : this(name, src_struct_in, 0, 0)
 
     fun assign(depow_fractions: hw_fractions, src: hw_param) {
-        default_astc.assign(depow_fractions, this, src)
+        default_astc.assign(this, depow_fractions, src)
     }
 
     fun assign(depow_fractions: hw_fractions, src: Int) {
-        default_astc.assign(depow_fractions, this, src)
+        default_astc.assign(this, depow_fractions, src)
     }
 
     fun assign(src: hw_param) {
@@ -120,13 +120,13 @@ open class hw_var(name_in : String, vartype_in : hw_type, defval_in : String) : 
         var depow_fractions = hw_fractions()
         if (index.type == PARAM_TYPE.VAL) depow_fractions.add(hw_fraction_C(index as hw_imm))
         else depow_fractions.add(hw_fraction_V(index as hw_var))
-        default_astc.assign(depow_fractions, this, src)
+        default_astc.assign(this, depow_fractions, src)
     }
 
     operator fun set(index: Int, src: hw_param) {
         var depow_fractions = hw_fractions()
         depow_fractions.add(hw_fraction_C(index))
-        default_astc.assign(depow_fractions, this, src)
+        default_astc.assign(this, depow_fractions, src)
     }
 
     operator fun set(msb: hw_param, lsb: hw_param, src: hw_param) {
@@ -145,13 +145,13 @@ open class hw_var(name_in : String, vartype_in : hw_type, defval_in : String) : 
                 depow_fractions.add(hw_fraction_VV(msb as hw_var, lsb as hw_var))
             }
         }
-        default_astc.assign(depow_fractions, this, src)
+        default_astc.assign(this, depow_fractions, src)
     }
 
     operator fun set(msb: Int, lsb: Int, src: hw_param) {
         var depow_fractions = hw_fractions()
         depow_fractions.add(hw_fraction_CC(msb, lsb))
-        default_astc.assign(depow_fractions, this, src)
+        default_astc.assign(this, depow_fractions, src)
     }
 
     fun GetDepowered(depow_fractions: hw_fractions): hw_type {

@@ -11,7 +11,7 @@ package citadel
 import hwast.*
 import reordex.*
 
-class ex_unit(name_in : String) : reordex.multiexu(name_in, 32, 32, 16) {
+class ex_unit(name_in : String) : reordex.MultiExu(name_in, 32, 32, 16) {
 
     // ALU control
     var alu_req         = ulocal("alu_req", 0, 0, "0")

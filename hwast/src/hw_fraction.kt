@@ -123,4 +123,10 @@ class hw_fractions() : ArrayList<hw_fraction>() {
     constructor(substruct_name_in : String) : this() {
         this.add(hw_fraction_SubStruct(substruct_name_in))
     }
+
+    constructor(vararg fractions: hw_fraction) : this() {
+        for (fraction in fractions) {
+            this.add(fraction)
+        }
+    }
 }
