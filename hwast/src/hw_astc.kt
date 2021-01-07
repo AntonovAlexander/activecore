@@ -1220,11 +1220,6 @@ open class hw_astc() : ArrayList<hw_exec>() {
         add(new_expr)
     }
 
-    fun endwhile() {
-        if (last().opcode != OP1_WHILE) ERROR("endwhile without begwhile!")
-        removeAt(lastIndex)
-    }
-
     data class for_loop_iteration(var iter_num : hw_var, var iter_elem: hw_var)
 
     fun begforrange(elements : hw_var, start: hw_param, end: hw_param) : for_loop_iteration {
@@ -1240,13 +1235,13 @@ open class hw_astc() : ArrayList<hw_exec>() {
         assign(genvar_iter_cont, 1)
         new_expr.AddGenVar(genvar_iter_cont)
         new_expr.AddRdParam(genvar_iter_cont)
+        new_expr.while_trailer = WHILE_TRAILER.INCR_COUNTER
 
         AddExpr(new_expr)
         add(new_expr)
 
         val genvar_iter_elem = indexed(elements, genvar_iter_num)
-        add_gen(genvar_iter_num, genvar_iter_num, 1)
-        assign(genvar_iter_cont, leq(genvar_iter_num, end))
+        assign(genvar_iter_cont, less(genvar_iter_num, end))
 
         return for_loop_iteration(genvar_iter_num, genvar_iter_elem)
     }
@@ -1267,6 +1262,14 @@ open class hw_astc() : ArrayList<hw_exec>() {
             ERROR("Deep bigforall not currently supported!")
             throw Exception()
         }
+    }
+
+    fun endloop() {
+        if (last().opcode != OP1_WHILE) ERROR("Ending loop without beginning!")
+        if (last().while_trailer == WHILE_TRAILER.INCR_COUNTER) {
+            add_gen(last().genvars[0], last().genvars[0], 1)
+        }
+        removeAt(lastIndex)
     }
 }
 

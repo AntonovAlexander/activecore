@@ -371,16 +371,16 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                                         cyclix_gen.assign(rob, hw_fracs(hw_frac_V(rob_shift_iter.iter_num)), cyclix_gen.indexed(rob, rob_shift_index_next))
 
                                         cyclix_gen.assign(rob_shift_iter.iter_num, rob_shift_index_next)
-                                    }; cyclix_gen.endwhile()
+                                    }; cyclix_gen.endloop()
 
                                 }; cyclix_gen.endif()
-                            }; cyclix_gen.endwhile()
+                            }; cyclix_gen.endloop()
                         }; cyclix_gen.endif()
                         fu_id++
                     }
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
-        }; cyclix_gen.endwhile()
+        }; cyclix_gen.endloop()
 
         // broadcasting FU results to ROB
         MSG("Translating: broadcasting FU results to ROB")
@@ -420,9 +420,9 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                             }; cyclix_gen.endif()
 
                         }; cyclix_gen.endif()
-                    }; cyclix_gen.endwhile()
+                    }; cyclix_gen.endloop()
                 }; cyclix_gen.endif()
-            }; cyclix_gen.endwhile()
+            }; cyclix_gen.endloop()
         }
 
         cyclix_gen.end()

@@ -703,7 +703,7 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
                         TranslateInfo,
                         curStageAssoc)
                 }
-            }; cyclix_gen.endwhile()
+            }; cyclix_gen.endloop()
 
         } else if (expr.opcode == OP_PKILL) {
             curStageAssoc.pkill_cmd_internal(cyclix_gen)

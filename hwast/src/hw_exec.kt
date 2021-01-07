@@ -56,11 +56,16 @@ val OP1_CASE            = hw_opcode("case")
 val OP1_CASEBRANCH      = hw_opcode("casebrach")
 val OP1_WHILE           = hw_opcode("while")
 
+enum class WHILE_TRAILER {
+    EMPTY,	INCR_COUNTER
+}
+
 
 // container for operation
 open class hw_exec(opcode_in : hw_opcode) {
 
     val opcode      = opcode_in
+    var while_trailer = WHILE_TRAILER.EMPTY
 
     var params      = ArrayList<hw_param>()
     var rdvars      = ArrayList<hw_var>()

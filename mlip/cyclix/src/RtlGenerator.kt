@@ -159,7 +159,7 @@ class RtlGenerator(module_in : module) {
                 for (child_expr in expr.expressions) {
                     export_expr(rtl_gen, child_expr, rst)
                 }
-            }; rtl_gen.endwhile()
+            }; rtl_gen.endloop()
 
         } else if (expr.opcode == OP_FIFO_WR) {
 
