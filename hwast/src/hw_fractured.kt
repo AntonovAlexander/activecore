@@ -9,10 +9,10 @@
 package hwast
 
 // Type container for depowered variables
-class hw_fractured (src_in: hw_var, depow_fractions_in: hw_fractions) {
+class hw_fractured (src_in: hw_var, depow_fractions_in: hw_fracs) {
 
     val src = src_in
-    var depow_fractions = hw_fractions()
+    var depow_fractions = hw_fracs()
     var depowered_fractions = hw_type(DUMMY_STRUCT)
 
     init {

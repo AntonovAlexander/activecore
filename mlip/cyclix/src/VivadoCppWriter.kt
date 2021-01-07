@@ -30,32 +30,32 @@ class VivadoCppWriter(module_in : module) {
         return ("[" + in_range.msb.toString() + ":" + in_range.lsb.toString() + "]")
     }
 
-    fun getDimString(fraction : hw_fraction) : String
+    fun getDimString(fraction : hw_frac) : String
     {
         if (fraction.type == FRAC_TYPE.C)
-            return ("[" + (fraction as hw_fraction_C).index.GetString() + "]")
+            return ("[" + (fraction as hw_frac_C).index.GetString() + "]")
 
         else if (fraction.type == FRAC_TYPE.V)
-            return ("[" + (fraction as hw_fraction_V).index.name + "]")
+            return ("[" + (fraction as hw_frac_V).index.name + "]")
 
         else if (fraction.type == FRAC_TYPE.CC)
-            return ("[" + (fraction as hw_fraction_CC).msb.GetString() + ":"
+            return ("[" + (fraction as hw_frac_CC).msb.GetString() + ":"
                     + fraction.lsb.GetString() + "]")
 
         else if (fraction.type == FRAC_TYPE.CV)
-            return ("[" + (fraction as hw_fraction_CV).msb.GetString() + ":"
+            return ("[" + (fraction as hw_frac_CV).msb.GetString() + ":"
                     + fraction.lsb.name + "]")
 
         else if (fraction.type == FRAC_TYPE.VC)
-            return ("[" + (fraction as hw_fraction_VC).msb.name + ":"
+            return ("[" + (fraction as hw_frac_VC).msb.name + ":"
                     + fraction.lsb.GetString() + "]")
 
         else if (fraction.type == FRAC_TYPE.VV)
-            return ("[" + (fraction as hw_fraction_VV).msb.name + ":"
+            return ("[" + (fraction as hw_frac_VV).msb.name + ":"
                     + fraction.lsb.name + "]")
 
         else if (fraction.type == FRAC_TYPE.SubStruct)
-            return ("." + (fraction as hw_fraction_SubStruct).substruct_name)
+            return ("." + (fraction as hw_frac_SubStruct).substruct_name)
 
         else {
             ERROR("Dimensions unrecognized!")
@@ -63,7 +63,7 @@ class VivadoCppWriter(module_in : module) {
         }
     }
 
-    fun getDimString(fractions : hw_fractions) : String
+    fun getDimString(fractions : hw_fracs) : String
     {
         var ret_val = ""
         for (i in fractions.lastIndex downTo 0) {

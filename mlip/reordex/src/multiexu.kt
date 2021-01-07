@@ -338,23 +338,23 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                             run {
                                 cyclix_gen.assign(
                                     exu_assoc.value.req_bus,
-                                    hw_fractions(hw_fraction_V(req_bus_iter.iter_num), hw_fraction_SubStruct("enb")),
+                                    hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("enb")),
                                     req_ndone)
                                 cyclix_gen.assign(
                                     exu_assoc.value.req_bus,
-                                    hw_fractions(hw_fraction_V(req_bus_iter.iter_num), hw_fraction_SubStruct("opcode")),
+                                    hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("opcode")),
                                     cyclix_gen.subStruct(rob_iter.iter_elem, "opcode"))
                                 cyclix_gen.assign(
                                     exu_assoc.value.req_bus,
-                                    hw_fractions(hw_fraction_V(req_bus_iter.iter_num), hw_fraction_SubStruct("rs0_rdata")),
+                                    hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("rs0_rdata")),
                                     cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdata"))
                                 cyclix_gen.assign(
                                     exu_assoc.value.req_bus,
-                                    hw_fractions(hw_fraction_V(req_bus_iter.iter_num), hw_fraction_SubStruct("rs1_rdata")),
+                                    hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("rs1_rdata")),
                                     cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdata"))
                                 cyclix_gen.assign(
                                     exu_assoc.value.req_bus,
-                                    hw_fractions(hw_fraction_V(req_bus_iter.iter_num), hw_fraction_SubStruct("rd_tag")),
+                                    hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("rd_tag")),
                                     cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"))
 
                                 cyclix_gen.begif(cyclix_gen.band(req_ndone, cyclix_gen.subStruct(req_bus_iter.iter_elem, "rdy")))
@@ -368,7 +368,7 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                                         cyclix_gen.add_gen(rob_shift_index_next, rob_shift_iter.iter_num, 1)
 
                                         // writing op
-                                        cyclix_gen.assign(rob, hw_fractions(hw_fraction_V(rob_shift_iter.iter_num)), cyclix_gen.indexed(rob, rob_shift_index_next))
+                                        cyclix_gen.assign(rob, hw_fracs(hw_frac_V(rob_shift_iter.iter_num)), cyclix_gen.indexed(rob, rob_shift_index_next))
 
                                         cyclix_gen.assign(rob_shift_iter.iter_num, rob_shift_index_next)
                                     }; cyclix_gen.endwhile()
@@ -398,11 +398,11 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                                 // setting rs0 ROB entry ready
                                 cyclix_gen.assign(
                                     rob,
-                                    hw_fractions(hw_fraction_V(rob_iter.iter_num), hw_fraction_SubStruct("rs0_rdata")),
+                                    hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rs0_rdata")),
                                     cyclix_gen.subStruct(resp_bus_iter.iter_elem, "wdata"))
                                 cyclix_gen.assign(
                                     rob,
-                                    hw_fractions(hw_fraction_V(rob_iter.iter_num), hw_fraction_SubStruct("rs0_ready")),
+                                    hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rs0_ready")),
                                     1)
                             }; cyclix_gen.endif()
 
@@ -411,11 +411,11 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                                 // setting rs1 ROB entry ready
                                 cyclix_gen.assign(
                                     rob,
-                                    hw_fractions(hw_fraction_V(rob_iter.iter_num), hw_fraction_SubStruct("rs1_rdata")),
+                                    hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rs1_rdata")),
                                     cyclix_gen.subStruct(resp_bus_iter.iter_elem, "wdata"))
                                 cyclix_gen.assign(
                                     rob,
-                                    hw_fractions(hw_fraction_V(rob_iter.iter_num), hw_fraction_SubStruct("rs1_ready")),
+                                    hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rs1_ready")),
                                     1)
                             }; cyclix_gen.endif()
 

@@ -428,7 +428,7 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
         AddExpr(hw_exec(OP_PFLUSH))
     }
 
-    fun assign_succ(depow_fractions: hw_fractions, tgt : hw_pipex_var, src: hw_param) {
+    fun assign_succ(depow_fractions: hw_fracs, tgt : hw_pipex_var, src: hw_param) {
         var new_expr = hw_exec(OP_ASSIGN_SUCC)
         new_expr.AddWrVar(tgt)
         new_expr.AddRdParam(src)
@@ -436,12 +436,12 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
         AddExpr(new_expr)
     }
 
-    fun assign_succ(depow_fractions: hw_fractions, tgt : hw_pipex_var, src: Int) {
+    fun assign_succ(depow_fractions: hw_fracs, tgt : hw_pipex_var, src: Int) {
         assign_succ(depow_fractions, tgt, hw_imm(src))
     }
 
     fun assign_succ(tgt : hw_pipex_var, src: hw_param) {
-        var dummy_depow_fractions = hw_fractions()
+        var dummy_depow_fractions = hw_fracs()
         assign_succ(dummy_depow_fractions, tgt, src)
     }
 
@@ -576,15 +576,15 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
                                TranslateInfo: __TranslateInfo,
                                curStageAssoc : __pstage_info) {
 
-        var fractions = hw_fractions()
+        var fractions = hw_fracs()
         for (src_fraction in expr.assign_tgt_fractured.depow_fractions) {
-            if (src_fraction is hw_fraction_C) fractions.add(src_fraction)
-            else if (src_fraction is hw_fraction_V) fractions.add(hw_fraction_V(curStageAssoc.TranslateVar(src_fraction.index)))
-            else if (src_fraction is hw_fraction_CC) fractions.add(src_fraction)
-            else if (src_fraction is hw_fraction_CV) fractions.add(hw_fraction_CV(src_fraction.msb, curStageAssoc.TranslateVar(src_fraction.lsb)))
-            else if (src_fraction is hw_fraction_VC) fractions.add(hw_fraction_VC(curStageAssoc.TranslateVar(src_fraction.msb), src_fraction.lsb))
-            else if (src_fraction is hw_fraction_VV) fractions.add(hw_fraction_VV(curStageAssoc.TranslateVar(src_fraction.msb), curStageAssoc.TranslateVar(src_fraction.lsb)))
-            else if (src_fraction is hw_fraction_SubStruct) fractions.add(src_fraction)
+            if (src_fraction is hw_frac_C) fractions.add(src_fraction)
+            else if (src_fraction is hw_frac_V) fractions.add(hw_frac_V(curStageAssoc.TranslateVar(src_fraction.index)))
+            else if (src_fraction is hw_frac_CC) fractions.add(src_fraction)
+            else if (src_fraction is hw_frac_CV) fractions.add(hw_frac_CV(src_fraction.msb, curStageAssoc.TranslateVar(src_fraction.lsb)))
+            else if (src_fraction is hw_frac_VC) fractions.add(hw_frac_VC(curStageAssoc.TranslateVar(src_fraction.msb), src_fraction.lsb))
+            else if (src_fraction is hw_frac_VV) fractions.add(hw_frac_VV(curStageAssoc.TranslateVar(src_fraction.msb), curStageAssoc.TranslateVar(src_fraction.lsb)))
+            else if (src_fraction is hw_frac_SubStruct) fractions.add(src_fraction)
             else ERROR("dimensions error")
         }
 
@@ -791,8 +791,8 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
                         mcopipe_if_assoc.req_fifo.vartype,
                         mcopipe_if_assoc.req_fifo.defval)
 
-                    cyclix_gen.assign(req_struct, hw_fractions("we"), cmd_translated)
-                    cyclix_gen.assign(req_struct, hw_fractions("wdata"), wdata_translated)
+                    cyclix_gen.assign(req_struct, hw_fracs("we"), cmd_translated)
+                    cyclix_gen.assign(req_struct, hw_fracs("wdata"), wdata_translated)
 
                     cyclix_gen.begif(cyclix_gen.fifo_wr(mcopipe_if_assoc.req_fifo, req_struct))
                     run {

@@ -397,7 +397,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op(opcode, srcs)
     }
 
-    private fun process_depow_fractions(depow_fractions: hw_fractions, tgt: hw_var) {
+    private fun process_depow_fractions(depow_fractions: hw_fracs, tgt: hw_var) {
         var tgt_struct_ptr = tgt.vartype.src_struct
         for (fraction in depow_fractions) {
             if (fraction.type == FRAC_TYPE.SubStruct) {
@@ -407,7 +407,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     var SUBSTR_INDEX = 0
                     for (structvar in tgt_struct_ptr) {
                         //println("structvar: " + structvar.name)
-                        if (structvar.name == (fraction as hw_fraction_SubStruct).substruct_name) {
+                        if (structvar.name == (fraction as hw_frac_SubStruct).substruct_name) {
 
                             //println("src_struct: " + tgt_struct_ptr.name)
                             //println("subStructIndex: " + SUBSTR_INDEX)
@@ -424,13 +424,13 @@ open class hw_astc() : ArrayList<hw_exec>() {
                         }
                         SUBSTR_INDEX += 1
                     }
-                    if (!substr_found) ERROR("substruct " + (fraction as hw_fraction_SubStruct).substruct_name + " not found!")
-                } else ERROR("substruct " + (fraction as hw_fraction_SubStruct).substruct_name + " request for tgt " + tgt.name + " is inconsistent!")
+                    if (!substr_found) ERROR("substruct " + (fraction as hw_frac_SubStruct).substruct_name + " not found!")
+                } else ERROR("substruct " + (fraction as hw_frac_SubStruct).substruct_name + " request for tgt " + tgt.name + " is inconsistent!")
             }
         }
     }
 
-    private fun assign_gen(tgt: hw_var, depow_fractions: hw_fractions, src: hw_param) {
+    private fun assign_gen(tgt: hw_var, depow_fractions: hw_fracs, src: hw_param) {
         process_depow_fractions(depow_fractions, tgt)
         var new_expr = hw_exec(OP1_ASSIGN)
         new_expr.AddRdParam(src)
@@ -440,10 +440,10 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     private fun assign_gen(tgt: hw_var, src: hw_param) {
-        assign_gen(tgt, hw_fractions(), src)
+        assign_gen(tgt, hw_fracs(), src)
     }
 
-    fun assign(tgt: hw_var, depow_fractions: hw_fractions, src: hw_param) {
+    fun assign(tgt: hw_var, depow_fractions: hw_fracs, src: hw_param) {
         //if (src is hw_var)
         //    println("ASSIGNMENT! tgt: " + tgt.name + " (struct: " + tgt.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.src_struct.name + ")")
 
@@ -482,7 +482,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             } else {
                 for (i in 0 until tgt.vartype.dimensions.last().GetWidth()) {
 
-                    depow_fractions.add(0, hw_fraction_C(i + tgt.vartype.dimensions.last().lsb))
+                    depow_fractions.add(0, hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
 
                     var new_dimrange = hw_dim_range_static(i - 1, 0)
                     var gen_dim = hw_dim_static()
@@ -503,7 +503,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             if (tgt_DePowered_Power == 1) assign_gen(tgt, depow_fractions, src)
             else {
                 for (i in 0 until tgt.vartype.dimensions.get(tgt_DePowered_Power - 1).GetWidth()) {
-                    depow_fractions.add(0, hw_fraction_C(i + tgt.vartype.dimensions.last().lsb))
+                    depow_fractions.add(0, hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
                     assign(tgt, depow_fractions, src)
                     depow_fractions.removeAt(0)
                 }
@@ -511,12 +511,12 @@ open class hw_astc() : ArrayList<hw_exec>() {
         }
     }
 
-    fun assign(tgt: hw_var, depow_fractions: hw_fractions, src: Int) {
+    fun assign(tgt: hw_var, depow_fractions: hw_fracs, src: Int) {
         assign(tgt, depow_fractions, hw_imm(src))
     }
 
     fun assign(tgt: hw_var, src: hw_param) {
-        assign(tgt, hw_fractions(), src)
+        assign(tgt, hw_fracs(), src)
     }
 
     fun assign(tgt: hw_var, src: Int) {

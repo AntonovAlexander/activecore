@@ -63,15 +63,15 @@ class RtlGenerator(module_in : module) {
         // for (param in expr.params) println("param: " + param.GetString())
         // for (wrvar in expr.wrvars) println("wrvar: " + wrvar.name)
 
-        var fractions = hw_fractions()
+        var fractions = hw_fracs()
         for (src_fraction in expr.assign_tgt_fractured.depow_fractions) {
-            if (src_fraction is hw_fraction_C) fractions.add(src_fraction)
-            else if (src_fraction is hw_fraction_V) fractions.add(hw_fraction_V(TranslateVar(src_fraction.index)))
-            else if (src_fraction is hw_fraction_CC) fractions.add(src_fraction)
-            else if (src_fraction is hw_fraction_CV) fractions.add(hw_fraction_CV(src_fraction.msb, TranslateVar(src_fraction.lsb)))
-            else if (src_fraction is hw_fraction_VC) fractions.add(hw_fraction_VC(TranslateVar(src_fraction.msb), src_fraction.lsb))
-            else if (src_fraction is hw_fraction_VV) fractions.add(hw_fraction_VV(TranslateVar(src_fraction.msb), TranslateVar(src_fraction.lsb)))
-            else if (src_fraction is hw_fraction_SubStruct) fractions.add(src_fraction)
+            if (src_fraction is hw_frac_C) fractions.add(src_fraction)
+            else if (src_fraction is hw_frac_V) fractions.add(hw_frac_V(TranslateVar(src_fraction.index)))
+            else if (src_fraction is hw_frac_CC) fractions.add(src_fraction)
+            else if (src_fraction is hw_frac_CV) fractions.add(hw_frac_CV(src_fraction.msb, TranslateVar(src_fraction.lsb)))
+            else if (src_fraction is hw_frac_VC) fractions.add(hw_frac_VC(TranslateVar(src_fraction.msb), src_fraction.lsb))
+            else if (src_fraction is hw_frac_VV) fractions.add(hw_frac_VV(TranslateVar(src_fraction.msb), TranslateVar(src_fraction.lsb)))
+            else if (src_fraction is hw_frac_SubStruct) fractions.add(src_fraction)
             else ERROR("dimensions error")
         }
 

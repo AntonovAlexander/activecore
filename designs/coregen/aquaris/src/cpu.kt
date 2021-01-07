@@ -217,9 +217,9 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     }
 
     fun process_req_instrmem() {
-        instr_busreq.assign(hw_fractions("addr"), curinstr_addr)
-        instr_busreq.assign(hw_fractions("be"), 0xf)
-        instr_busreq.assign(hw_fractions("wdata"), 0)
+        instr_busreq.assign(hw_fracs("addr"), curinstr_addr)
+        instr_busreq.assign(hw_fracs("be"), 0xf)
+        instr_busreq.assign(hw_fracs("wdata"), 0)
 
         begif(!instr_req_done)
         run {
@@ -1134,9 +1134,9 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
         run {
             begif(!data_req_done)
             run {
-                data_busreq.assign(hw_fractions("addr"), mem_addr)
-                data_busreq.assign(hw_fractions("be"), mem_be)
-                data_busreq.assign(hw_fractions("wdata"), mem_wdata)
+                data_busreq.assign(hw_fracs("addr"), mem_addr)
+                data_busreq.assign(hw_fracs("be"), mem_be)
+                data_busreq.assign(hw_fracs("wdata"), mem_wdata)
 
                 data_req_done.assign(data_mem.req(data_handle, mem_cmd, data_busreq))
             }; endif()
@@ -1200,7 +1200,7 @@ class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_i
     fun process_wb() {
         begif(rd_req)
         run {
-            regfile.assign_succ(hw_fractions(rd_addr), rd_wdata)
+            regfile.assign_succ(hw_fracs(rd_addr), rd_wdata)
         }; endif()
     }
 

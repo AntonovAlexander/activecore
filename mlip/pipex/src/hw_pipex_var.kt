@@ -12,12 +12,12 @@ import hwast.*
 
 open class hw_pipex_var(name_in : String, vartype : hw_type, defval_in : String) : hw_var(name_in, vartype, defval_in) {
 
-    fun assign_succ(depow_fractions: hw_fractions, src: hw_param) {
+    fun assign_succ(depow_fractions: hw_fracs, src: hw_param) {
         if (default_astc is pipeline) (default_astc as pipeline).assign_succ(depow_fractions, this, src)
         else ERROR("assign_succ cmd is out of place!")
     }
 
-    fun assign_succ(depow_fractions: hw_fractions, src: Int) {
+    fun assign_succ(depow_fractions: hw_fracs, src: Int) {
         if (default_astc is pipeline) (default_astc as pipeline).assign_succ(depow_fractions, this, src)
         else ERROR("assign_succ cmd is out of place!")
     }

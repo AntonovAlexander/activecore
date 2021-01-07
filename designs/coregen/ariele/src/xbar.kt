@@ -154,16 +154,16 @@ class xbar(name         : String,
 
             cproc_begin()
             run {
-                var we_fraction = hw_fractions("we")
+                var we_fraction = hw_fracs("we")
 
-                var addr_fraction = hw_fractions("wdata")
-                addr_fraction.add(hw_fraction_SubStruct("addr"))
+                var addr_fraction = hw_fracs("wdata")
+                addr_fraction.add(hw_frac_SubStruct("addr"))
 
-                var be_fraction = hw_fractions("wdata")
-                be_fraction.add(hw_fraction_SubStruct("be"))
+                var be_fraction = hw_fracs("wdata")
+                be_fraction.add(hw_frac_SubStruct("be"))
 
-                var wdata_fraction = hw_fractions("wdata")
-                wdata_fraction.add(hw_fraction_SubStruct("wdata"))
+                var wdata_fraction = hw_fracs("wdata")
+                wdata_fraction.add(hw_frac_SubStruct("wdata"))
 
                 master_ifs[num_master].req.wdata_struct.assign(we_fraction, master_ifs[num_master].req.we)
                 master_ifs[num_master].req.wdata_struct.assign(addr_fraction, master_ifs[num_master].req.addr)

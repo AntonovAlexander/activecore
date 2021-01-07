@@ -1,5 +1,5 @@
 /*
- * hw_fraction.kt
+ * hw_frac.kt
  *
  *  Created on: 05.06.2019
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
@@ -12,11 +12,11 @@ enum class FRAC_TYPE {
     C, V, CC, CV, VC, VV, SubStruct
 }
 
-abstract class hw_fraction (val type : FRAC_TYPE) {
+abstract class hw_frac (val type : FRAC_TYPE) {
     abstract fun GetWidth() : Int
 }
 
-class hw_fraction_C (val index_in : hw_imm) : hw_fraction(FRAC_TYPE.C) {
+class hw_frac_C (val index_in : hw_imm) : hw_frac(FRAC_TYPE.C) {
 
     val index = index_in
 
@@ -27,7 +27,7 @@ class hw_fraction_C (val index_in : hw_imm) : hw_fraction(FRAC_TYPE.C) {
     }
 }
 
-class hw_fraction_V (val index_in : hw_var) : hw_fraction(FRAC_TYPE.V) {
+class hw_frac_V (val index_in : hw_var) : hw_frac(FRAC_TYPE.V) {
 
     val index = index_in
 
@@ -36,7 +36,7 @@ class hw_fraction_V (val index_in : hw_var) : hw_fraction(FRAC_TYPE.V) {
     }
 }
 
-class hw_fraction_CC (val msb_in : hw_imm, val lsb_in : hw_imm) : hw_fraction(FRAC_TYPE.CC) {
+class hw_frac_CC (val msb_in : hw_imm, val lsb_in : hw_imm) : hw_frac(FRAC_TYPE.CC) {
 
     val msb = msb_in
     val lsb = lsb_in
@@ -49,7 +49,7 @@ class hw_fraction_CC (val msb_in : hw_imm, val lsb_in : hw_imm) : hw_fraction(FR
     }
 }
 
-class hw_fraction_CV (val msb_in : hw_imm, val lsb_in : hw_var) : hw_fraction(FRAC_TYPE.CV) {
+class hw_frac_CV (val msb_in : hw_imm, val lsb_in : hw_var) : hw_frac(FRAC_TYPE.CV) {
 
     val msb = msb_in
     val lsb = lsb_in
@@ -61,7 +61,7 @@ class hw_fraction_CV (val msb_in : hw_imm, val lsb_in : hw_var) : hw_fraction(FR
     }
 }
 
-class hw_fraction_VC (val msb_in : hw_var, val lsb_in : hw_imm) : hw_fraction(FRAC_TYPE.VC) {
+class hw_frac_VC (val msb_in : hw_var, val lsb_in : hw_imm) : hw_frac(FRAC_TYPE.VC) {
 
     val msb = msb_in
     val lsb = lsb_in
@@ -73,7 +73,7 @@ class hw_fraction_VC (val msb_in : hw_var, val lsb_in : hw_imm) : hw_fraction(FR
     }
 }
 
-class hw_fraction_VV (val msb_in : hw_var, val lsb_in : hw_var) : hw_fraction(FRAC_TYPE.VV) {
+class hw_frac_VV (val msb_in : hw_var, val lsb_in : hw_var) : hw_frac(FRAC_TYPE.VV) {
 
     val msb = msb_in
     val lsb = lsb_in
@@ -83,7 +83,7 @@ class hw_fraction_VV (val msb_in : hw_var, val lsb_in : hw_var) : hw_fraction(FR
     }
 }
 
-class hw_fraction_SubStruct (val substruct_name_in : String) : hw_fraction(FRAC_TYPE.SubStruct) {
+class hw_frac_SubStruct (val substruct_name_in : String) : hw_frac(FRAC_TYPE.SubStruct) {
 
     val substruct_name = substruct_name_in
     var subStructIndex : Int = 0
@@ -95,36 +95,36 @@ class hw_fraction_SubStruct (val substruct_name_in : String) : hw_fraction(FRAC_
 }
 
 // container for variable fractures to take
-class hw_fractions() : ArrayList<hw_fraction>() {
+class hw_fracs() : ArrayList<hw_frac>() {
     constructor(index : Int) : this() {
-        this.add(hw_fraction_C(index))
+        this.add(hw_frac_C(index))
     }
 
     constructor(index : hw_var) : this() {
-        this.add(hw_fraction_V(index))
+        this.add(hw_frac_V(index))
     }
 
     constructor(msb : Int, lsb : Int) : this() {
-        this.add(hw_fraction_CC(msb, lsb))
+        this.add(hw_frac_CC(msb, lsb))
     }
 
     constructor(msb : Int, lsb : hw_var) : this() {
-        this.add(hw_fraction_CV(msb, lsb))
+        this.add(hw_frac_CV(msb, lsb))
     }
 
     constructor(msb : hw_var, lsb : Int) : this() {
-        this.add(hw_fraction_VC(msb, lsb))
+        this.add(hw_frac_VC(msb, lsb))
     }
 
     constructor(msb : hw_var, lsb : hw_var) : this() {
-        this.add(hw_fraction_VV(msb, lsb))
+        this.add(hw_frac_VV(msb, lsb))
     }
 
     constructor(substruct_name_in : String) : this() {
-        this.add(hw_fraction_SubStruct(substruct_name_in))
+        this.add(hw_frac_SubStruct(substruct_name_in))
     }
 
-    constructor(vararg fractions: hw_fraction) : this() {
+    constructor(vararg fractions: hw_frac) : this() {
         for (fraction in fractions) {
             this.add(fraction)
         }

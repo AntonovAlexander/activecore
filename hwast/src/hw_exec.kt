@@ -69,7 +69,7 @@ open class hw_exec(opcode_in : hw_opcode) {
 
     var expressions     = ArrayList<hw_exec>()
 
-    var assign_tgt_fractured    = hw_fractured(DUMMY_VAR, hw_fractions())
+    var assign_tgt_fractured    = hw_fractured(DUMMY_VAR, hw_fracs())
     var subStructvar_name       = "UNDEF"
     var iftargets   = ArrayList<hw_var>()
     var priority_conditions  = ArrayList<hw_param>()
