@@ -285,15 +285,18 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
 
         var rob_struct = cyclix_gen.add_struct("rob_struct")
         rob_struct.addu("enb",     0, 0, "0")
+        rob_struct.addu("sent",     0, 0, "0")
+        rob_struct.addu("rdy",     0, 0, "0")
         rob_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size)-1, 0, "0")
         rob_struct.addu("opcode",     0, 0, "0")
-        rob_struct.addu("rs0_ready",     0, 0, "0")
+        rob_struct.addu("rs0_rdy",     0, 0, "0")
         rob_struct.addu("rs0_tag",     TAG_WIDTH-1, 0, "0")
         rob_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
-        rob_struct.addu("rs1_ready",     0, 0, "0")
+        rob_struct.addu("rs1_rdy",     0, 0, "0")
         rob_struct.addu("rs1_tag",     TAG_WIDTH-1, 0, "0")
         rob_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
         rob_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
+        rob_struct.addu("rd_wdata",     mem_data_width-1, 0, "0")
 
         var req_struct = cyclix_gen.add_struct("req_struct")
         req_struct.addu("enb",     0, 0, "0")
@@ -308,6 +311,13 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
         resp_struct.addu("tag",     TAG_WIDTH-1, 0, "0")
         resp_struct.addu("wdata",     mem_data_width-1, 0, "0")
 
+        var commit_struct = cyclix_gen.add_struct("commit_struct")
+        commit_struct.addu("enb",     0, 0, "0")
+        commit_struct.addu("rdy",     0, 0, "0")
+        commit_struct.addu("rd_enb",     0, 0, "0")
+        commit_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
+        commit_struct.addu("rd_wdata",     mem_data_width-1, 0, "0")
+
         var TranslateInfo = __TranslateInfo()
 
         var rob = cyclix_gen.global("genexu_" + name + "_rob", rob_struct, rob_size-1, 0)
@@ -318,6 +328,46 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
             )
             TranslateInfo.exu_assocs.put(ExUnit.value, exu_info)
         }
+        var commit_bus = cyclix_gen.global("genexu_" + name + "_commit", commit_struct)
+
+        // committing ROB head
+        var rob_head = cyclix_gen.indexed(rob, 0)
+        cyclix_gen.begif(cyclix_gen.subStruct(cyclix_gen.indexed(rob, 0), "enb"))
+        run {
+            cyclix_gen.assign(
+                commit_bus,
+                hw_fracs(hw_frac_SubStruct("enb")),
+                1)
+            cyclix_gen.assign(
+                commit_bus,
+                hw_fracs(hw_frac_SubStruct("rd_enb")),
+                1)
+            cyclix_gen.assign(
+                commit_bus,
+                hw_fracs(hw_frac_SubStruct("rd_tag")),
+                cyclix_gen.subStruct(rob_head, "rd_tag"))
+            cyclix_gen.assign(
+                commit_bus,
+                hw_fracs(hw_frac_SubStruct("rd_wdata")),
+                cyclix_gen.subStruct(rob_head, "rd_wdata"))
+
+            cyclix_gen.begif(cyclix_gen.subStruct(commit_bus, "rdy"))
+            run {
+
+                // shifting ops
+                var rob_shift_iter = cyclix_gen.begforrange(rob, hw_imm(0), hw_imm(rob.vartype.dimensions.last().msb-1))
+                run {
+                    cyclix_gen.assign(
+                        rob,
+                        hw_fracs(hw_frac_V(rob_shift_iter.iter_num)),
+                        cyclix_gen.indexed(rob, rob_shift_iter.iter_num_next))
+                }; cyclix_gen.endloop()
+                cyclix_gen.assign(
+                    rob,
+                    hw_fracs(hw_frac_C(rob.vartype.dimensions.last().msb)),
+                    0)
+            }; cyclix_gen.endif()
+        }; cyclix_gen.endif()
 
         // issuing operations from ROB to FUs
         MSG("Translating: issuing operations from ROB to FUs")
@@ -325,59 +375,50 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
         run {
             cyclix_gen.begif(cyclix_gen.subStruct(rob_iter.iter_elem, "enb"))
             run {
-                cyclix_gen.begif(cyclix_gen.band(cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_ready"), cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_ready")))
+                cyclix_gen.begif(cyclix_gen.band(cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdy"), cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdy")))
                 run {
                     // asserting op to FU req bus
-                    var req_ndone = cyclix_gen.ulocal(GetGenName("req_ndone"), 0, 0, "0")
-                    cyclix_gen.assign(req_ndone, 1)
-                    var fu_id = 0
-                    for (exu_assoc in TranslateInfo.exu_assocs) {
-                        cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "fu_id"), fu_id))
-                        run {
-                            var req_bus_iter = cyclix_gen.begforall(exu_assoc.value.req_bus)
+                    cyclix_gen.begif(!cyclix_gen.subStruct(rob_iter.iter_elem, "sent"))
+                    run {
+                        var fu_id = 0
+                        for (exu_assoc in TranslateInfo.exu_assocs) {
+                            cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "fu_id"), fu_id))
                             run {
-                                cyclix_gen.assign(
-                                    exu_assoc.value.req_bus,
-                                    hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("enb")),
-                                    req_ndone)
-                                cyclix_gen.assign(
-                                    exu_assoc.value.req_bus,
-                                    hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("opcode")),
-                                    cyclix_gen.subStruct(rob_iter.iter_elem, "opcode"))
-                                cyclix_gen.assign(
-                                    exu_assoc.value.req_bus,
-                                    hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("rs0_rdata")),
-                                    cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdata"))
-                                cyclix_gen.assign(
-                                    exu_assoc.value.req_bus,
-                                    hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("rs1_rdata")),
-                                    cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdata"))
-                                cyclix_gen.assign(
-                                    exu_assoc.value.req_bus,
-                                    hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("rd_tag")),
-                                    cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"))
-
-                                cyclix_gen.begif(cyclix_gen.band(req_ndone, cyclix_gen.subStruct(req_bus_iter.iter_elem, "rdy")))
+                                var req_bus_iter = cyclix_gen.begforall(exu_assoc.value.req_bus)
                                 run {
-                                    cyclix_gen.assign(req_ndone, 0)
+                                    cyclix_gen.assign(
+                                        exu_assoc.value.req_bus,
+                                        hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("enb")),
+                                        1)
+                                    cyclix_gen.assign(
+                                        exu_assoc.value.req_bus,
+                                        hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("opcode")),
+                                        cyclix_gen.subStruct(rob_iter.iter_elem, "opcode"))
+                                    cyclix_gen.assign(
+                                        exu_assoc.value.req_bus,
+                                        hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("rs0_rdata")),
+                                        cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdata"))
+                                    cyclix_gen.assign(
+                                        exu_assoc.value.req_bus,
+                                        hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("rs1_rdata")),
+                                        cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdata"))
+                                    cyclix_gen.assign(
+                                        exu_assoc.value.req_bus,
+                                        hw_fracs(hw_frac_V(req_bus_iter.iter_num), hw_frac_SubStruct("rd_tag")),
+                                        cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"))
 
-                                    // shifting ops
-                                    var rob_shift_index_next = cyclix_gen.ulocal(GetGenName("rob_shift_index"), GetWidthToContain(rob.vartype.dimensions.last().GetWidth())-1, 0, "0")
-                                    var rob_shift_iter = cyclix_gen.begforrange(rob, hw_imm(rob.vartype.dimensions.last().lsb), hw_imm(rob.vartype.dimensions.last().msb))
+                                    cyclix_gen.begif(cyclix_gen.subStruct(req_bus_iter.iter_elem, "rdy"))
                                     run {
-                                        cyclix_gen.add_gen(rob_shift_index_next, rob_shift_iter.iter_num, 1)
-
-                                        // writing op
-                                        cyclix_gen.assign(rob, hw_fracs(hw_frac_V(rob_shift_iter.iter_num)), cyclix_gen.indexed(rob, rob_shift_index_next))
-
-                                        cyclix_gen.assign(rob_shift_iter.iter_num, rob_shift_index_next)
-                                    }; cyclix_gen.endloop()
-
-                                }; cyclix_gen.endif()
-                            }; cyclix_gen.endloop()
-                        }; cyclix_gen.endif()
-                        fu_id++
-                    }
+                                        cyclix_gen.assign(
+                                            rob,
+                                            hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("sent")),
+                                            1)
+                                    }; cyclix_gen.endif()
+                                }; cyclix_gen.endloop()
+                            }; cyclix_gen.endif()
+                            fu_id++
+                        }
+                    }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
         }; cyclix_gen.endloop()
@@ -391,7 +432,9 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                 run {
                     var rob_iter = cyclix_gen.begforall(rob)
                     run {
-                        cyclix_gen.begif(!cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_ready"))
+
+                        // reading rs0
+                        cyclix_gen.begif(!cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdy"))
                         run {
                             cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_tag"), cyclix_gen.subStruct(resp_bus_iter.iter_elem, "tag")))
                             run {
@@ -402,10 +445,14 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                                     cyclix_gen.subStruct(resp_bus_iter.iter_elem, "wdata"))
                                 cyclix_gen.assign(
                                     rob,
-                                    hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rs0_ready")),
+                                    hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rs0_rdy")),
                                     1)
                             }; cyclix_gen.endif()
+                        }; cyclix_gen.endif()
 
+                        // reading rs1
+                        cyclix_gen.begif(!cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdy"))
+                        run {
                             cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_tag"), cyclix_gen.subStruct(resp_bus_iter.iter_elem, "tag")))
                             run {
                                 // setting rs1 ROB entry ready
@@ -415,11 +462,28 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
                                     cyclix_gen.subStruct(resp_bus_iter.iter_elem, "wdata"))
                                 cyclix_gen.assign(
                                     rob,
-                                    hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rs1_ready")),
+                                    hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rs1_rdy")),
                                     1)
                             }; cyclix_gen.endif()
-
                         }; cyclix_gen.endif()
+
+                        // reading rd
+                        cyclix_gen.begif(!cyclix_gen.subStruct(rob_iter.iter_elem, "rdy"))
+                        run {
+                            cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"), cyclix_gen.subStruct(resp_bus_iter.iter_elem, "tag")))
+                            run {
+                                // setting ROB entry ready for commit
+                                cyclix_gen.assign(
+                                    rob,
+                                    hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rd_wdata")),
+                                    cyclix_gen.subStruct(resp_bus_iter.iter_elem, "wdata"))
+                                cyclix_gen.assign(
+                                    rob,
+                                    hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rdy")),
+                                    1)
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endif()
+
                     }; cyclix_gen.endloop()
                 }; cyclix_gen.endif()
             }; cyclix_gen.endloop()
