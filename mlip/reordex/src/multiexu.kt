@@ -10,12 +10,17 @@ package reordex
 
 import hwast.*
 
-open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int, rob_size_in : Int) : hw_astc_stdif() {
+data class MultiExu_CFG_RF(val input_RF_width : Int,
+                           val input_RF_depth : Int,
+                           val rename_RF: Boolean,
+                           val rename_RF_depth : Int)
+
+open class MultiExu(name_in : String, MultiExu_cfg_rf_in : MultiExu_CFG_RF, rob_size_in : Int) : hw_astc_stdif() {
 
     val name = name_in
-    val mem_size = mem_size_in
-    val mem_addr_width = GetWidthToContain(mem_size_in)
-    val mem_data_width = mem_data_width_in
+    val MultiExu_cfg_rf = MultiExu_cfg_rf_in
+    val input_rf_addr_width = GetWidthToContain(MultiExu_cfg_rf.input_RF_depth)
+    val rename_rf_addr_width = GetWidthToContain(MultiExu_cfg_rf.rename_RF_depth)
     val rob_size = rob_size_in
 
     override var GenNamePrefix   = "reordex"
@@ -34,11 +39,11 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
         return new_exec_unit
     }
 
-    fun begexu(eu : hw_exec_unit) {
-        if (FROZEN_FLAG) ERROR("Failed to begin stage " + eu.name + ": ASTC frozen")
+    fun begexu(exu : hw_exec_unit) {
+        if (FROZEN_FLAG) ERROR("Failed to begin stage " + exu.name + ": ASTC frozen")
         if (this.size != 0) ERROR("reordex ASTC inconsistent!")
         // TODO: validate stage presence
-        add(eu)
+        add(exu)
     }
 
     fun endexu() {
@@ -257,18 +262,18 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
         var cmd_req_struct = cyclix_gen.add_struct(name + "_cmd_req_struct")
         cmd_req_struct.addu("exec",     0, 0, "0")
         cmd_req_struct.addu("rf_we",       0,  0, "0")
-        cmd_req_struct.addu("rf_addr",    mem_addr_width-1, 0, "0")
-        cmd_req_struct.addu("rf_wdata",    mem_data_width-1, 0, "0")
+        cmd_req_struct.addu("rf_addr",    input_rf_addr_width-1, 0, "0")
+        cmd_req_struct.addu("rf_wdata",    MultiExu_cfg_rf.input_RF_width-1, 0, "0")
         cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size)-1, 0, "0")
-        cmd_req_struct.addu("fu_rs0",    mem_addr_width-1, 0, "0")
-        cmd_req_struct.addu("fu_rs1",    mem_addr_width-1, 0, "0")
-        cmd_req_struct.addu("fu_rd",    mem_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_rs0",    input_rf_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_rs1",    input_rf_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_rd",    input_rf_addr_width-1, 0, "0")
         var cmd_req = cyclix_gen.fifo_in("cmd_req",  hw_type(cmd_req_struct))
-        var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(mem_data_width-1, 0)))
+        var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(MultiExu_cfg_rf.input_RF_width-1, 0)))
 
         // TODO: memory interface?
 
-        var MAX_INSTR_NUM = mem_size + rob_size
+        var MAX_INSTR_NUM = MultiExu_cfg_rf.input_RF_depth + rob_size
         for (ExecUnit in ExecUnits) {
             MAX_INSTR_NUM += ExecUnit.value.exu_num * ExecUnit.value.stage_num
         }
@@ -278,10 +283,10 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
         var uop_struct = cyclix_gen.add_struct("uop_struct")
         uop_struct.addu("enb",     0, 0, "0")
         uop_struct.addu("opcode",     0, 0, "0")
-        uop_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
-        uop_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
+        uop_struct.addu("rs0_rdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
+        uop_struct.addu("rs1_rdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
         uop_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
-        uop_struct.addu("rd_wdata",     mem_data_width-1, 0, "0")
+        uop_struct.addu("rd_wdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
 
         var rob_struct = cyclix_gen.add_struct("rob_struct")
         rob_struct.addu("enb",     0, 0, "0")
@@ -291,41 +296,54 @@ open class MultiExu(name_in : String, mem_size_in : Int, mem_data_width_in: Int,
         rob_struct.addu("opcode",     0, 0, "0")
         rob_struct.addu("rs0_rdy",     0, 0, "0")
         rob_struct.addu("rs0_tag",     TAG_WIDTH-1, 0, "0")
-        rob_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
+        rob_struct.addu("rs0_rdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
         rob_struct.addu("rs1_rdy",     0, 0, "0")
         rob_struct.addu("rs1_tag",     TAG_WIDTH-1, 0, "0")
-        rob_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
+        rob_struct.addu("rs1_rdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
         rob_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
-        rob_struct.addu("rd_wdata",     mem_data_width-1, 0, "0")
+        rob_struct.addu("rd_wdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
 
         var req_struct = cyclix_gen.add_struct("req_struct")
         req_struct.addu("enb",     0, 0, "0")
         req_struct.addu("opcode",     0, 0, "0")
         req_struct.addu("rdy",     0, 0, "0")
-        req_struct.addu("rs0_rdata",     mem_data_width-1, 0, "0")
-        req_struct.addu("rs1_rdata",     mem_data_width-1, 0, "0")
+        req_struct.addu("rs0_rdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
+        req_struct.addu("rs1_rdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
         req_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
 
         var resp_struct = cyclix_gen.add_struct("resp_struct")
         resp_struct.addu("enb",     0, 0, "0")
         resp_struct.addu("tag",     TAG_WIDTH-1, 0, "0")
-        resp_struct.addu("wdata",     mem_data_width-1, 0, "0")
+        resp_struct.addu("wdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
 
         var commit_struct = cyclix_gen.add_struct("commit_struct")
         commit_struct.addu("enb",     0, 0, "0")
         commit_struct.addu("rdy",     0, 0, "0")
         commit_struct.addu("rd_enb",     0, 0, "0")
         commit_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
-        commit_struct.addu("rd_wdata",     mem_data_width-1, 0, "0")
+        commit_struct.addu("rd_wdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
 
         var TranslateInfo = __TranslateInfo()
 
-        var rob = cyclix_gen.global("genexu_" + name + "_rob", rob_struct, rob_size-1, 0)
+        var rob = cyclix_gen.global("genrob_" + name, rob_struct, rob_size-1, 0)
         for (ExUnit in ExecUnits) {
+
+            var exu_vars = ArrayList<__exu_var_assoc>()
+            var exu_opcode = cyclix_gen.global("genexu_" + ExUnit.value.exu_opcode.name, ExUnit.value.exu_opcode.vartype, ExUnit.value.exu_opcode.defval)
+            exu_vars.add(__exu_var_assoc(ExUnit.value.exu_opcode, exu_opcode))
+            var rs0_rdata = cyclix_gen.global("genexu_" + ExUnit.value.rs0_rdata.name, ExUnit.value.rs0_rdata.vartype, ExUnit.value.rs0_rdata.defval)
+            exu_vars.add(__exu_var_assoc(ExUnit.value.rs0_rdata, rs0_rdata))
+            var rs1_rdata = cyclix_gen.global("genexu_" + ExUnit.value.rs1_rdata.name, ExUnit.value.rs1_rdata.vartype, ExUnit.value.rs1_rdata.defval)
+            exu_vars.add(__exu_var_assoc(ExUnit.value.rs1_rdata, rs1_rdata))
+            var rd_wdata = cyclix_gen.global("genexu_" + ExUnit.value.rd_wdata.name, ExUnit.value.rd_wdata.vartype, ExUnit.value.rd_wdata.defval)
+            exu_vars.add(__exu_var_assoc(ExUnit.value.rd_wdata, rd_wdata))
+
             var exu_info = __exu_info(
                 cyclix_gen.global("genexu_" + ExUnit.value.name + "_req", req_struct, ExUnit.value.exu_num-1, 0),
-                cyclix_gen.global("genexu_" + ExUnit.value.name + "_resp", resp_struct, ExUnit.value.exu_num-1, 0)
+                cyclix_gen.global("genexu_" + ExUnit.value.name + "_resp", resp_struct, ExUnit.value.exu_num-1, 0),
+                exu_vars
             )
+
             TranslateInfo.exu_assocs.put(ExUnit.value, exu_info)
         }
         var commit_bus = cyclix_gen.global("genexu_" + name + "_commit", commit_struct)
