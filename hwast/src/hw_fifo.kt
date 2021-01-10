@@ -8,15 +8,20 @@
 
 package hwast
 
-val OP_FIFO_WR = hw_opcode("fifo_wr")
-val OP_FIFO_RD = hw_opcode("fifo_rd")
+val OP_FIFO_WR_UNBLK = hw_opcode("fifo_wr_unblk")
+val OP_FIFO_RD_UNBLK = hw_opcode("fifo_rd_unblk")
 
-class hw_exec_fifo_wr(var fifo : hw_fifo_out) : hw_exec(OP_FIFO_WR)
+val OP_FIFO_WR_BLK = hw_opcode("fifo_wr_blk")
+val OP_FIFO_RD_BLK = hw_opcode("fifo_rd_blk")
 
-class hw_exec_fifo_rd(var fifo : hw_fifo_in) : hw_exec(OP_FIFO_RD)
+class hw_exec_fifo_wr_unblk(var fifo : hw_fifo_out) : hw_exec(OP_FIFO_WR_UNBLK)
+class hw_exec_fifo_rd_unblk(var fifo : hw_fifo_in) : hw_exec(OP_FIFO_RD_UNBLK)
 
-class hw_fifo_out(name_in : String, vartype : hw_type)
-    : hw_structvar(name_in, vartype, "0")
+class hw_exec_fifo_wr_blk(var fifo : hw_fifo_out) : hw_exec(OP_FIFO_WR_BLK)
+class hw_exec_fifo_rd_blk(var fifo : hw_fifo_in) : hw_exec(OP_FIFO_RD_BLK)
 
-class hw_fifo_in(name_in : String, vartype : hw_type)
-    : hw_structvar(name_in, vartype, "0")
+class hw_fifo_out(name : String, vartype : hw_type)
+    : hw_structvar(name, vartype, "0")
+
+class hw_fifo_in(name : String, vartype : hw_type)
+    : hw_structvar(name, vartype, "0")

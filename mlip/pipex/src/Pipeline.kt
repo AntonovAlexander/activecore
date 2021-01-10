@@ -745,22 +745,22 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                 TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_finish
             )
 
-        } else if (expr.opcode == OP_FIFO_WR) {
+        } else if (expr.opcode == OP_FIFO_WR_UNBLK) {
             var wdata_translated = curStageAssoc.TranslateParam(expr.params[0])
             var ack_translated = curStageAssoc.TranslateVar(expr.wrvars[0])
-            var fifo_wr_translated = TranslateInfo.__fifo_wr_assocs[(expr as hw_exec_fifo_wr).fifo]!!
+            var fifo_wr_translated = TranslateInfo.__fifo_wr_assocs[(expr as hw_exec_fifo_wr_unblk).fifo]!!
             cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
             run {
-                cyclix_gen.assign(ack_translated, cyclix_gen.fifo_wr(fifo_wr_translated, wdata_translated))
+                cyclix_gen.assign(ack_translated, cyclix_gen.fifo_wr_unblk(fifo_wr_translated, wdata_translated))
             }; cyclix_gen.endif()
 
-        } else if (expr.opcode == OP_FIFO_RD) {
+        } else if (expr.opcode == OP_FIFO_RD_UNBLK) {
             var ack_translated = curStageAssoc.TranslateVar(expr.wrvars[0])
             var rdata_translated = curStageAssoc.TranslateVar(expr.wrvars[1])
-            var fifo_rd_translated = TranslateInfo.__fifo_rd_assocs[(expr as hw_exec_fifo_rd).fifo]!!
+            var fifo_rd_translated = TranslateInfo.__fifo_rd_assocs[(expr as hw_exec_fifo_rd_unblk).fifo]!!
             cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
             run {
-                cyclix_gen.assign(ack_translated, cyclix_gen.fifo_rd(fifo_rd_translated, rdata_translated))
+                cyclix_gen.assign(ack_translated, cyclix_gen.fifo_rd_unblk(fifo_rd_translated, rdata_translated))
             }; cyclix_gen.endif()
 
         } else if (expr.opcode == OP_MCOPIPE_REQ) {
@@ -794,7 +794,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                     cyclix_gen.assign(req_struct, hw_fracs("we"), cmd_translated)
                     cyclix_gen.assign(req_struct, hw_fracs("wdata"), wdata_translated)
 
-                    cyclix_gen.begif(cyclix_gen.fifo_wr(mcopipe_if_assoc.req_fifo, req_struct))
+                    cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(mcopipe_if_assoc.req_fifo, req_struct))
                     run {
 
                         // req management
@@ -850,7 +850,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                     scopipe_if_assoc.req_fifo.vartype,
                     scopipe_if_assoc.req_fifo.defval)
 
-                cyclix_gen.begif(cyclix_gen.fifo_rd(scopipe_if_assoc.req_fifo, req_struct))
+                cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(scopipe_if_assoc.req_fifo, req_struct))
                 run {
                     cyclix_gen.subStruct_gen(curStageAssoc.TranslateVar(expr.wrvars[0]),  req_struct, "we")
                     cyclix_gen.subStruct_gen(curStageAssoc.TranslateVar(expr.wrvars[1]),  req_struct, "wdata")
@@ -875,7 +875,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
 
                     cyclix_gen.begif(cyclix_gen.eq2(if_id_translated, TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(scopipe_if)))
                     run {
-                        cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), cyclix_gen.fifo_wr(scopipe_if_assoc.resp_fifo, curStageAssoc.TranslateVar(expr.rdvars[0])))
+                        cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), cyclix_gen.fifo_wr_unblk(scopipe_if_assoc.resp_fifo, curStageAssoc.TranslateVar(expr.rdvars[0])))
                     }; cyclix_gen.endif()
                 }
             }; cyclix_gen.endif()
@@ -1345,7 +1345,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
 
                                     var fifo_rdata = cyclix_gen.local(GetGenName("mcopipe_rdata"), mcopipe_if.rdata_vartype, "0")
 
-                                    cyclix_gen.begif(cyclix_gen.fifo_rd(mcopipe_if_assoc.resp_fifo, fifo_rdata))
+                                    cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(mcopipe_if_assoc.resp_fifo, fifo_rdata))
                                     run {
                                         // acquiring data
                                         cyclix_gen.assign(rdreq_pending_translated, 0)

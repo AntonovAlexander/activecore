@@ -244,4 +244,14 @@ open class Generic(name_in : String) : hw_astc_stdif() {
     }
 }
 
-open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct: hw_struct) : Generic(name)
+open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct: hw_struct) : Generic(name) {
+
+    var stream_req_bus = hw_fifo_in("stream_req_bus", hw_type(fifo_in_struct))
+    var stream_req_var = local(GetGenName("stream_req_var"), fifo_in_struct)
+    var stream_resp_bus = hw_fifo_in("stream_resp_bus", hw_type(fifo_out_struct))
+    var stream_resp_var = local(GetGenName("stream_resp_var"), fifo_out_struct)
+
+    init {
+
+    }
+}

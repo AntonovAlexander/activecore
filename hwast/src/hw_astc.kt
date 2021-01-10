@@ -1568,8 +1568,8 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
-    fun fifo_wr(fifo : hw_fifo_out, wdata : hw_param) : hw_var {
-        var new_expr = hw_exec_fifo_wr(fifo)
+    fun fifo_wr_unblk(fifo : hw_fifo_out, wdata : hw_param) : hw_var {
+        var new_expr = hw_exec_fifo_wr_unblk(fifo)
         var genvar = hw_var(GetGenName("fifo_rdy"), VAR_TYPE.UNSIGNED, 0, 0, "0")
         new_expr.AddRdParam(wdata)
         new_expr.AddWrVar(genvar)
@@ -1578,12 +1578,26 @@ open class hw_astc_stdif() : hw_astc() {
         return genvar
     }
 
-    fun fifo_rd(fifo : hw_fifo_in, rdata : hw_var) : hw_var {
-        var new_expr = hw_exec_fifo_rd(fifo)
+    fun fifo_rd_unblk(fifo : hw_fifo_in, rdata : hw_var) : hw_var {
+        var new_expr = hw_exec_fifo_rd_unblk(fifo)
         var genvar = hw_var(GetGenName("fifo_rdy"), VAR_TYPE.UNSIGNED, 0, 0, "0")
         new_expr.AddWrVar(genvar)
         new_expr.AddGenVar(genvar)
         new_expr.AddWrVar(rdata)
+        AddExpr(new_expr)
+        return genvar
+    }
+    fun fifo_wr_blk(fifo : hw_fifo_out, wdata : hw_param) {
+        var new_expr = hw_exec_fifo_wr_blk(fifo)
+        new_expr.AddRdParam(wdata)
+        AddExpr(new_expr)
+    }
+
+    fun fifo_rd_blk(fifo : hw_fifo_in) : hw_var {
+        var new_expr = hw_exec_fifo_rd_blk(fifo)
+        var genvar = hw_var(GetGenName("fifo_rdata"), fifo.vartype, fifo.defval)
+        new_expr.AddWrVar(genvar)
+        new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
     }

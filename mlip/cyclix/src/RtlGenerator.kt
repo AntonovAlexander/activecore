@@ -159,9 +159,9 @@ class RtlGenerator(var cyclix_module : Generic) {
                 }
             }; rtl_gen.endloop()
 
-        } else if (expr.opcode == OP_FIFO_WR) {
+        } else if (expr.opcode == OP_FIFO_WR_UNBLK) {
 
-            var fifo = TranslateFifoOut((expr as hw_exec_fifo_wr).fifo)
+            var fifo = TranslateFifoOut((expr as hw_exec_fifo_wr_unblk).fifo)
             var wdata_translated = TranslateParam(expr.params[0])
             var fifo_rdy = TranslateVar(expr.wrvars[0])
 
@@ -182,9 +182,9 @@ class RtlGenerator(var cyclix_module : Generic) {
                 rtl_gen.assign(fifo.reqbuf_req, 1)
             }; rtl_gen.endif()
 
-        } else if (expr.opcode == OP_FIFO_RD) {
+        } else if (expr.opcode == OP_FIFO_RD_UNBLK) {
 
-            var fifo = TranslateFifoIn((expr as hw_exec_fifo_rd).fifo)
+            var fifo = TranslateFifoIn((expr as hw_exec_fifo_rd_unblk).fifo)
             var fifo_rdy = TranslateVar(expr.wrvars[0])
             var rdata_translated = TranslateVar(expr.wrvars[1])
 

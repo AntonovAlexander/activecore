@@ -12,17 +12,31 @@ import hwast.*
 
 val OP_EXU = hwast.hw_opcode("exec_unit")
 
-open class Exu(val name : String, val stage_num: Int) : hw_astc_stdif() {
+data class Exu_CFG_RF(val input_RF_width : Int)
+
+open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: Int) : hw_astc_stdif() {
 
     override var GenNamePrefix   = "reordex"
 
     var locals          = ArrayList<hw_var>()
     var globals         = ArrayList<hw_var>()
 
+    var req_struct = add_struct("req_struct")
+    var req_data = hw_var(GetGenName("req_data"), req_struct)
+
+    var resp_struct = add_struct("resp_struct")
+    var resp_data = hw_var(GetGenName("resp_data"), resp_struct)
+
     init {
         if (FROZEN_FLAG) ERROR("Failed to begin stage " + name + ": ASTC frozen")
         if (this.size != 0) ERROR("reordex ASTC inconsistent!")
         add(hw_exec(OP_EXU))
+
+        req_struct.addu("opcode",     0, 0, "0")
+        req_struct.addu("rs0_rdata",     Exu_cfg_rf.input_RF_width-1, 0, "0")
+        req_struct.addu("rs1_rdata",     Exu_cfg_rf.input_RF_width-1, 0, "0")
+
+        resp_struct.addu("wdata",     Exu_cfg_rf.input_RF_width-1, 0, "0")
     }
 
     fun endexu() {
