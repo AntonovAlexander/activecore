@@ -1,5 +1,5 @@
 /*
- * pipeline.kt
+ * Pipeline.kt
  *
  *  Created on: 05.06.2019
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
@@ -594,7 +594,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         }
 
         if ((expr.opcode == OP1_ASSIGN)) {
-            
+
             if (expr.wrvars[0] is hw_global) {
                 cyclix_gen.begif(!curStageAssoc.pctrl_stalled_glbl)
                 run {
@@ -1088,20 +1088,20 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
             for (STAGE_INDEX_ANLZ in 0 until StageList.size) {
                 if (STAGE_INDEX_ANLZ < CUR_STAGE_INDEX) {
                     prev_req_mcopipelist =
-                            UniteArrayLists(prev_req_mcopipelist, StageAssocList[STAGE_INDEX_ANLZ].mcopipe_handle_reqs)
+                        UniteArrayLists(prev_req_mcopipelist, StageAssocList[STAGE_INDEX_ANLZ].mcopipe_handle_reqs)
                     prev_req_scopipelist =
-                            UniteArrayLists(prev_req_scopipelist, StageAssocList[STAGE_INDEX_ANLZ].scopipe_handle_reqs)
+                        UniteArrayLists(prev_req_scopipelist, StageAssocList[STAGE_INDEX_ANLZ].scopipe_handle_reqs)
 
                 } else if (STAGE_INDEX_ANLZ == CUR_STAGE_INDEX) {
                     cur_req_mcopipelist =
-                            UniteArrayLists(cur_req_mcopipelist, StageAssocList[STAGE_INDEX_ANLZ].mcopipe_handle_reqs)
+                        UniteArrayLists(cur_req_mcopipelist, StageAssocList[STAGE_INDEX_ANLZ].mcopipe_handle_reqs)
                     cur_resp_mcopipelist =
-                            UniteArrayLists(cur_resp_mcopipelist, StageAssocList[STAGE_INDEX_ANLZ].mcopipe_handle_resps)
+                        UniteArrayLists(cur_resp_mcopipelist, StageAssocList[STAGE_INDEX_ANLZ].mcopipe_handle_resps)
 
                     cur_req_scopipelist =
-                            UniteArrayLists(cur_req_scopipelist, StageAssocList[STAGE_INDEX_ANLZ].scopipe_handle_reqs)
+                        UniteArrayLists(cur_req_scopipelist, StageAssocList[STAGE_INDEX_ANLZ].scopipe_handle_reqs)
                     cur_resp_scopipelist =
-                            UniteArrayLists(cur_resp_scopipelist, StageAssocList[STAGE_INDEX_ANLZ].scopipe_handle_resps)
+                        UniteArrayLists(cur_resp_scopipelist, StageAssocList[STAGE_INDEX_ANLZ].scopipe_handle_resps)
 
                 } else {
                     next_resp_mcopipelist = UniteArrayLists(
