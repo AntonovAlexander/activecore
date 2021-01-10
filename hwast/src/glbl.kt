@@ -67,3 +67,19 @@ fun WriteGenSrcHeader(wrFile : OutputStreamWriter, SrcType : String) {
     wrFile.write("// Copyright Alexander Antonov <antonov.alex.alex@gmail.com>\n")
     wrFile.write("// ===========================================================\n\n")
 }
+
+fun TranslateVar(var_in : hw_var, var_dict: MutableMap<hw_var, hw_var>) : hw_var {
+    var ret_var = var_dict[var_in]
+    if (ret_var != null) return ret_var
+    else ERROR("Var translation error")
+    throw Exception()
+}
+
+fun TranslateParam(param : hw_param, var_dict: MutableMap<hw_var, hw_var>) : hw_param {
+    if (param is hw_imm) return param
+    else if (param is hw_var) return TranslateVar(param, var_dict)
+    else {
+        ERROR("Type unrecognized!")
+        throw Exception()
+    }
+}

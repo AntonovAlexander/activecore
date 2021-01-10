@@ -31,21 +31,6 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
         }
     }
 
-
-    fun TranslateVar(var_in : hw_var, var_dict: MutableMap<hw_var, hw_var>) : hw_var {
-        var ret_var = var_dict[var_in]
-        if (ret_var != null) return ret_var
-        else ERROR("Var translation error")
-        return hw_var("UGLY HACK", VAR_TYPE.UNSIGNED, 0, 0, "0")
-    }
-
-    fun TranslateParam(param : hw_param, var_dict: MutableMap<hw_var, hw_var>) : hw_param {
-        if (param is hw_imm) return param
-        else if (param is hw_var) return TranslateVar(param, var_dict)
-        else ERROR("Type unrecognized!")
-        return param
-    }
-
     /*
     fun TranslateFifoOut(fifo : hw_fifo_out) : fifo_out_descr {
         var ret_var = fifo_out_dict[fifo]

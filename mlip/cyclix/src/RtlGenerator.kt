@@ -9,6 +9,7 @@
 package cyclix
 
 import hwast.*
+import java.lang.Exception
 
 class RtlGenerator(var cyclix_module : Generic) {
 
@@ -26,20 +27,6 @@ class RtlGenerator(var cyclix_module : Generic) {
     var var_dict        = mutableMapOf<hw_var, hw_var>()
     var fifo_out_dict   = mutableMapOf<hw_fifo_out, fifo_out_descr>()
     var fifo_in_dict    = mutableMapOf<hw_fifo_in, fifo_in_descr>()
-
-    fun TranslateVar(var_in : hw_var) : hw_var {
-        var ret_var = var_dict[var_in]
-        if (ret_var != null) return ret_var
-        else ERROR("Var translation error")
-        return hw_var("UGLY HACK", VAR_TYPE.UNSIGNED, 0, 0, "0")
-    }
-
-    fun TranslateParam(param : hw_param) : hw_param {
-        if (param is hw_imm) return param
-        else if (param is hw_var) return TranslateVar(param)
-        else ERROR("Type unrecognized!")
-        return param
-    }
 
     fun TranslateFifoOut(fifo : hw_fifo_out) : fifo_out_descr {
         var ret_var = fifo_out_dict[fifo]
@@ -64,17 +51,17 @@ class RtlGenerator(var cyclix_module : Generic) {
         var fractions = hw_fracs()
         for (src_fraction in expr.assign_tgt_fractured.depow_fractions) {
             if (src_fraction is hw_frac_C) fractions.add(src_fraction)
-            else if (src_fraction is hw_frac_V) fractions.add(hw_frac_V(TranslateVar(src_fraction.index)))
+            else if (src_fraction is hw_frac_V) fractions.add(hw_frac_V(TranslateVar(src_fraction.index, var_dict)))
             else if (src_fraction is hw_frac_CC) fractions.add(src_fraction)
-            else if (src_fraction is hw_frac_CV) fractions.add(hw_frac_CV(src_fraction.msb, TranslateVar(src_fraction.lsb)))
-            else if (src_fraction is hw_frac_VC) fractions.add(hw_frac_VC(TranslateVar(src_fraction.msb), src_fraction.lsb))
-            else if (src_fraction is hw_frac_VV) fractions.add(hw_frac_VV(TranslateVar(src_fraction.msb), TranslateVar(src_fraction.lsb)))
+            else if (src_fraction is hw_frac_CV) fractions.add(hw_frac_CV(src_fraction.msb, TranslateVar(src_fraction.lsb, var_dict)))
+            else if (src_fraction is hw_frac_VC) fractions.add(hw_frac_VC(TranslateVar(src_fraction.msb, var_dict), src_fraction.lsb))
+            else if (src_fraction is hw_frac_VV) fractions.add(hw_frac_VV(TranslateVar(src_fraction.msb, var_dict), TranslateVar(src_fraction.lsb, var_dict)))
             else if (src_fraction is hw_frac_SubStruct) fractions.add(src_fraction)
             else ERROR("dimensions error")
         }
 
         if ((expr.opcode == OP1_ASSIGN)) {
-            rtl_gen.assign(TranslateVar(expr.wrvars[0]), fractions, TranslateParam(expr.params[0]))
+            rtl_gen.assign(TranslateVar(expr.wrvars[0], var_dict), fractions, TranslateParam(expr.params[0], var_dict))
 
         } else if ((expr.opcode == OP2_ARITH_ADD)
             || (expr.opcode == OP2_ARITH_SUB)
@@ -116,20 +103,20 @@ class RtlGenerator(var cyclix_module : Generic) {
 
             var params = ArrayList<hw_param>()
             for (param in expr.params) {
-                params.add(TranslateParam(param))
+                params.add(TranslateParam(param, var_dict))
             }
-            rtl_gen.AddExpr_op_gen(expr.opcode, TranslateVar(expr.wrvars[0]), params)
+            rtl_gen.AddExpr_op_gen(expr.opcode, TranslateVar(expr.wrvars[0], var_dict), params)
 
         } else if (expr.opcode == OP2_SUBSTRUCT) {
             rtl_gen.subStruct_gen(
-                TranslateVar(expr.wrvars[0]),
-                TranslateVar(expr.rdvars[0]),
+                TranslateVar(expr.wrvars[0], var_dict),
+                TranslateVar(expr.rdvars[0], var_dict),
                 expr.subStructvar_name
             )
 
         } else if (expr.opcode == OP1_IF) {
 
-            rtl_gen.begif(TranslateParam(expr.params[0]))
+            rtl_gen.begif(TranslateParam(expr.params[0], var_dict))
             run {
                 for (child_expr in expr.expressions) {
                     export_expr(rtl_gen, child_expr, rst)
@@ -138,11 +125,11 @@ class RtlGenerator(var cyclix_module : Generic) {
 
         } else if (expr.opcode == OP1_CASE) {
 
-            rtl_gen.begcase(TranslateParam(expr.params[0]))
+            rtl_gen.begcase(TranslateParam(expr.params[0], var_dict))
             run {
                 for (casebranch in expr.expressions) {
                     if (casebranch.opcode != OP1_CASEBRANCH) ERROR("non-branch op in case")
-                    rtl_gen.begbranch(TranslateParam(casebranch.params[0]))
+                    rtl_gen.begbranch(TranslateParam(casebranch.params[0], var_dict))
                     for (subexpr in casebranch.expressions) {
                         export_expr(rtl_gen, subexpr, rst)
                     }
@@ -152,7 +139,7 @@ class RtlGenerator(var cyclix_module : Generic) {
 
         } else if (expr.opcode == OP1_WHILE) {
 
-            rtl_gen.begwhile(TranslateParam(expr.params[0]))
+            rtl_gen.begwhile(TranslateParam(expr.params[0], var_dict))
             run {
                 for (child_expr in expr.expressions) {
                     export_expr(rtl_gen, child_expr, rst)
@@ -162,8 +149,8 @@ class RtlGenerator(var cyclix_module : Generic) {
         } else if (expr.opcode == OP_FIFO_WR_UNBLK) {
 
             var fifo = TranslateFifoOut((expr as hw_exec_fifo_wr_unblk).fifo)
-            var wdata_translated = TranslateParam(expr.params[0])
-            var fifo_rdy = TranslateVar(expr.wrvars[0])
+            var wdata_translated = TranslateParam(expr.params[0], var_dict)
+            var fifo_rdy = TranslateVar(expr.wrvars[0], var_dict)
 
             rtl_gen.begif(rtl_gen.lnot(rst))
             run {
@@ -185,8 +172,8 @@ class RtlGenerator(var cyclix_module : Generic) {
         } else if (expr.opcode == OP_FIFO_RD_UNBLK) {
 
             var fifo = TranslateFifoIn((expr as hw_exec_fifo_rd_unblk).fifo)
-            var fifo_rdy = TranslateVar(expr.wrvars[0])
-            var rdata_translated = TranslateVar(expr.wrvars[1])
+            var fifo_rdy = TranslateVar(expr.wrvars[0], var_dict)
+            var rdata_translated = TranslateVar(expr.wrvars[1], var_dict)
 
             rtl_gen.begif(rtl_gen.lnot(rst))
             run {
