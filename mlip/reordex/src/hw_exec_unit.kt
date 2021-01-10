@@ -8,21 +8,162 @@
 
 package reordex
 
-val OP_STAGE = hwast.hw_opcode("rexec_unit")
+import hwast.*
 
-class hw_exec_unit(name_in : String, exu_num_in: Int, stage_num_in: Int, multiexu_in : MultiExu) : hwast.hw_exec(OP_STAGE) {
+val OP_EXU = hwast.hw_opcode("exec_unit")
+
+open class Exu(name_in : String, stage_num_in: Int) : hw_astc_stdif() {
 
     val name = name_in
-    val exu_num = exu_num_in
     val stage_num = stage_num_in
-    val multiexu = multiexu_in
 
-    val exu_opcode = multiexu_in.uglobal(("genexu_" + name + "_exu_opcode"), 3, 0, "0")
-    val rs0_rdata = multiexu_in.uglobal(("genexu_" + name + "_rs0_rdata"), 31, 0, "0")
-    val rs1_rdata = multiexu_in.uglobal(("genexu_" + name + "_rs1_rdata"), 31, 0, "0")
-    val rd_wdata = multiexu_in.uglobal(("genexu_" + name + "_rd_wdata"), 31, 0, "0")
+    override var GenNamePrefix   = "reordex"
 
-    fun begin() {
-        multiexu.begexu(this)
+    var locals          = ArrayList<hw_var>()
+    var globals         = ArrayList<hw_var>()
+
+    init {
+        if (FROZEN_FLAG) ERROR("Failed to begin stage " + name + ": ASTC frozen")
+        if (this.size != 0) ERROR("reordex ASTC inconsistent!")
+        add(hw_exec(OP_EXU))
+    }
+
+    fun endexu() {
+        if (FROZEN_FLAG) ERROR("Failed to end stage: ASTC frozen")
+        if (this.size != 1) ERROR("Exu ASTC inconsistent!")
+        if (this[0].opcode != OP_EXU) ERROR("Exu ASTC inconsistent!")
+        this.clear()
+    }
+
+    private fun add_local(new_local: hw_var) {
+        if (FROZEN_FLAG) ERROR("Failed to add local " + new_local.name + ": ASTC frozen")
+
+        if (wrvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
+        if (rdvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
+
+        wrvars.put(new_local.name, new_local)
+        rdvars.put(new_local.name, new_local)
+        locals.add(new_local)
+        new_local.default_astc = this
+    }
+
+    fun local(name: String, vartype : hw_type, defval: String): hw_var {
+        var ret_var = hw_var(name, vartype, defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun local(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_var {
+        var ret_var = hw_var(name, hw_type(src_struct_in, dimensions), "0")
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun local(name: String, src_struct_in: hw_struct): hw_var {
+        var ret_var = hw_var(name, hw_type(src_struct_in), "0")
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun ulocal(name: String, dimensions: hw_dim_static, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun ulocal(name: String, msb: Int, lsb: Int, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun ulocal(name: String, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun slocal(name: String, dimensions: hw_dim_static, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun slocal(name: String, msb: Int, lsb: Int, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun slocal(name: String, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, defval), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    private fun add_global(new_global: hw_var) {
+        if (FROZEN_FLAG) ERROR("Failed to add global " + new_global.name + ": ASTC frozen")
+
+        if (wrvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
+        if (rdvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
+
+        wrvars.put(new_global.name, new_global)
+        rdvars.put(new_global.name, new_global)
+        globals.add(new_global)
+        new_global.default_astc = this
+    }
+
+    fun global(name: String, vartype: hw_type, defval: String): hw_var {
+        var ret_var = hw_var(name, vartype, defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun global(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_var {
+        var ret_var = hw_var(name, hw_type(src_struct_in, dimensions), "0")
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun global(name: String, src_struct_in: hw_struct): hw_var {
+        var ret_var = hw_var(name, hw_type(src_struct_in), "0")
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun uglobal(name: String, dimensions: hw_dim_static, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun uglobal(name: String, msb: Int, lsb: Int, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun uglobal(name: String, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun sglobal(name: String, dimensions: hw_dim_static, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun sglobal(name: String, msb: Int, lsb: Int, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun sglobal(name: String, defval: String): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, defval), defval)
+        add_global(ret_var)
+        return ret_var
     }
 }

@@ -15,7 +15,10 @@ data class MultiExu_CFG_RF(val input_RF_width : Int,
                            val rename_RF: Boolean,
                            val rename_RF_depth : Int)
 
-open class MultiExu(name_in : String, MultiExu_cfg_rf_in : MultiExu_CFG_RF, rob_size_in : Int) : hw_astc_stdif() {
+data class Exu_CFG(val ExecUnit : Exu,
+                   val exu_num : Int)
+
+open class MultiExu(name_in : String, MultiExu_cfg_rf_in : MultiExu_CFG_RF, rob_size_in : Int) {
 
     val name = name_in
     val MultiExu_cfg_rf = MultiExu_cfg_rf_in
@@ -23,232 +26,12 @@ open class MultiExu(name_in : String, MultiExu_cfg_rf_in : MultiExu_CFG_RF, rob_
     val rename_rf_addr_width = GetWidthToContain(MultiExu_cfg_rf.rename_RF_depth)
     val rob_size = rob_size_in
 
-    override var GenNamePrefix   = "reordex"
+    var ExecUnits  = mutableMapOf<String, Exu_CFG>()
 
-    var locals          = ArrayList<hw_var>()
-    var globals         = ArrayList<hw_global>()
-
-    var ExecUnits  = mutableMapOf<String, hw_exec_unit>()
-
-    fun add_exu(name_in : String, exu_num_in: Int, stage_num_in: Int) : hw_exec_unit {
-        if (FROZEN_FLAG) ERROR("Failed to add stage " + name_in + ": ASTC frozen")
-        var new_exec_unit = hw_exec_unit(name_in, exu_num_in, stage_num_in, this)
-        if (ExecUnits.put(new_exec_unit.name, new_exec_unit) != null) {
+    fun add_exu(exu : Exu, exu_num: Int) {
+        if (ExecUnits.put(exu.name, Exu_CFG(exu, exu_num)) != null) {
             ERROR("Stage addition problem!")
         }
-        return new_exec_unit
-    }
-
-    fun begexu(exu : hw_exec_unit) {
-        if (FROZEN_FLAG) ERROR("Failed to begin stage " + exu.name + ": ASTC frozen")
-        if (this.size != 0) ERROR("reordex ASTC inconsistent!")
-        // TODO: validate stage presence
-        add(exu)
-    }
-
-    fun endexu() {
-        if (FROZEN_FLAG) ERROR("Failed to end stage: ASTC frozen")
-        if (this.size != 1) ERROR("Stage ASTC inconsistent!")
-        if (this[0].opcode != OP_STAGE) ERROR("Stage ASTC inconsistent!")
-        this.clear()
-    }
-
-    private fun add_local(new_local: hw_local) {
-        if (FROZEN_FLAG) ERROR("Failed to add local " + new_local.name + ": ASTC frozen")
-
-        if (wrvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
-        if (rdvars.containsKey(new_local.name)) ERROR("Naming conflict for local: " + new_local.name)
-
-        wrvars.put(new_local.name, new_local)
-        rdvars.put(new_local.name, new_local)
-        locals.add(new_local)
-        new_local.default_astc = this
-    }
-
-    fun local(name: String, vartype : hw_type, defval: String): hw_local {
-        var ret_var = hw_local(name, vartype, defval)
-        add_local(ret_var)
-        return ret_var
-    }
-
-    fun local(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_local {
-        var ret_var = hw_local(name, hw_type(src_struct_in, dimensions), "0")
-        add_local(ret_var)
-        return ret_var
-    }
-
-    fun local(name: String, src_struct_in: hw_struct): hw_local {
-        var ret_var = hw_local(name, hw_type(src_struct_in), "0")
-        add_local(ret_var)
-        return ret_var
-    }
-
-    fun ulocal(name: String, dimensions: hw_dim_static, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
-        add_local(ret_var)
-        return ret_var
-    }
-
-    fun ulocal(name: String, msb: Int, lsb: Int, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
-        add_local(ret_var)
-        return ret_var
-    }
-
-    fun ulocal(name: String, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
-        add_local(ret_var)
-        return ret_var
-    }
-
-    fun slocal(name: String, dimensions: hw_dim_static, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
-        add_local(ret_var)
-        return ret_var
-    }
-
-    fun slocal(name: String, msb: Int, lsb: Int, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
-        add_local(ret_var)
-        return ret_var
-    }
-
-    fun slocal(name: String, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.SIGNED, defval), defval)
-        add_local(ret_var)
-        return ret_var
-    }
-
-    private fun add_local_sticky(new_local_sticky: hw_local_sticky) {
-        if (FROZEN_FLAG) ERROR("Failed to add local_sticky " + new_local_sticky.name + ": ASTC frozen")
-
-        if (wrvars.containsKey(new_local_sticky.name)) ERROR("Naming conflict for local_sticky: " + new_local_sticky.name)
-        if (rdvars.containsKey(new_local_sticky.name)) ERROR("Naming conflict for local_sticky: " + new_local_sticky.name)
-
-        wrvars.put(new_local_sticky.name, new_local_sticky)
-        rdvars.put(new_local_sticky.name, new_local_sticky)
-        locals.add(new_local_sticky)
-        new_local_sticky.default_astc = this
-    }
-
-    fun local_sticky(name: String, vartype: hw_type, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, vartype, defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun local_sticky(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(src_struct_in, dimensions), "0")
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun local_sticky(name: String, src_struct_in: hw_struct): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(src_struct_in), "0")
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun ulocal_sticky(name: String, dimensions: hw_dim_static, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun ulocal_sticky(name: String, msb: Int, lsb: Int, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun ulocal_sticky(name: String, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun slocal_sticky(name: String, dimensions: hw_dim_static, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun slocal_sticky(name: String, msb: Int, lsb: Int, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun slocal_sticky(name: String, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, defval), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    private fun add_global(new_global: hw_global) {
-        if (FROZEN_FLAG) ERROR("Failed to add global " + new_global.name + ": ASTC frozen")
-
-        if (wrvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
-        if (rdvars.containsKey(new_global.name)) ERROR("Naming conflict for global: " + new_global.name)
-
-        wrvars.put(new_global.name, new_global)
-        rdvars.put(new_global.name, new_global)
-        globals.add(new_global)
-        new_global.default_astc = this
-    }
-
-    fun global(name: String, vartype: hw_type, defval: String): hw_global {
-        var ret_var = hw_global(name, vartype, defval)
-        add_global(ret_var)
-        return ret_var
-    }
-
-    fun global(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_global {
-        var ret_var = hw_global(name, hw_type(src_struct_in, dimensions), "0")
-        add_global(ret_var)
-        return ret_var
-    }
-
-    fun global(name: String, src_struct_in: hw_struct): hw_global {
-        var ret_var = hw_global(name, hw_type(src_struct_in), "0")
-        add_global(ret_var)
-        return ret_var
-    }
-
-    fun uglobal(name: String, dimensions: hw_dim_static, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
-        add_global(ret_var)
-        return ret_var
-    }
-
-    fun uglobal(name: String, msb: Int, lsb: Int, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
-        add_global(ret_var)
-        return ret_var
-    }
-
-    fun uglobal(name: String, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
-        add_global(ret_var)
-        return ret_var
-    }
-
-    fun sglobal(name: String, dimensions: hw_dim_static, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
-        add_global(ret_var)
-        return ret_var
-    }
-
-    fun sglobal(name: String, msb: Int, lsb: Int, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
-        add_global(ret_var)
-        return ret_var
-    }
-
-    fun sglobal(name: String, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.SIGNED, defval), defval)
-        add_global(ret_var)
-        return ret_var
     }
 
     fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
@@ -275,7 +58,7 @@ open class MultiExu(name_in : String, MultiExu_cfg_rf_in : MultiExu_CFG_RF, rob_
 
         var MAX_INSTR_NUM = MultiExu_cfg_rf.input_RF_depth + rob_size
         for (ExecUnit in ExecUnits) {
-            MAX_INSTR_NUM += ExecUnit.value.exu_num * ExecUnit.value.stage_num
+            MAX_INSTR_NUM += ExecUnit.value.exu_num * ExecUnit.value.ExecUnit.stage_num
         }
 
         val TAG_WIDTH = GetWidthToContain(MAX_INSTR_NUM)
@@ -327,24 +110,24 @@ open class MultiExu(name_in : String, MultiExu_cfg_rf_in : MultiExu_CFG_RF, rob_
 
         var rob = cyclix_gen.global("genrob_" + name, rob_struct, rob_size-1, 0)
         for (ExUnit in ExecUnits) {
+            var exu_opcode = cyclix_gen.uglobal("genexu_" + ExUnit.value.ExecUnit.name + "_exu_opcode", 3, 0, "0")
+            var rs0_rdata = cyclix_gen.uglobal("genexu_" + ExUnit.value.ExecUnit.name + "_rs0_rdata", 31, 0, "0")
+            var rs1_rdata = cyclix_gen.uglobal("genexu_" + ExUnit.value.ExecUnit.name + "_rs1_rdata", 31, 0, "0")
+            var rd_wdata = cyclix_gen.uglobal("genexu_" + ExUnit.value.ExecUnit.name + "_rd_wdata", 31, 0, "0")
 
-            var exu_vars = ArrayList<__exu_var_assoc>()
-            var exu_opcode = cyclix_gen.global("genexu_" + ExUnit.value.exu_opcode.name, ExUnit.value.exu_opcode.vartype, ExUnit.value.exu_opcode.defval)
-            exu_vars.add(__exu_var_assoc(ExUnit.value.exu_opcode, exu_opcode))
-            var rs0_rdata = cyclix_gen.global("genexu_" + ExUnit.value.rs0_rdata.name, ExUnit.value.rs0_rdata.vartype, ExUnit.value.rs0_rdata.defval)
-            exu_vars.add(__exu_var_assoc(ExUnit.value.rs0_rdata, rs0_rdata))
-            var rs1_rdata = cyclix_gen.global("genexu_" + ExUnit.value.rs1_rdata.name, ExUnit.value.rs1_rdata.vartype, ExUnit.value.rs1_rdata.defval)
-            exu_vars.add(__exu_var_assoc(ExUnit.value.rs1_rdata, rs1_rdata))
-            var rd_wdata = cyclix_gen.global("genexu_" + ExUnit.value.rd_wdata.name, ExUnit.value.rd_wdata.vartype, ExUnit.value.rd_wdata.defval)
-            exu_vars.add(__exu_var_assoc(ExUnit.value.rd_wdata, rd_wdata))
+            var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, req_struct, resp_struct)
+            exu_cyclix_gen.add(hw_imm("0"), hw_imm("1"))
+            exu_cyclix_gen.end()
+
+            cyclix_gen.subproc(exu_cyclix_gen)
 
             var exu_info = __exu_info(
-                cyclix_gen.global("genexu_" + ExUnit.value.name + "_req", req_struct, ExUnit.value.exu_num-1, 0),
-                cyclix_gen.global("genexu_" + ExUnit.value.name + "_resp", resp_struct, ExUnit.value.exu_num-1, 0),
-                exu_vars
+                exu_cyclix_gen,
+                cyclix_gen.global("genexu_" + ExUnit.value.ExecUnit.name + "_req", req_struct, ExUnit.value.exu_num-1, 0),
+                cyclix_gen.global("genexu_" + ExUnit.value.ExecUnit.name + "_resp", resp_struct, ExUnit.value.exu_num-1, 0)
             )
 
-            TranslateInfo.exu_assocs.put(ExUnit.value, exu_info)
+            TranslateInfo.exu_assocs.put(ExUnit.value.ExecUnit, exu_info)
         }
         var commit_bus = cyclix_gen.global("genexu_" + name + "_commit", commit_struct)
 

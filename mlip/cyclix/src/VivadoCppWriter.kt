@@ -341,11 +341,8 @@ class VivadoCppWriter(module_in : Generic) {
         } else ERROR("undefined opcode")
     }
 
-    fun write(pathname : String) {
 
-        // writing interface structures
-        // TODO: restrict to interfaces
-        File(pathname).mkdirs()
+    fun write_module(pathname : String) {
         val wrFileInterface = File(pathname + "/" + cyclix_module.name + ".hpp").writer()
 
         // writing header
@@ -464,5 +461,16 @@ class VivadoCppWriter(module_in : Generic) {
         println("done")
 
         wrFileModule.close()
+    }
+
+    fun write(pathname : String) {
+
+        // writing interface structures
+        // TODO: restrict to interfaces
+        File(pathname).mkdirs()
+        for (subproc in cyclix_module.Subprocs) {
+            subproc.export_to_vivado_cpp(pathname)
+        }
+        write_module(pathname)
     }
 }

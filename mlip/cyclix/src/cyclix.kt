@@ -23,6 +23,8 @@ open class Generic(name_in : String) : hw_astc_stdif() {
     var globals = ArrayList<hw_var>()
     var locals = ArrayList<hw_var>()
 
+    var Subprocs = ArrayList<Generic>()
+
     var proc = hw_exec(OP_CYCPROC)
 
     init {
@@ -165,6 +167,12 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         var ret_var = hw_var(name, VAR_TYPE.SIGNED, defval)
         add_global(ret_var)
         return ret_var
+    }
+
+    data class subproc_handle (var if_var : hw_var)
+    fun subproc(subproc_inst : Generic) : subproc_handle {
+        Subprocs.add(subproc_inst)
+        return subproc_handle(hw_var("TEST", VAR_TYPE.UNSIGNED, 31, 0, "0")) // TODO
     }
 
     fun validate() {
