@@ -274,6 +274,8 @@ class RtlGenerator(var cyclix_module : Generic) {
                 rtl_gen.assign(fifo_in.value.buf_rdata, fifo_in.value.ext_rdata)
             }
 
+            // TODO: Streaming
+
             // Generating payload
             for (expr in cyclix_module.proc.expressions) {
                 export_expr(rtl_gen, expr, rst)

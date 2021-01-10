@@ -341,10 +341,10 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_rd_unblk).fifo.name + ".read_nb(" + expr.wrvars[1].name + ");\n")
 
         } else if (expr.opcode == OP_FIFO_WR_BLK) {
-            wrFile.write((expr as hw_exec_fifo_wr_unblk).fifo.name + ".write(" + expr.params[0].GetString() + ");\n")
+            wrFile.write((expr as hw_exec_fifo_wr_blk).fifo.name + ".write(" + expr.params[0].GetString() + ");\n")
 
         } else if (expr.opcode == OP_FIFO_RD_BLK) {
-            wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_rd_unblk).fifo.name + ".read();\n")
+            wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_rd_blk).fifo.name + ".read();\n")
 
         } else ERROR("undefined opcode")
     }
@@ -461,9 +461,20 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         wrFileModule.write("\n\t} else {\n")
         tab_Counter = 2
 
+        // Reading streaming input data
+        if (cyclix_module is Streaming) {
+            wrFileModule.write("\t\t" + (cyclix_module as Streaming).stream_req_var.name + " = " + (cyclix_module as Streaming).stream_req_bus.name + ".read();\n")
+        }
+
         for (expression in cyclix_module.proc.expressions) {
             export_expr(wrFileModule, expression)
         }
+
+        // Writing streaming output data
+        if (cyclix_module is Streaming) {
+            wrFileModule.write("\t\t" + (cyclix_module as Streaming).stream_resp_bus.name + ".write(" + (cyclix_module as Streaming).stream_resp_var.name + ");\n")
+        }
+
         tab_Counter = 0
         wrFileModule.write("\t}\n}\n")
         println("done")
