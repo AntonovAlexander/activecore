@@ -11,9 +11,8 @@ package rtl
 import hwast.*
 import java.io.File
 
-class SvWriter(module_in : module) {
+class SvWriter(var mod : module) {
 
-    var mod = module_in
     var tab_Counter = 0
 
     fun getStringWithDim(param : hw_param) : String

@@ -23,16 +23,10 @@ enum class RST_TYPE {
     SYNC,    ASYNC
 }
 
-class mem_source(sync_lvl_in : SYNC_LVL, sync_signal_in : hw_var, sync_src_in : hw_param) {
-    val sync_lvl = sync_lvl_in
-    val sync_signal = sync_signal_in
-    val sync_src = sync_src_in
-}
+class mem_source(val sync_lvl : SYNC_LVL, val sync_signal : hw_var, val sync_src : hw_param)
 
-class hw_mem(name : String, vartype : hw_type, sync_type_in : SYNC_TYPE)
+class hw_mem(name : String, vartype : hw_type, val sync_type : SYNC_TYPE)
     : hw_var(name, vartype, "0") {
-
-    val sync_type = sync_type_in
 
     var mem_srcs = ArrayList<mem_source>()
     fun AddSource(clk_lvl : SYNC_LVL, clk_signal : hw_var, clk_src : hw_param) {

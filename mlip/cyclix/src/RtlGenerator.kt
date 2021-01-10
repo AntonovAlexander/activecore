@@ -10,9 +10,7 @@ package cyclix
 
 import hwast.*
 
-class RtlGenerator(module_in : Generic) {
-
-    var cyclix_module = module_in
+class RtlGenerator(var cyclix_module : Generic) {
 
     class fifo_out_descr (val ext_req      : rtl.hw_port,
                           val ext_wdata    : rtl.hw_port,

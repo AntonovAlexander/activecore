@@ -44,7 +44,7 @@ class EXU_SHIFT() : reordex.Exu("SHIFT", 1) {
     }
 }
 
-class ex_unit(name_in : String) : reordex.MultiExu(name_in, MultiExu_CFG_RF(32,32, false, 0), 16) {
+class test_multiexu(name_in : String) : reordex.MultiExu(name_in, MultiExu_CFG_RF(32,32, false, 0), 16) {
 
     init {
         add_exu(EXU_INTEGER(), 2)

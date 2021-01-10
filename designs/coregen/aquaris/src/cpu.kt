@@ -11,12 +11,7 @@ package aquaris
 import hwast.*
 import pipex.PSTAGE_MODE
 
-class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_in : Int, irq_width_in : Int) : pipex.Pipeline(name_in) {
-
-    val num_stages  = num_stages_in
-    val START_ADDR  = START_ADDR_in
-    val IRQ_ADDR    = IRQ_ADDR_in
-    val irq_width   = irq_width_in
+class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADDR : Int, val irq_width : Int) : pipex.Pipeline(name) {
 
     //// base opcodes ////
     val opcode_LOAD			= 0x03

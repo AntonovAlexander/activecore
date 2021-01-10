@@ -11,9 +11,8 @@ package rtl
 import hwast.*
 import kotlin.reflect.jvm.internal.impl.types.TypeConstructorSubstitution
 
-open class module(name_in : String) : hw_astc() {
+open class module(val name : String) : hw_astc() {
 
-    val name = name_in
     val OP_CPROC    = hw_opcode("cproc")
 
     override var GenNamePrefix   = "rtl"
@@ -63,14 +62,14 @@ open class module(name_in : String) : hw_astc() {
         return ret_var
     }
 
-    fun comb(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_var {
-        var ret_var = hw_var(name, src_struct_in, dimensions)
+    fun comb(name : String, src_struct : hw_struct, dimensions : hw_dim_static) : hw_var {
+        var ret_var = hw_var(name, src_struct, dimensions)
         add_comb(ret_var)
         return ret_var
     }
 
-    fun comb(name : String, src_struct_in : hw_struct) : hw_var {
-        var ret_var = hw_var(name, src_struct_in)
+    fun comb(name : String, src_struct : hw_struct) : hw_var {
+        var ret_var = hw_var(name, src_struct)
         add_comb(ret_var)
         return ret_var
     }
@@ -135,14 +134,14 @@ open class module(name_in : String) : hw_astc() {
         return ret_var
     }
 
-    fun port(name : String, port_dir : PORT_DIR, src_struct_in : hw_struct ,dimensions : hw_dim_static) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(src_struct_in, dimensions), "0")
+    fun port(name : String, port_dir : PORT_DIR, src_struct : hw_struct ,dimensions : hw_dim_static) : hw_port {
+        var ret_var = hw_port(name, port_dir, hw_type(src_struct, dimensions), "0")
         add_port(ret_var)
         return ret_var
     }
 
-    fun port(name : String, port_dir : PORT_DIR, src_struct_in : hw_struct) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(src_struct_in), "0")
+    fun port(name : String, port_dir : PORT_DIR, src_struct : hw_struct) : hw_port {
+        var ret_var = hw_port(name, port_dir, hw_type(src_struct), "0")
         add_port(ret_var)
         return ret_var
     }
@@ -189,14 +188,14 @@ open class module(name_in : String) : hw_astc() {
         return ret_var
     }
 
-    fun input(name : String, src_struct_in : hw_struct ,dimensions : hw_dim_static) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(src_struct_in, dimensions), "0")
+    fun input(name : String, src_struct : hw_struct ,dimensions : hw_dim_static) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(src_struct, dimensions), "0")
         add_port(ret_var)
         return ret_var
     }
 
-    fun input(name : String, src_struct_in : hw_struct) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(src_struct_in), "0")
+    fun input(name : String, src_struct : hw_struct) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(src_struct), "0")
         add_port(ret_var)
         return ret_var
     }
@@ -243,14 +242,14 @@ open class module(name_in : String) : hw_astc() {
         return ret_var
     }
 
-    fun output(name : String, src_struct_in : hw_struct ,dimensions : hw_dim_static) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(src_struct_in, dimensions), "0")
+    fun output(name : String, src_struct : hw_struct ,dimensions : hw_dim_static) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(src_struct, dimensions), "0")
         add_port(ret_var)
         return ret_var
     }
 
-    fun output(name : String, src_struct_in : hw_struct) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(src_struct_in), "0")
+    fun output(name : String, src_struct : hw_struct) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(src_struct), "0")
         add_port(ret_var)
         return ret_var
     }
@@ -297,14 +296,14 @@ open class module(name_in : String) : hw_astc() {
         return ret_var
     }
 
-    fun inout(name : String, src_struct_in : hw_struct ,dimensions : hw_dim_static) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(src_struct_in, dimensions), "0")
+    fun inout(name : String, src_struct : hw_struct ,dimensions : hw_dim_static) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(src_struct, dimensions), "0")
         add_port(ret_var)
         return ret_var
     }
 
-    fun inout(name : String, src_struct_in : hw_struct) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(src_struct_in), "0")
+    fun inout(name : String, src_struct : hw_struct) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(src_struct), "0")
         add_port(ret_var)
         return ret_var
     }
@@ -359,8 +358,8 @@ open class module(name_in : String) : hw_astc() {
         return ret_var
     }
 
-    fun mem(name : String, src_struct_in : hw_struct, sync_type : SYNC_TYPE) : hw_mem {
-        var ret_var = hw_mem(name, hw_type(src_struct_in), sync_type)
+    fun mem(name : String, src_struct : hw_struct, sync_type : SYNC_TYPE) : hw_mem {
+        var ret_var = hw_mem(name, hw_type(src_struct), sync_type)
         add_mem(ret_var)
         return ret_var
     }
@@ -409,14 +408,14 @@ open class module(name_in : String) : hw_astc() {
         return ret_var
     }
 
-    fun buffered(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static, clk : hw_var, rst : hw_var) : hw_buffered {
-        var ret_var = hw_buffered(name, hw_type(src_struct_in, dimensions), "0", clk, rst)
+    fun buffered(name : String, src_struct : hw_struct, dimensions : hw_dim_static, clk : hw_var, rst : hw_var) : hw_buffered {
+        var ret_var = hw_buffered(name, hw_type(src_struct, dimensions), "0", clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
-    fun buffered(name : String, src_struct_in : hw_struct, clk : hw_var, rst : hw_var) : hw_buffered {
-        var ret_var = hw_buffered(name, hw_type(src_struct_in), "0", clk, rst)
+    fun buffered(name : String, src_struct : hw_struct, clk : hw_var, rst : hw_var) : hw_buffered {
+        var ret_var = hw_buffered(name, hw_type(src_struct), "0", clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
@@ -451,14 +450,14 @@ open class module(name_in : String) : hw_astc() {
         return ret_var
     }
 
-    fun sticky(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static, clk : hw_var, rst : hw_var) : hw_sticky {
-        var ret_var = hw_sticky(name, hw_type(src_struct_in, dimensions), "0", clk, rst)
+    fun sticky(name : String, src_struct : hw_struct, dimensions : hw_dim_static, clk : hw_var, rst : hw_var) : hw_sticky {
+        var ret_var = hw_sticky(name, hw_type(src_struct, dimensions), "0", clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
-    fun sticky(name : String, src_struct_in : hw_struct, clk : hw_var, rst : hw_var) : hw_sticky {
-        var ret_var = hw_sticky(name, hw_type(src_struct_in), "0", clk, rst)
+    fun sticky(name : String, src_struct : hw_struct, clk : hw_var, rst : hw_var) : hw_sticky {
+        var ret_var = hw_sticky(name, hw_type(src_struct), "0", clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }

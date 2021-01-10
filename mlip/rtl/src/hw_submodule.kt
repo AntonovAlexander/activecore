@@ -2,16 +2,13 @@ package rtl
 
 import hwast.*
 
-class hw_submodule(inst_name_in : String, src_module_in: module, parent_module_in: module) {
+class hw_submodule(var inst_name : String, var src_module: module, var parent_module: module) {
 
-    var inst_name = inst_name_in
-    var src_module = src_module_in
-    var parent_module = parent_module_in
     var Ports = mutableMapOf<String, hw_port>()
     var Connections = mutableMapOf<hw_port, hw_param>()
 
     init {
-        for (port in src_module_in.Ports) {
+        for (port in src_module.Ports) {
             Ports.put(port.name, port)
         }
     }

@@ -3,7 +3,7 @@ import citadel.*
 fun main(args: Array<String>) {
     println("Citadel: generating experimental core")
 
-    var multiexu = citadel.ex_unit("citadel_gen")
+    var multiexu = citadel.test_multiexu("citadel_gen")
 
     var multiexu_cyclix = multiexu.translate_to_cyclix(true)
     var multiexu_rtl = multiexu_cyclix.export_to_rtl()

@@ -11,9 +11,8 @@ package cyclix
 import hwast.*
 import java.io.File
 
-class VivadoCppWriter(module_in : Generic) {
+class VivadoCppWriter(var cyclix_module : Generic) {
 
-    var cyclix_module = module_in
     var tab_Counter = 0
 
     fun getStringWithDim(param : hw_param) : String

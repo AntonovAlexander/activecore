@@ -244,4 +244,4 @@ open class Generic(name_in : String) : hw_astc_stdif() {
     }
 }
 
-open class Streaming (name_in : String, fifo_in_struct: hw_struct, fifo_out_struct: hw_struct) : Generic(name_in)
+open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct: hw_struct) : Generic(name)
