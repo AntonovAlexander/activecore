@@ -13,27 +13,27 @@ import hwast.*
 open class hw_pipex_var(name_in : String, vartype : hw_type, defval_in : String) : hw_var(name_in, vartype, defval_in) {
 
     fun assign_succ(depow_fractions: hw_fracs, src: hw_param) {
-        if (default_astc is pipeline) (default_astc as pipeline).assign_succ(depow_fractions, this, src)
+        if (default_astc is Pipeline) (default_astc as Pipeline).assign_succ(depow_fractions, this, src)
         else ERROR("assign_succ cmd is out of place!")
     }
 
     fun assign_succ(depow_fractions: hw_fracs, src: Int) {
-        if (default_astc is pipeline) (default_astc as pipeline).assign_succ(depow_fractions, this, src)
+        if (default_astc is Pipeline) (default_astc as Pipeline).assign_succ(depow_fractions, this, src)
         else ERROR("assign_succ cmd is out of place!")
     }
 
     fun assign_succ(src: hw_param) {
-        if (default_astc is pipeline) (default_astc as pipeline).assign_succ(this, src)
+        if (default_astc is Pipeline) (default_astc as Pipeline).assign_succ(this, src)
         else ERROR("assign_succ cmd is out of place!")
     }
 
     fun assign_succ(src: Int) {
-        if (default_astc is pipeline) (default_astc as pipeline).assign_succ(this, src)
+        if (default_astc is Pipeline) (default_astc as Pipeline).assign_succ(this, src)
         else ERROR("assign_succ cmd is out of place!")
     }
 
     fun readprev() : hw_pipex_var {
-        if (default_astc is pipeline) return (default_astc as pipeline).readprev(this)
+        if (default_astc is Pipeline) return (default_astc as Pipeline).readprev(this)
         else ERROR("readprev cmd is out of place!")
         return this
     }

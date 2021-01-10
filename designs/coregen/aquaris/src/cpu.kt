@@ -11,7 +11,7 @@ package aquaris
 import hwast.*
 import pipex.PSTAGE_MODE
 
-class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_in : Int, irq_width_in : Int) : pipex.pipeline(name_in) {
+class cpu(name_in : String, num_stages_in : Int, START_ADDR_in : Int, IRQ_ADDR_in : Int, irq_width_in : Int) : pipex.Pipeline(name_in) {
 
     val num_stages  = num_stages_in
     val START_ADDR  = START_ADDR_in

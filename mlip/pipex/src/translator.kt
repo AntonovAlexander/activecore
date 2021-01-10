@@ -92,7 +92,7 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
         return params
     }
 
-    fun pkill_cmd_internal(cyclix_gen : cyclix.module) {
+    fun pkill_cmd_internal(cyclix_gen : cyclix.Generic) {
         cyclix_gen.begif(pctrl_active_glbl)
         run {
             cyclix_gen.assign(pctrl_active_glbl, 0)
@@ -100,12 +100,12 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
         }; cyclix_gen.endif()
     }
 
-    fun pstall_ifactive_cmd(cyclix_gen : cyclix.module) {
+    fun pstall_ifactive_cmd(cyclix_gen : cyclix.Generic) {
         cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, pctrl_active_glbl)
         cyclix_gen.assign(pctrl_active_glbl, 0)
     }
 
-    fun pstall_ifoccupied_cmd(cyclix_gen : cyclix.module) {
+    fun pstall_ifoccupied_cmd(cyclix_gen : cyclix.Generic) {
         cyclix_gen.bor_gen(pctrl_occupied, pctrl_active_glbl, pctrl_killed_glbl)
         cyclix_gen.begif(pctrl_occupied)
         run {
@@ -113,7 +113,7 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
         }; cyclix_gen.endif()
     }
 
-    fun pflush_cmd_internal(cyclix_gen : cyclix.module) {
+    fun pflush_cmd_internal(cyclix_gen : cyclix.Generic) {
         cyclix_gen.bor_gen(pctrl_flushreq, pctrl_flushreq, pctrl_active_glbl)
     }
 }

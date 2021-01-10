@@ -42,7 +42,7 @@ open class hw_copipe(name_in: String,
     var rdata_vartype = rdata_vartype_in
 }
 
-class hw_mcopipe_if(pipeline_in: pipeline,
+class hw_mcopipe_if(pipeline_in: Pipeline,
                     name_in: String,
                     wdata_vartype_in: hw_type,
                     rdata_vartype_in: hw_type,
@@ -67,7 +67,7 @@ class hw_mcopipe_if(pipeline_in: pipeline,
     }
 }
 
-class hw_mcopipe_handle(pipeline_in: pipeline,
+class hw_mcopipe_handle(pipeline_in: Pipeline,
                         name_in: String,
                         wdata_vartype_in: hw_type,
                         rdata_vartype_in: hw_type,
@@ -91,7 +91,7 @@ class hw_mcopipe_handle(pipeline_in: pipeline,
     }
 }
 
-class hw_scopipe_if(pipeline_in: pipeline,
+class hw_scopipe_if(pipeline_in: Pipeline,
                     name_in: String,
                     wdata_vartype_in: hw_type,
                     rdata_vartype_in: hw_type)
@@ -106,7 +106,7 @@ class hw_scopipe_if(pipeline_in: pipeline,
     }
 }
 
-class hw_scopipe_handle(pipeline_in: pipeline,
+class hw_scopipe_handle(pipeline_in: Pipeline,
                         name_in: String,
                         wdata_vartype_in: hw_type,
                         rdata_vartype_in: hw_type)

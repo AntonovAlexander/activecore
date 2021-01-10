@@ -11,9 +11,9 @@ package cyclix
 import hwast.*
 import java.io.File
 
-class VivadoCppWriter(module_in : module) {
+class VivadoCppWriter(module_in : Generic) {
 
-    var mod = module_in
+    var cyclix_module = module_in
     var tab_Counter = 0
 
     fun getStringWithDim(param : hw_param) : String
@@ -346,20 +346,20 @@ class VivadoCppWriter(module_in : module) {
         // writing interface structures
         // TODO: restrict to interfaces
         File(pathname).mkdirs()
-        val wrFileInterface = File(pathname + "/" + mod.name + ".hpp").writer()
+        val wrFileInterface = File(pathname + "/" + cyclix_module.name + ".hpp").writer()
 
         // writing header
         WriteGenSrcHeader(wrFileInterface, "HLS sources")
 
-        wrFileInterface.write("#ifndef __" + mod.name +"_h_\n")
-        wrFileInterface.write("#define __" + mod.name +"_h_\n")
+        wrFileInterface.write("#ifndef __" + cyclix_module.name +"_h_\n")
+        wrFileInterface.write("#define __" + cyclix_module.name +"_h_\n")
         wrFileInterface.write("\n")
         wrFileInterface.write("#include <ap_int.h>")
         wrFileInterface.write("\n")
 
         println("Exporting structs...")
 
-        for (hw_struct in mod.hw_structs) {
+        for (hw_struct in cyclix_module.hw_structs) {
             if (hw_struct.value.IsInInterface) {
                 wrFileInterface.write("typedef struct {\n")
                 for (structvar in hw_struct.value) {
@@ -373,20 +373,20 @@ class VivadoCppWriter(module_in : module) {
         println("done")
 
         // writing module
-        val wrFileModule = File(pathname + "/" + mod.name + ".cpp").writer()
+        val wrFileModule = File(pathname + "/" + cyclix_module.name + ".cpp").writer()
 
         // writing header
         WriteGenSrcHeader(wrFileModule, "HLS sources")
 
         println("Exporting modules and ports...")
-        wrFileModule.write("#include \"" + mod.name + ".hpp\"\n")
+        wrFileModule.write("#include \"" + cyclix_module.name + ".hpp\"\n")
         wrFileModule.write("#include <ap_int.h>\n")
         wrFileModule.write("#include <hls_stream.h>\n")
         wrFileModule.write("\n")
 
         println("done")
 
-        for (hw_struct in mod.hw_structs) {
+        for (hw_struct in cyclix_module.hw_structs) {
             if (hw_struct.value.IsInInterface == false) {
                 wrFileModule.write("typedef struct {\n")
                 for (structvar in hw_struct.value) {
@@ -400,7 +400,7 @@ class VivadoCppWriter(module_in : module) {
 
         // globals
         println("Exporting globals...")
-        for (global in mod.globals) {
+        for (global in cyclix_module.globals) {
             export_structvar("", "", global, ";\n", wrFileModule)
         }
         wrFileModule.write("\n")
@@ -408,15 +408,15 @@ class VivadoCppWriter(module_in : module) {
 
         // proc
         println("Exporting cyclix process...")
-        wrFileModule.write("void " + mod.name + "(ap_uint<1> geninit")
+        wrFileModule.write("void " + cyclix_module.name + "(ap_uint<1> geninit")
 
-        for (port in mod.Ports) {
+        for (port in cyclix_module.Ports) {
             export_structvar(", volatile ", "*", port, "", wrFileModule)
         }
-        for (fifo_in in mod.fifo_ins) {
+        for (fifo_in in cyclix_module.fifo_ins) {
             export_stream(", hls::stream", fifo_in, "", wrFileModule)
         }
-        for (fifo_out in mod.fifo_outs) {
+        for (fifo_out in cyclix_module.fifo_outs) {
             export_stream(", hls::stream", fifo_out, "", wrFileModule)
         }
 
@@ -424,10 +424,10 @@ class VivadoCppWriter(module_in : module) {
         wrFileModule.write("\n")
 
         /*
-        for (fifo_in in mod.fifo_ins) {
+        for (fifo_in in cyclix_module.fifo_ins) {
             wrFileModule.write("#pragma HLS INTERFACE ap_fifo port=" + fifo_in.name + "\n")
         }
-        for (fifo_out in mod.fifo_outs) {
+        for (fifo_out in cyclix_module.fifo_outs) {
             wrFileModule.write("#pragma HLS INTERFACE ap_fifo port=" + fifo_out.name + "\n")
         }
         wrFileModule.write("\n")
@@ -435,14 +435,14 @@ class VivadoCppWriter(module_in : module) {
 
         tab_Counter = 1
 
-        for (local in mod.locals) {
+        for (local in cyclix_module.locals) {
             export_structvar("\t", "", local, ";\n", wrFileModule)
         }
         wrFileModule.write("\n")
 
         // generating global defaults
         wrFileModule.write("\tif (geninit) {\n")
-        for (global in mod.globals) {
+        for (global in cyclix_module.globals) {
             if (global.vartype.dimensions.size < 2) {
                 wrFileModule.write("\t\t" + global.name + " = " + global.defval + ";\n")
             } else if (global.vartype.dimensions.size == 2) {
@@ -456,7 +456,7 @@ class VivadoCppWriter(module_in : module) {
         wrFileModule.write("\n\t} else {\n")
         tab_Counter = 2
 
-        for (expression in mod.proc.expressions) {
+        for (expression in cyclix_module.proc.expressions) {
             export_expr(wrFileModule, expression)
         }
         tab_Counter = 0

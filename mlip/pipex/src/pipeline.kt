@@ -38,7 +38,7 @@ class hw_exec_read_remote(stage_in : hw_stage, remote_var_in : hw_pipex_var) : h
     var remote_var = remote_var_in
 }
 
-open class pipeline(name_in : String) : hw_astc_stdif() {
+open class Pipeline(name_in : String) : hw_astc_stdif() {
 
     val name = name_in
 
@@ -511,7 +511,7 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
         }
     }
 
-    fun ProcessSyncOp(expression : hw_exec, Translate_info : __TranslateInfo, pstage_info : __pstage_info, cyclix_gen : cyclix.module) {
+    fun ProcessSyncOp(expression : hw_exec, Translate_info : __TranslateInfo, pstage_info : __pstage_info, cyclix_gen : cyclix.Generic) {
         if ((expression.opcode == OP1_IF) || (expression.opcode == OP1_WHILE)) {
             for (subexpression in expression.expressions) ProcessSyncOp(subexpression, Translate_info, pstage_info, cyclix_gen)
 
@@ -570,7 +570,7 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
     }
 
     fun reconstruct_expression(DEBUG_FLAG : Boolean,
-                               cyclix_gen : cyclix.module,
+                               cyclix_gen : cyclix.Generic,
                                expr : hw_exec,
                                curStage : hw_stage,
                                TranslateInfo: __TranslateInfo,
@@ -885,12 +885,12 @@ open class pipeline(name_in : String) : hw_astc_stdif() {
         }
     }
 
-    fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.module {
+    fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
 
         MSG("Translating to cyclix: beginning")
         validate()
 
-        var cyclix_gen = cyclix.module(name)
+        var cyclix_gen = cyclix.Generic(name)
         var TranslateInfo = __TranslateInfo()
 
         MSG(DEBUG_FLAG, "Processing structs")

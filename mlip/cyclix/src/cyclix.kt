@@ -14,7 +14,7 @@ import java.io.File
 
 val OP_CYCPROC = hw_opcode("cycproc")
 
-open class module(name_in : String) : hw_astc_stdif() {
+open class Generic(name_in : String) : hw_astc_stdif() {
 
     val name = name_in
 
@@ -235,3 +235,5 @@ open class module(name_in : String) : hw_astc_stdif() {
         println("#############################################")
     }
 }
+
+open class Streaming (name_in : String, fifo_in_struct: hw_struct, fifo_out_struct: hw_struct) : Generic(name_in)

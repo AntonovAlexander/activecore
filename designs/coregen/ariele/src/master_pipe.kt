@@ -6,7 +6,7 @@ import pipex.*
 class master_pipe(name          : String,
                   req_vartype   : hw_type,
                   map           : addr_map,
-                  resp_vartype  : hw_type) : pipex.pipeline(name) {
+                  resp_vartype  : hw_type) : pipex.Pipeline(name) {
 
     var master_if = scopipe_if("master", req_vartype, resp_vartype)
     var master_handle = scopipe_handle(master_if)

@@ -10,9 +10,9 @@ package cyclix
 
 import hwast.*
 
-class RtlGenerator(module_in : module) {
+class RtlGenerator(module_in : Generic) {
 
-    var mod = module_in
+    var cyclix_module = module_in
 
     class fifo_out_descr (val ext_req      : rtl.hw_port,
                           val ext_wdata    : rtl.hw_port,
@@ -227,10 +227,10 @@ class RtlGenerator(module_in : module) {
         fifo_out_dict.clear()
         fifo_in_dict.clear()
 
-        var rtl_gen = rtl.module(mod.name)
+        var rtl_gen = rtl.module(cyclix_module.name)
 
         // Adding structs
-        for (struct in mod.hw_structs) {
+        for (struct in cyclix_module.hw_structs) {
             rtl_gen.add_struct(struct.value)
         }
 
@@ -239,15 +239,15 @@ class RtlGenerator(module_in : module) {
         var rst = rtl_gen.uinput("rst_i", 0, 0, "1")
 
         // Generating combinationals
-        for (local in mod.locals)
+        for (local in cyclix_module.locals)
             var_dict.put(local, rtl_gen.comb(local.name, local.vartype, local.defval))
 
         // Generating globals
-        for (global in mod.globals)
+        for (global in cyclix_module.globals)
             var_dict.put(global, rtl_gen.sticky(global.name, global.vartype, global.defval, clk, rst))
 
         // Generating fifo_outs
-        for (fifo_out in mod.fifo_outs) {
+        for (fifo_out in cyclix_module.fifo_outs) {
             fifo_out_dict.put(fifo_out, fifo_out_descr(
                 rtl_gen.uoutput((fifo_out.name + "_genfifo_req_o"), 0, 0, "0"),
                 rtl_gen.port((fifo_out.name + "_genfifo_wdata_bo"), rtl.PORT_DIR.OUT, fifo_out.vartype, fifo_out.defval),
@@ -257,7 +257,7 @@ class RtlGenerator(module_in : module) {
         }
 
         // Generating fifo_ins
-        for (fifo_in in mod.fifo_ins) {
+        for (fifo_in in cyclix_module.fifo_ins) {
             fifo_in_dict.put(fifo_in, fifo_in_descr(
                 rtl_gen.uinput((fifo_in.name + "_genfifo_req_i"), 0, 0, "0"),
                 rtl_gen.port((fifo_in.name + "_genfifo_rdata_bi"), rtl.PORT_DIR.IN, fifo_in.vartype, fifo_in.defval),
@@ -277,7 +277,7 @@ class RtlGenerator(module_in : module) {
             }
 
             // Generating payload
-            for (expr in mod.proc.expressions) {
+            for (expr in cyclix_module.proc.expressions) {
                 export_expr(rtl_gen, expr, rst)
             }
 

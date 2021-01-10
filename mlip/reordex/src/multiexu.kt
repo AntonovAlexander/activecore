@@ -251,11 +251,11 @@ open class MultiExu(name_in : String, MultiExu_cfg_rf_in : MultiExu_CFG_RF, rob_
         return ret_var
     }
 
-    fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.module {
+    fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
 
         MSG("Translating to cyclix: beginning")
 
-        var cyclix_gen = cyclix.module(name)
+        var cyclix_gen = cyclix.Generic(name)
 
         //// Generating interfaces ////
         // cmd (sequential instruction stream) //
