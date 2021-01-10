@@ -31,6 +31,197 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
         }
     }
 
+
+    fun TranslateVar(var_in : hw_var, var_dict: MutableMap<hw_var, hw_var>) : hw_var {
+        var ret_var = var_dict[var_in]
+        if (ret_var != null) return ret_var
+        else ERROR("Var translation error")
+        return hw_var("UGLY HACK", VAR_TYPE.UNSIGNED, 0, 0, "0")
+    }
+
+    fun TranslateParam(param : hw_param, var_dict: MutableMap<hw_var, hw_var>) : hw_param {
+        if (param is hw_imm) return param
+        else if (param is hw_var) return TranslateVar(param, var_dict)
+        else ERROR("Type unrecognized!")
+        return param
+    }
+
+    /*
+    fun TranslateFifoOut(fifo : hw_fifo_out) : fifo_out_descr {
+        var ret_var = fifo_out_dict[fifo]
+        if (ret_var == null) ERROR("FIFO translation error")
+        return ret_var!!
+    }
+
+    fun TranslateFifoIn(fifo : hw_fifo_in) : fifo_in_descr {
+        var ret_var = fifo_in_dict[fifo]
+        if (ret_var == null) ERROR("FIFO translation error")
+        return ret_var!!
+    }
+    */
+
+    fun reconstruct_expression(cyclix_gen : cyclix.Streaming,
+                               expr : hw_exec,
+                               var_dict : MutableMap<hw_var, hw_var>) {
+
+        // println("#### Cyclix: exporting expression: " + expr.opcode.default_string)
+        // for (param in expr.params) println("param: " + param.GetString())
+        // for (wrvar in expr.wrvars) println("wrvar: " + wrvar.name)
+
+        var fractions = hw_fracs()
+        for (src_fraction in expr.assign_tgt_fractured.depow_fractions) {
+            if (src_fraction is hw_frac_C) fractions.add(src_fraction)
+            else if (src_fraction is hw_frac_V) fractions.add(hw_frac_V(TranslateVar(src_fraction.index, var_dict)))
+            else if (src_fraction is hw_frac_CC) fractions.add(src_fraction)
+            else if (src_fraction is hw_frac_CV) fractions.add(hw_frac_CV(src_fraction.msb, TranslateVar(src_fraction.lsb, var_dict)))
+            else if (src_fraction is hw_frac_VC) fractions.add(hw_frac_VC(TranslateVar(src_fraction.msb, var_dict), src_fraction.lsb))
+            else if (src_fraction is hw_frac_VV) fractions.add(hw_frac_VV(TranslateVar(src_fraction.msb, var_dict), TranslateVar(src_fraction.lsb, var_dict)))
+            else if (src_fraction is hw_frac_SubStruct) fractions.add(src_fraction)
+            else ERROR("dimensions error")
+        }
+
+        if ((expr.opcode == OP1_ASSIGN)) {
+            cyclix_gen.assign(TranslateVar(expr.wrvars[0], var_dict), fractions, TranslateParam(expr.params[0], var_dict))
+
+        } else if ((expr.opcode == OP2_ARITH_ADD)
+            || (expr.opcode == OP2_ARITH_SUB)
+            || (expr.opcode == OP2_ARITH_MUL)
+            || (expr.opcode == OP2_ARITH_DIV)
+            || (expr.opcode == OP2_ARITH_SLL)
+            || (expr.opcode == OP2_ARITH_SRL)
+            || (expr.opcode == OP2_ARITH_SRA)
+
+            || (expr.opcode == OP1_LOGICAL_NOT)
+            || (expr.opcode == OP2_LOGICAL_AND)
+            || (expr.opcode == OP2_LOGICAL_OR)
+            || (expr.opcode == OP2_LOGICAL_G)
+            || (expr.opcode == OP2_LOGICAL_L)
+            || (expr.opcode == OP2_LOGICAL_GEQ)
+            || (expr.opcode == OP2_LOGICAL_LEQ)
+            || (expr.opcode == OP2_LOGICAL_EQ2)
+            || (expr.opcode == OP2_LOGICAL_NEQ2)
+            || (expr.opcode == OP2_LOGICAL_EQ4)
+            || (expr.opcode == OP2_LOGICAL_NEQ4)
+
+            || (expr.opcode == OP1_COMPLEMENT)
+            || (expr.opcode == OP1_BITWISE_NOT)
+            || (expr.opcode == OP2_BITWISE_AND)
+            || (expr.opcode == OP2_BITWISE_OR)
+            || (expr.opcode == OP2_BITWISE_XOR)
+            || (expr.opcode == OP2_BITWISE_XNOR)
+
+            || (expr.opcode == OP1_REDUCT_AND)
+            || (expr.opcode == OP1_REDUCT_NAND)
+            || (expr.opcode == OP1_REDUCT_OR)
+            || (expr.opcode == OP1_REDUCT_NOR)
+            || (expr.opcode == OP1_REDUCT_XOR)
+            || (expr.opcode == OP1_REDUCT_XNOR)
+
+            || (expr.opcode == OP2_INDEXED)
+            || (expr.opcode == OP3_RANGED)
+            || (expr.opcode == OPS_CNCT)) {
+
+            var params = ArrayList<hw_param>()
+            for (param in expr.params) {
+                params.add(TranslateParam(param, var_dict))
+            }
+            cyclix_gen.AddExpr_op_gen(expr.opcode, TranslateVar(expr.wrvars[0], var_dict), params)
+
+        } else if (expr.opcode == OP2_SUBSTRUCT) {
+            cyclix_gen.subStruct_gen(
+                TranslateVar(expr.wrvars[0], var_dict),
+                TranslateVar(expr.rdvars[0], var_dict),
+                expr.subStructvar_name
+            )
+
+        } else if (expr.opcode == OP1_IF) {
+
+            cyclix_gen.begif(TranslateParam(expr.params[0], var_dict))
+            run {
+                for (child_expr in expr.expressions) {
+                    reconstruct_expression(cyclix_gen, child_expr, var_dict)
+                }
+            }; cyclix_gen.endif()
+
+        } else if (expr.opcode == OP1_CASE) {
+
+            cyclix_gen.begcase(TranslateParam(expr.params[0], var_dict))
+            run {
+                for (casebranch in expr.expressions) {
+                    if (casebranch.opcode != OP1_CASEBRANCH) ERROR("non-branch op in case")
+                    cyclix_gen.begbranch(TranslateParam(casebranch.params[0], var_dict))
+                    for (subexpr in casebranch.expressions) {
+                        reconstruct_expression(cyclix_gen, subexpr, var_dict)
+                    }
+                    cyclix_gen.endbranch()
+                }
+            }; cyclix_gen.endcase()
+
+        } else if (expr.opcode == OP1_WHILE) {
+
+            cyclix_gen.begwhile(TranslateParam(expr.params[0], var_dict))
+            run {
+                for (child_expr in expr.expressions) {
+                    reconstruct_expression(cyclix_gen, child_expr, var_dict)
+                }
+            }; cyclix_gen.endloop()
+
+        /*
+        } else if (expr.opcode == OP_FIFO_WR_UNBLK) {
+
+            var fifo = TranslateFifoOut((expr as hw_exec_fifo_wr_unblk).fifo)
+            var wdata_translated = TranslateParam(expr.params[0])
+            var fifo_rdy = TranslateVar(expr.wrvars[0])
+
+            rtl_gen.begif(rtl_gen.lnot(rst))
+            run {
+                rtl_gen.assign(fifo.ext_req, 1)
+                rtl_gen.begif(fifo.reqbuf_req)
+                run {
+                    // fifo busy
+                    rtl_gen.assign(fifo_rdy, 0)
+                }; rtl_gen.endif()
+                rtl_gen.begelse()
+                run {
+                    // fifo ready to consume request
+                    rtl_gen.assign(fifo.ext_wdata, wdata_translated)
+                    rtl_gen.assign(fifo_rdy, fifo.ext_ack)
+                }; rtl_gen.endif()
+                rtl_gen.assign(fifo.reqbuf_req, 1)
+            }; rtl_gen.endif()
+
+        } else if (expr.opcode == OP_FIFO_RD_UNBLK) {
+
+            var fifo = TranslateFifoIn((expr as hw_exec_fifo_rd_unblk).fifo)
+            var fifo_rdy = TranslateVar(expr.wrvars[0])
+            var rdata_translated = TranslateVar(expr.wrvars[1])
+
+            rtl_gen.begif(rtl_gen.lnot(rst))
+            run {
+                // default: inactive
+                rtl_gen.assign(fifo_rdy, 0)
+
+                rtl_gen.begif(fifo.buf_req)
+                run {
+                    //// request pending
+                    // reading data
+                    rtl_gen.assign(fifo_rdy, 1)
+                    rtl_gen.assign(rdata_translated, fifo.buf_rdata)
+
+                    // clearing buffer
+                    rtl_gen.assign(fifo.buf_req, 0)
+
+                    // asserting ack
+                    rtl_gen.assign(fifo.ext_ack, 1)
+                }; rtl_gen.endif()
+            }; rtl_gen.endif()
+            */
+
+        } else ERROR("Reconstruction of expression failed: opcode undefined: " + expr.opcode.default_string)
+
+        // println("#### Cyclix: exporting expression complete!")
+    }
+
     fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
 
         MSG("Translating to cyclix: beginning")
@@ -110,6 +301,23 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
 
             var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, req_struct, resp_struct)
             exu_cyclix_gen.add(hw_imm("0"), hw_imm("1"))
+
+            var var_dict = mutableMapOf<hw_var, hw_var>()
+
+            // Generating locals
+            for (local in ExUnit.value.ExecUnit.locals)
+                var_dict.put(local, exu_cyclix_gen.local(local.name, local.vartype, local.defval))
+
+            // Generating globals
+            for (global in ExUnit.value.ExecUnit.globals)
+                var_dict.put(global, exu_cyclix_gen.global(global.name, global.vartype, global.defval))
+
+            for (expr in ExUnit.value.ExecUnit[0].expressions) {
+                reconstruct_expression(exu_cyclix_gen,
+                    expr,
+                    var_dict)
+            }
+
             exu_cyclix_gen.end()
 
             cyclix_gen.subproc(exu_cyclix_gen)
