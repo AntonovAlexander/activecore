@@ -62,9 +62,8 @@ enum class WHILE_TRAILER {
 
 
 // container for operation
-open class hw_exec(opcode_in : hw_opcode) {
+open class hw_exec(val opcode : hw_opcode) {
 
-    val opcode      = opcode_in
     var while_trailer = WHILE_TRAILER.EMPTY
 
     var params      = ArrayList<hw_param>()

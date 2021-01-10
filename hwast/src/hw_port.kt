@@ -12,8 +12,5 @@ enum class PORT_DIR {
     IN,	OUT, INOUT
 }
 
-class hw_port(name : String, port_dir_in : PORT_DIR, vartype : hw_type, defval : String)
-    : hw_var(name, vartype, defval) {
-
-    var port_dir = port_dir_in
-}
+class hw_port(name : String, var port_dir : PORT_DIR, vartype : hw_type, defval : String)
+    : hw_var(name, vartype, defval)

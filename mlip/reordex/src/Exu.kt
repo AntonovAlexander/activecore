@@ -12,10 +12,7 @@ import hwast.*
 
 val OP_EXU = hwast.hw_opcode("exec_unit")
 
-open class Exu(name_in : String, stage_num_in: Int) : hw_astc_stdif() {
-
-    val name = name_in
-    val stage_num = stage_num_in
+open class Exu(val name : String, val stage_num: Int) : hw_astc_stdif() {
 
     override var GenNamePrefix   = "reordex"
 

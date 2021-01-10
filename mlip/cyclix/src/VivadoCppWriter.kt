@@ -19,8 +19,8 @@ class VivadoCppWriter(module_in : Generic) {
     fun getStringWithDim(param : hw_param) : String
     {
         if (param is hw_imm) {
-            if (param.dimensions_in.size > 1) throw Exception("cyclix: param print error")
-            return "ap_uint<" + param.dimensions_in[0].GetWidth() + ">(" + param.imm_value + ")"
+            if (param.dimensions.size > 1) throw Exception("cyclix: param print error")
+            return "ap_uint<" + param.dimensions[0].GetWidth() + ">(" + param.imm_value + ")"
         }
         return param.GetString()
     }

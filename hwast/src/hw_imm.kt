@@ -8,7 +8,7 @@
 
 package hwast
 
-class hw_imm (val dimensions_in : hw_dim_static, val imm_value : String) : hw_param(PARAM_TYPE.VAL, hw_type(VAR_TYPE.UNSIGNED, dimensions_in), imm_value)
+class hw_imm (val dimensions : hw_dim_static, val imm_value : String) : hw_param(PARAM_TYPE.VAL, hw_type(VAR_TYPE.UNSIGNED, dimensions), imm_value)
 {
     constructor(imm_value : Int) : this(hw_dim_static(imm_value.toString()), imm_value.toString())
     constructor(imm_value : String) : this(hw_dim_static(imm_value), imm_value)

@@ -8,7 +8,7 @@
 
 package hwast
 
-open class hw_var(name_in : String, vartype_in : hw_type, defval_in : String) : hw_structvar(name_in, vartype_in, defval_in) {
+open class hw_var(name : String, vartype : hw_type, defval : String) : hw_structvar(name, vartype, defval) {
 
     var read_done: Boolean
     var write_done: Boolean
@@ -16,7 +16,6 @@ open class hw_var(name_in : String, vartype_in : hw_type, defval_in : String) : 
     var default_astc = hw_astc()
 
     init {
-        name = name_in
         read_done = false
         write_done = false
         token_printable = name
@@ -31,14 +30,14 @@ open class hw_var(name_in : String, vartype_in : hw_type, defval_in : String) : 
     constructor(name: String, VarType: VAR_TYPE, defval: String)
             : this(name, hw_type(VarType, defval), defval)
 
-    constructor(name: String, src_struct_in: hw_struct, dimensions : hw_dim_static)
-            : this(name, hw_type(src_struct_in, dimensions), "0")
+    constructor(name: String, src_struct: hw_struct, dimensions : hw_dim_static)
+            : this(name, hw_type(src_struct, dimensions), "0")
 
-    constructor(name: String, src_struct_in: hw_struct, msb: Int, lsb: Int)
-            : this(name, hw_type(src_struct_in, msb, lsb), "0")
+    constructor(name: String, src_struct: hw_struct, msb: Int, lsb: Int)
+            : this(name, hw_type(src_struct, msb, lsb), "0")
 
-    constructor(name: String, src_struct_in: hw_struct)
-            : this(name, src_struct_in, 0, 0)
+    constructor(name: String, src_struct: hw_struct)
+            : this(name, src_struct, 0, 0)
 
     fun assign(depow_fracs: hw_fracs, src: hw_param) {
         default_astc.assign(this, depow_fracs, src)

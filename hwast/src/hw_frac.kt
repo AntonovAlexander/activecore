@@ -16,9 +16,7 @@ abstract class hw_frac (val type : FRAC_TYPE) {
     abstract fun GetWidth() : Int
 }
 
-class hw_frac_C (val index_in : hw_imm) : hw_frac(FRAC_TYPE.C) {
-
-    val index = index_in
+class hw_frac_C (val index : hw_imm) : hw_frac(FRAC_TYPE.C) {
 
     constructor(index : Int) : this(hw_imm(index.toString()))
 
@@ -27,19 +25,14 @@ class hw_frac_C (val index_in : hw_imm) : hw_frac(FRAC_TYPE.C) {
     }
 }
 
-class hw_frac_V (val index_in : hw_var) : hw_frac(FRAC_TYPE.V) {
-
-    val index = index_in
+class hw_frac_V (val index : hw_var) : hw_frac(FRAC_TYPE.V) {
 
     override fun GetWidth() : Int {
         return 1
     }
 }
 
-class hw_frac_CC (val msb_in : hw_imm, val lsb_in : hw_imm) : hw_frac(FRAC_TYPE.CC) {
-
-    val msb = msb_in
-    val lsb = lsb_in
+class hw_frac_CC (val msb : hw_imm, val lsb : hw_imm) : hw_frac(FRAC_TYPE.CC) {
 
     constructor(msb : Int, lsb : Int) : this(hw_imm(msb.toString()), hw_imm(lsb.toString()))
 
@@ -49,10 +42,7 @@ class hw_frac_CC (val msb_in : hw_imm, val lsb_in : hw_imm) : hw_frac(FRAC_TYPE.
     }
 }
 
-class hw_frac_CV (val msb_in : hw_imm, val lsb_in : hw_var) : hw_frac(FRAC_TYPE.CV) {
-
-    val msb = msb_in
-    val lsb = lsb_in
+class hw_frac_CV (val msb : hw_imm, val lsb : hw_var) : hw_frac(FRAC_TYPE.CV) {
 
     constructor(msb : Int, lsb : hw_var) : this(hw_imm(msb.toString()), lsb)
 
@@ -61,10 +51,7 @@ class hw_frac_CV (val msb_in : hw_imm, val lsb_in : hw_var) : hw_frac(FRAC_TYPE.
     }
 }
 
-class hw_frac_VC (val msb_in : hw_var, val lsb_in : hw_imm) : hw_frac(FRAC_TYPE.VC) {
-
-    val msb = msb_in
-    val lsb = lsb_in
+class hw_frac_VC (val msb : hw_var, val lsb : hw_imm) : hw_frac(FRAC_TYPE.VC) {
 
     constructor(msb : hw_var, lsb : Int) : this(msb, hw_imm(lsb.toString()))
 
@@ -73,19 +60,15 @@ class hw_frac_VC (val msb_in : hw_var, val lsb_in : hw_imm) : hw_frac(FRAC_TYPE.
     }
 }
 
-class hw_frac_VV (val msb_in : hw_var, val lsb_in : hw_var) : hw_frac(FRAC_TYPE.VV) {
-
-    val msb = msb_in
-    val lsb = lsb_in
+class hw_frac_VV (val msb : hw_var, val lsb : hw_var) : hw_frac(FRAC_TYPE.VV) {
 
     override fun GetWidth() : Int {
         return 0
     }
 }
 
-class hw_frac_SubStruct (val substruct_name_in : String) : hw_frac(FRAC_TYPE.SubStruct) {
+class hw_frac_SubStruct (val substruct_name : String) : hw_frac(FRAC_TYPE.SubStruct) {
 
-    val substruct_name = substruct_name_in
     var subStructIndex : Int = 0
     var src_struct = DUMMY_STRUCT
 
@@ -120,8 +103,8 @@ class hw_fracs() : ArrayList<hw_frac>() {
         this.add(hw_frac_VV(msb, lsb))
     }
 
-    constructor(substruct_name_in : String) : this() {
-        this.add(hw_frac_SubStruct(substruct_name_in))
+    constructor(substruct_name : String) : this() {
+        this.add(hw_frac_SubStruct(substruct_name))
     }
 
     constructor(vararg fractions: hw_frac) : this() {
