@@ -252,6 +252,14 @@ class RtlGenerator(var cyclix_module : Generic) {
             ))
         }
 
+        // Generating submodules
+        for (subproc in cyclix_module.Subprocs) {
+            var submod_rtl_gen = subproc.value.src_module.export_to_rtl()
+            var rtl_submodule_inst = rtl_gen.submodule(subproc.value.inst_name, submod_rtl_gen)
+            rtl_submodule_inst.connect("clk_i", clk)
+            rtl_submodule_inst.connect("rst_i", rst)
+        }
+
         rtl_gen.cproc_begin()
         run {
 

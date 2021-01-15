@@ -23,7 +23,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
     var globals = ArrayList<hw_var>()
     var locals = ArrayList<hw_var>()
 
-    var Subprocs = ArrayList<Generic>()
+    var Subprocs  = mutableMapOf<String, hw_subproc>()
 
     var proc = hw_exec(OP_CYCPROC)
 
@@ -170,8 +170,9 @@ open class Generic(name_in : String) : hw_astc_stdif() {
     }
 
     fun subproc(inst_name : String, subproc_inst : Generic) : hw_subproc {
-        Subprocs.add(subproc_inst)
-        return hw_subproc(inst_name, subproc_inst, this)
+        var new_inst = hw_subproc(inst_name, subproc_inst, this)
+        Subprocs.put(inst_name, new_inst)
+        return new_inst
     }
 
     fun validate() {

@@ -438,6 +438,8 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         wrFileModule.write("\n")
         */
 
+        // TODO: interacting with submodules
+
         tab_Counter = 1
 
         for (local in cyclix_module.locals) {
@@ -488,7 +490,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         // TODO: restrict to interfaces
         File(pathname).mkdirs()
         for (subproc in cyclix_module.Subprocs) {
-            subproc.export_to_vivado_cpp(pathname)
+            subproc.value.src_module.export_to_vivado_cpp(pathname)
         }
         write_module(pathname)
     }
