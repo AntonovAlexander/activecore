@@ -285,7 +285,6 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
         for (ExUnit in ExecUnits) {
 
             var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, req_struct, resp_struct)
-            exu_cyclix_gen.add(hw_imm("0"), hw_imm("1"))
 
             var var_dict = mutableMapOf<hw_var, hw_var>()
 

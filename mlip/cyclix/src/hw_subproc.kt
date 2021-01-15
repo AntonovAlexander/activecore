@@ -98,4 +98,19 @@ class hw_subproc(var inst_name : String, var src_module: Generic, var parent_mod
         connectFifo(fifo_name, part_var)
         return part_var
     }
+
+    fun fifo_internal_wr_unblk(fifo_name : String, wdata : hw_param) : hw_var {
+        return parent_module.fifo_internal_wr_unblk(this, fifo_name, wdata)
+    }
+
+    fun fifo_internal_rd_unblk(fifo_name : String, rdata : hw_var) : hw_var {
+        return parent_module.fifo_internal_rd_unblk(this, fifo_name, rdata)
+    }
+    fun fifo_internal_wr_blk(fifo_name : String, wdata : hw_param) {
+        parent_module.fifo_internal_wr_blk(this, fifo_name, wdata)
+    }
+
+    fun fifo_internal_rd_blk(fifo_name : String) : hw_var {
+        return parent_module.fifo_internal_rd_blk(this, fifo_name)
+    }
 }

@@ -175,6 +175,40 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         return new_inst
     }
 
+    fun fifo_internal_wr_unblk(subproc : hw_subproc, fifo_name : String, wdata : hw_param) : hw_var {
+        var new_expr = hw_exec_fifo_internal_wr_unblk(subproc, fifo_name, wdata)
+        var genvar = hw_var(GetGenName("fifo_rdy"), VAR_TYPE.UNSIGNED, 0, 0, "0")
+        new_expr.AddRdParam(wdata)
+        new_expr.AddWrVar(genvar)
+        new_expr.AddGenVar(genvar)
+        AddExpr(new_expr)
+        return genvar
+    }
+
+    fun fifo_internal_rd_unblk(subproc : hw_subproc, fifo_name : String, rdata : hw_var) : hw_var {
+        var new_expr = hw_exec_fifo_internal_rd_unblk(subproc, fifo_name, rdata)
+        var genvar = hw_var(GetGenName("fifo_rdy"), VAR_TYPE.UNSIGNED, 0, 0, "0")
+        new_expr.AddWrVar(genvar)
+        new_expr.AddGenVar(genvar)
+        new_expr.AddWrVar(rdata)
+        AddExpr(new_expr)
+        return genvar
+    }
+    fun fifo_internal_wr_blk(subproc : hw_subproc, fifo_name : String, wdata : hw_param) {
+        var new_expr = hw_exec_fifo_internal_wr_blk(subproc, fifo_name, wdata)
+        new_expr.AddRdParam(wdata)
+        AddExpr(new_expr)
+    }
+
+    fun fifo_internal_rd_blk(subproc : hw_subproc, fifo_name : String) : hw_var {
+        var new_expr = hw_exec_fifo_internal_rd_blk(subproc, fifo_name)
+        var genvar = hw_var(GetGenName("fifo_rdata"), subproc.getFifoByName(fifo_name).vartype, subproc.getFifoByName(fifo_name).defval)
+        new_expr.AddWrVar(genvar)
+        new_expr.AddGenVar(genvar)
+        AddExpr(new_expr)
+        return genvar
+    }
+
     fun validate() {
         for (wrvar in wrvars) {
             if (!wrvar.value.write_done) WARNING("signal " + wrvar.value.name + " is not initialized")
