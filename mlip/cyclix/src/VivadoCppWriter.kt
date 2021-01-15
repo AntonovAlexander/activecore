@@ -355,10 +355,10 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_rd_blk).fifo.name + ".read();\n")
 
         } else if (expr.opcode == OP_FIFO_INTERNAL_WR_UNBLK) {
-            wrFile.write("OPERATION: OP_FIFO_INTERNAL_WR_UNBLK")
+            wrFile.write("OPERATION: OP_FIFO_INTERNAL_WR_UNBLK\n")
 
         } else if (expr.opcode == OP_FIFO_INTERNAL_RD_UNBLK) {
-            wrFile.write("OPERATION: OP_FIFO_INTERNAL_RD_UNBLK")
+            wrFile.write("OPERATION: OP_FIFO_INTERNAL_RD_UNBLK\n")
 
         } else ERROR("undefined opcode")
     }

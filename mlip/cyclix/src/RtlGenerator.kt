@@ -58,7 +58,7 @@ class RtlGenerator(var cyclix_module : Generic) {
                     expr : hw_exec,
                     rst : rtl.hw_port) {
 
-        // println("#### Cyclix: exporting expression: " + expr.opcode.default_string)
+        println("#### Cyclix: exporting expression: " + expr.opcode.default_string)
         // for (param in expr.params) println("param: " + param.GetString())
         // for (wrvar in expr.wrvars) println("wrvar: " + wrvar.name)
 
@@ -211,7 +211,68 @@ class RtlGenerator(var cyclix_module : Generic) {
 
         } else if (expr.opcode == OP_FIFO_INTERNAL_WR_UNBLK) {
 
+            var subproc = (expr as hw_exec_fifo_internal_wr_unblk).subproc
+            var fifo_name = expr.fifo_name
+            var wdata_translated = TranslateParam(expr.params[0], var_dict)
+            var fifo_rdy = TranslateVar(expr.wrvars[0], var_dict)
+
+            println("DBG: START")
+            println("subproc: " + subproc + ", name: " + subproc.inst_name)
+            println("fifo_name: " + fifo_name)
+            println("size: " + submod_insts_fifos_in.size)
+            for (i in submod_insts_fifos_in) {
+                println("-- subproc: " + i.key)
+                for (j in i.value) {
+                    println("---- fifo_name: " + j.key)
+                }
+            }
+            println(submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_req.name)
+            println("DBG: END")
+
+            rtl_gen.begif(rtl_gen.lnot(rst))
+            run {
+                rtl_gen.assign(submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_req, 1)
+                rtl_gen.begif(submod_insts_fifos_in[subproc]!![fifo_name]!!.reqbuf_req)
+                run {
+                    // fifo busy
+                    rtl_gen.assign(fifo_rdy, 0)
+                }; rtl_gen.endif()
+                rtl_gen.begelse()
+                run {
+                    // fifo ready to consume request
+                    rtl_gen.assign(submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_wdata, wdata_translated)
+                    rtl_gen.assign(fifo_rdy, submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_ack)
+                }; rtl_gen.endif()
+                rtl_gen.assign(submod_insts_fifos_in[subproc]!![fifo_name]!!.reqbuf_req, 1)
+            }; rtl_gen.endif()
+
         } else if (expr.opcode == OP_FIFO_INTERNAL_RD_UNBLK) {
+
+            var subproc = (expr as hw_exec_fifo_internal_rd_unblk).subproc
+            var fifo_name = expr.fifo_name
+
+            var fifo_rdy = TranslateVar(expr.wrvars[0], var_dict)
+            var rdata_translated = TranslateVar(expr.wrvars[1], var_dict)
+
+            rtl_gen.begif(rtl_gen.lnot(rst))
+            run {
+                // default: inactive
+                rtl_gen.assign(fifo_rdy, 0)
+
+                rtl_gen.begif(submod_insts_fifos_out[subproc]!![fifo_name]!!.buf_req)
+                run {
+                    //// request pending
+                    // reading data
+                    rtl_gen.assign(fifo_rdy, 1)
+                    rtl_gen.assign(rdata_translated, submod_insts_fifos_out[subproc]!![fifo_name]!!.buf_rdata)
+
+                    // clearing buffer
+                    rtl_gen.assign(submod_insts_fifos_out[subproc]!![fifo_name]!!.buf_req, 0)
+
+                    // asserting ack
+                    rtl_gen.assign(submod_insts_fifos_out[subproc]!![fifo_name]!!.ext_ack, 1)
+                }; rtl_gen.endif()
+            }; rtl_gen.endif()
 
         } else ERROR("Reconstruction of expression failed: opcode undefined: " + expr.opcode.default_string)
 
@@ -287,6 +348,24 @@ class RtlGenerator(var cyclix_module : Generic) {
                 if (fifo_if.value is hw_fifo_in) {
 
                     var conn_req        = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_req"), 0, 0, "0")
+                    var conn_wdata      = rtl_gen.comb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_wdata"), fifo_if.value.vartype, fifo_if.value.defval)
+                    var conn_ack        = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_ack"), 0, 0, "1")
+                    var conn_reqbuf_req = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_reqbuf_req"), 0, 0, "0")
+
+                    fifo_internal_in_descrs.put(fifo_if.value.name, fifo_internal_out_descr(
+                        conn_req,
+                        conn_wdata,
+                        conn_ack,
+                        conn_reqbuf_req
+                    ))
+
+                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_req_o", conn_req)
+                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_wdata_bo", conn_wdata)
+                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_ack_i", conn_ack)
+
+                } else if (fifo_if.value is hw_fifo_out) {
+
+                    var conn_req        = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_req"), 0, 0, "0")
                     var conn_rdata      = rtl_gen.comb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_rdata"), fifo_if.value.vartype, fifo_if.value.defval)
                     var conn_ack        = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_ack"), 0, 0, "0")
                     var conn_buf_req    = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_buf_req"), 0, 0, "0")
@@ -303,24 +382,6 @@ class RtlGenerator(var cyclix_module : Generic) {
                     rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_req_i", conn_req)
                     rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_rdata_bi", conn_rdata)
                     rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_ack_o", conn_ack)
-
-                } else if (fifo_if.value is hw_fifo_out) {
-
-                    var conn_req        = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_req"), 0, 0, "0")
-                    var conn_wdata      = rtl_gen.comb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_wdata"), fifo_if.value.vartype, fifo_if.value.defval)
-                    var conn_ack        = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_ack"), 0, 0, "1")
-                    var conn_reqbuf_req = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_reqbuf_req"), 0, 0, "0")
-
-                    fifo_internal_in_descrs.put(fifo_if.value.name, fifo_internal_out_descr(
-                        conn_req,
-                        conn_wdata,
-                        conn_ack,
-                        conn_reqbuf_req
-                    ))
-
-                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_req_o", conn_req)
-                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_wdata_bo", conn_wdata)
-                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_ack_i", conn_ack)
 
                 } else {
                     ERROR("FIFO error: " + fifo_if.value.name)
