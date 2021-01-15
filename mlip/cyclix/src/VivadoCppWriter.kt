@@ -438,9 +438,12 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         wrFileModule.write("\n")
         */
 
-        // TODO: interacting with submodules
-
         tab_Counter = 1
+
+        for (subproc in cyclix_module.Subprocs) {
+            wrFileModule.write("<SUBPROCESS>: " + subproc.value.inst_name + "\n") // TODO: interacting with submodules
+        }
+        wrFileModule.write("\n")
 
         for (local in cyclix_module.locals) {
             export_structvar("\t", "", local, ";\n", wrFileModule)
