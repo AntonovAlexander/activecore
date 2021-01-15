@@ -359,9 +359,9 @@ class RtlGenerator(var cyclix_module : Generic) {
                         conn_reqbuf_req
                     ))
 
-                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_req_o", conn_req)
-                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_wdata_bo", conn_wdata)
-                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_ack_i", conn_ack)
+                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_req_i", conn_req)
+                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_rdata_bi", conn_wdata)
+                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_ack_o", conn_ack)
 
                 } else if (fifo_if.value is hw_fifo_out) {
 
@@ -379,9 +379,9 @@ class RtlGenerator(var cyclix_module : Generic) {
                         conn_buf_rdata
                     ))
 
-                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_req_i", conn_req)
-                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_rdata_bi", conn_rdata)
-                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_ack_o", conn_ack)
+                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_req_o", conn_req)
+                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_wdata_bo", conn_rdata)
+                    rtl_submodule_inst.connect(fifo_if.value.name + "_genfifo_ack_i", conn_ack)
 
                 } else {
                     ERROR("FIFO error: " + fifo_if.value.name)
