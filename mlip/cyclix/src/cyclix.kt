@@ -246,6 +246,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
 
         println("###########################################")
         println("#### Starting Cyclix-to-RTL generation ####")
+        println("#### module: " + name)
         println("###########################################")
 
         validate()
@@ -255,6 +256,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
 
         println("############################################")
         println("#### Cyclix-to-RTL generation complete! ####")
+        println("#### module: " + name)
         println("############################################")
 
         return rtl_gen
@@ -264,6 +266,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
 
         println("############################################")
         println("#### Cyclix: starting vivado_cpp export ####")
+        println("#### module: " + name)
         println("############################################")
 
         validate()
@@ -274,6 +277,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
 
         println("#############################################")
         println("#### Cyclix: vivado_cpp export complete! ####")
+        println("#### module: " + name)
         println("#############################################")
     }
 }

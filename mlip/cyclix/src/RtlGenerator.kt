@@ -209,6 +209,10 @@ class RtlGenerator(var cyclix_module : Generic) {
                 }; rtl_gen.endif()
             }; rtl_gen.endif()
 
+        } else if (expr.opcode == OP_FIFO_INTERNAL_WR_UNBLK) {
+
+        } else if (expr.opcode == OP_FIFO_INTERNAL_RD_UNBLK) {
+
         } else ERROR("Reconstruction of expression failed: opcode undefined: " + expr.opcode.default_string)
 
         // println("#### Cyclix: exporting expression complete!")

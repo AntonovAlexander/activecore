@@ -72,6 +72,7 @@ class hw_subproc(var inst_name : String, var src_module: Generic, var parent_mod
         return part_var
     }
 
+    /*
     fun connectFifo(fifo : hw_structvar, src : hw_param) {
         if (!fifo_ifs.containsValue(fifo)) ERROR("Port " + fifo.name + " is unknown!")
         if (FifoConnections.containsKey(fifo)) ERROR("port " + fifo.name + " for instance " + inst_name
@@ -98,6 +99,7 @@ class hw_subproc(var inst_name : String, var src_module: Generic, var parent_mod
         connectFifo(fifo_name, part_var)
         return part_var
     }
+    */
 
     fun fifo_internal_wr_unblk(fifo_name : String, wdata : hw_param) : hw_var {
         return parent_module.fifo_internal_wr_unblk(this, fifo_name, wdata)
@@ -106,6 +108,7 @@ class hw_subproc(var inst_name : String, var src_module: Generic, var parent_mod
     fun fifo_internal_rd_unblk(fifo_name : String, rdata : hw_var) : hw_var {
         return parent_module.fifo_internal_rd_unblk(this, fifo_name, rdata)
     }
+
     fun fifo_internal_wr_blk(fifo_name : String, wdata : hw_param) {
         parent_module.fifo_internal_wr_blk(this, fifo_name, wdata)
     }

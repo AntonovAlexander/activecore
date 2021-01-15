@@ -51,8 +51,8 @@ class EXU_SHIFT(stage_num: Int) : reordex.Exu("SHIFT", Exu_CFG_RF(32), stage_num
 class test_multiexu(name_in : String) : reordex.MultiExu(name_in, MultiExu_CFG_RF(32, 32, false, 0), 16) {
 
     init {
-        add_exu(EXU_INTEGER(2), 2)
+        add_exu(EXU_INTEGER(2), 3)
         add_exu(EXU_MUL(4), 1)
-        add_exu(EXU_SHIFT(1), 1)
+        add_exu(EXU_SHIFT(1), 2)
     }
 }

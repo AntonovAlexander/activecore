@@ -144,6 +144,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         var dimstring = getDimString(expr.assign_tgt_fractured.depow_fractions)
 
         var opstring = ""
+
         if (expr.opcode == OP1_ASSIGN) 	        opstring = ""
         else if (expr.opcode == OP1_COMPLEMENT) 	opstring = "-"
 
@@ -195,7 +196,14 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         else if (expr.opcode == OP_FIFO_WR_BLK) 	    opstring = ""
         else if (expr.opcode == OP_FIFO_RD_BLK) 	    opstring = ""
 
+        else if (expr.opcode == OP_FIFO_INTERNAL_WR_UNBLK) 	    opstring = ""
+        else if (expr.opcode == OP_FIFO_INTERNAL_RD_UNBLK) 	    opstring = ""
+
+        else if (expr.opcode == OP_FIFO_INTERNAL_WR_BLK) 	    opstring = ""
+        else if (expr.opcode == OP_FIFO_INTERNAL_RD_BLK) 	    opstring = ""
+
         else ERROR("operation " + expr.opcode.default_string + " not recognized")
+
 
         if ((expr.opcode == OP1_ASSIGN)
             || (expr.opcode == OP1_COMPLEMENT)
@@ -345,6 +353,12 @@ class VivadoCppWriter(var cyclix_module : Generic) {
 
         } else if (expr.opcode == OP_FIFO_RD_BLK) {
             wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_rd_blk).fifo.name + ".read();\n")
+
+        } else if (expr.opcode == OP_FIFO_INTERNAL_WR_UNBLK) {
+            wrFile.write("OPERATION: OP_FIFO_INTERNAL_WR_UNBLK")
+
+        } else if (expr.opcode == OP_FIFO_INTERNAL_RD_UNBLK) {
+            wrFile.write("OPERATION: OP_FIFO_INTERNAL_RD_UNBLK")
 
         } else ERROR("undefined opcode")
     }
