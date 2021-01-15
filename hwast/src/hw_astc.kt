@@ -1288,6 +1288,18 @@ open class hw_astc_stdif() : hw_astc() {
     var fifo_ins = ArrayList<hw_fifo_in>()
     var fifo_outs = ArrayList<hw_fifo_out>()
 
+    fun getPortByName(name : String) : hw_port {
+        for (port in Ports) {
+            if (port.name == name) return port
+        }
+        ERROR("port " + name + " not found!")
+        throw Exception()
+    }
+
+    fun getFifoByName(name : String) : hw_structvar {
+        return fifo_ifs[name]!!
+    }
+
     private fun add_port(new_port : hw_port) {
         if (FROZEN_FLAG) ERROR("Failed to add port " + new_port.name + ": ASTC frozen")
 

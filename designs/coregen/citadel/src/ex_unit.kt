@@ -32,7 +32,7 @@ class EXU_MUL(stage_num: Int) : reordex.Exu("MUL", Exu_CFG_RF(32), stage_num) {
 
     init {
         mul_gen(alu_result, alu_op1, alu_op2)
-        //resp_data.assign(hw_fracs(hw_frac_SubStruct("rd_wdata")), alu_result)
+        resp_data.assign(hw_fracs(hw_frac_SubStruct("rd_wdata")), alu_result)
     }
 }
 
@@ -44,11 +44,11 @@ class EXU_SHIFT(stage_num: Int) : reordex.Exu("SHIFT", Exu_CFG_RF(32), stage_num
 
     init {
         sra_gen(alu_result, alu_op1, alu_op2)
-        //resp_data.assign(hw_fracs(hw_frac_SubStruct("rd_wdata")), alu_result)
+        resp_data.assign(hw_fracs(hw_frac_SubStruct("rd_wdata")), alu_result)
     }
 }
 
-class test_multiexu(name_in : String) : reordex.MultiExu(name_in, MultiExu_CFG_RF(32,32, false, 0), 16) {
+class test_multiexu(name_in : String) : reordex.MultiExu(name_in, MultiExu_CFG_RF(32, 32, false, 0), 16) {
 
     init {
         add_exu(EXU_INTEGER(2), 2)

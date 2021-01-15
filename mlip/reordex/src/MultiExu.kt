@@ -305,13 +305,19 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
 
             exu_cyclix_gen.end()
 
-            cyclix_gen.subproc(exu_cyclix_gen)
+            var exu_inst = cyclix_gen.subproc(exu_cyclix_gen.name, exu_cyclix_gen) // TODO: multiple modules
+
+            var exu_req = cyclix_gen.global("genexu_" + ExUnit.value.ExecUnit.name + "_req", req_struct, ExUnit.value.exu_num-1, 0)
+            var exu_resp = cyclix_gen.global("genexu_" + ExUnit.value.ExecUnit.name + "_resp", resp_struct, ExUnit.value.exu_num-1, 0)
 
             var exu_info = __exu_info(
                 exu_cyclix_gen,
-                cyclix_gen.global("genexu_" + ExUnit.value.ExecUnit.name + "_req", req_struct, ExUnit.value.exu_num-1, 0),
-                cyclix_gen.global("genexu_" + ExUnit.value.ExecUnit.name + "_resp", resp_struct, ExUnit.value.exu_num-1, 0)
+                exu_req,
+                exu_resp
             )
+
+            exu_inst.connectFifo(cyclix.STREAM_REQ_BUS_NAME, exu_req)
+            exu_inst.connectFifo(cyclix.STREAM_RESP_BUS_NAME, exu_resp)
 
             TranslateInfo.exu_assocs.put(ExUnit.value.ExecUnit, exu_info)
         }

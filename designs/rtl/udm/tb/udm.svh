@@ -172,7 +172,9 @@ class udm_driver;
         // length
         udm_sendword32(32'h4);
         
-        @(posedge `UDM_BLOCK.bus_resp_i)
+        do begin
+            @(posedge `UDM_BLOCK.clk_i);
+        end while (!`UDM_BLOCK.bus_resp_i);
         $display("UDM RD32: addr: 0x%8x, data: 0x%8x", wr_addr, `UDM_BLOCK.bus_rdata_bi);
     
         end
