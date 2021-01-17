@@ -893,11 +893,6 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         var cyclix_gen = cyclix.Generic(name)
         var TranslateInfo = __TranslateInfo()
 
-        MSG(DEBUG_FLAG, "Processing structs")
-        for (struct in hw_structs) {
-            cyclix_gen.add_struct(struct.value)
-        }
-
         MSG(DEBUG_FLAG, "Processing globals")
         for (global in globals) {
             var new_global = cyclix_gen.global(("genpsticky_glbl_" + global.name), global.vartype, global.defval)
@@ -929,7 +924,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
             var wr_ptr_next = cyclix_gen.ulocal((mcopipe_name_prefix + "wr_ptr_next"), (mcopipe_if.trx_id_width-1), 0, "0")
             var rd_ptr_next = cyclix_gen.ulocal((mcopipe_name_prefix + "rd_ptr_next"), (mcopipe_if.trx_id_width-1), 0, "0")
 
-            var wr_struct = cyclix_gen.add_struct("genpmodule_" + name + "_" + mcopipe_name_prefix + "genstruct_fifo_wdata")
+            var wr_struct = hw_struct("genpmodule_" + name + "_" + mcopipe_name_prefix + "genstruct_fifo_wdata")
             wr_struct.addu("we", 0, 0, "0")
             wr_struct.add("wdata", mcopipe_if.wdata_vartype, "0")
 
@@ -981,7 +976,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         for (scopipe_if in scopipe_ifs) {
             val scopipe_name_prefix = "genscopipe_" + scopipe_if.name + "_"
 
-            var rd_struct = cyclix_gen.add_struct("genpmodule_" + name + "_" + scopipe_name_prefix + "genstruct_fifo_wdata")
+            var rd_struct = hw_struct("genpmodule_" + name + "_" + scopipe_name_prefix + "genstruct_fifo_wdata")
             rd_struct.addu("we", 0, 0, "0")
             rd_struct.add("wdata", scopipe_if.wdata_vartype, "0")
 

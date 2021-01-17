@@ -21,10 +21,10 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: In
     var locals          = ArrayList<hw_var>()
     var globals         = ArrayList<hw_var>()
 
-    var req_struct = add_struct("req_struct")
+    var req_struct = hw_struct("req_struct")
     var req_data = local(GetGenName("req_data"), req_struct)
 
-    var resp_struct = add_struct("resp_struct")
+    var resp_struct = hw_struct("resp_struct")
     var resp_data = local(GetGenName("resp_data"), resp_struct)
 
     init {

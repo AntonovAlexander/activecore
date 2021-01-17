@@ -20,7 +20,7 @@ class xbar(name         : String,
     var master_pipe_insts   = ArrayList<hw_submodule>()
     var slave_pipe_insts    = ArrayList<hw_submodule>()
 
-    var busreq_struct = add_struct(name + "_busreq_struct")
+    var busreq_struct = hw_struct(name + "_busreq_struct")
 
     data class reqfifo_channel_internal(val req : hw_var, val ack : hw_var, var wdata : hw_var)
     data class respfifo_channel_internal(val resp : hw_var, var rdata : hw_var)

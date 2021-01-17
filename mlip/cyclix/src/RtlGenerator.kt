@@ -293,11 +293,6 @@ class RtlGenerator(var cyclix_module : Generic) {
 
         var rtl_gen = rtl.module(cyclix_module.name)
 
-        // Adding structs
-        for (struct in cyclix_module.hw_structs) {
-            rtl_gen.add_struct(struct.value)
-        }
-
         // Generating ports
         var clk = rtl_gen.uinput("clk_i", 0, 0, "0")
         var rst = rtl_gen.uinput("rst_i", 0, 0, "1")

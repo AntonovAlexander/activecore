@@ -349,9 +349,6 @@ class SvWriter(var mod : module) {
         // writing interface structures
         println("Exporting structs...")
 
-        structsIfToPrint.clear()
-        structsInternalToPrint.clear()
-
         File(pathname).mkdirs()
         val wrFileInterface = File(pathname + "/" + mod.name + ".svh").writer()
 
@@ -362,10 +359,10 @@ class SvWriter(var mod : module) {
         wrFileInterface.write("`define __" + mod.name +"_h_\n")
         wrFileInterface.write("\n")
 
+        structsIfToPrint.clear()
         for (port in mod.Ports) {
             AddStructsIfToPrint(port)
         }
-
         for (hw_struct in structsIfToPrint) {
             val STRUCT_DECL_STRING = "__genstructdel_" + hw_struct.value.name + "_"
             wrFileInterface.write("`ifndef " + STRUCT_DECL_STRING + "\n")
@@ -433,6 +430,7 @@ class SvWriter(var mod : module) {
 
         println("done")
 
+        structsInternalToPrint.clear()
         for (comb in mod.Combs) {
             AddStructsInternalToPrint(comb)
         }

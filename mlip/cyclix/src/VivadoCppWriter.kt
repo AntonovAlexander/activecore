@@ -363,6 +363,28 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         } else ERROR("undefined opcode")
     }
 
+    var structsIfToPrint = mutableMapOf<String, hw_struct>()
+    fun AddStructsIfToPrint(param: hw_param) {
+        if (param.vartype.VarType == VAR_TYPE.STRUCTURED) {
+            if (!structsIfToPrint.containsKey(param.vartype.src_struct.name)) {
+                for (structvar in param.vartype.src_struct) {
+                    AddStructsIfToPrint(structvar)
+                }
+                structsIfToPrint.put(param.vartype.src_struct.name, param.vartype.src_struct)
+            }
+        }
+    }
+    var structsInternalToPrint = mutableMapOf<String, hw_struct>()
+    fun AddStructsInternalToPrint(param: hw_param) {
+        if (param.vartype.VarType == VAR_TYPE.STRUCTURED) {
+            if (!structsIfToPrint.containsKey(param.vartype.src_struct.name) && !structsInternalToPrint.containsKey(param.vartype.src_struct.name)) {
+                for (structvar in param.vartype.src_struct) {
+                    AddStructsInternalToPrint(structvar)
+                }
+                structsInternalToPrint.put(param.vartype.src_struct.name, param.vartype.src_struct)
+            }
+        }
+    }
 
     fun write_module(pathname : String) {
         val wrFileInterface = File(pathname + "/" + cyclix_module.name + ".hpp").writer()
@@ -373,19 +395,27 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         wrFileInterface.write("#ifndef __" + cyclix_module.name +"_h_\n")
         wrFileInterface.write("#define __" + cyclix_module.name +"_h_\n")
         wrFileInterface.write("\n")
-        wrFileInterface.write("#include <ap_int.h>")
-        wrFileInterface.write("\n")
+        wrFileInterface.write("#include <ap_int.h>\n\n")
 
         println("Exporting structs...")
 
-        for (hw_struct in cyclix_module.hw_structs) {
-            if (hw_struct.value.IsInInterface) {
-                wrFileInterface.write("typedef struct {\n")
-                for (structvar in hw_struct.value) {
-                    export_structvar("\t", "", structvar, ";\n", wrFileInterface)
-                }
-                wrFileInterface.write("} " + hw_struct.value.name + ";\n\n")
+        structsIfToPrint.clear()
+        for (port in cyclix_module.Ports) {
+            AddStructsIfToPrint(port)
+        }
+        for (fifo_if in cyclix_module.fifo_ifs) {
+            AddStructsIfToPrint(fifo_if.value)
+        }
+        for (hw_struct in structsIfToPrint) {
+            val STRUCT_DECL_STRING = "__genstructdel_" + hw_struct.value.name + "_"
+            wrFileInterface.write("#ifndef " + STRUCT_DECL_STRING + "\n")
+            wrFileInterface.write("#define " + STRUCT_DECL_STRING + "\n")
+            wrFileInterface.write("typedef struct {\n")
+            for (structvar in hw_struct.value) {
+                export_structvar("\t", "", structvar, ";\n", wrFileInterface)
             }
+            wrFileInterface.write("} " + hw_struct.value.name + ";\n")
+            wrFileInterface.write("#endif // " + STRUCT_DECL_STRING + "\n\n")
         }
         wrFileInterface.write("#endif\n")
         wrFileInterface.close()
@@ -398,21 +428,26 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         WriteGenSrcHeader(wrFileModule, "HLS sources")
 
         println("Exporting modules and ports...")
-        wrFileModule.write("#include \"" + cyclix_module.name + ".hpp\"\n")
         wrFileModule.write("#include <ap_int.h>\n")
         wrFileModule.write("#include <hls_stream.h>\n")
+        wrFileModule.write("#include \"" + cyclix_module.name + ".hpp\"\n")
         wrFileModule.write("\n")
 
         println("done")
 
-        for (hw_struct in cyclix_module.hw_structs) {
-            if (hw_struct.value.IsInInterface == false) {
-                wrFileModule.write("typedef struct {\n")
-                for (structvar in hw_struct.value) {
-                    export_structvar("\t", "", structvar, ";\n", wrFileModule)
-                }
-                wrFileModule.write("} " + hw_struct.value.name + ";\n\n")
+        structsInternalToPrint.clear()
+        for (global in cyclix_module.globals) {
+            AddStructsInternalToPrint(global)
+        }
+        for (local in cyclix_module.locals) {
+            AddStructsInternalToPrint(local)
+        }
+        for (hw_struct in structsInternalToPrint) {
+            wrFileModule.write("typedef struct {\n")
+            for (structvar in hw_struct.value) {
+                export_structvar("\t", "", structvar, ";\n", wrFileModule)
             }
+            wrFileModule.write("} " + hw_struct.value.name + ";\n\n")
         }
 
         tab_Counter++

@@ -215,7 +215,7 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
 
         //// Generating interfaces ////
         // cmd (sequential instruction stream) //
-        var cmd_req_struct = cyclix_gen.add_struct(name + "_cmd_req_struct")
+        var cmd_req_struct = hw_struct(name + "_cmd_req_struct")
         cmd_req_struct.addu("exec",     0, 0, "0")
         cmd_req_struct.addu("rf_we",       0,  0, "0")
         cmd_req_struct.addu("rf_addr",    input_rf_addr_width-1, 0, "0")
@@ -236,7 +236,7 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
 
         val TAG_WIDTH = GetWidthToContain(MAX_INSTR_NUM)
 
-        var uop_struct = cyclix_gen.add_struct("uop_struct")
+        var uop_struct = hw_struct("uop_struct")
         uop_struct.addu("enb",     0, 0, "0")
         uop_struct.addu("opcode",     0, 0, "0")
         uop_struct.addu("rs0_rdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
@@ -244,7 +244,7 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
         uop_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
         uop_struct.addu("rd_wdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
 
-        var rob_struct = cyclix_gen.add_struct("rob_struct")
+        var rob_struct = hw_struct("rob_struct")
         rob_struct.addu("enb",     0, 0, "0")
         rob_struct.addu("sent",     0, 0, "0")
         rob_struct.addu("rdy",     0, 0, "0")
@@ -259,7 +259,7 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
         rob_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
         rob_struct.addu("rd_wdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
 
-        var req_struct = cyclix_gen.add_struct("req_struct")
+        var req_struct = hw_struct("req_struct")
         req_struct.addu("enb",     0, 0, "0")
         req_struct.addu("opcode",     0, 0, "0")
         req_struct.addu("rdy",     0, 0, "0")
@@ -267,12 +267,12 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
         req_struct.addu("rs1_rdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
         req_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
 
-        var resp_struct = cyclix_gen.add_struct("resp_struct")
+        var resp_struct = hw_struct("resp_struct")
         resp_struct.addu("enb",     0, 0, "0")
         resp_struct.addu("tag",     TAG_WIDTH-1, 0, "0")
         resp_struct.addu("wdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
 
-        var commit_struct = cyclix_gen.add_struct("commit_struct")
+        var commit_struct = hw_struct("commit_struct")
         commit_struct.addu("enb",     0, 0, "0")
         commit_struct.addu("rdy",     0, 0, "0")
         commit_struct.addu("rd_enb",     0, 0, "0")
