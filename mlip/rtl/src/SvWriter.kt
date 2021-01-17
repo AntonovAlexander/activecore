@@ -321,10 +321,36 @@ class SvWriter(var mod : module) {
         } else ERROR("undefined opcode")
     }
 
+    var structsIfToPrint = mutableMapOf<String, hw_struct>()
+    fun AddStructsIfToPrint(param: hw_param) {
+        if (param.vartype.VarType == VAR_TYPE.STRUCTURED) {
+            if (!structsIfToPrint.containsKey(param.vartype.src_struct.name)) {
+                for (structvar in param.vartype.src_struct) {
+                    AddStructsIfToPrint(structvar)
+                }
+                structsIfToPrint.put(param.vartype.src_struct.name, param.vartype.src_struct)
+            }
+        }
+    }
+    var structsInternalToPrint = mutableMapOf<String, hw_struct>()
+    fun AddStructsInternalToPrint(param: hw_param) {
+        if (param.vartype.VarType == VAR_TYPE.STRUCTURED) {
+            if (!structsIfToPrint.containsKey(param.vartype.src_struct.name) && !structsInternalToPrint.containsKey(param.vartype.src_struct.name)) {
+                for (structvar in param.vartype.src_struct) {
+                    AddStructsInternalToPrint(structvar)
+                }
+                structsInternalToPrint.put(param.vartype.src_struct.name, param.vartype.src_struct)
+            }
+        }
+    }
+
     fun write(pathname : String) {
 
         // writing interface structures
         println("Exporting structs...")
+
+        structsIfToPrint.clear()
+        structsInternalToPrint.clear()
 
         File(pathname).mkdirs()
         val wrFileInterface = File(pathname + "/" + mod.name + ".svh").writer()
@@ -336,16 +362,22 @@ class SvWriter(var mod : module) {
         wrFileInterface.write("`define __" + mod.name +"_h_\n")
         wrFileInterface.write("\n")
 
-        for (hw_struct in mod.hw_structs) {
-            if (hw_struct.value.IsInInterface) {
-                wrFileInterface.write("typedef struct packed {\n")
-                for (structvar in hw_struct.value) {
-                    export_structvar("\t", "logic ", ";\n", structvar, wrFileInterface)
-                }
-                wrFileInterface.write("} " + hw_struct.value.name + ";\n\n")
-            }
+        for (port in mod.Ports) {
+            AddStructsIfToPrint(port)
         }
-        wrFileInterface.write("`endif\n")
+
+        for (hw_struct in structsIfToPrint) {
+            val STRUCT_DECL_STRING = "__genstructdel_" + hw_struct.value.name + "_"
+            wrFileInterface.write("`ifndef " + STRUCT_DECL_STRING + "\n")
+            wrFileInterface.write("`define " + STRUCT_DECL_STRING + "\n")
+            wrFileInterface.write("typedef struct packed {\n")
+            for (structvar in hw_struct.value) {
+                export_structvar("\t", "logic ", ";\n", structvar, wrFileInterface)
+            }
+            wrFileInterface.write("} " + hw_struct.value.name + ";\n")
+            wrFileInterface.write("`endif // " + STRUCT_DECL_STRING + "\n\n")
+        }
+        wrFileInterface.write("`endif // __" + mod.name +"_h_\n")
         wrFileInterface.close()
         println("done")
 
@@ -369,12 +401,12 @@ class SvWriter(var mod : module) {
                 mods_included.add(incl)
             }
         }
-        mods_included.add(mod.name)
         for (submodule in mod.Submodules) {
             if (!mods_included.contains(submodule.value.src_module.name)) {
                 mods_included.add(submodule.value.src_module.name)
             }
         }
+        mods_included.add(mod.name)
         for (incl_file in mods_included) {
             wrFileModule.write("`include \"" + incl_file + ".svh\"\n")
         }
@@ -401,14 +433,18 @@ class SvWriter(var mod : module) {
 
         println("done")
 
-        for (hw_struct in mod.hw_structs) {
-            if (hw_struct.value.IsInInterface == false) {
-                wrFileModule.write("typedef struct packed {\n")
-                for (structvar in hw_struct.value) {
-                    export_structvar("\t", "logic ", ";\n", structvar, wrFileModule)
-                }
-                wrFileModule.write("} " + hw_struct.value.name + ";\n\n")
+        for (comb in mod.Combs) {
+            AddStructsInternalToPrint(comb)
+        }
+        for (mem in mod.Mems) {
+            AddStructsInternalToPrint(mem)
+        }
+        for (hw_struct in structsInternalToPrint) {
+            wrFileModule.write("typedef struct packed {\n")
+            for (structvar in hw_struct.value) {
+                export_structvar("\t", "logic ", ";\n", structvar, wrFileModule)
             }
+            wrFileModule.write("} " + hw_struct.value.name + ";\n\n")
         }
         wrFileModule.write("\n")
 
