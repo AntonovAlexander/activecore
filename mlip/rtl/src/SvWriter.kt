@@ -458,7 +458,13 @@ class SvWriter(var mod : module) {
 
                         wrFileModule.write("\tif ($reset_condition)\n")
                         wrFileModule.write("\t\tbegin\n")
-                        if (mem.vartype.dimensions.size == 1) {
+                        if (mem.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                            wrFileModule.write("\t\t"
+                                    + mem.name
+                                    + " <= '{default:"
+                                    + mem.rst_src.GetString()
+                                    + "};\n")
+                        } else if (mem.vartype.dimensions.size == 1) {
                             wrFileModule.write("\t\t" + mem.name + " <= " + mem.rst_src.GetString() +";\n")
                         } else if (mem.vartype.dimensions.size == 2) {
                             var power = mem.vartype.dimensions[1].GetWidth()
@@ -484,16 +490,8 @@ class SvWriter(var mod : module) {
                             }
                         } else if (mem.vartype.dimensions.size > 2)
                             ERROR("Large dimensions for mems (reset) are currently not supported!\n")
-                        else {
-                            if (mem.vartype.VarType == VAR_TYPE.STRUCTURED) {
-                                wrFileModule.write("\t\t"
-                                        + mem.name
-                                        + " <= '{default:"
-                                        + mem.rst_src.GetString()
-                                        + "};\n")
-                            } else
-                                ERROR("Undimensioned mems (reset) are currently not supported!\n")
-                        }
+                        else
+                            ERROR("Undimensioned mems (reset) are currently not supported!\n")
 
                         wrFileModule.write("\t\tend\n")
                         wrFileModule.write("\telse\n")
