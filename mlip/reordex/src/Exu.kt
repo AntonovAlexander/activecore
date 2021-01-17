@@ -36,7 +36,7 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: In
         req_struct.addu("rs0_rdata",     Exu_cfg_rf.input_RF_width-1, 0, "0")
         req_struct.addu("rs1_rdata",     Exu_cfg_rf.input_RF_width-1, 0, "0")
 
-        resp_struct.addu("rd_wdata",     Exu_cfg_rf.input_RF_width-1, 0, "0")
+        resp_struct.addu("wdata",     Exu_cfg_rf.input_RF_width-1, 0, "0")
     }
 
     fun endexu() {

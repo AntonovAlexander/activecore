@@ -3,466 +3,64 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="tb_behav.wdb" id="1">
+      <db_ref path="tb_direct_behav.wdb" id="1">
          <top_modules>
+            <top_module name="\$unit_citadel_gen_sv " />
             <top_module name="glbl" />
-            <top_module name="tb" />
+            <top_module name="tb_direct" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="1243667fs"></ZoomStartTime>
-      <ZoomEndTime time="3699668fs"></ZoomEndTime>
-      <Cursor1Time time="1445000fs"></Cursor1Time>
+      <ZoomStartTime time="11037200fs"></ZoomStartTime>
+      <ZoomEndTime time="11142201fs"></ZoomEndTime>
+      <Cursor1Time time="11045400fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="175"></NameColumnWidth>
-      <ValueColumnWidth column_width="133"></ValueColumnWidth>
+      <ValueColumnWidth column_width="128"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="13" />
-   <wvobject fp_name="/tb/SW" type="array">
-      <obj_property name="ElementShortName">SW[15:0]</obj_property>
-      <obj_property name="ObjectShortName">SW[15:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
+   <WVObjectSize size="4" />
+   <wvobject fp_name="/tb_direct/CLK_100MHZ" type="logic">
+      <obj_property name="ElementShortName">CLK_100MHZ</obj_property>
+      <obj_property name="ObjectShortName">CLK_100MHZ</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb/LED" type="array">
-      <obj_property name="ElementShortName">LED[15:0]</obj_property>
-      <obj_property name="ObjectShortName">LED[15:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
+   <wvobject fp_name="/tb_direct/RST" type="logic">
+      <obj_property name="ElementShortName">RST</obj_property>
+      <obj_property name="ObjectShortName">RST</obj_property>
    </wvobject>
-   <wvobject fp_name="group75" type="group">
-      <obj_property name="label">udm_controller</obj_property>
+   <wvobject fp_name="group104" type="group">
+      <obj_property name="label">CMD input</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/clk_i" type="logic">
-         <obj_property name="ElementShortName">clk_i</obj_property>
-         <obj_property name="ObjectShortName">clk_i</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_req_genfifo_req_i" type="array">
+         <obj_property name="ElementShortName">cmd_req_genfifo_req_i[0:0]</obj_property>
+         <obj_property name="ObjectShortName">cmd_req_genfifo_req_i[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/reset_i" type="logic">
-         <obj_property name="ElementShortName">reset_i</obj_property>
-         <obj_property name="ObjectShortName">reset_i</obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_req_genfifo_rdata_bi" type="array">
+         <obj_property name="ElementShortName">cmd_req_genfifo_rdata_bi</obj_property>
+         <obj_property name="ObjectShortName">cmd_req_genfifo_rdata_bi</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/rx_done_tick_i" type="logic">
-         <obj_property name="ElementShortName">rx_done_tick_i</obj_property>
-         <obj_property name="ObjectShortName">rx_done_tick_i</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/rx_din_bi" type="array">
-         <obj_property name="ElementShortName">rx_din_bi[7:0]</obj_property>
-         <obj_property name="ObjectShortName">rx_din_bi[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_rdy" type="logic">
-         <obj_property name="ElementShortName">tx_rdy</obj_property>
-         <obj_property name="ObjectShortName">tx_rdy</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_start_o" type="logic">
-         <obj_property name="ElementShortName">tx_start_o</obj_property>
-         <obj_property name="ObjectShortName">tx_start_o</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_dout_bo" type="array">
-         <obj_property name="ElementShortName">tx_dout_bo[7:0]</obj_property>
-         <obj_property name="ObjectShortName">tx_dout_bo[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_done_tick_i" type="logic">
-         <obj_property name="ElementShortName">tx_done_tick_i</obj_property>
-         <obj_property name="ObjectShortName">tx_done_tick_i</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/rst_o" type="logic">
-         <obj_property name="ElementShortName">rst_o</obj_property>
-         <obj_property name="ObjectShortName">rst_o</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/bus_req_o" type="logic">
-         <obj_property name="ElementShortName">bus_req_o</obj_property>
-         <obj_property name="ObjectShortName">bus_req_o</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/bus_ack_i" type="logic">
-         <obj_property name="ElementShortName">bus_ack_i</obj_property>
-         <obj_property name="ObjectShortName">bus_ack_i</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/bus_we_o" type="logic">
-         <obj_property name="ElementShortName">bus_we_o</obj_property>
-         <obj_property name="ObjectShortName">bus_we_o</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/bus_addr_bo" type="array">
-         <obj_property name="ElementShortName">bus_addr_bo[31:0]</obj_property>
-         <obj_property name="ObjectShortName">bus_addr_bo[31:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/bus_be_bo" type="array">
-         <obj_property name="ElementShortName">bus_be_bo[3:0]</obj_property>
-         <obj_property name="ObjectShortName">bus_be_bo[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/bus_wdata_bo" type="array">
-         <obj_property name="ElementShortName">bus_wdata_bo[31:0]</obj_property>
-         <obj_property name="ObjectShortName">bus_wdata_bo[31:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/bus_resp_i" type="logic">
-         <obj_property name="ElementShortName">bus_resp_i</obj_property>
-         <obj_property name="ObjectShortName">bus_resp_i</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/bus_rdata_bi" type="array">
-         <obj_property name="ElementShortName">bus_rdata_bi[31:0]</obj_property>
-         <obj_property name="ObjectShortName">bus_rdata_bi[31:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/timeout_counter" type="array">
-         <obj_property name="ElementShortName">timeout_counter[31:0]</obj_property>
-         <obj_property name="ObjectShortName">timeout_counter[31:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/rx_req" type="logic">
-         <obj_property name="ElementShortName">rx_req</obj_property>
-         <obj_property name="ObjectShortName">rx_req</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/rx_sync" type="logic">
-         <obj_property name="ElementShortName">rx_sync</obj_property>
-         <obj_property name="ObjectShortName">rx_sync</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/r_data" type="array">
-         <obj_property name="ElementShortName">r_data[7:0]</obj_property>
-         <obj_property name="ObjectShortName">r_data[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/escape_received" type="logic">
-         <obj_property name="ElementShortName">escape_received</obj_property>
-         <obj_property name="ObjectShortName">escape_received</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_sendbyte_start" type="logic">
-         <obj_property name="ElementShortName">tx_sendbyte_start</obj_property>
-         <obj_property name="ObjectShortName">tx_sendbyte_start</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_err_ack" type="logic">
-         <obj_property name="ElementShortName">tx_err_ack</obj_property>
-         <obj_property name="ObjectShortName">tx_err_ack</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_idcode_resp" type="logic">
-         <obj_property name="ElementShortName">tx_idcode_resp</obj_property>
-         <obj_property name="ObjectShortName">tx_idcode_resp</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_err_resp" type="logic">
-         <obj_property name="ElementShortName">tx_err_resp</obj_property>
-         <obj_property name="ObjectShortName">tx_err_resp</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_irq" type="logic">
-         <obj_property name="ElementShortName">tx_irq</obj_property>
-         <obj_property name="ObjectShortName">tx_irq</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_sendbyte" type="array">
-         <obj_property name="ElementShortName">tx_sendbyte[7:0]</obj_property>
-         <obj_property name="ObjectShortName">tx_sendbyte[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_sendbyte_ff" type="array">
-         <obj_property name="ElementShortName">tx_sendbyte_ff[7:0]</obj_property>
-         <obj_property name="ObjectShortName">tx_sendbyte_ff[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_escape" type="logic">
-         <obj_property name="ElementShortName">tx_escape</obj_property>
-         <obj_property name="ObjectShortName">tx_escape</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tx_rdy_comb" type="logic">
-         <obj_property name="ElementShortName">tx_rdy_comb</obj_property>
-         <obj_property name="ObjectShortName">tx_rdy_comb</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/state" type="array">
-         <obj_property name="ElementShortName">state[7:0]</obj_property>
-         <obj_property name="ObjectShortName">state[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/counter" type="array">
-         <obj_property name="ElementShortName">counter[1:0]</obj_property>
-         <obj_property name="ObjectShortName">counter[1:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/cmd_ff" type="logic">
-         <obj_property name="ElementShortName">cmd_ff</obj_property>
-         <obj_property name="ObjectShortName">cmd_ff</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/autoinc_ff" type="logic">
-         <obj_property name="ElementShortName">autoinc_ff</obj_property>
-         <obj_property name="ObjectShortName">autoinc_ff</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/RD_DATA_reg" type="array">
-         <obj_property name="ElementShortName">RD_DATA_reg[31:0]</obj_property>
-         <obj_property name="ObjectShortName">RD_DATA_reg[31:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/tr_length" type="array">
-         <obj_property name="ElementShortName">tr_length[31:0]</obj_property>
-         <obj_property name="ObjectShortName">tr_length[31:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/BUS_TIMEOUT" type="array">
-         <obj_property name="ElementShortName">BUS_TIMEOUT[31:0]</obj_property>
-         <obj_property name="ObjectShortName">BUS_TIMEOUT[31:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/SYNC_BYTE" type="array">
-         <obj_property name="ElementShortName">SYNC_BYTE[7:0]</obj_property>
-         <obj_property name="ObjectShortName">SYNC_BYTE[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/ESCAPE_BYTE" type="array">
-         <obj_property name="ElementShortName">ESCAPE_BYTE[7:0]</obj_property>
-         <obj_property name="ObjectShortName">ESCAPE_BYTE[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/TRX_IRQ_BYTE" type="array">
-         <obj_property name="ElementShortName">TRX_IRQ_BYTE[7:0]</obj_property>
-         <obj_property name="ObjectShortName">TRX_IRQ_BYTE[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/TRX_ERR_ACK_BYTE" type="array">
-         <obj_property name="ElementShortName">TRX_ERR_ACK_BYTE[7:0]</obj_property>
-         <obj_property name="ObjectShortName">TRX_ERR_ACK_BYTE[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/TRX_ERR_RESP_BYTE" type="array">
-         <obj_property name="ElementShortName">TRX_ERR_RESP_BYTE[7:0]</obj_property>
-         <obj_property name="ObjectShortName">TRX_ERR_RESP_BYTE[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/IDCODE_CMD" type="array">
-         <obj_property name="ElementShortName">IDCODE_CMD[7:0]</obj_property>
-         <obj_property name="ObjectShortName">IDCODE_CMD[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/RST_CMD" type="array">
-         <obj_property name="ElementShortName">RST_CMD[7:0]</obj_property>
-         <obj_property name="ObjectShortName">RST_CMD[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/nRST_CMD" type="array">
-         <obj_property name="ElementShortName">nRST_CMD[7:0]</obj_property>
-         <obj_property name="ObjectShortName">nRST_CMD[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/WR_INC_CMD" type="array">
-         <obj_property name="ElementShortName">WR_INC_CMD[7:0]</obj_property>
-         <obj_property name="ObjectShortName">WR_INC_CMD[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/RD_INC_CMD" type="array">
-         <obj_property name="ElementShortName">RD_INC_CMD[7:0]</obj_property>
-         <obj_property name="ObjectShortName">RD_INC_CMD[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/WR_NOINC_CMD" type="array">
-         <obj_property name="ElementShortName">WR_NOINC_CMD[7:0]</obj_property>
-         <obj_property name="ObjectShortName">WR_NOINC_CMD[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/RD_NOINC_CMD" type="array">
-         <obj_property name="ElementShortName">RD_NOINC_CMD[7:0]</obj_property>
-         <obj_property name="ObjectShortName">RD_NOINC_CMD[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/IDLE" type="array">
-         <obj_property name="ElementShortName">IDLE[7:0]</obj_property>
-         <obj_property name="ObjectShortName">IDLE[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/FETCH_ADDR" type="array">
-         <obj_property name="ElementShortName">FETCH_ADDR[7:0]</obj_property>
-         <obj_property name="ObjectShortName">FETCH_ADDR[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/FETCH_LENGTH" type="array">
-         <obj_property name="ElementShortName">FETCH_LENGTH[7:0]</obj_property>
-         <obj_property name="ObjectShortName">FETCH_LENGTH[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/FETCH_DATA" type="array">
-         <obj_property name="ElementShortName">FETCH_DATA[7:0]</obj_property>
-         <obj_property name="ObjectShortName">FETCH_DATA[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/WAIT_ACK" type="array">
-         <obj_property name="ElementShortName">WAIT_ACK[7:0]</obj_property>
-         <obj_property name="ObjectShortName">WAIT_ACK[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/RD_DATA" type="array">
-         <obj_property name="ElementShortName">RD_DATA[7:0]</obj_property>
-         <obj_property name="ObjectShortName">RD_DATA[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/TX_RDATA" type="array">
-         <obj_property name="ElementShortName">TX_RDATA[7:0]</obj_property>
-         <obj_property name="ObjectShortName">TX_RDATA[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/WAIT_TX" type="array">
-         <obj_property name="ElementShortName">WAIT_TX[7:0]</obj_property>
-         <obj_property name="ObjectShortName">WAIT_TX[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/udm_controller/WAIT_RESP" type="array">
-         <obj_property name="ElementShortName">WAIT_RESP[7:0]</obj_property>
-         <obj_property name="ObjectShortName">WAIT_RESP[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_req_genfifo_ack_o" type="array">
+         <obj_property name="ElementShortName">cmd_req_genfifo_ack_o[0:0]</obj_property>
+         <obj_property name="ObjectShortName">cmd_req_genfifo_ack_o[0:0]</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject fp_name="group101" type="group">
-      <obj_property name="label">udm_rx</obj_property>
+   <wvobject fp_name="group105" type="group">
+      <obj_property name="label">CMD output</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/clk_i" type="logic">
-         <obj_property name="ElementShortName">clk_i</obj_property>
-         <obj_property name="ObjectShortName">clk_i</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_resp_genfifo_req_o" type="array">
+         <obj_property name="ElementShortName">cmd_resp_genfifo_req_o[0:0]</obj_property>
+         <obj_property name="ObjectShortName">cmd_resp_genfifo_req_o[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/rst_i" type="logic">
-         <obj_property name="ElementShortName">rst_i</obj_property>
-         <obj_property name="ObjectShortName">rst_i</obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_resp_genfifo_wdata_bo" type="array">
+         <obj_property name="ElementShortName">cmd_resp_genfifo_wdata_bo[31:0]</obj_property>
+         <obj_property name="ObjectShortName">cmd_resp_genfifo_wdata_bo[31:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/rx_i" type="logic">
-         <obj_property name="ElementShortName">rx_i</obj_property>
-         <obj_property name="ObjectShortName">rx_i</obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_resp_genfifo_ack_i" type="array">
+         <obj_property name="ElementShortName">cmd_resp_genfifo_ack_i[0:0]</obj_property>
+         <obj_property name="ObjectShortName">cmd_resp_genfifo_ack_i[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/rx_done_tick_o" type="logic">
-         <obj_property name="ElementShortName">rx_done_tick_o</obj_property>
-         <obj_property name="ObjectShortName">rx_done_tick_o</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/dout_bo" type="array">
-         <obj_property name="ElementShortName">dout_bo[7:0]</obj_property>
-         <obj_property name="ObjectShortName">dout_bo[7:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/locked_o" type="logic">
-         <obj_property name="ElementShortName">locked_o</obj_property>
-         <obj_property name="ObjectShortName">locked_o</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/bitperiod_o" type="array">
-         <obj_property name="ElementShortName">bitperiod_o[28:0]</obj_property>
-         <obj_property name="ObjectShortName">bitperiod_o[28:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/state" type="array">
-         <obj_property name="ElementShortName">state[4:0]</obj_property>
-         <obj_property name="ObjectShortName">state[4:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/clk_counter" type="array">
-         <obj_property name="ElementShortName">clk_counter[31:0]</obj_property>
-         <obj_property name="ObjectShortName">clk_counter[31:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/bit_counter" type="array">
-         <obj_property name="ElementShortName">bit_counter[2:0]</obj_property>
-         <obj_property name="ObjectShortName">bit_counter[2:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/rx_buf" type="logic">
-         <obj_property name="ElementShortName">rx_buf</obj_property>
-         <obj_property name="ObjectShortName">rx_buf</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_NOSYNC" type="array">
-         <obj_property name="ElementShortName">ST_NOSYNC[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_NOSYNC[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_NOSYNC_WAIT1_1" type="array">
-         <obj_property name="ElementShortName">ST_NOSYNC_WAIT1_1[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_NOSYNC_WAIT1_1[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_NOSYNC_WAIT0_2" type="array">
-         <obj_property name="ElementShortName">ST_NOSYNC_WAIT0_2[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_NOSYNC_WAIT0_2[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_NOSYNC_WAIT1_3" type="array">
-         <obj_property name="ElementShortName">ST_NOSYNC_WAIT1_3[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_NOSYNC_WAIT1_3[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_NOSYNC_WAIT0_4" type="array">
-         <obj_property name="ElementShortName">ST_NOSYNC_WAIT0_4[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_NOSYNC_WAIT0_4[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_NOSYNC_WAIT1_5" type="array">
-         <obj_property name="ElementShortName">ST_NOSYNC_WAIT1_5[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_NOSYNC_WAIT1_5[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_NOSYNC_WAIT0_6" type="array">
-         <obj_property name="ElementShortName">ST_NOSYNC_WAIT0_6[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_NOSYNC_WAIT0_6[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_NOSYNC_WAIT1_7" type="array">
-         <obj_property name="ElementShortName">ST_NOSYNC_WAIT1_7[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_NOSYNC_WAIT1_7[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_NOSYNC_WAIT0_8" type="array">
-         <obj_property name="ElementShortName">ST_NOSYNC_WAIT0_8[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_NOSYNC_WAIT0_8[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_NOSYNC_WAIT_STOP" type="array">
-         <obj_property name="ElementShortName">ST_NOSYNC_WAIT_STOP[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_NOSYNC_WAIT_STOP[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_SYNC" type="array">
-         <obj_property name="ElementShortName">ST_SYNC[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_SYNC[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_SYNC_WAIT_START" type="array">
-         <obj_property name="ElementShortName">ST_SYNC_WAIT_START[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_SYNC_WAIT_START[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_SYNC_RX_DATA" type="array">
-         <obj_property name="ElementShortName">ST_SYNC_RX_DATA[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_SYNC_RX_DATA[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb/DUT/udm/uart_rx/ST_SYNC_WAIT_STOP" type="array">
-         <obj_property name="ElementShortName">ST_SYNC_WAIT_STOP[3:0]</obj_property>
-         <obj_property name="ObjectShortName">ST_SYNC_WAIT_STOP[3:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject fp_name="/tb/DUT/testmem/ram" type="array">
-      <obj_property name="ElementShortName">ram[0:1023][31:0]</obj_property>
-      <obj_property name="ObjectShortName">ram[0:1023][31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb/DUT/udm_req" type="array">
-      <obj_property name="ElementShortName">udm_req[0:0]</obj_property>
-      <obj_property name="ObjectShortName">udm_req[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb/DUT/udm_ack" type="array">
-      <obj_property name="ElementShortName">udm_ack[0:0]</obj_property>
-      <obj_property name="ObjectShortName">udm_ack[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb/DUT/udm_we" type="array">
-      <obj_property name="ElementShortName">udm_we[0:0]</obj_property>
-      <obj_property name="ObjectShortName">udm_we[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb/DUT/udm_addr" type="array">
-      <obj_property name="ElementShortName">udm_addr[31:0]</obj_property>
-      <obj_property name="ObjectShortName">udm_addr[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb/DUT/udm_be" type="array">
-      <obj_property name="ElementShortName">udm_be[3:0]</obj_property>
-      <obj_property name="ObjectShortName">udm_be[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb/DUT/udm_wdata" type="array">
-      <obj_property name="ElementShortName">udm_wdata[31:0]</obj_property>
-      <obj_property name="ObjectShortName">udm_wdata[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb/DUT/udm_resp" type="array">
-      <obj_property name="ElementShortName">udm_resp[0:0]</obj_property>
-      <obj_property name="ObjectShortName">udm_resp[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb/DUT/udm_rdata" type="array">
-      <obj_property name="ElementShortName">udm_rdata[31:0]</obj_property>
-      <obj_property name="ObjectShortName">udm_rdata[31:0]</obj_property>
    </wvobject>
 </wave_config>

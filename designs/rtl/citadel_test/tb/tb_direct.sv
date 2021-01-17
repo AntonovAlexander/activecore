@@ -9,7 +9,7 @@
 
 `timescale 1ns / 1ps
 
-`include "citadel_gen.svh"
+`include "../hw/citadel_gen/coregen/sverilog/citadel_gen.svh"
 
 `define HALF_PERIOD			5						//external 100 MHZ
 
@@ -52,18 +52,32 @@ task WAIT
     integer i;
     for (i=0; i<periods; i=i+1)
         begin
-        #(`HALF_PERIOD*2);
+        @(posedge CLK_100MHZ);
         end
     end
 endtask
 
 task CMD
 	(
-		input citadel_gen_cmd_req_struct data
+		input logic unsigned [0:0] exec
+		, input logic unsigned [0:0] rf_we
+		, input logic unsigned [4:0] rf_addr
+		, input logic unsigned [31:0] rf_wdata
+		, input logic unsigned [1:0] fu_id
+		, input logic unsigned [4:0] fu_rs0
+		, input logic unsigned [4:0] fu_rs1
+		, input logic unsigned [4:0] fu_rd
 	);
 	begin
 	cmd_req_genfifo_req <= 1'b1;
-	cmd_req_genfifo_data <= data;
+	cmd_req_genfifo_data.exec <= exec;
+	cmd_req_genfifo_data.rf_we <= rf_we;
+	cmd_req_genfifo_data.rf_addr <= rf_addr;
+	cmd_req_genfifo_data.rf_wdata <= rf_wdata;
+	cmd_req_genfifo_data.fu_id <= fu_id;
+	cmd_req_genfifo_data.fu_rs0 <= fu_rs0;
+	cmd_req_genfifo_data.fu_rs1 <= fu_rs1;
+	cmd_req_genfifo_data.fu_rd <= fu_rd;
 	do begin
         @(posedge CLK_100MHZ);
     end while (!cmd_req_genfifo_ack);
@@ -97,11 +111,10 @@ initial
 	RESET_ALL();
 	WAIT(100);
 	
-	WAIT(100);
-	
 	// fetching results
-	CMD('{default:32'd0});
-	CMD('{default:32'd0});
+	CMD(0, 0, 0, 0, 0, 0, 0, 0);
+	WAIT(10);
+	CMD(1, 2, 3, 4, 5, 6, 7, 8);
 	
 	WAIT(1000);
 
