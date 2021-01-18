@@ -755,7 +755,13 @@ open class hw_astc() : ArrayList<hw_exec>() {
                 return hw_type(structvar.vartype.VarType, structvar.vartype.src_struct, structvar.vartype.dimensions)
             }
         }
-        if (!structvar_found) ERROR("Structvar " + subStruct_name + " not found in var " + src.name)
+        if (!structvar_found) {
+            MSG("Possible struct elements for variable " + src.name + ":")
+            for (structvar_entry in src.vartype.src_struct) {
+                println("-- " + structvar_entry.name)
+            }
+            ERROR("Structvar " + subStruct_name + " not found in var " + src.name)
+        }
         return hw_type(src.vartype.VarType, src.vartype.src_struct, src.vartype.dimensions)
     }
 

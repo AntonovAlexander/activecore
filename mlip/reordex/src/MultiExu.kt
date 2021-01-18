@@ -221,11 +221,14 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
         cmd_req_struct.addu("rf_addr",    input_rf_addr_width-1, 0, "0")
         cmd_req_struct.addu("rf_wdata",    MultiExu_cfg_rf.input_RF_width-1, 0, "0")
         cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size)-1, 0, "0")
+        cmd_req_struct.addu("opcode",     0, 0, "0")
         cmd_req_struct.addu("fu_rs0",    input_rf_addr_width-1, 0, "0")
         cmd_req_struct.addu("fu_rs1",    input_rf_addr_width-1, 0, "0")
         cmd_req_struct.addu("fu_rd",    input_rf_addr_width-1, 0, "0")
         var cmd_req = cyclix_gen.fifo_in("cmd_req",  hw_type(cmd_req_struct))
+        var cmd_req_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_req_data"), cmd_req_struct)
         var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(MultiExu_cfg_rf.input_RF_width-1, 0)))
+        var cmd_resp_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_resp_data"), hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(MultiExu_cfg_rf.input_RF_width-1, 0)), "0")
 
         // TODO: memory interface?
 
@@ -281,7 +284,10 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
 
         var TranslateInfo = __TranslateInfo()
 
-        var rob = cyclix_gen.global("genrob_" + name, rob_struct, rob_size-1, 0)
+        var rob = cyclix_gen.global("genrob", rob_struct, rob_size-1, 0)
+        var rob_wr_ptr = cyclix_gen.uglobal("genrob_wr_ptr", GetWidthToContain(rob_size)-1, 0, "0")
+        var rob_wr = cyclix_gen.ulocal("genrob_wr", 0, 0, "0")
+        var rob_rd = cyclix_gen.ulocal("genrob_rd", 0, 0, "0")
 
         var ExUnits_insts = ArrayList<ArrayList<cyclix.hw_subproc>>()
 
@@ -368,6 +374,7 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
                     rob,
                     hw_fracs(hw_frac_C(rob.vartype.dimensions.last().msb)),
                     0)
+                cyclix_gen.assign(rob_rd, 1)
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
 
@@ -497,6 +504,82 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
             }
             fu_id++
         }
+
+        // acquiring new operation to rob tail
+        // TODO: check if ROB full
+        cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(cmd_req, cmd_req_data))
+        run {
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("enb")),
+                1)
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("sent")),
+                0)
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rdy")),
+                0)
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("fu_id")),
+                cyclix_gen.subStruct(cmd_req_data, "fu_id"))
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("opcode")),
+                cyclix_gen.subStruct(cmd_req_data, "opcode"))
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rs0_rdy")),
+                1)
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rs0_tag")),
+                cyclix_gen.subStruct(cmd_req_data, "fu_rs0"))         // TODO: renaming
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rs0_rdata")),
+                7)                                                              // TODO: rs0 read
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rs1_rdy")),
+                1)
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rs1_tag")),
+                cyclix_gen.subStruct(cmd_req_data, "fu_rs1"))         // TODO: renaming
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rs1_rdata")),
+                9)                                                             // TODO: rs1 read
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rd_tag")),
+                cyclix_gen.subStruct(cmd_req_data, "fu_rd"))          // TODO: renaming
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rd_wdata")),
+                0)
+            cyclix_gen.assign(rob_wr, 1)
+        }; cyclix_gen.endif()
+
+        // processing pointer
+        cyclix_gen.begif(rob_rd)
+        run {
+            cyclix_gen.begif(!rob_wr)
+            run {
+                cyclix_gen.sub(rob_wr_ptr, 1)   // TODO: edge case
+            }; cyclix_gen.endif()
+        }; cyclix_gen.endif()
+
+        cyclix_gen.begif(rob_wr)
+        run {
+            cyclix_gen.begif(!rob_rd)
+            run {
+                cyclix_gen.add(rob_wr_ptr, 1)   // TODO: edge case
+            }; cyclix_gen.endif()
+        }; cyclix_gen.endif()
 
         cyclix_gen.end()
         MSG(DEBUG_FLAG, "Translating to cyclix: complete")
