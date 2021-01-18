@@ -569,7 +569,7 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
         run {
             cyclix_gen.begif(!rob_wr)
             run {
-                cyclix_gen.sub(rob_wr_ptr, 1)   // TODO: edge case
+                cyclix_gen.sub_gen(rob_wr_ptr, rob_wr_ptr, 1)   // TODO: edge case
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
 
@@ -577,7 +577,7 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
         run {
             cyclix_gen.begif(!rob_rd)
             run {
-                cyclix_gen.add(rob_wr_ptr, 1)   // TODO: edge case
+                cyclix_gen.add_gen(rob_wr_ptr, rob_wr_ptr, 1)   // TODO: edge case
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
 
