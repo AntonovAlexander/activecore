@@ -457,6 +457,14 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     // assignment of 1-bit structs
                     if (src.vartype.src_struct != tgt_DePow_descr.src_struct) {
                         // assignment of inequally structured variables
+                        MSG("Structure of tgt: " + tgt.name + ", struct name: " + tgt_DePow_descr.src_struct.name)
+                        for (structvar in tgt_DePow_descr.src_struct) {
+                            println("-- " + structvar.name)
+                        }
+                        MSG("Structure of src: " + tgt.name + ", struct name: " + src.vartype.src_struct.name)
+                        for (structvar in src.vartype.src_struct) {
+                            println("-- " + structvar.name)
+                        }
                         ERROR("assignment of inequally structured variables! tgt: " + tgt.name + " (struct: " + tgt_DePow_descr.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
                     }
                 }
@@ -756,7 +764,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             }
         }
         if (!structvar_found) {
-            MSG("Possible struct elements for variable " + src.name + ":")
+            MSG("Struct elements for variable " + src.name + ":")
             for (structvar_entry in src.vartype.src_struct) {
                 println("-- " + structvar_entry.name)
             }

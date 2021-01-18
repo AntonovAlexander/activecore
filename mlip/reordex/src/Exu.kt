@@ -12,7 +12,21 @@ import hwast.*
 
 val OP_EXU = hwast.hw_opcode("exec_unit")
 
-data class Exu_CFG_RF(val input_RF_width : Int)
+class Exu_CFG_RF(val RF_width : Int) {
+
+    var req_struct = hw_struct("req_struct")
+    var resp_struct = hw_struct("resp_struct")
+
+    init {
+        req_struct.addu("opcode",     0, 0, "0")
+        req_struct.addu("rs0_rdata",     RF_width-1, 0, "0")
+        req_struct.addu("rs1_rdata",     RF_width-1, 0, "0")
+        req_struct.addu("rd_tag",     3, 0, "0")
+
+        resp_struct.addu("tag",     3, 0, "0")
+        resp_struct.addu("wdata",     RF_width-1, 0, "0")
+    }
+}
 
 open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: Int) : hw_astc_stdif() {
 
@@ -21,22 +35,13 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: In
     var locals          = ArrayList<hw_var>()
     var globals         = ArrayList<hw_var>()
 
-    var req_struct = hw_struct("req_struct")
-    var req_data = local(GetGenName("req_data"), req_struct)
-
-    var resp_struct = hw_struct("resp_struct")
-    var resp_data = local(GetGenName("resp_data"), resp_struct)
+    var req_data = local(GetGenName("req_data"), Exu_cfg_rf.req_struct)
+    var resp_data = local(GetGenName("resp_data"), Exu_cfg_rf.resp_struct)
 
     init {
         if (FROZEN_FLAG) ERROR("Failed to begin stage " + name + ": ASTC frozen")
         if (this.size != 0) ERROR("reordex ASTC inconsistent!")
         add(hw_exec(OP_EXU))
-
-        req_struct.addu("opcode",     0, 0, "0")
-        req_struct.addu("rs0_rdata",     Exu_cfg_rf.input_RF_width-1, 0, "0")
-        req_struct.addu("rs1_rdata",     Exu_cfg_rf.input_RF_width-1, 0, "0")
-
-        resp_struct.addu("wdata",     Exu_cfg_rf.input_RF_width-1, 0, "0")
     }
 
     fun endexu() {

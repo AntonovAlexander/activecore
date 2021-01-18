@@ -11,7 +11,9 @@ package citadel
 import hwast.*
 import reordex.*
 
-class EXU_INTEGER(stage_num: Int) : reordex.Exu("INTEGER", Exu_CFG_RF(32), stage_num) {
+val Exu_cfg_rf = Exu_CFG_RF(32)
+
+class EXU_INTEGER(stage_num: Int) : reordex.Exu("INTEGER", Exu_cfg_rf, stage_num) {
 
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op2         = ulocal("alu_op2", 31, 0, "0")
@@ -26,7 +28,7 @@ class EXU_INTEGER(stage_num: Int) : reordex.Exu("INTEGER", Exu_CFG_RF(32), stage
     }
 }
 
-class EXU_MUL(stage_num: Int) : reordex.Exu("MUL", Exu_CFG_RF(32), stage_num) {
+class EXU_MUL(stage_num: Int) : reordex.Exu("MUL", Exu_cfg_rf, stage_num) {
 
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op2         = ulocal("alu_op2", 31, 0, "0")
@@ -40,7 +42,7 @@ class EXU_MUL(stage_num: Int) : reordex.Exu("MUL", Exu_CFG_RF(32), stage_num) {
     }
 }
 
-class EXU_SHIFT(stage_num: Int) : reordex.Exu("SHIFT", Exu_CFG_RF(32), stage_num) {
+class EXU_SHIFT(stage_num: Int) : reordex.Exu("SHIFT", Exu_cfg_rf, stage_num) {
 
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op2         = ulocal("alu_op2", 31, 0, "0")
@@ -54,7 +56,7 @@ class EXU_SHIFT(stage_num: Int) : reordex.Exu("SHIFT", Exu_CFG_RF(32), stage_num
     }
 }
 
-class test_multiexu(name_in : String) : reordex.MultiExu(name_in, MultiExu_CFG_RF(32, 32, false, 0), 16) {
+class test_multiexu(name_in : String) : reordex.MultiExu(name_in, Exu_cfg_rf, MultiExu_CFG_RF(32, 32, false, 0), 16) {
 
     init {
         add_exu(EXU_INTEGER(2), 3)

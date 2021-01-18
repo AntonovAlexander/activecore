@@ -18,7 +18,7 @@ data class MultiExu_CFG_RF(val input_RF_width : Int,
 data class Exu_CFG(val ExecUnit : Exu,
                    val exu_num : Int)
 
-open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, val rob_size : Int) {
+open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu_cfg_rf : MultiExu_CFG_RF, val rob_size : Int) {
 
     val input_rf_addr_width = GetWidthToContain(MultiExu_cfg_rf.input_RF_depth)
     val rename_rf_addr_width = GetWidthToContain(MultiExu_cfg_rf.rename_RF_depth)
@@ -262,19 +262,6 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
         rob_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
         rob_struct.addu("rd_wdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
 
-        var req_struct = hw_struct("req_struct")
-        req_struct.addu("enb",     0, 0, "0")
-        req_struct.addu("opcode",     0, 0, "0")
-        req_struct.addu("rdy",     0, 0, "0")
-        req_struct.addu("rs0_rdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
-        req_struct.addu("rs1_rdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
-        req_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
-
-        var resp_struct = hw_struct("resp_struct")
-        resp_struct.addu("enb",     0, 0, "0")
-        resp_struct.addu("tag",     TAG_WIDTH-1, 0, "0")
-        resp_struct.addu("wdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
-
         var commit_struct = hw_struct("commit_struct")
         commit_struct.addu("enb",     0, 0, "0")
         commit_struct.addu("rdy",     0, 0, "0")
@@ -291,12 +278,12 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
 
         var ExUnits_insts = ArrayList<ArrayList<cyclix.hw_subproc>>()
 
-        var exu_req = cyclix_gen.global(cyclix_gen.GetGenName("exu_req"), req_struct)
-        var exu_resp = cyclix_gen.global(cyclix_gen.GetGenName("exu_resp"), resp_struct)
+        var exu_req = cyclix_gen.global(cyclix_gen.GetGenName("exu_req"), Exu_cfg_rf.req_struct)
+        var exu_resp = cyclix_gen.global(cyclix_gen.GetGenName("exu_resp"), Exu_cfg_rf.resp_struct)
 
         for (ExUnit in ExecUnits) {
 
-            var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, req_struct, resp_struct)
+            var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, Exu_cfg_rf.req_struct, Exu_cfg_rf.resp_struct)
 
             var var_dict = mutableMapOf<hw_var, hw_var>()
 
@@ -312,11 +299,15 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
             for (genvar in ExUnit.value.ExecUnit[0].genvars)
                 var_dict.put(genvar, exu_cyclix_gen.local(genvar.name, genvar.vartype, genvar.defval))
 
+            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict), exu_cyclix_gen.stream_req_var)
+
             for (expr in ExUnit.value.ExecUnit[0].expressions) {
                 reconstruct_expression(exu_cyclix_gen,
                     expr,
                     var_dict)
             }
+
+            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var, TranslateVar(ExUnit.value.ExecUnit.resp_data, var_dict))
 
             exu_cyclix_gen.end()
 
