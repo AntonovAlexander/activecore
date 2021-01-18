@@ -409,6 +409,7 @@ class RtlGenerator(var cyclix_module : Generic) {
 
             if (cyclix_module is Streaming) {
                 rtl_gen.assign(fifo_out_dict[(cyclix_module as Streaming).stream_resp_bus]!!.ext_req, 1)
+                rtl_gen.assign(fifo_out_dict[(cyclix_module as Streaming).stream_resp_bus]!!.ext_wdata, TranslateVar((cyclix_module as Streaming).stream_resp_var, var_dict))
                 rtl_gen.endif()
             }
 
