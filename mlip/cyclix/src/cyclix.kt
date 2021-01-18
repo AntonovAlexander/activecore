@@ -288,8 +288,8 @@ var STREAM_RESP_BUS_NAME = "stream_resp_bus"
 open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct: hw_struct) : Generic(name) {
 
     var stream_req_bus = fifo_in(STREAM_REQ_BUS_NAME, hw_type(fifo_in_struct))
-    var stream_resp_bus = fifo_out(STREAM_RESP_BUS_NAME, hw_type(fifo_out_struct))
-
     var stream_req_var = local(GetGenName("stream_req_var"), fifo_in_struct)
+
+    var stream_resp_bus = fifo_out(STREAM_RESP_BUS_NAME, hw_type(fifo_out_struct))
     var stream_resp_var = local(GetGenName("stream_resp_var"), fifo_out_struct)
 }

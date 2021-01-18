@@ -397,20 +397,42 @@ class RtlGenerator(var cyclix_module : Generic) {
             }
 
             if (cyclix_module is Streaming) {
-                rtl_gen.begif(fifo_in_dict[(cyclix_module as Streaming).stream_req_bus]!!.ext_req)
-                rtl_gen.assign(fifo_in_dict[(cyclix_module as Streaming).stream_req_bus]!!.ext_ack, 1)
-                rtl_gen.assign(TranslateVar((cyclix_module as Streaming).stream_req_var, var_dict), fifo_in_dict[(cyclix_module as Streaming).stream_req_bus]!!.buf_rdata)
-            }
+                var stream_req_bus = fifo_in_dict[(cyclix_module as Streaming).stream_req_bus]!!
+                var stream_resp_bus = fifo_out_dict[(cyclix_module as Streaming).stream_resp_bus]!!
 
-            // Generating payload
-            for (expr in cyclix_module.proc.expressions) {
-                export_expr(rtl_gen, expr, rst)
-            }
+                var streambuf_enb = rtl_gen.ssticky(rtl_gen.GetGenName("streambuf_enb"), 0, 0, "0", clk, rst)
+                var streambuf_data = rtl_gen.sticky(rtl_gen.GetGenName("streambuf_data"), stream_resp_bus.ext_wdata.vartype.src_struct, clk, rst)
 
-            if (cyclix_module is Streaming) {
-                rtl_gen.assign(fifo_out_dict[(cyclix_module as Streaming).stream_resp_bus]!!.ext_req, 1)
-                rtl_gen.assign(fifo_out_dict[(cyclix_module as Streaming).stream_resp_bus]!!.ext_wdata, TranslateVar((cyclix_module as Streaming).stream_resp_var, var_dict))
-                rtl_gen.endif()
+                rtl_gen.assign(stream_resp_bus.ext_req, streambuf_enb)
+                rtl_gen.assign(stream_resp_bus.ext_wdata, streambuf_data)
+                rtl_gen.begif(rtl_gen.band(stream_resp_bus.ext_req, stream_resp_bus.ext_ack))
+                run {
+                    rtl_gen.assign(streambuf_enb, 0)
+                    rtl_gen.assign(streambuf_data, 0)
+                }; rtl_gen.endif()
+
+                rtl_gen.begif(rtl_gen.eq2(streambuf_enb, 0))
+                run {
+                    rtl_gen.begif(stream_req_bus.ext_req)
+                    run {
+                        rtl_gen.assign(stream_req_bus.ext_ack, 1)
+                        rtl_gen.assign(TranslateVar((cyclix_module as Streaming).stream_req_var, var_dict), stream_req_bus.buf_rdata)
+
+                        // Generating payload
+                        for (expr in cyclix_module.proc.expressions) {
+                            export_expr(rtl_gen, expr, rst)
+                        }
+
+                        rtl_gen.assign(streambuf_enb, 1)
+                        rtl_gen.assign(streambuf_data, TranslateVar((cyclix_module as Streaming).stream_resp_var, var_dict))
+                    }; rtl_gen.endif()
+                }; rtl_gen.endif()
+
+            } else {
+                // Generating payload
+                for (expr in cyclix_module.proc.expressions) {
+                    export_expr(rtl_gen, expr, rst)
+                }
             }
 
         }; rtl_gen.cproc_end()
