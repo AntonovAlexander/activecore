@@ -302,6 +302,10 @@ open class MultiExu(val name : String, val MultiExu_cfg_rf : MultiExu_CFG_RF, va
             for (global in ExUnit.value.ExecUnit.globals)
                 var_dict.put(global, exu_cyclix_gen.global(global.name, global.vartype, global.defval))
 
+            // Generating intermediates
+            for (genvar in ExUnit.value.ExecUnit[0].genvars)
+                var_dict.put(genvar, exu_cyclix_gen.local(genvar.name, genvar.vartype, genvar.defval))
+
             for (expr in ExUnit.value.ExecUnit[0].expressions) {
                 reconstruct_expression(exu_cyclix_gen,
                     expr,

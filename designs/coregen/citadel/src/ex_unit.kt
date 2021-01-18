@@ -18,7 +18,9 @@ class EXU_INTEGER(stage_num: Int) : reordex.Exu("INTEGER", Exu_CFG_RF(32), stage
     var alu_result      = ulocal("alu_result", 31, 0, "0")
 
     init {
-        add_gen(alu_result, alu_op1, alu_op2)
+        alu_op1.assign(subStruct(req_data, "rs0_rdata"))
+        alu_op2.assign(subStruct(req_data, "rs1_rdata"))
+        add_gen(alu_result, alu_op1, alu_op1)
         add_gen(alu_result, alu_op1, alu_op2)
         resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), alu_result)
     }
@@ -31,6 +33,8 @@ class EXU_MUL(stage_num: Int) : reordex.Exu("MUL", Exu_CFG_RF(32), stage_num) {
     var alu_result      = ulocal("alu_result", 31, 0, "0")
 
     init {
+        alu_op1.assign(subStruct(req_data, "rs0_rdata"))
+        alu_op2.assign(subStruct(req_data, "rs1_rdata"))
         mul_gen(alu_result, alu_op1, alu_op2)
         resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), alu_result)
     }
@@ -43,6 +47,8 @@ class EXU_SHIFT(stage_num: Int) : reordex.Exu("SHIFT", Exu_CFG_RF(32), stage_num
     var alu_result      = ulocal("alu_result", 31, 0, "0")
 
     init {
+        alu_op1.assign(subStruct(req_data, "rs0_rdata"))
+        alu_op2.assign(subStruct(req_data, "rs1_rdata"))
         sra_gen(alu_result, alu_op1, alu_op2)
         resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), alu_result)
     }

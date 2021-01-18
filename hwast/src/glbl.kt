@@ -71,7 +71,13 @@ fun WriteGenSrcHeader(wrFile : OutputStreamWriter, SrcType : String) {
 fun TranslateVar(var_in : hw_var, var_dict: MutableMap<hw_var, hw_var>) : hw_var {
     var ret_var = var_dict[var_in]
     if (ret_var != null) return ret_var
-    else ERROR("Var translation error")
+    else {
+        MSG("Possible var translations for variable " + var_in.name + ":")
+        for (var_entry in var_dict) {
+            println("-- " + var_entry.key.name)
+        }
+        ERROR("Var translation error")
+    }
     throw Exception()
 }
 
