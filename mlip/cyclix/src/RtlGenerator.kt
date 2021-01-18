@@ -396,11 +396,20 @@ class RtlGenerator(var cyclix_module : Generic) {
                 rtl_gen.assign(fifo_in.value.buf_rdata, fifo_in.value.ext_rdata)
             }
 
-            // TODO: Streaming
+            if (cyclix_module is Streaming) {
+                rtl_gen.begif(fifo_in_dict[(cyclix_module as Streaming).stream_req_bus]!!.ext_req)
+                rtl_gen.assign(fifo_in_dict[(cyclix_module as Streaming).stream_req_bus]!!.ext_ack, 1)
+                rtl_gen.assign(TranslateVar((cyclix_module as Streaming).stream_req_var, var_dict), fifo_in_dict[(cyclix_module as Streaming).stream_req_bus]!!.buf_rdata)
+            }
 
             // Generating payload
             for (expr in cyclix_module.proc.expressions) {
                 export_expr(rtl_gen, expr, rst)
+            }
+
+            if (cyclix_module is Streaming) {
+                rtl_gen.assign(fifo_out_dict[(cyclix_module as Streaming).stream_resp_bus]!!.ext_req, 1)
+                rtl_gen.endif()
             }
 
         }; rtl_gen.cproc_end()
