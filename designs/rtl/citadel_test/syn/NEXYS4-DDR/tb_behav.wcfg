@@ -12,13 +12,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="896599fs"></ZoomStartTime>
-      <ZoomEndTime time="968603fs"></ZoomEndTime>
-      <Cursor1Time time="922600fs"></Cursor1Time>
+      <ZoomStartTime time="993000fs"></ZoomStartTime>
+      <ZoomEndTime time="1089801fs"></ZoomEndTime>
+      <Cursor1Time time="1051200fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="578"></NameColumnWidth>
-      <ValueColumnWidth column_width="247"></ValueColumnWidth>
+      <NameColumnWidth column_width="379"></NameColumnWidth>
+      <ValueColumnWidth column_width="322"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="10" />
    <wvobject fp_name="/tb_direct/CLK_100MHZ" type="logic">
@@ -66,6 +66,7 @@
    <wvobject fp_name="/tb_direct/citadel_inst/genrf" type="array">
       <obj_property name="ElementShortName">genrf[31:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">genrf[31:0][31:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/tb_direct/citadel_inst/genrob" type="array">
       <obj_property name="ElementShortName">genrob[15:0]</obj_property>

@@ -87,6 +87,43 @@ task CMD
 	end
 endtask
 
+localparam exec_EXEC = 1'b1;
+localparam exec_RF   = 1'b0;
+localparam RF_RD = 1'b0;
+localparam RF_WR = 1'b1;
+
+
+task CMD_EXEC
+	(
+		input logic unsigned [1:0] fu_id
+		, input logic unsigned [4:0] fu_rs0
+		, input logic unsigned [4:0] fu_rs1
+		, input logic unsigned [4:0] fu_rd
+	);
+	begin
+	CMD(exec_EXEC, 0, 0, 0, fu_id, fu_rs0, fu_rs1, fu_rd);
+	end
+endtask
+
+task CMD_RF_LOAD
+	(
+		input logic unsigned [4:0] rf_addr
+		, input logic unsigned [31:0] rf_wdata
+	);
+	begin
+	CMD(exec_RF, RF_WR, rf_addr, rf_wdata, 0, 0, 0, 0);
+	end
+endtask
+
+task CMD_RF_STORE
+	(
+		input logic unsigned [4:0] rf_addr
+	);
+	begin
+	CMD(exec_RF, RF_RD, rf_addr, 32'hdeadbeef, 0, 0, 0, 0);
+	end
+endtask
+
 citadel_gen citadel_inst
 (
 	.clk_i(CLK_100MHZ)
@@ -101,6 +138,14 @@ citadel_gen citadel_inst
 	, .cmd_resp_genfifo_ack_i(cmd_resp_genfifo_ack)
 );
 
+always @(posedge CLK_100MHZ)
+	begin
+	if (cmd_resp_genfifo_req && cmd_resp_genfifo_ack)
+		begin
+		$display("DATA OUTPUT: 0x%x", cmd_resp_genfifo_data);
+		end
+	end
+
 /////////////////////////
 // main test procesure //
 
@@ -113,9 +158,21 @@ initial
 	WAIT(100);
 	
 	// fetching results
-	CMD(0, 0, 0, 0, 0, 0, 0, 0);
-	WAIT(10);
-	CMD(1, 2, 3, 4, 5, 6, 7, 8);
+	CMD_RF_LOAD(0, 32'hbadc0ffe);
+	CMD_RF_LOAD(1, 32'h1);
+	CMD_RF_LOAD(2, 32'h2);
+	CMD_RF_LOAD(3, 32'h3);
+	CMD_RF_LOAD(7, 32'h7);
+	CMD_RF_LOAD(9, 32'h9);
+	CMD_RF_LOAD(31, 32'hfafae00f);
+
+	CMD_RF_STORE(0);
+	CMD_RF_STORE(1);
+	CMD_RF_STORE(2);
+	CMD_RF_STORE(3);
+	CMD_RF_STORE(7);
+	CMD_RF_STORE(9);
+	CMD_RF_STORE(31);
 	
 	WAIT(1000);
 

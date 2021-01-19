@@ -267,6 +267,9 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         var rob = cyclix_gen.global("genrob", rob_struct, rob_size-1, 0)
         var rob_wr_ptr = cyclix_gen.uglobal("genrob_wr_ptr", GetWidthToContain(rob_size)-1, 0, "0")
+        var rob_wr_ptr_buf = cyclix_gen.ulocal("genrob_wr_ptr_buf", GetWidthToContain(rob_size)-1, 0, "0")
+        var rob_wr_ptr_inc = cyclix_gen.ulocal("genrob_wr_ptr_inc", GetWidthToContain(rob_size)-1, 0, "0")
+        var rob_wr_ptr_dec = cyclix_gen.ulocal("genrob_wr_ptr_dec", GetWidthToContain(rob_size)-1, 0, "0")
         var rob_wr = cyclix_gen.ulocal("genrob_wr", 0, 0, "0")
         var rob_rd = cyclix_gen.ulocal("genrob_rd", 0, 0, "0")
 
@@ -322,6 +325,10 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             TranslateInfo.exu_assocs.put(ExUnit.value.ExecUnit, exu_info)
         }
 
+        cyclix_gen.assign(rob_wr_ptr_buf, rob_wr_ptr)
+        cyclix_gen.add_gen(rob_wr_ptr_inc, rob_wr_ptr, 1)
+        cyclix_gen.sub_gen(rob_wr_ptr_dec, rob_wr_ptr, 1)
+
         // committing ROB head
         var rob_head = cyclix_gen.indexed(rob, 0)
         cyclix_gen.begif(cyclix_gen.band(cyclix_gen.subStruct(rob_head, "enb"), cyclix_gen.subStruct(rob_head, "rdy")))
@@ -367,6 +374,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     hw_fracs(hw_frac_C(rob.vartype.dimensions.last().msb)),
                     0)
                 cyclix_gen.assign(rob_rd, 1)
+                cyclix_gen.assign(rob_wr_ptr, rob_wr_ptr_dec)
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
 
@@ -512,7 +520,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             cyclix_gen.assign(
                 rob,
                 hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rdy")),
-                0)
+                !cyclix_gen.subStruct(cmd_req_data, "exec"))
             cyclix_gen.assign(
                 rob,
                 hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("exec")),
@@ -565,24 +573,17 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                 rob,
                 hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rd_tag")),
                 cyclix_gen.subStruct(cmd_req_data, "fu_rd"))          // TODO: renaming
+
             cyclix_gen.assign(rob_wr, 1)
-        }; cyclix_gen.endif()
-
-        // processing pointer
-        cyclix_gen.begif(rob_rd)
-        run {
-            cyclix_gen.begif(!rob_wr)
+            cyclix_gen.begif(rob_rd)
             run {
-                cyclix_gen.sub_gen(rob_wr_ptr, rob_wr_ptr, 1)   // TODO: edge case
+                cyclix_gen.assign(rob_wr_ptr, rob_wr_ptr_buf)
             }; cyclix_gen.endif()
-        }; cyclix_gen.endif()
-
-        cyclix_gen.begif(rob_wr)
-        run {
-            cyclix_gen.begif(!rob_rd)
+            cyclix_gen.begelse()
             run {
-                cyclix_gen.add_gen(rob_wr_ptr, rob_wr_ptr, 1)   // TODO: edge case
+                cyclix_gen.assign(rob_wr_ptr, rob_wr_ptr_inc)       // TODO: check for full
             }; cyclix_gen.endif()
+
         }; cyclix_gen.endif()
 
         cyclix_gen.end()
