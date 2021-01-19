@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="1007200fs"></ZoomStartTime>
-      <ZoomEndTime time="1031001fs"></ZoomEndTime>
-      <Cursor1Time time="1025000fs"></Cursor1Time>
+      <ZoomStartTime time="896599fs"></ZoomStartTime>
+      <ZoomEndTime time="968603fs"></ZoomEndTime>
+      <Cursor1Time time="922600fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="578"></NameColumnWidth>
-      <ValueColumnWidth column_width="252"></ValueColumnWidth>
+      <ValueColumnWidth column_width="247"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="9" />
+   <WVObjectSize size="10" />
    <wvobject fp_name="/tb_direct/CLK_100MHZ" type="logic">
       <obj_property name="ElementShortName">CLK_100MHZ</obj_property>
       <obj_property name="ObjectShortName">CLK_100MHZ</obj_property>
@@ -62,6 +62,10 @@
          <obj_property name="ElementShortName">cmd_resp_genfifo_ack_i[0:0]</obj_property>
          <obj_property name="ObjectShortName">cmd_resp_genfifo_ack_i[0:0]</obj_property>
       </wvobject>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genrf" type="array">
+      <obj_property name="ElementShortName">genrf[31:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">genrf[31:0][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_direct/citadel_inst/genrob" type="array">
       <obj_property name="ElementShortName">genrob[15:0]</obj_property>
