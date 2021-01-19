@@ -35,6 +35,7 @@ task RESET_ALL ();
     CLK_100MHZ = 1'b0;
     cmd_req_genfifo_req <= 1'b0;
 	cmd_req_genfifo_data <= '{default:32'd0};
+	cmd_resp_genfifo_ack <= 1'b1;
     RST = 1'b1;
     #(`HALF_PERIOD/2);
     RST = 1;

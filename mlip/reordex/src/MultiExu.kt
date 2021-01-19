@@ -213,6 +213,12 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         var cyclix_gen = cyclix.Generic(name)
 
+        //// Generating RF ////
+        var rf_dim = hw_dim_static()
+        rf_dim.add(31, 0)
+        rf_dim.add(31, 0)
+        var RF = cyclix_gen.uglobal("genrf", rf_dim, "0")
+
         //// Generating interfaces ////
         // cmd (sequential instruction stream) //
         var cmd_req_struct = hw_struct(name + "_cmd_req_struct")
@@ -249,8 +255,12 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         var rob_struct = hw_struct("rob_struct")
         rob_struct.addu("enb",     0, 0, "0")
-        rob_struct.addu("sent",     0, 0, "0")
         rob_struct.addu("rdy",     0, 0, "0")
+        rob_struct.addu("exec",     0, 0, "0")
+        rob_struct.addu("rf_we",       0,  0, "0")
+        rob_struct.addu("rf_addr",    input_rf_addr_width-1, 0, "0")
+        rob_struct.addu("rf_wdata",    MultiExu_cfg_rf.input_RF_width-1, 0, "0")
+        rob_struct.addu("sent",     0, 0, "0")
         rob_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size)-1, 0, "0")
         rob_struct.addu("opcode",     0, 0, "0")
         rob_struct.addu("rs0_rdy",     0, 0, "0")
@@ -261,13 +271,6 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         rob_struct.addu("rs1_rdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
         rob_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
         rob_struct.addu("rd_wdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
-
-        var commit_struct = hw_struct("commit_struct")
-        commit_struct.addu("enb",     0, 0, "0")
-        commit_struct.addu("rdy",     0, 0, "0")
-        commit_struct.addu("rd_enb",     0, 0, "0")
-        commit_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
-        commit_struct.addu("rd_wdata",     MultiExu_cfg_rf.input_RF_width-1, 0, "0")
 
         var TranslateInfo = __TranslateInfo()
 
@@ -328,32 +331,38 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             TranslateInfo.exu_assocs.put(ExUnit.value.ExecUnit, exu_info)
         }
 
-        var commit_bus = cyclix_gen.global("genexu_" + name + "_commit", commit_struct)
-
         // committing ROB head
         var rob_head = cyclix_gen.indexed(rob, 0)
-        cyclix_gen.begif(cyclix_gen.subStruct(cyclix_gen.indexed(rob, 0), "enb"))
+        cyclix_gen.begif(cyclix_gen.band(cyclix_gen.subStruct(rob_head, "enb"), cyclix_gen.subStruct(rob_head, "rdy")))
         run {
-            cyclix_gen.assign(
-                commit_bus,
-                hw_fracs(hw_frac_SubStruct("enb")),
-                1)
-            cyclix_gen.assign(
-                commit_bus,
-                hw_fracs(hw_frac_SubStruct("rd_enb")),
-                1)
-            cyclix_gen.assign(
-                commit_bus,
-                hw_fracs(hw_frac_SubStruct("rd_tag")),
-                cyclix_gen.subStruct(rob_head, "rd_tag"))
-            cyclix_gen.assign(
-                commit_bus,
-                hw_fracs(hw_frac_SubStruct("rd_wdata")),
-                cyclix_gen.subStruct(rob_head, "rd_wdata"))
-
-            cyclix_gen.begif(cyclix_gen.subStruct(commit_bus, "rdy"))
+            cyclix_gen.begif(cyclix_gen.subStruct(rob_head, "exec"))
             run {
+                // wb to RF
+                cyclix_gen.assign(
+                    RF,
+                    hw_fracs(hw_frac_V(cyclix_gen.subStruct(rob_head, "rf_addr"))),
+                    cyclix_gen.subStruct(rob_head, "rf_wdata"))
+            }; cyclix_gen.endif()
+            cyclix_gen.begelse()
+            run {
+                cyclix_gen.begif(cyclix_gen.subStruct(rob_head, "rf_we"))       // "load"
+                run {
+                    cyclix_gen.assign(
+                        RF,
+                        hw_fracs(hw_frac_V(cyclix_gen.subStruct(rob_head, "rf_addr"))),
+                        cyclix_gen.subStruct(rob_head, "rf_wdata"))
+                }; cyclix_gen.endif()
+                cyclix_gen.begelse()                                                        // store
+                run {
+                    cyclix_gen.assign(
+                        rob_head,
+                        hw_fracs(hw_frac_SubStruct("rd_wdata")),
+                        cyclix_gen.indexed(RF, cyclix_gen.subStruct(rob_head, "rf_addr")))
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
 
+            cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(cmd_resp, cyclix_gen.subStruct(rob_head, "rf_wdata")))
+            run {
                 // shifting ops
                 var rob_shift_iter = cyclix_gen.begforrange(rob, hw_imm(0), hw_imm(rob.vartype.dimensions.last().msb-1))
                 run {
@@ -513,6 +522,23 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                 rob,
                 hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rdy")),
                 0)
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("exec")),
+                cyclix_gen.subStruct(cmd_req_data, "exec"))
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rf_we")),
+                cyclix_gen.subStruct(cmd_req_data, "rf_we"))
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rf_addr")),
+                cyclix_gen.subStruct(cmd_req_data, "rf_addr"))
+            cyclix_gen.assign(
+                rob,
+                hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("rf_wdata")),
+                cyclix_gen.subStruct(cmd_req_data, "rf_wdata"))
+
             cyclix_gen.assign(
                 rob,
                 hw_fracs(hw_frac_V(rob_wr_ptr), hw_frac_SubStruct("fu_id")),

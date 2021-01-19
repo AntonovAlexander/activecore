@@ -6,6 +6,7 @@
  *     License: See LICENSE file for details
  */
 
+`include "citadel_gen.svh"
 
 module NEXYS4_DDR
 #( parameter SIM = "NO" )
@@ -83,6 +84,42 @@ localparam CSR_LED_ADDR         = 32'h00000000;
 localparam CSR_SW_ADDR          = 32'h00000004;
 localparam TESTMEM_ADDR         = 32'h80000000;
 
+localparam CSR_CITADEL_CTRL_ADDR        = 32'h10000000;
+localparam CSR_CITADEL_EXEC_ADDR        = 32'h10000004;
+localparam CSR_CITADEL_RF_WE_ADDR       = 32'h10000008;
+localparam CSR_CITADEL_RF_ADDR_ADDR     = 32'h1000000C;
+localparam CSR_CITADEL_RF_WDATA_ADDR    = 32'h10000010;
+localparam CSR_CITADEL_FU_ID_ADDR       = 32'h10000014;
+localparam CSR_CITADEL_OPCODE_ADDR      = 32'h10000018;
+localparam CSR_CITADEL_FU_RS0_ADDR      = 32'h1000001C;
+localparam CSR_CITADEL_FU_RS1_ADDR      = 32'h10000020;
+localparam CSR_CITADEL_FU_RD_ADDR       = 32'h10000024;
+
+localparam CSR_CITADEL_RDATA_ADDR       = 32'h10000040;
+
+logic cmd_req_genfifo_req;
+citadel_gen_cmd_req_struct cmd_req_genfifo_data;
+logic cmd_req_genfifo_ack;
+
+logic cmd_resp_genfifo_req;
+logic [31:0] cmd_resp_genfifo_data;
+logic cmd_resp_genfifo_ack;
+assign cmd_resp_genfifo_ack = 1'b1;
+
+logic [31:0] citadel_databuf;
+
+citadel_gen citadel_inst (
+	.clk_i(clk_gen)
+	, .rst_i(srst)
+	, .cmd_req_genfifo_req_i(cmd_req_genfifo_req)
+	, .cmd_req_genfifo_rdata_bi(cmd_req_genfifo_data)
+	, .cmd_req_genfifo_ack_o(cmd_req_genfifo_ack)
+
+	, .cmd_resp_genfifo_req_o(cmd_resp_genfifo_req)
+	, .cmd_resp_genfifo_wdata_bo(cmd_resp_genfifo_data)
+	, .cmd_resp_genfifo_ack_i(cmd_resp_genfifo_ack)
+);
+
 localparam TESTMEM_WSIZE_POW    = 10;
 localparam TESTMEM_WSIZE        = 2**TESTMEM_WSIZE_POW;
 
@@ -128,9 +165,13 @@ assign udm_ack = udm_req;   // bus always ready to accept request
 logic csr_resp, testmem_resp, testmem_resp_dly;
 logic [31:0] csr_rdata;
 
+
 // bus request
 always @(posedge clk_gen)
     begin
+    
+    cmd_req_genfifo_req <= 1'b0;
+    if (cmd_resp_genfifo_req) citadel_databuf <= cmd_resp_genfifo_data;
     
     testmem_udm_we <= 1'b0;
     testmem_udm_addr <= 0;
@@ -152,6 +193,16 @@ always @(posedge clk_gen)
                 testmem_udm_addr <= udm_addr[31:2];     // 4-byte aligned access only
                 testmem_udm_wdata <= udm_wdata;
                 end
+            if (udm_addr == CSR_CITADEL_CTRL_ADDR)      cmd_req_genfifo_req <= udm_wdata[0];
+            if (udm_addr == CSR_CITADEL_EXEC_ADDR)      cmd_req_genfifo_data.exec <= udm_wdata;
+            if (udm_addr == CSR_CITADEL_RF_WE_ADDR)     cmd_req_genfifo_data.rf_we <= udm_wdata;
+            if (udm_addr == CSR_CITADEL_RF_ADDR_ADDR)   cmd_req_genfifo_data.rf_addr <= udm_wdata;
+            if (udm_addr == CSR_CITADEL_RF_WDATA_ADDR)  cmd_req_genfifo_data.rf_wdata <= udm_wdata;
+            if (udm_addr == CSR_CITADEL_FU_ID_ADDR)     cmd_req_genfifo_data.fu_id <= udm_wdata;
+            if (udm_addr == CSR_CITADEL_OPCODE_ADDR)    cmd_req_genfifo_data.opcode <= udm_wdata;
+            if (udm_addr == CSR_CITADEL_FU_RS0_ADDR)    cmd_req_genfifo_data.fu_rs0 <= udm_wdata;
+            if (udm_addr == CSR_CITADEL_FU_RS1_ADDR)    cmd_req_genfifo_data.fu_rs1 <= udm_wdata;
+            if (udm_addr == CSR_CITADEL_FU_RD_ADDR)     cmd_req_genfifo_data.fu_rd <= udm_wdata;
             end
         
         else            // reading
@@ -172,6 +223,11 @@ always @(posedge clk_gen)
                 testmem_udm_addr <= udm_addr[31:2];     // 4-byte aligned access only
                 testmem_udm_wdata <= udm_wdata;
                 testmem_resp_dly <= 1'b1;
+                end
+            if (udm_addr == CSR_CITADEL_RDATA_ADDR)
+                begin
+                csr_resp <= 1'b1;
+                csr_rdata <= citadel_databuf;
                 end
             end
         end
