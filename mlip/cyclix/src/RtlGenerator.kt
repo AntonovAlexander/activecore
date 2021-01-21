@@ -396,6 +396,14 @@ class RtlGenerator(var cyclix_module : Generic) {
                 rtl_gen.assign(fifo_in.value.buf_rdata, fifo_in.value.ext_rdata)
             }
 
+            // subproc fifo_in buffering
+            for (subproc in submod_insts_fifos_out) {
+                for (subproc_fifo_out in subproc.value) {
+                    rtl_gen.assign(subproc_fifo_out.value.buf_req, subproc_fifo_out.value.ext_req)
+                    rtl_gen.assign(subproc_fifo_out.value.buf_rdata, subproc_fifo_out.value.ext_rdata)
+                }
+            }
+
             if (cyclix_module is Streaming) {
                 var stream_req_bus = fifo_in_dict[(cyclix_module as Streaming).stream_req_bus]!!
                 var stream_resp_bus = fifo_out_dict[(cyclix_module as Streaming).stream_resp_bus]!!

@@ -429,7 +429,6 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         }; cyclix_gen.endloop()
 
         // broadcasting FU results to ROB
-        /*
         MSG("Translating: broadcasting FU results to ROB")
         var fu_id = 0
         for (exu_num in 0 until ExUnits_insts.size) {
@@ -503,7 +502,6 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             }
             fu_id++
         }
-        */
 
         // acquiring new operation to rob tail
         cyclix_gen.begif(!rob_full)         // checking if ROB not full
