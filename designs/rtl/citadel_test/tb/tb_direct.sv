@@ -125,7 +125,7 @@ endtask
 
 logic [31:0] cycle_counter = 0;
 always @(posedge CLK_100MHZ) cycle_counter <= cycle_counter + 1;
-assign cmd_resp_genfifo_ack = cycle_counter[2];
+assign cmd_resp_genfifo_ack = cycle_counter[2] & cycle_counter[1] & cycle_counter[0];
 
 citadel_gen citadel_inst
 (
@@ -169,13 +169,13 @@ initial
 	CMD_RF_LOAD(9, 32'h9);
 	CMD_RF_LOAD(31, 32'hfafae00f);
 	
-	CMD_EXEC(0, 2, 3, 5);
-	CMD_RF_STORE(5);
+	CMD_EXEC(0, 0, 1, 5);
 
 	CMD_RF_STORE(0);
 	CMD_RF_STORE(1);
 	CMD_RF_STORE(2);
 	CMD_RF_STORE(3);
+	CMD_RF_STORE(5);
 	CMD_RF_STORE(7);
 	CMD_RF_STORE(9);
 	CMD_RF_STORE(31);

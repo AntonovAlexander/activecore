@@ -20,6 +20,7 @@ class RtlGenerator(var cyclix_module : Generic) {
 
     class fifo_in_descr  (val ext_req      : rtl.hw_port,
                           val ext_rdata    : rtl.hw_port,
+                          val buf_ack      : hw_var,
                           val ext_ack      : rtl.hw_port,
                           var buf_req      : hw_var,
                           var buf_rdata    : hw_var)
@@ -205,7 +206,7 @@ class RtlGenerator(var cyclix_module : Generic) {
                     rtl_gen.assign(fifo.buf_req, 0)
 
                     // asserting ack
-                    rtl_gen.assign(fifo.ext_ack, 1)
+                    rtl_gen.assign(fifo.buf_ack, 1)
                 }; rtl_gen.endif()
             }; rtl_gen.endif()
 
@@ -320,6 +321,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             fifo_in_dict.put(fifo_in, fifo_in_descr(
                 rtl_gen.uinput((fifo_in.name + "_genfifo_req_i"), 0, 0, "0"),
                 rtl_gen.port((fifo_in.name + "_genfifo_rdata_bi"), rtl.PORT_DIR.IN, fifo_in.vartype, fifo_in.defval),
+                rtl_gen.ucomb((fifo_in.name + "_genfifo_buf_ack"), 0, 0, "0"),
                 rtl_gen.uoutput((fifo_in.name + "_genfifo_ack_o"), 0, 0, "0"),
                 rtl_gen.ucomb((fifo_in.name + "_genfifo_buf_req"), 0, 0, "0"),
                 rtl_gen.comb((fifo_in.name + "_genfifo_buf_rdata"), fifo_in.vartype, fifo_in.defval)
@@ -387,6 +389,13 @@ class RtlGenerator(var cyclix_module : Generic) {
             submod_insts_fifos_out.put(subproc.value, fifo_internal_out_descrs)
         }
 
+        for (fifo_in in fifo_in_dict) {
+            rtl_gen.cproc_begin()
+            run {
+                rtl_gen.assign(fifo_in.value.ext_ack, fifo_in.value.buf_ack)
+            }; rtl_gen.cproc_end()
+        }
+
         rtl_gen.cproc_begin()
         run {
 
@@ -423,7 +432,7 @@ class RtlGenerator(var cyclix_module : Generic) {
                 run {
                     rtl_gen.begif(stream_req_bus.ext_req)
                     run {
-                        rtl_gen.assign(stream_req_bus.ext_ack, 1)
+                        rtl_gen.assign(stream_req_bus.buf_ack, 1)
                         rtl_gen.assign(TranslateVar((cyclix_module as Streaming).stream_req_var, var_dict), stream_req_bus.buf_rdata)
 
                         // Generating payload
