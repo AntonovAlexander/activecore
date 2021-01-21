@@ -35,7 +35,6 @@ task RESET_ALL ();
     CLK_100MHZ = 1'b0;
     cmd_req_genfifo_req <= 1'b0;
 	cmd_req_genfifo_data <= '{default:32'd0};
-	cmd_resp_genfifo_ack <= 1'b1;
     RST = 1'b1;
     #(`HALF_PERIOD/2);
     RST = 1;
@@ -124,6 +123,10 @@ task CMD_RF_STORE
 	end
 endtask
 
+logic [31:0] cycle_counter = 0;
+always @(posedge CLK_100MHZ) cycle_counter <= cycle_counter + 1;
+assign cmd_resp_genfifo_ack = cycle_counter[2];
+
 citadel_gen citadel_inst
 (
 	.clk_i(CLK_100MHZ)
@@ -155,7 +158,7 @@ initial
 	$display ("### SIMULATION STARTED ###");
 
 	RESET_ALL();
-	WAIT(100);
+	WAIT(10);
 	
 	// fetching results
 	CMD_RF_LOAD(0, 32'hbadc0ffe);
@@ -165,6 +168,9 @@ initial
 	CMD_RF_LOAD(7, 32'h7);
 	CMD_RF_LOAD(9, 32'h9);
 	CMD_RF_LOAD(31, 32'hfafae00f);
+	
+	CMD_EXEC(0, 2, 3, 5);
+	CMD_RF_STORE(5);
 
 	CMD_RF_STORE(0);
 	CMD_RF_STORE(1);
@@ -174,7 +180,7 @@ initial
 	CMD_RF_STORE(9);
 	CMD_RF_STORE(31);
 	
-	WAIT(1000);
+	WAIT(100);
 
 	$display ("### TEST PROCEDURE FINISHED ###");
 	$stop;

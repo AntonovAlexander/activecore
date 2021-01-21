@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="2640001fs"></ZoomEndTime>
-      <Cursor1Time time="920000fs"></Cursor1Time>
+      <ZoomStartTime time="1240750fs"></ZoomStartTime>
+      <ZoomEndTime time="1293851fs"></ZoomEndTime>
+      <Cursor1Time time="1259450fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="379"></NameColumnWidth>
-      <ValueColumnWidth column_width="317"></ValueColumnWidth>
+      <NameColumnWidth column_width="243"></NameColumnWidth>
+      <ValueColumnWidth column_width="237"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="11" />
+   <WVObjectSize size="19" />
    <wvobject fp_name="/tb_direct/CLK_100MHZ" type="logic">
       <obj_property name="ElementShortName">CLK_100MHZ</obj_property>
       <obj_property name="ObjectShortName">CLK_100MHZ</obj_property>
@@ -63,19 +63,92 @@
          <obj_property name="ObjectShortName">cmd_resp_genfifo_ack_i[0:0]</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject fp_name="/tb_direct/citadel_inst/genrf" type="array">
-      <obj_property name="ElementShortName">genrf[31:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">genrf[31:0][31:0]</obj_property>
+   <wvobject fp_name="/tb_direct/citadel_inst/genPRF_stat" type="array">
+      <obj_property name="ElementShortName">genPRF_stat[31:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF_stat[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genPRF" type="array">
+      <obj_property name="ElementShortName">genPRF[31:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF[31:0][31:0]</obj_property>
       <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/tb_direct/citadel_inst/genrob" type="array">
       <obj_property name="ElementShortName">genrob[15:0]</obj_property>
       <obj_property name="ObjectShortName">genrob[15:0]</obj_property>
       <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[15]" type="array">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[14]" type="array">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[13]" type="array">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[12]" type="array">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[11]" type="array">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[10]" type="array">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[9]" type="array">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[8]" type="array">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[7]" type="array">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[6]" type="array">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[5]" type="array">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[4]" type="array">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[3]" type="array">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[2]" type="array">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[1]" type="array">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genrob[0]" type="array">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="/tb_direct/citadel_inst/genrob_wr" type="array">
       <obj_property name="ElementShortName">genrob_wr[0:0]</obj_property>
       <obj_property name="ObjectShortName">genrob_wr[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genrob_wr_microop" type="array">
+      <obj_property name="ElementShortName">genrob_wr_microop</obj_property>
+      <obj_property name="ObjectShortName">genrob_wr_microop</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_direct/citadel_inst/genrob_rd" type="array">
       <obj_property name="ElementShortName">genrob_rd[0:0]</obj_property>
@@ -262,5 +335,29 @@
             <obj_property name="ObjectShortName">gensubmod_genexu_SHIFT_1_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
          </wvobject>
       </wvobject>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/gen9_rtl_var" type="array">
+      <obj_property name="ElementShortName">gen9_rtl_var[0:0]</obj_property>
+      <obj_property name="ObjectShortName">gen9_rtl_var[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/gen10_rtl_var" type="array">
+      <obj_property name="ElementShortName">gen10_rtl_var[0:0]</obj_property>
+      <obj_property name="ObjectShortName">gen10_rtl_var[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/gen11_rtl_var" type="array">
+      <obj_property name="ElementShortName">gen11_rtl_var[0:0]</obj_property>
+      <obj_property name="ObjectShortName">gen11_rtl_var[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/gen12_rtl_var" type="array">
+      <obj_property name="ElementShortName">gen12_rtl_var[0:0]</obj_property>
+      <obj_property name="ObjectShortName">gen12_rtl_var[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/gen13_rtl_var" type="array">
+      <obj_property name="ElementShortName">gen13_rtl_var[0:0]</obj_property>
+      <obj_property name="ObjectShortName">gen13_rtl_var[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/gen14_rtl_var" type="array">
+      <obj_property name="ElementShortName">gen14_rtl_var[0:0]</obj_property>
+      <obj_property name="ObjectShortName">gen14_rtl_var[0:0]</obj_property>
    </wvobject>
 </wave_config>
