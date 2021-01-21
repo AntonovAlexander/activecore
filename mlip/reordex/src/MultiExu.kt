@@ -345,7 +345,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             }; cyclix_gen.endif()
             cyclix_gen.begelse()
             run {
-                cyclix_gen.assign(rob_rd, 1)
+                cyclix_gen.assign(rob_rd, cyclix_gen.subStruct(rob_head, "fu_pending"))
             }; cyclix_gen.endif()
 
             // ROB processing
@@ -384,35 +384,42 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
                             for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
 
-                                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "fu_id"), fu_id))
+                                cyclix_gen.begif(!cyclix_gen.subStruct(cyclix_gen.indexed(rob, rob_iter.iter_num), "fu_pending"))
                                 run {
 
-                                    // filling exu_req with rob data
-                                    cyclix_gen.assign(
-                                        exu_req,
-                                        hw_fracs(hw_frac_SubStruct("opcode")),
-                                        cyclix_gen.subStruct(rob_iter.iter_elem, "opcode"))
-                                    cyclix_gen.assign(
-                                        exu_req,
-                                        hw_fracs(hw_frac_SubStruct("rs0_rdata")),
-                                        cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdata"))
-                                    cyclix_gen.assign(
-                                        exu_req,
-                                        hw_fracs(hw_frac_SubStruct("rs1_rdata")),
-                                        cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdata"))
-                                    cyclix_gen.assign(
-                                        exu_req,
-                                        hw_fracs(hw_frac_SubStruct("rd_tag")),
-                                        cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"))
-
-                                    cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(ExUnits_insts[exu_num][exu_inst_num], cyclix.STREAM_REQ_BUS_NAME, exu_req))
+                                    cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "fu_id"), fu_id))
                                     run {
+
+                                        // filling exu_req with rob data
                                         cyclix_gen.assign(
-                                            rob,
-                                            hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("fu_pending")),
-                                            1)
+                                            exu_req,
+                                            hw_fracs(hw_frac_SubStruct("opcode")),
+                                            cyclix_gen.subStruct(rob_iter.iter_elem, "opcode"))
+                                        cyclix_gen.assign(
+                                            exu_req,
+                                            hw_fracs(hw_frac_SubStruct("rs0_rdata")),
+                                            cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdata"))
+                                        cyclix_gen.assign(
+                                            exu_req,
+                                            hw_fracs(hw_frac_SubStruct("rs1_rdata")),
+                                            cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdata"))
+                                        cyclix_gen.assign(
+                                            exu_req,
+                                            hw_fracs(hw_frac_SubStruct("rd_tag")),
+                                            cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"))
+
+                                        cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(ExUnits_insts[exu_num][exu_inst_num], cyclix.STREAM_REQ_BUS_NAME, exu_req))
+                                        run {
+                                            cyclix_gen.assign(
+                                                rob,
+                                                hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("fu_pending")),
+                                                1)
+                                        }; cyclix_gen.endif()
+
                                     }; cyclix_gen.endif()
+
                                 }; cyclix_gen.endif()
+
                             }
                             fu_id++
                         }
@@ -422,6 +429,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         }; cyclix_gen.endloop()
 
         // broadcasting FU results to ROB
+        /*
         MSG("Translating: broadcasting FU results to ROB")
         var fu_id = 0
         for (exu_num in 0 until ExUnits_insts.size) {
@@ -495,6 +503,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             }
             fu_id++
         }
+        */
 
         // acquiring new operation to rob tail
         cyclix_gen.begif(!rob_full)         // checking if ROB not full
