@@ -207,6 +207,50 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         // println("#### Cyclix: exporting expression complete!")
     }
 
+    fun max0(cyclix_gen : cyclix.Generic, datain : hw_var) {
+        var genvar = cyclix_gen.ulocal(cyclix_gen.GetGenName(""), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+        var iter = cyclix_gen.begforall_asc(datain)
+        run {
+            cyclix_gen.begif(!iter.iter_elem)
+            run {
+                cyclix_gen.assign(genvar, iter.iter_num)
+            }; cyclix_gen.end()
+        }; cyclix_gen.endif()
+    }
+
+    fun min0(cyclix_gen : cyclix.Generic, datain : hw_var) {
+        var genvar = cyclix_gen.ulocal(cyclix_gen.GetGenName(""), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+        var iter = cyclix_gen.begforall_desc(datain)
+        run {
+            cyclix_gen.begif(!iter.iter_elem)
+            run {
+                cyclix_gen.assign(genvar, iter.iter_num)
+            }; cyclix_gen.end()
+        }; cyclix_gen.endif()
+    }
+
+    fun max1(cyclix_gen : cyclix.Generic, datain : hw_var) {
+        var genvar = cyclix_gen.ulocal(cyclix_gen.GetGenName(""), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+        var iter = cyclix_gen.begforall_asc(datain)
+        run {
+            cyclix_gen.begif(iter.iter_elem)
+            run {
+                cyclix_gen.assign(genvar, iter.iter_num)
+            }; cyclix_gen.end()
+        }; cyclix_gen.endif()
+    }
+
+    fun min1(cyclix_gen : cyclix.Generic, datain : hw_var) {
+        var genvar = cyclix_gen.ulocal(cyclix_gen.GetGenName(""), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+        var iter = cyclix_gen.begforall_desc(datain)
+        run {
+            cyclix_gen.begif(iter.iter_elem)
+            run {
+                cyclix_gen.assign(genvar, iter.iter_num)
+            }; cyclix_gen.end()
+        }; cyclix_gen.endif()
+    }
+
     fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
 
         MSG("Translating to cyclix: beginning")
@@ -241,14 +285,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(MultiExu_cfg_rf.RF_width-1, 0)))
         var cmd_resp_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_resp_data"), hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(MultiExu_cfg_rf.RF_width-1, 0)), "0")
 
-        // TODO: memory interface?
-
-        var MAX_INSTR_NUM = MultiExu_cfg_rf.ARF_depth + rob_size
-        for (ExecUnit in ExecUnits) {
-            MAX_INSTR_NUM += ExecUnit.value.exu_num * ExecUnit.value.ExecUnit.stage_num
-        }
-
-        val TAG_WIDTH = GetWidthToContain(MAX_INSTR_NUM)
+        // TODO: external memory interface
 
         var rob_struct = hw_struct("rob_struct")
         rob_struct.addu("enb",     0, 0, "0")
@@ -258,13 +295,13 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         rob_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size)-1, 0, "0")
         rob_struct.addu("fu_opcode",     0, 0, "0")
         rob_struct.addu("rs0_rdy",     0, 0, "0")
-        rob_struct.addu("rs0_tag",     TAG_WIDTH-1, 0, "0")
+        rob_struct.addu("rs0_tag",     MultiExu_cfg_rf.PRF_depth-1, 0, "0")
         rob_struct.addu("rs0_rdata",     MultiExu_cfg_rf.RF_width-1, 0, "0")
         rob_struct.addu("rs1_rdy",     0, 0, "0")
-        rob_struct.addu("rs1_tag",     TAG_WIDTH-1, 0, "0")
+        rob_struct.addu("rs1_tag",     MultiExu_cfg_rf.PRF_depth-1, 0, "0")
         rob_struct.addu("rs1_rdata",     MultiExu_cfg_rf.RF_width-1, 0, "0")
-        rob_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
-        rob_struct.addu("rd_tag_prev",     TAG_WIDTH-1, 0, "0")                 // freeing
+        rob_struct.addu("rd_tag",     MultiExu_cfg_rf.PRF_depth-1, 0, "0")
+        rob_struct.addu("rd_tag_prev",     MultiExu_cfg_rf.PRF_depth-1, 0, "0")                 // freeing
         rob_struct.addu("wb_ext",     0, 0, "0")
         rob_struct.addu("wb_wdata",     MultiExu_cfg_rf.RF_width-1, 0, "0")
 
@@ -365,7 +402,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             run {
                 cyclix_gen.assign(rob_full, 0)
                 // shifting ops
-                var rob_shift_iter = cyclix_gen.begforrange(rob, hw_imm(0), hw_imm(rob.vartype.dimensions.last().msb-1))
+                var rob_shift_iter = cyclix_gen.begforrange_asc(rob, hw_imm(0), hw_imm(rob.vartype.dimensions.last().msb-1))
                 run {
                     cyclix_gen.assign(
                         rob,
@@ -382,7 +419,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         // issuing operations from ROB to FUs
         MSG("Translating: issuing operations from ROB to FUs")
-        var rob_iter = cyclix_gen.begforall(rob)
+        var rob_iter = cyclix_gen.begforall_asc(rob)
         run {
             cyclix_gen.begif(cyclix_gen.subStruct(rob_iter.iter_elem, "enb"))
             run {
@@ -454,7 +491,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                         hw_fracs(hw_frac_V(cyclix_gen.subStruct(exu_resp, "tag"))),
                         cyclix_gen.subStruct(exu_resp, "wdata"))
 
-                    rob_iter = cyclix_gen.begforall(rob)
+                    rob_iter = cyclix_gen.begforall_asc(rob)
                     run {
 
                         cyclix_gen.begif(cyclix_gen.subStruct(rob_iter.iter_elem, "enb"))

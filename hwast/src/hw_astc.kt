@@ -1241,14 +1241,85 @@ open class hw_astc() : ArrayList<hw_exec>() {
         add(new_expr)
 
         val genvar_iter_elem = indexed(elements, genvar_iter_num)
+
+        begif(less(start, end))
+        run {
+            assign(genvar_iter_cont, less(genvar_iter_num, end))
+            add_gen(genvar_iter_num_next, genvar_iter_num, 1)
+        }; endif()
+        begelse()
+        run {
+            assign(genvar_iter_cont, gr(genvar_iter_num, end))
+            sub_gen(genvar_iter_num_next, genvar_iter_num, 1)
+        }; endif()
+
+        return for_loop_iteration(genvar_iter_num, genvar_iter_elem, genvar_iter_num_next)
+    }
+
+    fun begforrange_asc(elements : hw_var, start: hw_param, end: hw_param) : for_loop_iteration {
+
+        var new_expr = hw_exec(OP1_WHILE)
+
+        val iterations = elements.GetWidth()
+        val genvar_iter_num = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        assign(genvar_iter_num, start)
+        new_expr.AddGenVar(genvar_iter_num)
+
+        val genvar_iter_cont = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
+        assign(genvar_iter_cont, 1)
+        new_expr.AddGenVar(genvar_iter_cont)
+        new_expr.AddRdParam(genvar_iter_cont)
+        new_expr.while_trailer = WHILE_TRAILER.INCR_COUNTER
+
+        val genvar_iter_num_next = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        new_expr.AddGenVar(genvar_iter_num_next)
+
+        AddExpr(new_expr)
+        add(new_expr)
+
+        val genvar_iter_elem = indexed(elements, genvar_iter_num)
+
         assign(genvar_iter_cont, less(genvar_iter_num, end))
         add_gen(genvar_iter_num_next, genvar_iter_num, 1)
 
         return for_loop_iteration(genvar_iter_num, genvar_iter_elem, genvar_iter_num_next)
     }
 
-    fun begforall(elements : hw_var) : for_loop_iteration {
-        return begforrange(elements, hw_imm(elements.vartype.dimensions.last().lsb), hw_imm(elements.vartype.dimensions.last().msb))
+    fun begforrange_desc(elements : hw_var, start: hw_param, end: hw_param) : for_loop_iteration {
+
+        var new_expr = hw_exec(OP1_WHILE)
+
+        val iterations = elements.GetWidth()
+        val genvar_iter_num = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        assign(genvar_iter_num, start)
+        new_expr.AddGenVar(genvar_iter_num)
+
+        val genvar_iter_cont = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
+        assign(genvar_iter_cont, 1)
+        new_expr.AddGenVar(genvar_iter_cont)
+        new_expr.AddRdParam(genvar_iter_cont)
+        new_expr.while_trailer = WHILE_TRAILER.INCR_COUNTER
+
+        val genvar_iter_num_next = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        new_expr.AddGenVar(genvar_iter_num_next)
+
+        AddExpr(new_expr)
+        add(new_expr)
+
+        val genvar_iter_elem = indexed(elements, genvar_iter_num)
+
+        assign(genvar_iter_cont, gr(genvar_iter_num, end))
+        sub_gen(genvar_iter_num_next, genvar_iter_num, 1)
+
+        return for_loop_iteration(genvar_iter_num, genvar_iter_elem, genvar_iter_num_next)
+    }
+
+    fun begforall_asc(elements : hw_var) : for_loop_iteration {
+        return begforrange_asc(elements, hw_imm(elements.vartype.dimensions.last().lsb), hw_imm(elements.vartype.dimensions.last().msb))
+    }
+
+    fun begforall_desc(elements : hw_var) : for_loop_iteration {
+        return begforrange_desc(elements, hw_imm(elements.vartype.dimensions.last().msb), hw_imm(elements.vartype.dimensions.last().lsb))
     }
 
     fun begforall(elements : hw_var, depth : Int) : for_loop_iteration {
