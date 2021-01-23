@@ -207,48 +207,62 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         // println("#### Cyclix: exporting expression complete!")
     }
 
-    fun max0(cyclix_gen : cyclix.Generic, datain : hw_var) {
-        var genvar = cyclix_gen.ulocal(cyclix_gen.GetGenName(""), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+    data class bit_position(var found : hw_var, var position: hw_var)
+
+    fun max0(cyclix_gen : cyclix.Generic, datain : hw_var) : bit_position {
+        var found = cyclix_gen.ulocal(cyclix_gen.GetGenName("flag"), 0, 0, "0")
+        var position = cyclix_gen.ulocal(cyclix_gen.GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
         var iter = cyclix_gen.begforall_asc(datain)
         run {
             cyclix_gen.begif(!iter.iter_elem)
             run {
-                cyclix_gen.assign(genvar, iter.iter_num)
+                cyclix_gen.assign(found, 1)
+                cyclix_gen.assign(position, iter.iter_num)
             }; cyclix_gen.end()
         }; cyclix_gen.endif()
+        return bit_position(found, position)
     }
 
-    fun min0(cyclix_gen : cyclix.Generic, datain : hw_var) {
-        var genvar = cyclix_gen.ulocal(cyclix_gen.GetGenName(""), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+    fun min0(cyclix_gen : cyclix.Generic, datain : hw_var) : bit_position {
+        var found = cyclix_gen.ulocal(cyclix_gen.GetGenName("flag"), 0, 0, "0")
+        var position = cyclix_gen.ulocal(cyclix_gen.GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
         var iter = cyclix_gen.begforall_desc(datain)
         run {
             cyclix_gen.begif(!iter.iter_elem)
             run {
-                cyclix_gen.assign(genvar, iter.iter_num)
+                cyclix_gen.assign(found, 1)
+                cyclix_gen.assign(position, iter.iter_num)
             }; cyclix_gen.end()
         }; cyclix_gen.endif()
+        return bit_position(found, position)
     }
 
-    fun max1(cyclix_gen : cyclix.Generic, datain : hw_var) {
-        var genvar = cyclix_gen.ulocal(cyclix_gen.GetGenName(""), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+    fun max1(cyclix_gen : cyclix.Generic, datain : hw_var) : bit_position {
+        var found = cyclix_gen.ulocal(cyclix_gen.GetGenName("flag"), 0, 0, "0")
+        var position = cyclix_gen.ulocal(cyclix_gen.GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
         var iter = cyclix_gen.begforall_asc(datain)
         run {
             cyclix_gen.begif(iter.iter_elem)
             run {
-                cyclix_gen.assign(genvar, iter.iter_num)
+                cyclix_gen.assign(found, 1)
+                cyclix_gen.assign(position, iter.iter_num)
             }; cyclix_gen.end()
         }; cyclix_gen.endif()
+        return bit_position(found, position)
     }
 
-    fun min1(cyclix_gen : cyclix.Generic, datain : hw_var) {
-        var genvar = cyclix_gen.ulocal(cyclix_gen.GetGenName(""), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+    fun min1(cyclix_gen : cyclix.Generic, datain : hw_var) : bit_position {
+        var found = cyclix_gen.ulocal(cyclix_gen.GetGenName("flag"), 0, 0, "0")
+        var position = cyclix_gen.ulocal(cyclix_gen.GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
         var iter = cyclix_gen.begforall_desc(datain)
         run {
             cyclix_gen.begif(iter.iter_elem)
             run {
-                cyclix_gen.assign(genvar, iter.iter_num)
+                cyclix_gen.assign(found, 1)
+                cyclix_gen.assign(position, iter.iter_num)
             }; cyclix_gen.end()
         }; cyclix_gen.endif()
+        return bit_position(found, position)
     }
 
     fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
@@ -740,7 +754,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     }; cyclix_gen.endif()
                     cyclix_gen.begelse()
                     run {
-                        cyclix_gen.assign(rob_wr_ptr, rob_wr_ptr_inc)       // TODO: check for full
+                        cyclix_gen.assign(rob_wr_ptr, rob_wr_ptr_inc)
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
 
