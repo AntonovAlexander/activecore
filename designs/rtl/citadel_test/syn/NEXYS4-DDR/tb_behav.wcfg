@@ -63,9 +63,9 @@
          <obj_property name="ObjectShortName">cmd_resp_genfifo_ack_i[0:0]</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject fp_name="/tb_direct/citadel_inst/genPRF_busy" type="array">
-      <obj_property name="ElementShortName">genPRF_busy[31:0]</obj_property>
-      <obj_property name="ObjectShortName">genPRF_busy[31:0]</obj_property>
+   <wvobject fp_name="/tb_direct/citadel_inst/genPRF_mapped" type="array">
+      <obj_property name="ElementShortName">genPRF_mapped[31:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF_mapped[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_direct/citadel_inst/genPRF" type="array">
       <obj_property name="ElementShortName">genPRF[31:0][31:0]</obj_property>
