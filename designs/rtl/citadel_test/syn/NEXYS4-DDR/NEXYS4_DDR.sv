@@ -199,7 +199,7 @@ always @(posedge clk_gen)
             if (udm_addr == CSR_CITADEL_RF_ADDR_ADDR)   cmd_req_genfifo_data.rf_addr <= udm_wdata;
             if (udm_addr == CSR_CITADEL_RF_WDATA_ADDR)  cmd_req_genfifo_data.rf_wdata <= udm_wdata;
             if (udm_addr == CSR_CITADEL_FU_ID_ADDR)     cmd_req_genfifo_data.fu_id <= udm_wdata;
-            if (udm_addr == CSR_CITADEL_OPCODE_ADDR)    cmd_req_genfifo_data.opcode <= udm_wdata;
+            if (udm_addr == CSR_CITADEL_OPCODE_ADDR)    cmd_req_genfifo_data.fu_opcode <= udm_wdata;
             if (udm_addr == CSR_CITADEL_FU_RS0_ADDR)    cmd_req_genfifo_data.fu_rs0 <= udm_wdata;
             if (udm_addr == CSR_CITADEL_FU_RS1_ADDR)    cmd_req_genfifo_data.fu_rs1 <= udm_wdata;
             if (udm_addr == CSR_CITADEL_FU_RD_ADDR)     cmd_req_genfifo_data.fu_rd <= udm_wdata;
