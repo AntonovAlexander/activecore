@@ -11,7 +11,7 @@ MLIP core approach serves as intermediate solution for codification of custom mi
 
 Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
 
-The ultimate goal of the project is to provide top-down methodology and reusable components for explicit allocation of intermediate *“microarchitectural middleware”* design level for complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) incorporates expert knowledge about cross-cutting internal mechanisms of custom microarchitectures, addressing:
+The ultimate goal of the project is to provide top-down methodology and reusable components for explicit allocation of intermediate ***“microarchitectural middleware”*** design level for complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) incorporates expert knowledge about cross-cutting internal mechanisms of custom microarchitectures, addressing:
 * rapid prototyping of various-purpose IP blocks with common microarchitectural mechanisms;
 * diversification of responsibility and competence of IP engineers: implementation of key microarchitectural mechanisms can be charged to the core of leading engineers, while developers of final products can focus solely on application-specific functionality;
 * facilitating IP design centers to package, reuse and deliver complex hardware templates with programmable microarchitectural mechanisms as basis for semi-custom IP cores.
@@ -28,9 +28,9 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **cyclix** (**cycli**c e**x**ecution) - generator of statically scheduled cyclic processing hardware targeting RTL and HLS flows. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Vivado HLS
 
-	* **pipex** (**pipe**lined e**x**ecution) - generator of dynamically scheduled scalar in-order pipelined structures. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
+	* **pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
 
-	* **reordex** (**reorde**red e**x**ecution, *in development*) - generator of dynamically scheduled multi-pipeline structures with loosely ordered execution (superscalar, dataflow, etc). Translates to cyclix MLIP
+	* **reordex** (**reorde**red e**x**ecution, *in development*) - generator of co-processors with superscalar out-of-order microarchitecture and register renaming. Translates to cyclix MLIP
 
 * core generators based on MLIP cores (/designs/coregen):
 
@@ -38,7 +38,7 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 
-	* **citadel** (*in development*) - generator of multi-pipeline computational blocks with register renaming based on Tomasulo algorithm, based on reordex MLIP core
+	* **citadel** (*in development*) - experimental co-processor, based on reordex MLIP core
 
 Other reusable cores:
 

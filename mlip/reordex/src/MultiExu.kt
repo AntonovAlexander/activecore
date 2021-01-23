@@ -11,17 +11,17 @@ package reordex
 import hwast.*
 
 data class MultiExu_CFG_RF(val RF_width : Int,
-                           val input_RF_depth : Int,
+                           val ARF_depth : Int,
                            val rename_RF: Boolean,
-                           val rename_RF_depth : Int)
+                           val PRF_depth : Int)
 
 data class Exu_CFG(val ExecUnit : Exu,
                    val exu_num : Int)
 
 open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu_cfg_rf : MultiExu_CFG_RF, val rob_size : Int) {
 
-    val input_rf_addr_width = GetWidthToContain(MultiExu_cfg_rf.input_RF_depth)
-    val rename_rf_addr_width = GetWidthToContain(MultiExu_cfg_rf.rename_RF_depth)
+    val arf_addr_width = GetWidthToContain(MultiExu_cfg_rf.ARF_depth)
+    val prf_addr_width = GetWidthToContain(MultiExu_cfg_rf.PRF_depth)
 
     var ExecUnits  = mutableMapOf<String, Exu_CFG>()
 
@@ -213,25 +213,29 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         var cyclix_gen = cyclix.Generic(name)
 
-        //// Generating RF ////
+        //// Generating PRF ////
         var prf_dim = hw_dim_static()
         prf_dim.add(MultiExu_cfg_rf.RF_width-1, 0)
-        prf_dim.add(MultiExu_cfg_rf.rename_RF_depth-1, 0)
+        prf_dim.add(MultiExu_cfg_rf.PRF_depth-1, 0)
         var PRF = cyclix_gen.uglobal("genPRF", prf_dim, "0")
-        var PRF_stat = cyclix_gen.uglobal("genPRF_stat", MultiExu_cfg_rf.rename_RF_depth-1, 0, 0xFFFFFFFF.toString(10))
+        var PRF_busy = cyclix_gen.uglobal("genPRF_busy", MultiExu_cfg_rf.PRF_depth-1, 0, "0")   // used tags flags
+        var arf_map_dim = hw_dim_static()
+        arf_map_dim.add(GetWidthToContain(MultiExu_cfg_rf.PRF_depth)-1, 0)
+        arf_map_dim.add(MultiExu_cfg_rf.ARF_depth-1, 0)
+        var ARF_map = cyclix_gen.uglobal("genARF_map", arf_map_dim, "0")        // ARF-to-PRF mappings
 
         //// Generating interfaces ////
         // cmd (sequential instruction stream) //
         var cmd_req_struct = hw_struct(name + "_cmd_req_struct")
         cmd_req_struct.addu("exec",     0, 0, "0")
         cmd_req_struct.addu("rf_we",       0,  0, "0")
-        cmd_req_struct.addu("rf_addr",    input_rf_addr_width-1, 0, "0")
+        cmd_req_struct.addu("rf_addr",    arf_addr_width-1, 0, "0")
         cmd_req_struct.addu("rf_wdata",    MultiExu_cfg_rf.RF_width-1, 0, "0")
         cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size)-1, 0, "0")
-        cmd_req_struct.addu("opcode",     0, 0, "0")
-        cmd_req_struct.addu("fu_rs0",    input_rf_addr_width-1, 0, "0")
-        cmd_req_struct.addu("fu_rs1",    input_rf_addr_width-1, 0, "0")
-        cmd_req_struct.addu("fu_rd",    input_rf_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_opcode",     0, 0, "0")
+        cmd_req_struct.addu("fu_rs0",    arf_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_rs1",    arf_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_rd",    arf_addr_width-1, 0, "0")
         var cmd_req = cyclix_gen.fifo_in("cmd_req",  hw_type(cmd_req_struct))
         var cmd_req_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_req_data"), cmd_req_struct)
         var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(MultiExu_cfg_rf.RF_width-1, 0)))
@@ -239,7 +243,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         // TODO: memory interface?
 
-        var MAX_INSTR_NUM = MultiExu_cfg_rf.input_RF_depth + rob_size
+        var MAX_INSTR_NUM = MultiExu_cfg_rf.ARF_depth + rob_size
         for (ExecUnit in ExecUnits) {
             MAX_INSTR_NUM += ExecUnit.value.exu_num * ExecUnit.value.ExecUnit.stage_num
         }
@@ -252,7 +256,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         rob_struct.addu("fu_req",     0, 0, "0")
         rob_struct.addu("fu_pending",     0, 0, "0")
         rob_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size)-1, 0, "0")
-        rob_struct.addu("opcode",     0, 0, "0")
+        rob_struct.addu("fu_opcode",     0, 0, "0")
         rob_struct.addu("rs0_rdy",     0, 0, "0")
         rob_struct.addu("rs0_tag",     TAG_WIDTH-1, 0, "0")
         rob_struct.addu("rs0_rdata",     MultiExu_cfg_rf.RF_width-1, 0, "0")
@@ -260,7 +264,8 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         rob_struct.addu("rs1_tag",     TAG_WIDTH-1, 0, "0")
         rob_struct.addu("rs1_rdata",     MultiExu_cfg_rf.RF_width-1, 0, "0")
         rob_struct.addu("rd_tag",     TAG_WIDTH-1, 0, "0")
-        rob_struct.addu("wb_ext",     MultiExu_cfg_rf.RF_width-1, 0, "0")
+        rob_struct.addu("rd_tag_prev",     TAG_WIDTH-1, 0, "0")                 // freeing
+        rob_struct.addu("wb_ext",     0, 0, "0")
         rob_struct.addu("wb_wdata",     MultiExu_cfg_rf.RF_width-1, 0, "0")
 
         var TranslateInfo = __TranslateInfo()
@@ -343,9 +348,16 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     cyclix_gen.assign(rob_rd, 1)
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
+
+            // loads and execs
             cyclix_gen.begelse()
             run {
-                cyclix_gen.assign(rob_rd, cyclix_gen.subStruct(rob_head, "fu_pending"))
+                // PRF written, and previous tag can be remapped
+                cyclix_gen.assign(
+                    PRF_busy,
+                    hw_fracs(hw_frac_V(cyclix_gen.subStruct(rob_head, "rd_tag_prev"))),
+                    0)
+                cyclix_gen.assign(rob_rd, 1)
             }; cyclix_gen.endif()
 
             // ROB processing
@@ -394,7 +406,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                                         cyclix_gen.assign(
                                             exu_req,
                                             hw_fracs(hw_frac_SubStruct("opcode")),
-                                            cyclix_gen.subStruct(rob_iter.iter_elem, "opcode"))
+                                            cyclix_gen.subStruct(rob_iter.iter_elem, "fu_opcode"))
                                         cyclix_gen.assign(
                                             exu_req,
                                             hw_fracs(hw_frac_SubStruct("rs0_rdata")),
@@ -441,10 +453,6 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                         PRF,
                         hw_fracs(hw_frac_V(cyclix_gen.subStruct(exu_resp, "tag"))),
                         cyclix_gen.subStruct(exu_resp, "wdata"))
-                    cyclix_gen.assign(
-                        PRF_stat,
-                        hw_fracs(hw_frac_V(cyclix_gen.subStruct(exu_resp, "tag"))),
-                        1)
 
                     rob_iter = cyclix_gen.begforall(rob)
                     run {
@@ -486,13 +494,17 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                                 }; cyclix_gen.endif()
                             }; cyclix_gen.endif()
 
-                            // TODO: rdy
-
-                            // updating rdy
-                            cyclix_gen.assign(
-                                rob,
-                                hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rdy")),
-                                cyclix_gen.band(cyclix_gen.subStruct(rob_iter.iter_elem, "rs0_rdy"), cyclix_gen.subStruct(rob_iter.iter_elem, "rs1_rdy")))
+                            // setting rdy if data generated
+                            cyclix_gen.begif(cyclix_gen.subStruct(rob_iter.iter_elem, "fu_pending"))
+                            run {
+                                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"), cyclix_gen.subStruct(exu_resp, "tag")))
+                                run {
+                                    cyclix_gen.assign(
+                                        rob,
+                                        hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rdy")),
+                                        1)
+                                }; cyclix_gen.endif()
+                            }; cyclix_gen.endif()
 
                         }; cyclix_gen.endif()
 
@@ -511,78 +523,88 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
                 // decoding input
 
-                var rob_wr_microop = cyclix_gen.local("genrob_wr_microop", rob_struct)
+                var rob_wr_uop = cyclix_gen.local("genrob_wr_uop", rob_struct)
 
                 cyclix_gen.assign(
-                    rob_wr_microop,
+                    rob_wr_uop,
                     hw_fracs(hw_frac_SubStruct("enb")),
                     1)
                 cyclix_gen.assign(
-                    rob_wr_microop,
+                    rob_wr_uop,
                     hw_fracs(hw_frac_SubStruct("fu_req")),
                     cyclix_gen.subStruct(cmd_req_data, "exec"))
                 cyclix_gen.assign(
-                    rob_wr_microop,
+                    rob_wr_uop,
                     hw_fracs(hw_frac_SubStruct("fu_pending")),
                     0)
                 cyclix_gen.assign(
-                    rob_wr_microop,
+                    rob_wr_uop,
                     hw_fracs(hw_frac_SubStruct("fu_id")),
                     cyclix_gen.subStruct(cmd_req_data, "fu_id"))
                 cyclix_gen.assign(
-                    rob_wr_microop,
-                    hw_fracs(hw_frac_SubStruct("opcode")),
-                    cyclix_gen.subStruct(cmd_req_data, "opcode"))
+                    rob_wr_uop,
+                    hw_fracs(hw_frac_SubStruct("fu_opcode")),
+                    cyclix_gen.subStruct(cmd_req_data, "fu_opcode"))
 
                 cyclix_gen.assign(
-                    rob_wr_microop,
+                    rob_wr_uop,
                     hw_fracs(hw_frac_SubStruct("rs0_tag")),
                     cyclix_gen.subStruct(cmd_req_data, "fu_rs0"))         // TODO: renaming
                 cyclix_gen.assign(
-                    rob_wr_microop,
+                    rob_wr_uop,
                     hw_fracs(hw_frac_SubStruct("rs0_rdata")),
                     cyclix_gen.indexed(PRF, cyclix_gen.subStruct(cmd_req_data, "fu_rs0")))
 
                 cyclix_gen.assign(
-                    rob_wr_microop,
+                    rob_wr_uop,
                     hw_fracs(hw_frac_SubStruct("rs1_tag")),
                     cyclix_gen.subStruct(cmd_req_data, "fu_rs1"))         // TODO: renaming
                 cyclix_gen.assign(
-                    rob_wr_microop,
+                    rob_wr_uop,
                     hw_fracs(hw_frac_SubStruct("rs1_rdata")),
                     cyclix_gen.indexed(PRF, cyclix_gen.subStruct(cmd_req_data, "fu_rs1")))
-
-                cyclix_gen.assign(
-                    rob_wr_microop,
-                    hw_fracs(hw_frac_SubStruct("rd_tag")),
-                    cyclix_gen.subStruct(cmd_req_data, "fu_rd"))         // TODO: renaming
 
                 cyclix_gen.begif(cyclix_gen.subStruct(cmd_req_data, "exec"))
                 run {
 
                     cyclix_gen.assign(
-                        rob_wr_microop,
+                        rob_wr_uop,
                         hw_fracs(hw_frac_SubStruct("rs0_rdy")),
-                        cyclix_gen.indexed(PRF_stat, cyclix_gen.subStruct(cmd_req_data, "fu_rs0")))
+                        !cyclix_gen.indexed(PRF_busy, cyclix_gen.subStruct(cmd_req_data, "fu_rs0")))
 
                     cyclix_gen.assign(
-                        rob_wr_microop,
+                        rob_wr_uop,
                         hw_fracs(hw_frac_SubStruct("rs1_rdy")),
-                        cyclix_gen.indexed(PRF_stat, cyclix_gen.subStruct(cmd_req_data, "fu_rs1")))
+                        !cyclix_gen.indexed(PRF_busy, cyclix_gen.subStruct(cmd_req_data, "fu_rs1")))
 
                     cyclix_gen.assign(
-                        PRF_stat,
+                        rob_wr_uop,
+                        hw_fracs(hw_frac_SubStruct("rd_tag")),
+                        cyclix_gen.subStruct(cmd_req_data, "fu_rd"))         // TODO: renaming
+
+                    cyclix_gen.assign(
+                        rob_wr_uop,
+                        hw_fracs(hw_frac_SubStruct("rd_tag_prev")),
+                        cyclix_gen.subStruct(cmd_req_data, "fu_rd"))         // TODO: renaming
+
+                    cyclix_gen.assign(
+                        rob_wr_uop,
+                        hw_fracs(hw_frac_SubStruct("rdy")),
+                        0)
+
+                    cyclix_gen.assign(
+                        PRF_busy,
                         hw_fracs(hw_frac_V(cyclix_gen.subStruct(cmd_req_data, "fu_rd"))),
                         0
                     )
 
                     cyclix_gen.assign(
-                        rob_wr_microop,
+                        rob_wr_uop,
                         hw_fracs(hw_frac_SubStruct("wb_ext")),
                         0)
 
                     cyclix_gen.assign(
-                        rob_wr_microop,
+                        rob_wr_uop,
                         hw_fracs(hw_frac_SubStruct("wb_wdata")),
                         0)
 
@@ -596,15 +618,32 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     cyclix_gen.begif(cyclix_gen.subStruct(cmd_req_data, "rf_we"))
                     run {
 
+                        cyclix_gen.assign(
+                            rob_wr_uop,
+                            hw_fracs(hw_frac_SubStruct("rdy")),
+                            1)
+
+                        cyclix_gen.assign(
+                            rob_wr_uop,
+                            hw_fracs(hw_frac_SubStruct("rd_tag")),
+                            cyclix_gen.subStruct(cmd_req_data, "rf_addr"))         // TODO: renaming
+
+                        cyclix_gen.assign(
+                            rob_wr_uop,
+                            hw_fracs(hw_frac_SubStruct("rd_tag_prev")),
+                            cyclix_gen.subStruct(cmd_req_data, "rf_addr"))         // TODO: renaming
+
                         // writing to PRF
                         cyclix_gen.assign(
                             PRF,
                             hw_fracs(hw_frac_V(cyclix_gen.subStruct(cmd_req_data, "rf_addr"))),
                             cyclix_gen.subStruct(cmd_req_data, "rf_wdata"))
                         cyclix_gen.assign(
-                            PRF_stat,
+                            PRF_busy,
                             hw_fracs(hw_frac_V(cyclix_gen.subStruct(cmd_req_data, "rf_addr"))),
                             1)
+
+                        cyclix_gen.assign(rob_wr, 1)
 
                     }; cyclix_gen.endif()
 
@@ -612,23 +651,28 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     cyclix_gen.begelse()
                     run {
                         cyclix_gen.assign(
-                            rob_wr_microop,
+                            rob_wr_uop,
                             hw_fracs(hw_frac_SubStruct("rs0_rdy")),
-                            cyclix_gen.indexed(PRF_stat, cyclix_gen.subStruct(cmd_req_data, "fu_rs0")))
+                            !cyclix_gen.indexed(PRF_busy, cyclix_gen.subStruct(cmd_req_data, "fu_rs0")))
 
                         cyclix_gen.assign(
-                            rob_wr_microop,
+                            rob_wr_uop,
                             hw_fracs(hw_frac_SubStruct("rs1_rdy")),
                             1)
 
                         cyclix_gen.assign(
-                            rob_wr_microop,
+                            rob_wr_uop,
+                            hw_fracs(hw_frac_SubStruct("rdy")),
+                            cyclix_gen.band(cyclix_gen.subStruct(rob_wr_uop, "rs0_rdy"), cyclix_gen.subStruct(rob_wr_uop, "rs1_rdy")))
+
+                        cyclix_gen.assign(
+                            rob_wr_uop,
                             hw_fracs(hw_frac_SubStruct("wb_ext")),
                             1)
 
                         // TODO: checking PRF readiness
                         cyclix_gen.assign(
-                            rob_wr_microop,
+                            rob_wr_uop,
                             hw_fracs(hw_frac_SubStruct("wb_wdata")),
                             cyclix_gen.indexed(PRF, cyclix_gen.subStruct(cmd_req_data, "rf_addr")))
 
@@ -637,19 +681,13 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
                 }; cyclix_gen.endif()
 
-                // updating rdy
-                cyclix_gen.assign(
-                    rob_wr_microop,
-                    hw_fracs(hw_frac_SubStruct("rdy")),
-                    cyclix_gen.band(cyclix_gen.subStruct(rob_wr_microop, "rs0_rdy"), cyclix_gen.subStruct(rob_wr_microop, "rs1_rdy")))
-
                 cyclix_gen.begif(rob_wr)
                 run {
-                    // putting new micro-op in ROB
+                    // putting new uop in ROB
                     cyclix_gen.assign(
                         rob,
                         hw_fracs(hw_frac_V(rob_wr_ptr)),
-                        rob_wr_microop
+                        rob_wr_uop
                     )
 
                     // asserting rob_full - checking if data written to last available entry

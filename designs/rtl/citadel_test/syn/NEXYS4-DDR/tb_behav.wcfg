@@ -63,9 +63,9 @@
          <obj_property name="ObjectShortName">cmd_resp_genfifo_ack_i[0:0]</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject fp_name="/tb_direct/citadel_inst/genPRF_stat" type="array">
-      <obj_property name="ElementShortName">genPRF_stat[31:0]</obj_property>
-      <obj_property name="ObjectShortName">genPRF_stat[31:0]</obj_property>
+   <wvobject fp_name="/tb_direct/citadel_inst/genPRF_busy" type="array">
+      <obj_property name="ElementShortName">genPRF_busy[31:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF_busy[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_direct/citadel_inst/genPRF" type="array">
       <obj_property name="ElementShortName">genPRF[31:0][31:0]</obj_property>
@@ -146,9 +146,9 @@
       <obj_property name="ElementShortName">genrob_wr[0:0]</obj_property>
       <obj_property name="ObjectShortName">genrob_wr[0:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_direct/citadel_inst/genrob_wr_microop" type="array">
-      <obj_property name="ElementShortName">genrob_wr_microop</obj_property>
-      <obj_property name="ObjectShortName">genrob_wr_microop</obj_property>
+   <wvobject fp_name="/tb_direct/citadel_inst/genrob_wr_uop" type="array">
+      <obj_property name="ElementShortName">genrob_wr_uop</obj_property>
+      <obj_property name="ObjectShortName">genrob_wr_uop</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_direct/citadel_inst/genrob_rd" type="array">
       <obj_property name="ElementShortName">genrob_rd[0:0]</obj_property>
