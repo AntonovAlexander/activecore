@@ -46,20 +46,39 @@ open class hw_astc() : ArrayList<hw_exec>() {
         FROZEN_FLAG = true
     }
 
-    fun DistributeVars(new_expr: hw_exec) {
+    fun AddWrVar(new_wrvar: hw_var) {
         for (cur_exec in this) {
-            for (new_wrvar in new_expr.wrvars) {
-                cur_exec.AddWrVar(new_wrvar)
-            }
+            cur_exec.AddWrVar(new_wrvar)
+        }
+    }
 
-            for (new_rdvar in new_expr.rdvars) {
-                cur_exec.AddRdVar(new_rdvar)
-            }
+    fun AddRdVar(new_rdvar: hw_var) {
+        for (cur_exec in this) {
+            cur_exec.AddRdVar(new_rdvar)
+        }
+    }
 
-            for (new_genvar in new_expr.genvars) {
-                cur_exec.AddGenVar(new_genvar)
-                new_genvar.default_astc = this
-            }
+    fun AddGenVar(new_genvar: hw_var) {
+        for (cur_exec in this) {
+            cur_exec.AddGenVar(new_genvar)
+        }
+        new_genvar.default_astc = this
+    }
+
+    fun DistributeVars(new_expr: hw_exec) {
+
+        for (new_wrvar in new_expr.wrvars) {
+            AddWrVar(new_wrvar)
+        }
+        for (new_rdvar in new_expr.rdvars) {
+            AddRdVar(new_rdvar)
+        }
+        for (new_genvar in new_expr.genvars) {
+            AddGenVar(new_genvar)
+        }
+
+        for (cur_exec in this) {
+
 
             for (new_ifvar in new_expr.iftargets) {
                 cur_exec.AddIfTargetVar(new_ifvar)
@@ -1342,6 +1361,118 @@ open class hw_astc() : ArrayList<hw_exec>() {
             assign(last().genvars[0], last().genvars[2])
         }
         removeAt(lastIndex)
+    }
+
+    fun genvar(name : String, vartype : hw_type, defval : String) : hw_var {
+        var ret_var = hw_var(name, vartype, defval)
+        AddGenVar(ret_var)
+        return ret_var
+    }
+
+    fun genvar(name : String, src_struct_in : hw_struct ,dimensions : hw_dim_static) : hw_var {
+        var ret_var = hw_var(name, src_struct_in, dimensions)
+        AddGenVar(ret_var)
+        return ret_var
+    }
+
+    fun genvar(name : String, src_struct_in : hw_struct) : hw_var {
+        var ret_var = hw_var(name, src_struct_in)
+        AddGenVar(ret_var)
+        return ret_var
+    }
+
+    fun ugenvar(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, dimensions, defval)
+        AddGenVar(ret_var)
+        return ret_var
+    }
+
+    fun ugenvar(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, msb, lsb, defval)
+        AddGenVar(ret_var)
+        return ret_var
+    }
+
+    fun ugenvar(name : String, defval : String) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, defval)
+        AddGenVar(ret_var)
+        return ret_var
+    }
+
+    fun sgenvar(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.SIGNED, dimensions, defval)
+        AddGenVar(ret_var)
+        return ret_var
+    }
+
+    fun sgenvar(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.SIGNED, msb, lsb, defval)
+        AddGenVar(ret_var)
+        return ret_var
+    }
+
+    fun sgenvar(name : String, defval : String) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.SIGNED, defval)
+        AddGenVar(ret_var)
+        return ret_var
+    }
+
+    data class bit_position(var found : hw_var, var position: hw_var)
+
+    fun max0(datain : hw_var) : bit_position {
+        var found = ugenvar(GetGenName("flag"), 0, 0, "0")
+        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+        var iter = begforall_asc(datain)
+        run {
+            begif(!iter.iter_elem)
+            run {
+                assign(found, 1)
+                assign(position, iter.iter_num)
+            }; endif()
+        }; endloop()
+        return bit_position(found, position)
+    }
+
+    fun min0(datain : hw_var) : bit_position {
+        var found = ugenvar(GetGenName("flag"), 0, 0, "0")
+        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+        var iter = begforall_desc(datain)
+        run {
+            begif(!iter.iter_elem)
+            run {
+                assign(found, 1)
+                assign(position, iter.iter_num)
+            }; endif()
+        }; endloop()
+        return bit_position(found, position)
+    }
+
+    fun max1(datain : hw_var) : bit_position {
+        var found = ugenvar(GetGenName("flag"), 0, 0, "0")
+        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+        var iter = begforall_asc(datain)
+        run {
+            begif(iter.iter_elem)
+            run {
+                assign(found, 1)
+                assign(position, iter.iter_num)
+            }; endif()
+        }; endloop()
+        return bit_position(found, position)
+    }
+
+    fun min1(datain : hw_var) : bit_position {
+        var found = ugenvar(GetGenName("flag"), 0, 0, "0")
+        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
+        var iter = begforall_desc(datain)
+        run {
+            begif(iter.iter_elem)
+            run {
+                assign(found, 1)
+                assign(position, iter.iter_num)
+            }; endif()
+        }; endloop()
+        return bit_position(found, position)
     }
 }
 

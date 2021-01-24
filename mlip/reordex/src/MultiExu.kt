@@ -207,64 +207,6 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         // println("#### Cyclix: exporting expression complete!")
     }
 
-    data class bit_position(var found : hw_var, var position: hw_var)
-
-    fun max0(cyclix_gen : cyclix.Generic, datain : hw_var) : bit_position {
-        var found = cyclix_gen.ulocal(cyclix_gen.GetGenName("flag"), 0, 0, "0")
-        var position = cyclix_gen.ulocal(cyclix_gen.GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        var iter = cyclix_gen.begforall_asc(datain)
-        run {
-            cyclix_gen.begif(!iter.iter_elem)
-            run {
-                cyclix_gen.assign(found, 1)
-                cyclix_gen.assign(position, iter.iter_num)
-            }; cyclix_gen.end()
-        }; cyclix_gen.endif()
-        return bit_position(found, position)
-    }
-
-    fun min0(cyclix_gen : cyclix.Generic, datain : hw_var) : bit_position {
-        var found = cyclix_gen.ulocal(cyclix_gen.GetGenName("flag"), 0, 0, "0")
-        var position = cyclix_gen.ulocal(cyclix_gen.GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        var iter = cyclix_gen.begforall_desc(datain)
-        run {
-            cyclix_gen.begif(!iter.iter_elem)
-            run {
-                cyclix_gen.assign(found, 1)
-                cyclix_gen.assign(position, iter.iter_num)
-            }; cyclix_gen.endif()
-        }; cyclix_gen.endloop()
-        return bit_position(found, position)
-    }
-
-    fun max1(cyclix_gen : cyclix.Generic, datain : hw_var) : bit_position {
-        var found = cyclix_gen.ulocal(cyclix_gen.GetGenName("flag"), 0, 0, "0")
-        var position = cyclix_gen.ulocal(cyclix_gen.GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        var iter = cyclix_gen.begforall_asc(datain)
-        run {
-            cyclix_gen.begif(iter.iter_elem)
-            run {
-                cyclix_gen.assign(found, 1)
-                cyclix_gen.assign(position, iter.iter_num)
-            }; cyclix_gen.end()
-        }; cyclix_gen.endif()
-        return bit_position(found, position)
-    }
-
-    fun min1(cyclix_gen : cyclix.Generic, datain : hw_var) : bit_position {
-        var found = cyclix_gen.ulocal(cyclix_gen.GetGenName("flag"), 0, 0, "0")
-        var position = cyclix_gen.ulocal(cyclix_gen.GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        var iter = cyclix_gen.begforall_desc(datain)
-        run {
-            cyclix_gen.begif(iter.iter_elem)
-            run {
-                cyclix_gen.assign(found, 1)
-                cyclix_gen.assign(position, iter.iter_num)
-            }; cyclix_gen.end()
-        }; cyclix_gen.endif()
-        return bit_position(found, position)
-    }
-
     fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
 
         MSG("Translating to cyclix: beginning")
@@ -628,7 +570,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     hw_fracs(hw_frac_SubStruct("rs1_rdata")),
                     cyclix_gen.indexed(PRF, cyclix_gen.subStruct(rob_wr_uop, "rs1_tag")))
 
-                var alloc_rd_tag = min0(cyclix_gen, PRF_mapped)
+                var alloc_rd_tag = cyclix_gen.min0(PRF_mapped)
 
                 cyclix_gen.begif(cyclix_gen.subStruct(cmd_req_data, "exec"))
                 run {
