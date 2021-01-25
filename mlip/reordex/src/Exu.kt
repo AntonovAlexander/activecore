@@ -23,9 +23,9 @@ class Exu_CFG_RF(val RF_width : Int,
         for (RF_rs_idx in 0 until RF_rs_num) {
             req_struct.addu("rs" + RF_rs_idx + "_rdata", RF_width-1, 0, "0")
         }
-        req_struct.addu("rd_tag",     3, 0, "0")
+        req_struct.addu("rd_tag",     31, 0, "0")       // TODO: clean up
 
-        resp_struct.addu("tag",     3, 0, "0")
+        resp_struct.addu("tag",     31, 0, "0")         // TODO: clean up
         resp_struct.addu("wdata",     RF_width-1, 0, "0")
     }
 }
