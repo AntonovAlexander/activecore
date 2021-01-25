@@ -10,18 +10,18 @@ package reordex
 
 import hwast.*
 
-data class MultiExu_CFG_RF(val RF_width : Int,
-                           val ARF_depth : Int,
+data class MultiExu_CFG_RF(val ARF_depth : Int,
                            val rename_RF: Boolean,
-                           val PRF_depth : Int)
+                           val PRF_depth : Int) {
+
+    val ARF_addr_width = GetWidthToContain(ARF_depth)
+    val PRF_addr_width = GetWidthToContain(PRF_depth)
+}
 
 data class Exu_CFG(val ExecUnit : Exu,
                    val exu_num : Int)
 
 open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu_cfg_rf : MultiExu_CFG_RF, val rob_size : Int) {
-
-    val arf_addr_width = GetWidthToContain(MultiExu_cfg_rf.ARF_depth)
-    val prf_addr_width = GetWidthToContain(MultiExu_cfg_rf.PRF_depth)
 
     var ExecUnits  = mutableMapOf<String, Exu_CFG>()
 
@@ -215,7 +215,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         //// Generating control structures ////
         var prf_dim = hw_dim_static()
-        prf_dim.add(MultiExu_cfg_rf.RF_width-1, 0)
+        prf_dim.add(Exu_cfg_rf.RF_width-1, 0)
         prf_dim.add(MultiExu_cfg_rf.PRF_depth-1, 0)
         var PRF = cyclix_gen.uglobal("genPRF", prf_dim, "0")
 
@@ -224,7 +224,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         var PRF_rdy = cyclix_gen.uglobal("genPRF_rdy", MultiExu_cfg_rf.PRF_depth-1, 0, 0xFFFFFFFF.toString(10))
 
         var arf_map_dim = hw_dim_static()
-        arf_map_dim.add(prf_addr_width-1, 0)
+        arf_map_dim.add(MultiExu_cfg_rf.PRF_addr_width-1, 0)
         arf_map_dim.add(MultiExu_cfg_rf.ARF_depth-1, 0)
         var ARF_map = cyclix_gen.uglobal("genARF_map", arf_map_dim, "0")        // ARF-to-PRF mappings
         ////
@@ -234,17 +234,17 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         var cmd_req_struct = hw_struct(name + "_cmd_req_struct")
         cmd_req_struct.addu("exec",     0, 0, "0")
         cmd_req_struct.addu("rf_we",       0,  0, "0")
-        cmd_req_struct.addu("rf_addr",    arf_addr_width-1, 0, "0")
-        cmd_req_struct.addu("rf_wdata",    MultiExu_cfg_rf.RF_width-1, 0, "0")
+        cmd_req_struct.addu("rf_addr",    MultiExu_cfg_rf.ARF_addr_width-1, 0, "0")
+        cmd_req_struct.addu("rf_wdata",    Exu_cfg_rf.RF_width-1, 0, "0")
         cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size)-1, 0, "0")
         cmd_req_struct.addu("fu_opcode",     0, 0, "0")
-        cmd_req_struct.addu("fu_rs0",    arf_addr_width-1, 0, "0")
-        cmd_req_struct.addu("fu_rs1",    arf_addr_width-1, 0, "0")
-        cmd_req_struct.addu("fu_rd",    arf_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_rs0",    MultiExu_cfg_rf.ARF_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_rs1",    MultiExu_cfg_rf.ARF_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_rd",    MultiExu_cfg_rf.ARF_addr_width-1, 0, "0")
         var cmd_req = cyclix_gen.fifo_in("cmd_req",  hw_type(cmd_req_struct))
         var cmd_req_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_req_data"), cmd_req_struct)
-        var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(MultiExu_cfg_rf.RF_width-1, 0)))
-        var cmd_resp_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_resp_data"), hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(MultiExu_cfg_rf.RF_width-1, 0)), "0")
+        var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(Exu_cfg_rf.RF_width-1, 0)))
+        var cmd_resp_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_resp_data"), hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(Exu_cfg_rf.RF_width-1, 0)), "0")
 
         // TODO: external memory interface
 
@@ -257,15 +257,15 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         rob_struct.addu("fu_opcode",     0, 0, "0")
         rob_struct.addu("rs0_rdy",     0, 0, "0")
         rob_struct.addu("rs0_tag",     MultiExu_cfg_rf.PRF_depth-1, 0, "0")
-        rob_struct.addu("rs0_rdata",     MultiExu_cfg_rf.RF_width-1, 0, "0")
+        rob_struct.addu("rs0_rdata",     Exu_cfg_rf.RF_width-1, 0, "0")
         rob_struct.addu("rs1_rdy",     0, 0, "0")
         rob_struct.addu("rs1_tag",     MultiExu_cfg_rf.PRF_depth-1, 0, "0")
-        rob_struct.addu("rs1_rdata",     MultiExu_cfg_rf.RF_width-1, 0, "0")
+        rob_struct.addu("rs1_rdata",     Exu_cfg_rf.RF_width-1, 0, "0")
         rob_struct.addu("rd_tag",     MultiExu_cfg_rf.PRF_depth-1, 0, "0")
         rob_struct.addu("rd_tag_prev",     MultiExu_cfg_rf.PRF_depth-1, 0, "0")                 // freeing
         rob_struct.addu("rd_tag_prev_clr",     0, 0, "0")
         rob_struct.addu("wb_ext",     0, 0, "0")
-        rob_struct.addu("wb_wdata",     MultiExu_cfg_rf.RF_width-1, 0, "0")
+        rob_struct.addu("wb_wdata",     Exu_cfg_rf.RF_width-1, 0, "0")
 
         var TranslateInfo = __TranslateInfo()
 
