@@ -162,12 +162,12 @@ initial
 	
 	// fetching results
 	CMD_RF_LOAD(0, 32'hbadc0ffe);
+	CMD_RF_LOAD(7, 32'h7);
+	CMD_RF_LOAD(9, 32'h9);
 	CMD_RF_LOAD(1, 32'h1);
 	CMD_RF_LOAD(2, 32'h2);
 	CMD_RF_LOAD(3, 32'h3);
-	CMD_RF_LOAD(7, 32'h7);
-	CMD_RF_LOAD(9, 32'h9);
-	CMD_RF_LOAD(31, 32'hfafae00f);
+	CMD_RF_LOAD(15, 32'hfafae00f);
 	
 	CMD_EXEC(0, 0, 1, 5);
 	CMD_EXEC(0, 2, 5, 6);
@@ -180,7 +180,7 @@ initial
 	CMD_RF_STORE(6);
 	CMD_RF_STORE(7);
 	CMD_RF_STORE(9);
-	CMD_RF_STORE(31);
+	CMD_RF_STORE(15);
 	
 	WAIT(100);
 

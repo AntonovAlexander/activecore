@@ -1806,7 +1806,7 @@ open class hw_astc_stdif() : hw_astc() {
 
     fun fifo_rd_blk(fifo : hw_fifo_in) : hw_var {
         var new_expr = hw_exec_fifo_rd_blk(fifo)
-        var genvar = hw_var(GetGenName("fifo_rdata"), fifo.vartype, fifo.defval)
+        var genvar = hw_var(GetGenName("fifo_rdata"), fifo.vartype, fifo.defimm)
         new_expr.AddWrVar(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)

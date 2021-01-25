@@ -504,7 +504,7 @@ open class module(val name : String) : hw_astc() {
 
         // asserting defaults to iftargets
         for (iftarget in cproc.iftargets) {
-            iftarget.assign(hw_imm(iftarget.defval))
+            iftarget.assign(iftarget.defimm)
         }
 
         // restoring stickies

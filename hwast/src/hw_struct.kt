@@ -35,16 +35,19 @@ data class hw_type(var VarType : VAR_TYPE, var src_struct: hw_struct, var dimens
 }
 
 // container for named variables
-open class hw_structvar(var name: String, vartype : hw_type, var defval : String) : hw_param(PARAM_TYPE.VAR, vartype, defval) {
+open class hw_structvar(var name: String, vartype : hw_type, var defimm : hw_imm) : hw_param(PARAM_TYPE.VAR, vartype, defimm.imm_value) {
 
     override fun GetString(): String {
         return name
     }
 
+    constructor(name: String, vartype : hw_type, defval : String) : this(name, vartype, hw_imm(defval))
     constructor(name: String, VarType : VAR_TYPE, dimensions : hw_dim_static, defval : String) : this(name, hw_type(VarType, dimensions), defval)
     constructor(name: String, VarType : VAR_TYPE, msb: Int, lsb: Int, defval : String) : this(name, hw_type(VarType, msb, lsb), defval)
     constructor(name: String, VarType : VAR_TYPE, defval : String) : this(name, hw_type(VarType, hw_dim_static(defval)), defval)
     constructor(name: String, src_struct : hw_struct) : this(name, hw_type(src_struct), "0")
+
+    var defval = defimm.imm_value           // TODO: remove
 
     fun DisplayType() {
         print("#### Variable: " + name + " ####\n")

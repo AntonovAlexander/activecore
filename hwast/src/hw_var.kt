@@ -8,7 +8,7 @@
 
 package hwast
 
-open class hw_var(name : String, vartype : hw_type, defval : String) : hw_structvar(name, vartype, defval) {
+open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_structvar(name, vartype, defimm) {
 
     var read_done: Boolean
     var write_done: Boolean
@@ -21,8 +21,17 @@ open class hw_var(name : String, vartype : hw_type, defval : String) : hw_struct
         token_printable = name
     }
 
+    constructor(name : String, vartype : hw_type, defval : String)
+            : this(name, vartype, hw_imm(defval))
+
+    constructor(name: String, VarType : VAR_TYPE, dimensions : hw_dim_static, defimm : hw_imm)
+            : this(name, hw_type(VarType, dimensions), defimm)
+
     constructor(name: String, VarType : VAR_TYPE, dimensions : hw_dim_static, defval : String)
             : this(name, hw_type(VarType, dimensions), defval)
+
+    constructor(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int, defimm : hw_imm)
+            : this(name, hw_type(VarType, msb, lsb), defimm)
 
     constructor(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int, defval: String)
             : this(name, hw_type(VarType, msb, lsb), defval)
