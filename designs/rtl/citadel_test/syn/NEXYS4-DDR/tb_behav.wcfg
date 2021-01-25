@@ -110,112 +110,112 @@
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="group91" type="group">
-         <obj_property name="label">INTEGER 0</obj_property>
+         <obj_property name="label">ADD 0</obj_property>
          <obj_property name="DisplayName">label</obj_property>
          <obj_property name="isExpanded"></obj_property>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_0_stream_req_bus_genfifo_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_0_stream_req_bus_genfifo_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_0_stream_req_bus_genfifo_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_wdata" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_wdata</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_wdata</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_0_stream_req_bus_genfifo_wdata" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_0_stream_req_bus_genfifo_wdata</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_0_stream_req_bus_genfifo_wdata</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_ack" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_ack[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_ack[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_0_stream_req_bus_genfifo_ack" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_0_stream_req_bus_genfifo_ack[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_0_stream_req_bus_genfifo_ack[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_reqbuf_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_0_stream_req_bus_genfifo_reqbuf_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_0_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_0_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_buf_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_buf_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_ack" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_ack[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_ack[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_ack" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_ack[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_ack[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_rdata" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_rdata</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_rdata</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_rdata" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_rdata</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_0_stream_resp_bus_genfifo_rdata</obj_property>
          </wvobject>
       </wvobject>
       <wvobject fp_name="group92" type="group">
-         <obj_property name="label">INTEGER 1</obj_property>
+         <obj_property name="label">ADD 1</obj_property>
          <obj_property name="DisplayName">label</obj_property>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_1_stream_req_bus_genfifo_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_1_stream_req_bus_genfifo_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_1_stream_req_bus_genfifo_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_wdata" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_wdata</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_wdata</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_1_stream_req_bus_genfifo_wdata" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_1_stream_req_bus_genfifo_wdata</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_1_stream_req_bus_genfifo_wdata</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_ack" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_ack[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_ack[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_1_stream_req_bus_genfifo_ack" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_1_stream_req_bus_genfifo_ack[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_1_stream_req_bus_genfifo_ack[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_reqbuf_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_1_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_1_stream_req_bus_genfifo_reqbuf_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_1_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_1_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_buf_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_buf_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_ack" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_ack[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_ack[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_ack" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_ack[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_ack[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_rdata" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_rdata</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_rdata</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_rdata" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_rdata</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_1_stream_resp_bus_genfifo_rdata</obj_property>
          </wvobject>
       </wvobject>
       <wvobject fp_name="group93" type="group">
-         <obj_property name="label">INTEGER 2</obj_property>
+         <obj_property name="label">ADD 2</obj_property>
          <obj_property name="DisplayName">label</obj_property>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_2_stream_req_bus_genfifo_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_2_stream_req_bus_genfifo_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_2_stream_req_bus_genfifo_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_wdata" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_wdata</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_wdata</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_2_stream_req_bus_genfifo_wdata" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_2_stream_req_bus_genfifo_wdata</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_2_stream_req_bus_genfifo_wdata</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_ack" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_ack[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_ack[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_2_stream_req_bus_genfifo_ack" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_2_stream_req_bus_genfifo_ack[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_2_stream_req_bus_genfifo_ack[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_reqbuf_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_2_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_2_stream_req_bus_genfifo_reqbuf_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_2_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_2_stream_req_bus_genfifo_reqbuf_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_buf_req" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_buf_req" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_buf_req[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_ack" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_ack[0:0]</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_ack[0:0]</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_ack" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_ack[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_ack[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_rdata" type="array">
-            <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_rdata</obj_property>
-            <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_2_stream_resp_bus_genfifo_rdata</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_rdata" type="array">
+            <obj_property name="ElementShortName">gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_rdata</obj_property>
+            <obj_property name="ObjectShortName">gensubmod_genexu_ADD_2_stream_resp_bus_genfifo_rdata</obj_property>
          </wvobject>
       </wvobject>
       <wvobject fp_name="group94" type="group">
