@@ -12,15 +12,17 @@ import hwast.*
 
 val OP_EXU = hwast.hw_opcode("exec_unit")
 
-class Exu_CFG_RF(val RF_width : Int) {
+class Exu_CFG_RF(val RF_width : Int,
+                 val RF_rs_num : Int) {
 
     var req_struct = hw_struct("req_struct")
     var resp_struct = hw_struct("resp_struct")
 
     init {
         req_struct.addu("opcode",     0, 0, "0")
-        req_struct.addu("rs0_rdata",     RF_width-1, 0, "0")
-        req_struct.addu("rs1_rdata",     RF_width-1, 0, "0")
+        for (RF_rs_idx in 0 until RF_rs_num) {
+            req_struct.addu("rs" + RF_rs_idx + "_rdata", RF_width-1, 0, "0")
+        }
         req_struct.addu("rd_tag",     3, 0, "0")
 
         resp_struct.addu("tag",     3, 0, "0")

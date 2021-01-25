@@ -11,7 +11,7 @@ package citadel
 import hwast.*
 import reordex.*
 
-val Exu_cfg_rf = Exu_CFG_RF(32)
+val Exu_cfg_rf = Exu_CFG_RF(32, 2)
 
 class EXU_INTEGER(stage_num: Int) : reordex.Exu("INTEGER", Exu_cfg_rf, stage_num) {
 
