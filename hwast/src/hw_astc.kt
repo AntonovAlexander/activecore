@@ -258,7 +258,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             }
 
             var curVarType = VAR_TYPE.UNSIGNED
-            if (params[0].type == PARAM_TYPE.VAR) curVarType = (params[0] as hw_var).vartype.VarType
+            if (params[0] is hw_var) curVarType = params[0].vartype.VarType
 
             return hw_var(GetGenName("var"), curVarType, gen_dim, "0")
         } else if ((opcode == OP2_ARITH_ADD)
@@ -306,18 +306,18 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     || (opcode == OP2_ARITH_SRL)
                     || (opcode == OP2_ARITH_SRA)) {
                 for (param in params) {
-                    if (param.type == PARAM_TYPE.VAR) {
-                        if ((param as hw_var).vartype.VarType == VAR_TYPE.SIGNED) curVarType = VAR_TYPE.SIGNED
+                    if (param is hw_var) {
+                        if (param.vartype.VarType == VAR_TYPE.SIGNED) curVarType = VAR_TYPE.SIGNED
                     }
                 }
             }
 
             // if indexed of struct array - assert struct
             if (opcode == OP2_INDEXED) {
-                if (params[0].type == PARAM_TYPE.VAR) {
-                    if ((params[0] as hw_var).vartype.VarType == VAR_TYPE.STRUCTURED) {
+                if (params[0] is hw_var) {
+                    if (params[0].vartype.VarType == VAR_TYPE.STRUCTURED) {
                         curVarType = VAR_TYPE.STRUCTURED
-                        curStruct = (params[0] as hw_var).vartype.src_struct
+                        curStruct = params[0].vartype.src_struct
                     }
                 }
             }
@@ -329,7 +329,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                 ERROR("params incorrect for operation")
 
             var gendim = hw_dim_static()
-            if ((params[1].type == PARAM_TYPE.VAL) && (params[2].type == PARAM_TYPE.VAL)) {
+            if ((params[1] is hw_imm) && (params[2] is hw_imm)) {
                 var msb = params[1].token_printable.toInt()
                 var lsb = params[2].token_printable.toInt()
                 gendim.add(hw_dim_range_static(msb, lsb))
@@ -460,7 +460,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         var src_Power = src.GetDimensions().size
         if (src_Power < 1) src_Power = 1                    // for 1-bit signals
 
-        if (src.type == PARAM_TYPE.VAR) {
+        if (src is hw_var) {
             if (tgt_DePowered_Power != src_Power) ERROR("dimensions do not match for target " + tgt.name + " (source tgt power: " + tgt.vartype.dimensions.size + ", depow size: " + depow_fractions.size + ", final tgt power: " + tgt_DePowered_Power + "), src: " + src.GetString() + " (src power: " + src_Power + ")")
             else if (tgt_DePowered_Power == 1) {
 
@@ -509,7 +509,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     depow_fractions.removeAt(depow_fractions.lastIndex)
                 }
             }
-        } else if (src.type == PARAM_TYPE.VAL) {
+        } else if (src is hw_imm) {
             if (tgt_DePowered_Power == 1) assign_gen(tgt, depow_fractions, src)
             else {
                 for (i in 0 until tgt.vartype.dimensions.get(tgt_DePowered_Power - 1).GetWidth()) {
@@ -1110,7 +1110,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
         var new_expr = hw_exec(OP1_IF)
 
-        if (cond.type == PARAM_TYPE.VAR) {
+        if (cond is hw_var) {
             val genvar = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
             new_expr.AddGenVar(genvar)
             assign_gen(genvar, cond)

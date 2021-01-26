@@ -178,7 +178,7 @@ class SvWriter(var mod : module) {
                 || (expr.opcode == OP1_REDUCT_XNOR))
         {
             var var_descr = expr.assign_tgt_fractured.depowered_fractions
-            if ((var_descr.VarType == VAR_TYPE.STRUCTURED) && (expr.params[0].type == PARAM_TYPE.VAL)) {
+            if ((var_descr.VarType == VAR_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
                 if (opstring == "") {
                     wrFile.write(expr.wrvars[0].name +
                             dimstring +
@@ -339,7 +339,7 @@ class SvWriter(var mod : module) {
     }
 
     fun GetParamString(param : hw_param) : String {
-        if (param.type == PARAM_TYPE.VAR) {
+        if (param is hw_var) {
             return param.GetString()
         } else {
             when ((param as hw_imm).base_type) {
@@ -513,7 +513,7 @@ class SvWriter(var mod : module) {
                         } else if (mem.vartype.dimensions.size == 2) {
                             var power = mem.vartype.dimensions[1].GetWidth()
                             for (k in 0 until power) {
-                                if (mem.rst_src.type == PARAM_TYPE.VAR)
+                                if (mem.rst_src is hw_var)
                                     wrFileModule.write("\t\t"
                                             + mem.name
                                             + "["
@@ -523,7 +523,7 @@ class SvWriter(var mod : module) {
                                             + "["
                                             + (k + mem.rst_src.GetDimensions()[1].lsb)
                                             + "];\n")
-                                else if (mem.rst_src.type == PARAM_TYPE.VAL)
+                                else if (mem.rst_src is hw_imm)
                                     if (mem.rst_src is hw_imm_arr) {
                                         wrFileModule.write("\t\t"
                                                 + mem.name
@@ -560,7 +560,7 @@ class SvWriter(var mod : module) {
                         } else if (mem.vartype.dimensions.size == 2) {
                             var power = mem.vartype.dimensions[1].GetWidth()
                             for (k in 0 until power) {
-                                if (mem_src.sync_src.type == PARAM_TYPE.VAR)
+                                if (mem_src.sync_src is hw_var)
                                     wrFileModule.write("\t\t"
                                             + mem.name
                                             + "["

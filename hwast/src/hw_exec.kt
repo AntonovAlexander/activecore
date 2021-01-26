@@ -104,7 +104,7 @@ open class hw_exec(val opcode : hw_opcode) {
 
     fun AddRdParam(new_param : hw_param) {
         params.add(new_param)
-        if (new_param.type == PARAM_TYPE.VAR) AddRdVar(new_param as hw_var)
+        if (new_param is hw_var) AddRdVar(new_param)
     }
 
     fun AddRdParams(new_params : ArrayList<hw_param>) {

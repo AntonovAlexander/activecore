@@ -208,7 +208,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             || (expr.opcode == OP1_REDUCT_XNOR))
         {
             var var_descr = expr.wrvars[0].GetDepowered(expr.assign_tgt_fractured.depow_fractions)
-            if ((var_descr.VarType == VAR_TYPE.STRUCTURED) && (expr.params[0].type == PARAM_TYPE.VAL)) {
+            if ((var_descr.VarType == VAR_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
                 if (opstring == "") {
                     wrFile.write(expr.wrvars[0].name +
                             dimstring +
@@ -378,7 +378,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
     }
 
     fun GetParamString(param : hw_param) : String {
-        if (param.type == PARAM_TYPE.VAR) {
+        if (param is hw_var) {
             return param.GetString()
         } else {
             if ((param as hw_imm).dimensions.size > 1) throw Exception("cyclix: param print error")

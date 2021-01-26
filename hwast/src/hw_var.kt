@@ -129,7 +129,7 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
 
     operator fun set(index: hw_param, src: hw_param) {
         var depow_fracs = hw_fracs()
-        if (index.type == PARAM_TYPE.VAL) depow_fracs.add(hw_frac_C(index as hw_imm))
+        if (index is hw_imm) depow_fracs.add(hw_frac_C(index))
         else depow_fracs.add(hw_frac_V(index as hw_var))
         default_astc.assign(this, depow_fracs, src)
     }
@@ -143,15 +143,15 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     operator fun set(msb: hw_param, lsb: hw_param, src: hw_param) {
         var depow_fracs = hw_fracs()
 
-        if (msb.type == PARAM_TYPE.VAL) {
-            if (lsb.type == PARAM_TYPE.VAL) {
-                depow_fracs.add(hw_frac_CC(msb as hw_imm, lsb as hw_imm))
+        if (msb is hw_imm) {
+            if (lsb is hw_imm) {
+                depow_fracs.add(hw_frac_CC(msb , lsb))
             } else {
-                depow_fracs.add(hw_frac_CV(msb as hw_imm, lsb as hw_var))
+                depow_fracs.add(hw_frac_CV(msb, lsb as hw_var))
             }
         } else {
-            if (lsb.type == PARAM_TYPE.VAL) {
-                depow_fracs.add(hw_frac_VC(msb as hw_var, lsb as hw_imm))
+            if (lsb is hw_imm) {
+                depow_fracs.add(hw_frac_VC(msb as hw_var, lsb))
             } else {
                 depow_fracs.add(hw_frac_VV(msb as hw_var, lsb as hw_var))
             }

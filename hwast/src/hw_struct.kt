@@ -35,7 +35,7 @@ data class hw_type(var VarType : VAR_TYPE, var src_struct: hw_struct, var dimens
 }
 
 // container for named variables
-open class hw_structvar(var name: String, vartype : hw_type, var defimm : hw_imm) : hw_param(PARAM_TYPE.VAR, vartype, defimm.imm_value) {
+open class hw_structvar(var name: String, vartype : hw_type, var defimm : hw_imm) : hw_param(vartype, defimm.imm_value) {
 
     override fun GetString(): String {
         return name

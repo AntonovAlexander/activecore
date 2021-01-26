@@ -8,11 +8,7 @@
 
 package hwast
 
-enum class PARAM_TYPE {
-    VAR, VAL
-}
-
-open class hw_param (val type : PARAM_TYPE, var vartype : hw_type, var token_printable : String) {
+open class hw_param (var vartype : hw_type, var token_printable : String) {
 
     open fun GetString(): String {
         return token_printable
