@@ -22,30 +22,30 @@ class VivadoCppWriter(var cyclix_module : Generic) {
 
     fun getDimString(fraction : hw_frac) : String
     {
-        if (fraction.type == FRAC_TYPE.C)
-            return ("[" + (fraction as hw_frac_C).index.GetString() + "]")
+        if (fraction is hw_frac_C)
+            return ("[" + fraction.index.GetString() + "]")
 
-        else if (fraction.type == FRAC_TYPE.V)
-            return ("[" + (fraction as hw_frac_V).index.name + "]")
+        else if (fraction is hw_frac_V)
+            return ("[" + fraction.index.name + "]")
 
-        else if (fraction.type == FRAC_TYPE.CC)
-            return ("[" + (fraction as hw_frac_CC).msb.GetString() + ":"
+        else if (fraction is hw_frac_CC)
+            return ("[" + fraction.msb.GetString() + ":"
                     + fraction.lsb.GetString() + "]")
 
-        else if (fraction.type == FRAC_TYPE.CV)
-            return ("[" + (fraction as hw_frac_CV).msb.GetString() + ":"
+        else if (fraction is hw_frac_CV)
+            return ("[" + fraction.msb.GetString() + ":"
                     + fraction.lsb.name + "]")
 
-        else if (fraction.type == FRAC_TYPE.VC)
-            return ("[" + (fraction as hw_frac_VC).msb.name + ":"
+        else if (fraction is hw_frac_VC)
+            return ("[" + fraction.msb.name + ":"
                     + fraction.lsb.GetString() + "]")
 
-        else if (fraction.type == FRAC_TYPE.VV)
-            return ("[" + (fraction as hw_frac_VV).msb.name + ":"
+        else if (fraction is hw_frac_VV)
+            return ("[" + fraction.msb.name + ":"
                     + fraction.lsb.name + "]")
 
-        else if (fraction.type == FRAC_TYPE.SubStruct)
-            return ("." + (fraction as hw_frac_SubStruct).substruct_name)
+        else if (fraction is hw_frac_SubStruct)
+            return ("." + fraction.substruct_name)
 
         else {
             ERROR("Dimensions unrecognized!")

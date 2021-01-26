@@ -16,5 +16,5 @@ class hw_port(name : String, var port_dir : PORT_DIR, vartype : hw_type, defimm 
     : hw_var(name, vartype, defimm) {
 
     constructor(name : String, port_dir : PORT_DIR, vartype : hw_type, defval : String)
-            : this(name, port_dir, vartype, hw_imm(defval))
+        : this(name, port_dir, vartype, hw_imm(defval))
 }

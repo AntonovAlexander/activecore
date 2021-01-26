@@ -182,9 +182,9 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
             if (ret_dim.isSingle()) {
                 // undimensioned var
                 ret_dim.clear()
-                if (depow_fraction.type == FRAC_TYPE.SubStruct) {
+                if (depow_fraction is hw_frac_SubStruct) {
                     // retrieving structure
-                    ret_vartype = (depow_fraction as hw_frac_SubStruct).src_struct[depow_fraction.subStructIndex].vartype.VarType
+                    ret_vartype = depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.VarType
                     ret_struct = depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.src_struct
                     for (dimension in depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.dimensions) {
                         ret_dim.add(dimension)
@@ -196,15 +196,15 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
 
             } else {
                 // dimensioned var
-                if (depow_fraction.type == FRAC_TYPE.SubStruct) ERROR("Depower index generation incorrect, accessing substruct in multidimensional variable")
+                if (depow_fraction is hw_frac_SubStruct) ERROR("Depower index generation incorrect, accessing substruct in multidimensional variable")
                 else {
-                    if ((depow_fraction.type == FRAC_TYPE.C) || (depow_fraction.type == FRAC_TYPE.V)) {
+                    if ((depow_fraction is hw_frac_C) || (depow_fraction is hw_frac_V)) {
                         // taking indexed variable - detachment of last dimensions
                         ret_dim.removeAt(ret_dim.lastIndex)
-                    } else if (depow_fraction.type == FRAC_TYPE.CC) {
+                    } else if (depow_fraction is hw_frac_CC) {
                         // replacing last dimension with taken
                         ret_dim.removeAt(ret_dim.lastIndex)
-                        ret_dim.add(hw_dim_range_static((depow_fraction as hw_frac_CC).msb.toInt(), depow_fraction.lsb.toInt()))
+                        ret_dim.add(hw_dim_range_static(depow_fraction.msb.toInt(), depow_fraction.lsb.toInt()))
                     } else continue
                 }
             }

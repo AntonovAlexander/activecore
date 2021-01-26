@@ -8,15 +8,11 @@
 
 package hwast
 
-enum class FRAC_TYPE {
-    C, V, CC, CV, VC, VV, SubStruct
-}
-
-abstract class hw_frac (val type : FRAC_TYPE) {
+abstract class hw_frac () {
     abstract fun GetWidth() : Int
 }
 
-class hw_frac_C (val index : hw_imm) : hw_frac(FRAC_TYPE.C) {
+class hw_frac_C (val index : hw_imm) : hw_frac() {
 
     constructor(index : Int) : this(hw_imm(index.toString()))
 
@@ -25,14 +21,14 @@ class hw_frac_C (val index : hw_imm) : hw_frac(FRAC_TYPE.C) {
     }
 }
 
-class hw_frac_V (val index : hw_var) : hw_frac(FRAC_TYPE.V) {
+class hw_frac_V (val index : hw_var) : hw_frac() {
 
     override fun GetWidth() : Int {
         return 1
     }
 }
 
-class hw_frac_CC (val msb : hw_imm, val lsb : hw_imm) : hw_frac(FRAC_TYPE.CC) {
+class hw_frac_CC (val msb : hw_imm, val lsb : hw_imm) : hw_frac() {
 
     constructor(msb : Int, lsb : Int) : this(hw_imm(msb.toString()), hw_imm(lsb.toString()))
 
@@ -42,7 +38,7 @@ class hw_frac_CC (val msb : hw_imm, val lsb : hw_imm) : hw_frac(FRAC_TYPE.CC) {
     }
 }
 
-class hw_frac_CV (val msb : hw_imm, val lsb : hw_var) : hw_frac(FRAC_TYPE.CV) {
+class hw_frac_CV (val msb : hw_imm, val lsb : hw_var) : hw_frac() {
 
     constructor(msb : Int, lsb : hw_var) : this(hw_imm(msb.toString()), lsb)
 
@@ -51,7 +47,7 @@ class hw_frac_CV (val msb : hw_imm, val lsb : hw_var) : hw_frac(FRAC_TYPE.CV) {
     }
 }
 
-class hw_frac_VC (val msb : hw_var, val lsb : hw_imm) : hw_frac(FRAC_TYPE.VC) {
+class hw_frac_VC (val msb : hw_var, val lsb : hw_imm) : hw_frac() {
 
     constructor(msb : hw_var, lsb : Int) : this(msb, hw_imm(lsb.toString()))
 
@@ -60,14 +56,14 @@ class hw_frac_VC (val msb : hw_var, val lsb : hw_imm) : hw_frac(FRAC_TYPE.VC) {
     }
 }
 
-class hw_frac_VV (val msb : hw_var, val lsb : hw_var) : hw_frac(FRAC_TYPE.VV) {
+class hw_frac_VV (val msb : hw_var, val lsb : hw_var) : hw_frac() {
 
     override fun GetWidth() : Int {
         return 0
     }
 }
 
-class hw_frac_SubStruct (val substruct_name : String) : hw_frac(FRAC_TYPE.SubStruct) {
+class hw_frac_SubStruct (val substruct_name : String) : hw_frac() {
 
     var subStructIndex : Int = 0
     var src_struct = DUMMY_STRUCT

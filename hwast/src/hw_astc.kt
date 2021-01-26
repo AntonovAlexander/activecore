@@ -402,14 +402,14 @@ open class hw_astc() : ArrayList<hw_exec>() {
     private fun process_depow_fractions(depow_fractions: hw_fracs, tgt: hw_var) {
         var tgt_struct_ptr = tgt.vartype.src_struct
         for (fraction in depow_fractions) {
-            if (fraction.type == FRAC_TYPE.SubStruct) {
+            if (fraction is hw_frac_SubStruct) {
                 //println("Substruct found!")
                 if (tgt_struct_ptr != DUMMY_STRUCT) {
                     var substr_found = false
                     var SUBSTR_INDEX = 0
                     for (structvar in tgt_struct_ptr) {
                         //println("structvar: " + structvar.name)
-                        if (structvar.name == (fraction as hw_frac_SubStruct).substruct_name) {
+                        if (structvar.name == fraction.substruct_name) {
 
                             //println("src_struct: " + tgt_struct_ptr.name)
                             //println("subStructIndex: " + SUBSTR_INDEX)
