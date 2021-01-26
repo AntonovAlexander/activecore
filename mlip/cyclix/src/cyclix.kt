@@ -43,13 +43,19 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         new_local.default_astc = this
     }
 
+    fun local(name : String, vartype : hw_type, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, vartype, defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun local(name : String, vartype : hw_type, defval : String) : hw_var {
         var ret_var = hw_var(name, vartype, defval)
         add_local(ret_var)
         return ret_var
     }
 
-    fun local(name : String, src_struct_in : hw_struct ,dimensions : hw_dim_static) : hw_var {
+    fun local(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_var {
         var ret_var = hw_var(name, src_struct_in, dimensions)
         add_local(ret_var)
         return ret_var
@@ -61,8 +67,20 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun ulocal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, dimensions, defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun ulocal(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
         var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, dimensions, defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun ulocal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, msb, lsb, defimm)
         add_local(ret_var)
         return ret_var
     }
@@ -73,8 +91,20 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun ulocal(name : String, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun ulocal(name : String, defval : String) : hw_var {
         var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun slocal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.SIGNED, dimensions, defimm)
         add_local(ret_var)
         return ret_var
     }
@@ -85,8 +115,20 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun slocal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.SIGNED, msb, lsb, defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun slocal(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
         var ret_var = hw_var(name, VAR_TYPE.SIGNED, msb, lsb, defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun slocal(name : String, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.SIGNED, defimm)
         add_local(ret_var)
         return ret_var
     }
@@ -107,6 +149,12 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         rdvars.put(new_global.name, new_global)
         globals.add(new_global)
         new_global.default_astc = this
+    }
+
+    fun global(name : String, vartype : hw_type, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, vartype, defimm)
+        add_global(ret_var)
+        return ret_var
     }
 
     fun global(name : String, vartype : hw_type, defval : String) : hw_var {
@@ -133,8 +181,20 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun uglobal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, dimensions, defimm)
+        add_global(ret_var)
+        return ret_var
+    }
+
     fun uglobal(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
         var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, dimensions, defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun uglobal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, msb, lsb, defimm)
         add_global(ret_var)
         return ret_var
     }
@@ -145,8 +205,20 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun uglobal(name : String, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, defimm)
+        add_global(ret_var)
+        return ret_var
+    }
+
     fun uglobal(name : String, defval : String) : hw_var {
         var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun sglobal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.SIGNED, dimensions, defimm)
         add_global(ret_var)
         return ret_var
     }
@@ -157,8 +229,20 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun sglobal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.SIGNED, msb, lsb, defimm)
+        add_global(ret_var)
+        return ret_var
+    }
+
     fun sglobal(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
         var ret_var = hw_var(name, VAR_TYPE.SIGNED, msb, lsb, defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun sglobal(name : String, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, VAR_TYPE.SIGNED, defimm)
         add_global(ret_var)
         return ret_var
     }
