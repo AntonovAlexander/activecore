@@ -19,7 +19,7 @@ abstract class hw_syncbuf(name : String, buftype : String, vartype : hw_type, de
     var buf = hw_mem((buftype + "_" + name), vartype, SYNC_TYPE.EDGE)
     init {
         buf.AddSource(SYNC_LVL.POS, clk, this)
-        buf.AddReset(RST_TYPE.SYNC, SYNC_LVL.POS, rst, hw_imm(defval))
+        buf.AddReset(RST_TYPE.SYNC, SYNC_LVL.POS, rst, defimm)
     }
 }
 

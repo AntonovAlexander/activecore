@@ -344,6 +344,22 @@ class SvWriter(var mod : module) {
         }
     }
 
+    fun GetParamString(param : hw_param) : String {
+        if (param.type == PARAM_TYPE.VAR) {
+            return param.GetString()
+        } else {
+            when ((param as hw_imm).base_type) {
+                IMM_BASE_TYPE.DEC -> return(param.GetWidth().toString() + "'d" + param.imm_value)
+                IMM_BASE_TYPE.BIN -> return(param.GetWidth().toString() + "'b" + param.imm_value)
+                IMM_BASE_TYPE.HEX -> return(param.GetWidth().toString() + "'h" + param.imm_value)
+                else -> {
+                    ERROR("Imm type undefined!")
+                    throw Exception()
+                }
+            }
+        }
+    }
+
     fun write(pathname : String) {
 
         // writing interface structures
@@ -499,7 +515,7 @@ class SvWriter(var mod : module) {
                                     + mem.rst_src.GetString()
                                     + "};\n")
                         } else if (mem.vartype.dimensions.size == 1) {
-                            wrFileModule.write("\t\t" + mem.name + " <= " + mem.rst_src.GetString() +";\n")
+                            wrFileModule.write("\t\t" + mem.name + " <= " + GetParamString(mem.rst_src) +";\n")
                         } else if (mem.vartype.dimensions.size == 2) {
                             var power = mem.vartype.dimensions[1].GetWidth()
                             for (k in 0 until power) {
@@ -513,14 +529,25 @@ class SvWriter(var mod : module) {
                                             + "["
                                             + (k + mem.rst_src.GetDimensions()[1].lsb)
                                             + "];\n")
-                                else
-                                    wrFileModule.write("\t\t"
-                                            + mem.name
-                                            + "["
-                                            + (k + mem.vartype.dimensions[1].lsb)
-                                            + "] <= "
-                                            + mem.rst_src.GetString()
-                                            + ";\n")
+                                else if (mem.rst_src.type == PARAM_TYPE.VAL)
+                                    if (mem.rst_src is hw_imm_arr) {
+                                        wrFileModule.write("\t\t"
+                                                + mem.name
+                                                + "["
+                                                + (k + mem.vartype.dimensions[1].lsb)
+                                                + "] <= "
+                                                + GetParamString((mem.rst_src as hw_imm_arr).subimms[k])
+                                                + ";\n")
+                                    } else {
+                                        wrFileModule.write("\t\t"
+                                                + mem.name
+                                                + "["
+                                                + (k + mem.vartype.dimensions[1].lsb)
+                                                + "] <= "
+                                                + GetParamString(mem.rst_src as hw_imm)
+                                                + ";\n")
+                                    }
+                                else ERROR("mem.rst_src.type unrecognized!\n")
                             }
                         } else if (mem.vartype.dimensions.size > 2)
                             ERROR("Large dimensions for mems (reset) are currently not supported!\n")

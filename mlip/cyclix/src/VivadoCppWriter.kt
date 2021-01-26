@@ -386,6 +386,22 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         }
     }
 
+    fun GetParamString(param : hw_param) : String {
+        if (param.type == PARAM_TYPE.VAR) {
+            return param.GetString()
+        } else {
+            when ((param as hw_imm).base_type) {
+                IMM_BASE_TYPE.DEC -> return(param.imm_value)
+                IMM_BASE_TYPE.BIN -> return(param.GetWidth().toString() + "'b" + param.imm_value)
+                IMM_BASE_TYPE.HEX -> return("0x" + param.imm_value)
+                else -> {
+                    ERROR("Imm type undefined!")
+                    throw Exception()
+                }
+            }
+        }
+    }
+
     fun write_module(pathname : String) {
         val wrFileInterface = File(pathname + "/" + cyclix_module.name + ".hpp").writer()
 
@@ -506,7 +522,11 @@ class VivadoCppWriter(var cyclix_module : Generic) {
                 wrFileModule.write("\t\t" + global.name + " = " + global.defval + ";\n")
             } else if (global.vartype.dimensions.size == 2) {
                 for (i in global.vartype.dimensions[1].lsb..global.vartype.dimensions[1].msb) {
-                    wrFileModule.write("\t\t" + global.name + "[" + i + "] = " + global.defval + ";\n")
+                    if (global.defimm is hw_imm_arr) {
+                        wrFileModule.write("\t\t" + global.name + "[" + i + "] = " + GetParamString((global.defimm as hw_imm_arr).subimms[i]) + ";\n")
+                    } else {
+                        wrFileModule.write("\t\t" + global.name + "[" + i + "] = " + GetParamString(global.defimm) + ";\n")
+                    }
                 }
             } else {
                 throw Exception("cyclix: default value assignment error to value " + global.name)
