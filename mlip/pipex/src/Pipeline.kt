@@ -92,6 +92,12 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         new_local.default_astc = this
     }
 
+    fun local(name: String, vartype : hw_type, defimm: hw_imm): hw_local {
+        var ret_var = hw_local(name, vartype, defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun local(name: String, vartype : hw_type, defval: String): hw_local {
         var ret_var = hw_local(name, vartype, defval)
         add_local(ret_var)
@@ -110,8 +116,20 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun ulocal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_local {
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun ulocal(name: String, dimensions: hw_dim_static, defval: String): hw_local {
         var ret_var = hw_local(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun ulocal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_local {
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defimm)
         add_local(ret_var)
         return ret_var
     }
@@ -122,8 +140,20 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun ulocal(name: String, defimm: hw_imm): hw_local {
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.UNSIGNED, defimm.imm_value), defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun ulocal(name: String, defval: String): hw_local {
         var ret_var = hw_local(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun slocal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_local {
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.SIGNED, dimensions), defimm)
         add_local(ret_var)
         return ret_var
     }
@@ -134,8 +164,20 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun slocal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_local {
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun slocal(name: String, msb: Int, lsb: Int, defval: String): hw_local {
         var ret_var = hw_local(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun slocal(name: String, defimm: hw_imm): hw_local {
+        var ret_var = hw_local(name, hw_type(VAR_TYPE.SIGNED, defimm.imm_value), defimm)
         add_local(ret_var)
         return ret_var
     }
@@ -158,6 +200,12 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         new_local_sticky.default_astc = this
     }
 
+    fun local_sticky(name: String, vartype: hw_type, defimm: hw_imm): hw_local_sticky {
+        var ret_var = hw_local_sticky(name, vartype, defimm)
+        add_local_sticky(ret_var)
+        return ret_var
+    }
+
     fun local_sticky(name: String, vartype: hw_type, defval: String): hw_local_sticky {
         var ret_var = hw_local_sticky(name, vartype, defval)
         add_local_sticky(ret_var)
@@ -176,8 +224,20 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun ulocal_sticky(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_local_sticky {
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defimm)
+        add_local_sticky(ret_var)
+        return ret_var
+    }
+
     fun ulocal_sticky(name: String, dimensions: hw_dim_static, defval: String): hw_local_sticky {
         var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
+        add_local_sticky(ret_var)
+        return ret_var
+    }
+
+    fun ulocal_sticky(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_local_sticky {
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defimm)
         add_local_sticky(ret_var)
         return ret_var
     }
@@ -188,8 +248,20 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun ulocal_sticky(name: String, defimm: hw_imm): hw_local_sticky {
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, defimm.imm_value), defimm)
+        add_local_sticky(ret_var)
+        return ret_var
+    }
+
     fun ulocal_sticky(name: String, defval: String): hw_local_sticky {
         var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
+        add_local_sticky(ret_var)
+        return ret_var
+    }
+
+    fun slocal_sticky(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_local_sticky {
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, dimensions), defimm)
         add_local_sticky(ret_var)
         return ret_var
     }
@@ -200,8 +272,20 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun slocal_sticky(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_local_sticky {
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defimm)
+        add_local_sticky(ret_var)
+        return ret_var
+    }
+
     fun slocal_sticky(name: String, msb: Int, lsb: Int, defval: String): hw_local_sticky {
         var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
+        add_local_sticky(ret_var)
+        return ret_var
+    }
+
+    fun slocal_sticky(name: String, defimm: hw_imm): hw_local_sticky {
+        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, defimm.imm_value), defimm)
         add_local_sticky(ret_var)
         return ret_var
     }
@@ -224,6 +308,12 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         new_global.default_astc = this
     }
 
+    fun global(name: String, vartype: hw_type, defimm: hw_imm): hw_global {
+        var ret_var = hw_global(name, vartype, defimm)
+        add_global(ret_var)
+        return ret_var
+    }
+
     fun global(name: String, vartype: hw_type, defval: String): hw_global {
         var ret_var = hw_global(name, vartype, defval)
         add_global(ret_var)
@@ -242,8 +332,20 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun uglobal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_global {
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defimm)
+        add_global(ret_var)
+        return ret_var
+    }
+
     fun uglobal(name: String, dimensions: hw_dim_static, defval: String): hw_global {
         var ret_var = hw_global(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun uglobal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_global {
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defimm)
         add_global(ret_var)
         return ret_var
     }
@@ -254,8 +356,20 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun uglobal(name: String, defimm: hw_imm): hw_global {
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.UNSIGNED, defimm.imm_value), defimm)
+        add_global(ret_var)
+        return ret_var
+    }
+
     fun uglobal(name: String, defval: String): hw_global {
         var ret_var = hw_global(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun sglobal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_global {
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.SIGNED, dimensions), defimm)
         add_global(ret_var)
         return ret_var
     }
@@ -266,8 +380,20 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         return ret_var
     }
 
+    fun sglobal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_global {
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defimm)
+        add_global(ret_var)
+        return ret_var
+    }
+
     fun sglobal(name: String, msb: Int, lsb: Int, defval: String): hw_global {
         var ret_var = hw_global(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun sglobal(name: String, defimm: hw_imm): hw_global {
+        var ret_var = hw_global(name, hw_type(VAR_TYPE.SIGNED, defimm.imm_value), defimm)
         add_global(ret_var)
         return ret_var
     }

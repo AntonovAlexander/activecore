@@ -65,6 +65,12 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: In
         new_local.default_astc = this
     }
 
+    fun local(name: String, vartype : hw_type, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, vartype, defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun local(name: String, vartype : hw_type, defval: String): hw_var {
         var ret_var = hw_var(name, vartype, defval)
         add_local(ret_var)
@@ -83,8 +89,20 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: In
         return ret_var
     }
 
+    fun ulocal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun ulocal(name: String, dimensions: hw_dim_static, defval: String): hw_var {
         var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun ulocal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defimm)
         add_local(ret_var)
         return ret_var
     }
@@ -95,8 +113,20 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: In
         return ret_var
     }
 
+    fun ulocal(name: String, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, defimm.imm_value), defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun ulocal(name: String, defval: String): hw_var {
         var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun slocal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, dimensions), defimm)
         add_local(ret_var)
         return ret_var
     }
@@ -107,8 +137,20 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: In
         return ret_var
     }
 
+    fun slocal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defimm)
+        add_local(ret_var)
+        return ret_var
+    }
+
     fun slocal(name: String, msb: Int, lsb: Int, defval: String): hw_var {
         var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
+        add_local(ret_var)
+        return ret_var
+    }
+
+    fun slocal(name: String, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, defimm.imm_value), defimm)
         add_local(ret_var)
         return ret_var
     }
@@ -131,6 +173,12 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: In
         new_global.default_astc = this
     }
 
+    fun global(name: String, vartype: hw_type, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, vartype, defimm)
+        add_global(ret_var)
+        return ret_var
+    }
+
     fun global(name: String, vartype: hw_type, defval: String): hw_var {
         var ret_var = hw_var(name, vartype, defval)
         add_global(ret_var)
@@ -149,8 +197,20 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: In
         return ret_var
     }
 
+    fun uglobal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defimm)
+        add_global(ret_var)
+        return ret_var
+    }
+
     fun uglobal(name: String, dimensions: hw_dim_static, defval: String): hw_var {
         var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun uglobal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defimm)
         add_global(ret_var)
         return ret_var
     }
@@ -161,8 +221,20 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: In
         return ret_var
     }
 
+    fun uglobal(name: String, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, defimm.imm_value), defimm)
+        add_global(ret_var)
+        return ret_var
+    }
+
     fun uglobal(name: String, defval: String): hw_var {
         var ret_var = hw_var(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun sglobal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, dimensions), defimm)
         add_global(ret_var)
         return ret_var
     }
@@ -173,8 +245,20 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: In
         return ret_var
     }
 
+    fun sglobal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defimm)
+        add_global(ret_var)
+        return ret_var
+    }
+
     fun sglobal(name: String, msb: Int, lsb: Int, defval: String): hw_var {
         var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
+        add_global(ret_var)
+        return ret_var
+    }
+
+    fun sglobal(name: String, defimm: hw_imm): hw_var {
+        var ret_var = hw_var(name, hw_type(VAR_TYPE.SIGNED, defimm.imm_value), defimm)
         add_global(ret_var)
         return ret_var
     }
