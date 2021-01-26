@@ -300,17 +300,17 @@ class RtlGenerator(var cyclix_module : Generic) {
 
         // Generating combinationals
         for (local in cyclix_module.locals)
-            var_dict.put(local, rtl_gen.comb(local.name, local.vartype, local.defval))
+            var_dict.put(local, rtl_gen.comb(local.name, local.vartype, local.defimm))
 
         // Generating globals
         for (global in cyclix_module.globals)
-            var_dict.put(global, rtl_gen.sticky(global.name, global.vartype, global.defval, clk, rst))
+            var_dict.put(global, rtl_gen.sticky(global.name, global.vartype, global.defimm, clk, rst))
 
         // Generating fifo_outs
         for (fifo_out in cyclix_module.fifo_outs) {
             fifo_out_dict.put(fifo_out, fifo_out_descr(
                 rtl_gen.uoutput((fifo_out.name + "_genfifo_req_o"), 0, 0, "0"),
-                rtl_gen.port((fifo_out.name + "_genfifo_wdata_bo"), PORT_DIR.OUT, fifo_out.vartype, fifo_out.defval),
+                rtl_gen.port((fifo_out.name + "_genfifo_wdata_bo"), PORT_DIR.OUT, fifo_out.vartype, fifo_out.defimm),
                 rtl_gen.uinput((fifo_out.name + "_genfifo_ack_i"), 0, 0, "1"),
                 rtl_gen.ucomb((fifo_out.name + "_genfifo_reqbuf_req"), 0, 0, "0")
             ))
@@ -320,11 +320,11 @@ class RtlGenerator(var cyclix_module : Generic) {
         for (fifo_in in cyclix_module.fifo_ins) {
             fifo_in_dict.put(fifo_in, fifo_in_descr(
                 rtl_gen.uinput((fifo_in.name + "_genfifo_req_i"), 0, 0, "0"),
-                rtl_gen.port((fifo_in.name + "_genfifo_rdata_bi"), PORT_DIR.IN, fifo_in.vartype, fifo_in.defval),
+                rtl_gen.port((fifo_in.name + "_genfifo_rdata_bi"), PORT_DIR.IN, fifo_in.vartype, fifo_in.defimm),
                 rtl_gen.ucomb((fifo_in.name + "_genfifo_buf_ack"), 0, 0, "0"),
                 rtl_gen.uoutput((fifo_in.name + "_genfifo_ack_o"), 0, 0, "0"),
                 rtl_gen.ucomb((fifo_in.name + "_genfifo_buf_req"), 0, 0, "0"),
-                rtl_gen.comb((fifo_in.name + "_genfifo_buf_rdata"), fifo_in.vartype, fifo_in.defval)
+                rtl_gen.comb((fifo_in.name + "_genfifo_buf_rdata"), fifo_in.vartype, fifo_in.defimm)
             ))
         }
 
@@ -345,7 +345,7 @@ class RtlGenerator(var cyclix_module : Generic) {
                 if (fifo_if.value is hw_fifo_in) {
 
                     var conn_req        = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_req"), 0, 0, "0")
-                    var conn_wdata      = rtl_gen.comb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_wdata"), fifo_if.value.vartype, fifo_if.value.defval)
+                    var conn_wdata      = rtl_gen.comb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_wdata"), fifo_if.value.vartype, fifo_if.value.defimm)
                     var conn_ack        = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_ack"), 0, 0, "1")
                     var conn_reqbuf_req = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_reqbuf_req"), 0, 0, "0")
 
@@ -363,10 +363,10 @@ class RtlGenerator(var cyclix_module : Generic) {
                 } else if (fifo_if.value is hw_fifo_out) {
 
                     var conn_req        = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_req"), 0, 0, "0")
-                    var conn_rdata      = rtl_gen.comb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_rdata"), fifo_if.value.vartype, fifo_if.value.defval)
+                    var conn_rdata      = rtl_gen.comb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_rdata"), fifo_if.value.vartype, fifo_if.value.defimm)
                     var conn_ack        = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_ack"), 0, 0, "0")
                     var conn_buf_req    = rtl_gen.ucomb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_buf_req"), 0, 0, "0")
-                    var conn_buf_rdata  = rtl_gen.comb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_buf_rdata"), fifo_if.value.vartype, fifo_if.value.defval)
+                    var conn_buf_rdata  = rtl_gen.comb(("gensubmod_" + subproc.value.inst_name + "_" + fifo_if.value.name + "_genfifo_buf_rdata"), fifo_if.value.vartype, fifo_if.value.defimm)
 
                     fifo_internal_out_descrs.put(fifo_if.value.name, fifo_internal_in_descr(
                         conn_req,

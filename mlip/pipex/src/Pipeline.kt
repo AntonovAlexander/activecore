@@ -451,7 +451,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
 
     fun readprev(src : hw_pipex_var) : hw_pipex_var {
         var new_expr = hw_exec(OP_RD_PREV)
-        var genvar = hw_pipex_var(GetGenName("readprev"), src.vartype, src.defval)
+        var genvar = hw_pipex_var(GetGenName("readprev"), src.vartype, src.defimm)
         genvar.default_astc = this
         new_expr.AddRdVar(src)
         new_expr.AddGenVar(genvar)
@@ -524,7 +524,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         } else if (expression.opcode == OP_ASSIGN_SUCC) {
             if (!pstage_info.assign_succ_assocs.containsKey(expression.wrvars[0])) {
                 val req = cyclix_gen.ulocal(GetGenName("syncreq"), 0, 0, "0")
-                val buf = cyclix_gen.local(GetGenName("syncbuf"), expression.wrvars[0].vartype, expression.wrvars[0].defval)
+                val buf = cyclix_gen.local(GetGenName("syncbuf"), expression.wrvars[0].vartype, expression.wrvars[0].defimm)
                 pstage_info.assign_succ_assocs.put((expression.wrvars[0] as hw_pipex_var), __assign_succ_buf(req, buf))
             }
 
@@ -789,7 +789,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
 
                     var req_struct = cyclix_gen.local(GetGenName("req_struct"),
                         mcopipe_if_assoc.req_fifo.vartype,
-                        mcopipe_if_assoc.req_fifo.defval)
+                        mcopipe_if_assoc.req_fifo.defimm)
 
                     cyclix_gen.assign(req_struct, hw_fracs("we"), cmd_translated)
                     cyclix_gen.assign(req_struct, hw_fracs("wdata"), wdata_translated)
@@ -848,7 +848,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
 
                 var req_struct = cyclix_gen.local(GetGenName("req_struct"),
                     scopipe_if_assoc.req_fifo.vartype,
-                    scopipe_if_assoc.req_fifo.defval)
+                    scopipe_if_assoc.req_fifo.defimm)
 
                 cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(scopipe_if_assoc.req_fifo, req_struct))
                 run {
@@ -895,8 +895,8 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
 
         MSG(DEBUG_FLAG, "Processing globals")
         for (global in globals) {
-            var new_global = cyclix_gen.global(("genpsticky_glbl_" + global.name), global.vartype, global.defval)
-            var new_global_buf = cyclix_gen.local(("genpsticky_glbl_" + global.name + "_buf"), global.vartype, global.defval)
+            var new_global = cyclix_gen.global(("genpsticky_glbl_" + global.name), global.vartype, global.defimm)
+            var new_global_buf = cyclix_gen.local(("genpsticky_glbl_" + global.name + "_buf"), global.vartype, global.defimm)
             TranslateInfo.__global_assocs.put(global, __global_info(new_global, new_global_buf))
         }
 
@@ -1061,7 +1061,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         MSG(DEBUG_FLAG, "Processing genvars")
         for (CUR_STAGE_INDEX in 0 until StageList.size) {
             for (genvar in StageList[CUR_STAGE_INDEX].genvars) {
-                var genvar_local = cyclix_gen.local(GetGenName("var"), genvar.vartype, genvar.defval)
+                var genvar_local = cyclix_gen.local(GetGenName("var"), genvar.vartype, genvar.defimm)
                 StageAssocList[CUR_STAGE_INDEX].pContext_local_dict.put(genvar, genvar_local)
             }
         }
@@ -1175,14 +1175,14 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                     var new_local = cyclix_gen.local(
                         (StageAssocList[CUR_STAGE_INDEX].name_prefix + local.name),
                         local.vartype,
-                        local.defval
+                        local.defimm
                     )
                     StageAssocList[CUR_STAGE_INDEX].pContext_local_dict.put(local, new_local)
                 } else if (local is hw_local_sticky) {
                     var new_local = cyclix_gen.global(
                         (StageAssocList[CUR_STAGE_INDEX].name_prefix + local.name),
                         local.vartype,
-                        local.defval
+                        local.defimm
                     )
                     StageAssocList[CUR_STAGE_INDEX].pContext_local_dict.put(local, new_local)
                 }
@@ -1193,7 +1193,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                     var new_global = cyclix_gen.global(
                         (StageAssocList[CUR_STAGE_INDEX].name_prefix + notnew.name + "_genglbl"),
                         notnew.vartype,
-                        notnew.defval)
+                        notnew.defimm)
                     StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict.put(notnew, new_global)
                 }
             }
@@ -1310,7 +1310,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                     cyclix_gen.begif(curStageAssoc.pctrl_new)
                     run {
                         for (sticky_new in local_stickies_new) {
-                            cyclix_gen.assign(curStageAssoc.TranslateVar(sticky_new), hw_imm(sticky_new.defval))
+                            cyclix_gen.assign(curStageAssoc.TranslateVar(sticky_new), sticky_new.defimm)
                         }
                     }; cyclix_gen.endif()
                 }
@@ -1381,11 +1381,11 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                         run {
                             // Dropping transaction context //
                             for (local in curStageAssoc.pContext_local_dict) {
-                                if (local.key is hw_local_sticky) cyclix_gen.assign(local.value, hw_imm(local.value.defval))
+                                if (local.key is hw_local_sticky) cyclix_gen.assign(local.value, local.value.defimm)
                             }
                             for (srcglbl in curStageAssoc.pContext_srcglbl_dict) {
-                                cyclix_gen.assign(srcglbl.value, hw_imm(srcglbl.value.defval))
-                                cyclix_gen.assign(curStageAssoc.TranslateVar(srcglbl.key), hw_imm(srcglbl.value.defval))
+                                cyclix_gen.assign(srcglbl.value, srcglbl.value.defimm)
+                                cyclix_gen.assign(curStageAssoc.TranslateVar(srcglbl.key), srcglbl.value.defimm)
                             }
                         }; cyclix_gen.endif()
                     } else {

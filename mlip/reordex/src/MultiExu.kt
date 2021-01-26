@@ -291,15 +291,15 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
             // Generating locals
             for (local in ExUnit.value.ExecUnit.locals)
-                var_dict.put(local, exu_cyclix_gen.local(local.name, local.vartype, local.defval))
+                var_dict.put(local, exu_cyclix_gen.local(local.name, local.vartype, local.defimm))
 
             // Generating globals
             for (global in ExUnit.value.ExecUnit.globals)
-                var_dict.put(global, exu_cyclix_gen.global(global.name, global.vartype, global.defval))
+                var_dict.put(global, exu_cyclix_gen.global(global.name, global.vartype, global.defimm))
 
             // Generating intermediates
             for (genvar in ExUnit.value.ExecUnit[0].genvars)
-                var_dict.put(genvar, exu_cyclix_gen.local(genvar.name, genvar.vartype, genvar.defval))
+                var_dict.put(genvar, exu_cyclix_gen.local(genvar.name, genvar.vartype, genvar.defimm))
 
             exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict), exu_cyclix_gen.stream_req_var)
 

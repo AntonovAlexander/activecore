@@ -10,7 +10,10 @@ package pipex
 
 import hwast.*
 
-open class hw_pipex_var(name_in : String, vartype : hw_type, defval_in : String) : hw_var(name_in, vartype, defval_in) {
+open class hw_pipex_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_var(name, vartype, defimm) {
+
+    constructor(name : String, vartype : hw_type, defval : String)
+        : this(name, vartype, hw_imm(defval))
 
     fun assign_succ(depow_fractions: hw_fracs, src: hw_param) {
         if (default_astc is Pipeline) (default_astc as Pipeline).assign_succ(depow_fractions, this, src)
@@ -39,11 +42,23 @@ open class hw_pipex_var(name_in : String, vartype : hw_type, defval_in : String)
     }
 }
 
-class hw_local(name_in : String, vartype : hw_type, defval_in : String)
-    : hw_pipex_var(name_in, vartype, defval_in)
+class hw_local(name : String, vartype : hw_type, defimm : hw_imm)
+    : hw_pipex_var(name, vartype, defimm) {
 
-class hw_local_sticky(name_in : String, vartype : hw_type, defval_in : String)
-    : hw_pipex_var(name_in, vartype, defval_in)
+    constructor(name : String, vartype : hw_type, defval : String)
+        : this(name, vartype, hw_imm(defval))
+}
 
-class hw_global(name_in : String, vartype : hw_type, defval_in : String)
-    : hw_pipex_var(name_in, vartype, defval_in)
+class hw_local_sticky(name : String, vartype : hw_type, defimm : hw_imm)
+    : hw_pipex_var(name, vartype, defimm) {
+
+    constructor(name : String, vartype : hw_type, defval : String)
+        : this(name, vartype, hw_imm(defval))
+}
+
+class hw_global(name : String, vartype : hw_type, defimm : hw_imm)
+    : hw_pipex_var(name, vartype, defimm) {
+
+    constructor(name : String, vartype : hw_type, defval : String)
+        : this(name, vartype, hw_imm(defval))
+}
