@@ -26,6 +26,22 @@ open class hw_imm (val dimensions : hw_dim_static, var base_type : IMM_BASE_TYPE
     }
 }
 
+fun hw_imm_zeroes(width: Int) : hw_imm {
+    var valstring = ""
+    for (i in 0 until width) {
+        valstring += "0"
+    }
+    return hw_imm(width, IMM_BASE_TYPE.BIN, valstring)
+}
+
+fun hw_imm_ones(width: Int) : hw_imm {
+    var valstring = ""
+    for (i in 0 until width) {
+        valstring += "1"
+    }
+    return hw_imm(width, IMM_BASE_TYPE.BIN, valstring)
+}
+
 class hw_imm_arr (dimensions : hw_dim_static) : hw_imm(dimensions, IMM_BASE_TYPE.DEC, "0") {
 
     var subimms = ArrayList<hw_imm>()

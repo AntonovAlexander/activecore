@@ -219,9 +219,9 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         prf_dim.add(MultiExu_cfg_rf.PRF_depth-1, 0)
         var PRF = cyclix_gen.uglobal("genPRF", prf_dim, "0")
 
-        var PRF_mapped = cyclix_gen.uglobal("genPRF_mapped", MultiExu_cfg_rf.PRF_depth-1, 0, hw_imm(MultiExu_cfg_rf.ARF_depth, IMM_BASE_TYPE.HEX, "FFFF"))   // TODO: calculate defval
+        var PRF_mapped = cyclix_gen.uglobal("genPRF_mapped", MultiExu_cfg_rf.PRF_depth-1, 0, hw_imm_ones(MultiExu_cfg_rf.ARF_depth))
 
-        var PRF_rdy = cyclix_gen.uglobal("genPRF_rdy", MultiExu_cfg_rf.PRF_depth-1, 0, 0xFFFFFFFF.toString(10))
+        var PRF_rdy = cyclix_gen.uglobal("genPRF_rdy", MultiExu_cfg_rf.PRF_depth-1, 0, hw_imm_ones(MultiExu_cfg_rf.PRF_depth))
 
         var arf_map_dim = hw_dim_static()
         arf_map_dim.add(MultiExu_cfg_rf.PRF_addr_width-1, 0)
