@@ -13,15 +13,15 @@ import java.lang.Exception
 
 class RtlGenerator(var cyclix_module : Generic) {
 
-    class fifo_out_descr (val ext_req      : rtl.hw_port,
-                          val ext_wdata    : rtl.hw_port,
-                          val ext_ack      : rtl.hw_port,
+    class fifo_out_descr (val ext_req      : hw_port,
+                          val ext_wdata    : hw_port,
+                          val ext_ack      : hw_port,
                           var reqbuf_req   : hw_var)
 
-    class fifo_in_descr  (val ext_req      : rtl.hw_port,
-                          val ext_rdata    : rtl.hw_port,
+    class fifo_in_descr  (val ext_req      : hw_port,
+                          val ext_rdata    : hw_port,
                           val buf_ack      : hw_var,
-                          val ext_ack      : rtl.hw_port,
+                          val ext_ack      : hw_port,
                           var buf_req      : hw_var,
                           var buf_rdata    : hw_var)
 
@@ -57,7 +57,7 @@ class RtlGenerator(var cyclix_module : Generic) {
 
     fun export_expr(rtl_gen : hw_astc,
                     expr : hw_exec,
-                    rst : rtl.hw_port) {
+                    rst : hw_port) {
 
         println("#### Cyclix: exporting expression: " + expr.opcode.default_string)
         // for (param in expr.params) println("param: " + param.GetString())
@@ -310,7 +310,7 @@ class RtlGenerator(var cyclix_module : Generic) {
         for (fifo_out in cyclix_module.fifo_outs) {
             fifo_out_dict.put(fifo_out, fifo_out_descr(
                 rtl_gen.uoutput((fifo_out.name + "_genfifo_req_o"), 0, 0, "0"),
-                rtl_gen.port((fifo_out.name + "_genfifo_wdata_bo"), rtl.PORT_DIR.OUT, fifo_out.vartype, fifo_out.defval),
+                rtl_gen.port((fifo_out.name + "_genfifo_wdata_bo"), PORT_DIR.OUT, fifo_out.vartype, fifo_out.defval),
                 rtl_gen.uinput((fifo_out.name + "_genfifo_ack_i"), 0, 0, "1"),
                 rtl_gen.ucomb((fifo_out.name + "_genfifo_reqbuf_req"), 0, 0, "0")
             ))
@@ -320,7 +320,7 @@ class RtlGenerator(var cyclix_module : Generic) {
         for (fifo_in in cyclix_module.fifo_ins) {
             fifo_in_dict.put(fifo_in, fifo_in_descr(
                 rtl_gen.uinput((fifo_in.name + "_genfifo_req_i"), 0, 0, "0"),
-                rtl_gen.port((fifo_in.name + "_genfifo_rdata_bi"), rtl.PORT_DIR.IN, fifo_in.vartype, fifo_in.defval),
+                rtl_gen.port((fifo_in.name + "_genfifo_rdata_bi"), PORT_DIR.IN, fifo_in.vartype, fifo_in.defval),
                 rtl_gen.ucomb((fifo_in.name + "_genfifo_buf_ack"), 0, 0, "0"),
                 rtl_gen.uoutput((fifo_in.name + "_genfifo_ack_o"), 0, 0, "0"),
                 rtl_gen.ucomb((fifo_in.name + "_genfifo_buf_req"), 0, 0, "0"),

@@ -12,5 +12,9 @@ enum class PORT_DIR {
     IN,	OUT, INOUT
 }
 
-class hw_port(name : String, var port_dir : PORT_DIR, vartype : hw_type, defval : String)
-    : hw_var(name, vartype, defval)
+class hw_port(name : String, var port_dir : PORT_DIR, vartype : hw_type, defimm : hw_imm)
+    : hw_var(name, vartype, defimm) {
+
+    constructor(name : String, port_dir : PORT_DIR, vartype : hw_type, defval : String)
+            : this(name, port_dir, vartype, hw_imm(defval))
+}

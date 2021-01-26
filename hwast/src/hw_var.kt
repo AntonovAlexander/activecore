@@ -36,6 +36,9 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     constructor(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int, defval: String)
             : this(name, hw_type(VarType, msb, lsb), defval)
 
+    constructor(name: String, VarType: VAR_TYPE, defimm : hw_imm)
+            : this(name, hw_type(VarType, defimm.imm_value), defimm)
+
     constructor(name: String, VarType: VAR_TYPE, defval: String)
             : this(name, hw_type(VarType, defval), defval)
 

@@ -1515,6 +1515,12 @@ open class hw_astc_stdif() : hw_astc() {
         new_port.default_astc = this
     }
 
+    fun port(name : String, port_dir : PORT_DIR, vartype : hw_type, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, port_dir, vartype, defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun port(name : String, port_dir : PORT_DIR, vartype : hw_type, defval : String) : hw_port {
         var ret_var = hw_port(name, port_dir, vartype, defval)
         add_port(ret_var)
@@ -1533,8 +1539,20 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
+    fun uport(name : String, port_dir : PORT_DIR, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.UNSIGNED, dimensions), defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun uport(name : String, port_dir : PORT_DIR, dimensions : hw_dim_static, defval : String) : hw_port {
         var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun uport(name : String, port_dir : PORT_DIR, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defimm)
         add_port(ret_var)
         return ret_var
     }
@@ -1545,8 +1563,20 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
+    fun uport(name : String, port_dir : PORT_DIR, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.UNSIGNED, defimm.imm_value), defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun uport(name : String, port_dir : PORT_DIR, defval : String) : hw_port {
         var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun sport(name : String, port_dir : PORT_DIR, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.SIGNED, dimensions), defimm)
         add_port(ret_var)
         return ret_var
     }
@@ -1557,14 +1587,32 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
+    fun sport(name : String, port_dir : PORT_DIR, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.SIGNED, msb, lsb), defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun sport(name : String, port_dir : PORT_DIR, msb: Int, lsb: Int, defval : String) : hw_port {
         var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
+    fun sport(name : String, port_dir : PORT_DIR, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.SIGNED, defimm.imm_value), defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun sport(name : String, port_dir : PORT_DIR, defval : String) : hw_port {
         var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.SIGNED, defval), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun input(name : String, vartype : hw_type, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.IN, vartype, defimm)
         add_port(ret_var)
         return ret_var
     }
@@ -1587,8 +1635,20 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
+    fun uinput(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.UNSIGNED, dimensions), defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun uinput(name : String, dimensions : hw_dim_static, defval : String) : hw_port {
         var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun uinput(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defimm)
         add_port(ret_var)
         return ret_var
     }
@@ -1599,8 +1659,20 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
+    fun uinput(name : String, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.UNSIGNED, defimm.imm_value), defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun uinput(name : String, defval : String) : hw_port {
         var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun sinput(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.SIGNED, dimensions), defimm)
         add_port(ret_var)
         return ret_var
     }
@@ -1611,8 +1683,20 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
+    fun sinput(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.SIGNED, msb, lsb), defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun sinput(name : String, msb: Int, lsb: Int, defval : String) : hw_port {
         var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun sinput(name : String, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.SIGNED, defimm.imm_value), defimm)
         add_port(ret_var)
         return ret_var
     }
@@ -1623,13 +1707,19 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
+    fun output(name : String, vartype : hw_type, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.OUT, vartype, defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun output(name : String, vartype : hw_type, defval : String) : hw_port {
         var ret_var = hw_port(name, PORT_DIR.OUT, vartype, defval)
         add_port(ret_var)
         return ret_var
     }
 
-    fun output(name : String, src_struct_in : hw_struct ,dimensions : hw_dim_static) : hw_port {
+    fun output(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_port {
         var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(src_struct_in, dimensions), "0")
         add_port(ret_var)
         return ret_var
@@ -1641,8 +1731,20 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
+    fun uoutput(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.UNSIGNED, dimensions), defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun uoutput(name : String, dimensions : hw_dim_static, defval : String) : hw_port {
         var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun uoutput(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defimm)
         add_port(ret_var)
         return ret_var
     }
@@ -1653,8 +1755,20 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
+    fun uoutput(name : String, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.UNSIGNED, defimm.imm_value), defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun uoutput(name : String, defval : String) : hw_port {
         var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun soutput(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.SIGNED, dimensions), defimm)
         add_port(ret_var)
         return ret_var
     }
@@ -1665,14 +1779,80 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
+    fun soutput(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.SIGNED, msb, lsb), defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun soutput(name : String, msb: Int, lsb: Int, defval : String) : hw_port {
         var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
+    fun soutput(name : String, defimm : hw_imm) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.SIGNED, defimm.imm_value), defimm)
+        add_port(ret_var)
+        return ret_var
+    }
+
     fun soutput(name : String, defval : String) : hw_port {
         var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.SIGNED, defval), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun inout(name : String, vartype : hw_type, defval : String) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.INOUT, vartype, defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun inout(name : String, src_struct : hw_struct ,dimensions : hw_dim_static) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(src_struct, dimensions), "0")
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun inout(name : String, src_struct : hw_struct) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(src_struct), "0")
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun uinout(name : String, dimensions : hw_dim_static, defval : String) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun uinout(name : String, msb: Int, lsb: Int, defval : String) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun uinout(name : String, defval : String) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun sinout(name : String, dimensions : hw_dim_static, defval : String) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun sinout(name : String, msb: Int, lsb: Int, defval : String) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
+        add_port(ret_var)
+        return ret_var
+    }
+
+    fun sinout(name : String, defval : String) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.SIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
