@@ -511,7 +511,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         wrFileModule.write("\tif (geninit) {\n")
         for (global in cyclix_module.globals) {
             if (global.vartype.dimensions.size < 2) {
-                wrFileModule.write("\t\t" + global.name + " = " + global.defval + ";\n")
+                wrFileModule.write("\t\t" + global.name + " = " + GetParamString(global.defimm) + ";\n")
             } else if (global.vartype.dimensions.size == 2) {
                 for (i in global.vartype.dimensions[1].lsb..global.vartype.dimensions[1].msb) {
                     if (global.defimm is hw_imm_arr) {
