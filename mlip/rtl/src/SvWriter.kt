@@ -15,12 +15,6 @@ class SvWriter(var mod : module) {
 
     var tab_Counter = 0
 
-    fun getStringWithDim(param : hw_param) : String
-    {
-        if (param.type == PARAM_TYPE.VAR) return param.token_printable
-        else return (param.vartype.dimensions[0].GetWidth().toString() + "'d" + param.token_printable)
-    }
-
     fun getStringAssignDefval(tgt: hw_var, src : String) : String
     {
         if (tgt.vartype.VarType == VAR_TYPE.STRUCTURED) {
@@ -189,7 +183,7 @@ class SvWriter(var mod : module) {
                     wrFile.write(expr.wrvars[0].name +
                             dimstring +
                             " = '{default:" +
-                            getStringWithDim(expr.params[0]) +
+                            GetParamString(expr.params[0]) +
                             "};\n")
                 } else ERROR("assignment error")
             } else {
@@ -197,7 +191,7 @@ class SvWriter(var mod : module) {
                         dimstring +
                         " = " +
                         opstring +
-                        getStringWithDim(expr.params[0]) +
+                        GetParamString(expr.params[0]) +
                         ";\n")
             }
 
@@ -227,35 +221,35 @@ class SvWriter(var mod : module) {
             wrFile.write(expr.wrvars[0].name +
                     dimstring +
                     " = (" +
-                    getStringWithDim(expr.params[0]) +
+                    GetParamString(expr.params[0]) +
                     " " +
                     opstring +
                     " " +
-                    getStringWithDim(expr.params[1]) +
+                    GetParamString(expr.params[1]) +
                     ");\n")
 
         } else if (expr.opcode == OP2_INDEXED) {
             wrFile.write(expr.wrvars[0].name +
                     " = " +
-                    expr.params[0].GetString() +
+                    GetParamString(expr.params[0]) +
                     "[" +
-                    expr.params[1].GetString() +
+                    GetParamString(expr.params[1]) +
                     "];\n")
 
         } else if (expr.opcode == OP3_RANGED) {
             wrFile.write(expr.wrvars[0].name +
                     " = " +
-                    expr.params[0].GetString() +
+                    GetParamString(expr.params[0]) +
                     "[" +
-                    expr.params[1].GetString() +
+                    GetParamString(expr.params[1]) +
                     ":" +
-                    expr.params[2].GetString() +
+                    GetParamString(expr.params[2]) +
                     "];\n")
 
         } else if (expr.opcode == OP2_SUBSTRUCT) {
             wrFile.write(expr.wrvars[0].name +
                     " = " +
-                    expr.params[0].GetString() +
+                    GetParamString(expr.params[0]) +
                     "." +
                     expr.subStructvar_name +
                     ";\n")
@@ -264,7 +258,7 @@ class SvWriter(var mod : module) {
             var cnct_string = "{"
             for (i in 0 until expr.params.size) {
                 if (i != 0) cnct_string += ", "
-                cnct_string += getStringWithDim(expr.params[i])
+                cnct_string += GetParamString(expr.params[i])
             }
             cnct_string += "}"
             wrFile.write(expr.wrvars[0].name +
@@ -273,7 +267,7 @@ class SvWriter(var mod : module) {
                     ";\n")
 
         } else if (expr.opcode == OP1_IF) {
-            wrFile.write("if (" + expr.params[0].GetString() + ")\n")
+            wrFile.write("if (" + GetParamString(expr.params[0]) + ")\n")
             tab_Counter++
             PrintTab(wrFile)
             wrFile.write("begin\n")
@@ -286,12 +280,12 @@ class SvWriter(var mod : module) {
 
         } else if (expr.opcode == OP1_CASE) {
 
-            wrFile.write("case (" + expr.params[0].GetString() + ")\n")
+            wrFile.write("case (" + GetParamString(expr.params[0]) + ")\n")
             tab_Counter++
 
             for (casebranch in expr.expressions) {
                 PrintTab(wrFile)
-                wrFile.write(casebranch.params[0].GetString() + ":\n")
+                wrFile.write(GetParamString(casebranch.params[0]) + ":\n")
                 tab_Counter++
                 PrintTab(wrFile)
                 wrFile.write("begin\n")
@@ -307,7 +301,7 @@ class SvWriter(var mod : module) {
             wrFile.write("endcase\n")
 
         } else if (expr.opcode == OP1_WHILE) {
-            wrFile.write("while (" + expr.params[0].GetString() + " == 1'b1)\n")
+            wrFile.write("while (" + GetParamString(expr.params[0]) + " == 1'b1)\n")
             tab_Counter++
             PrintTab(wrFile)
             wrFile.write("begin\n")
@@ -512,7 +506,7 @@ class SvWriter(var mod : module) {
                             wrFileModule.write("\t\t"
                                     + mem.name
                                     + " <= '{default:"
-                                    + mem.rst_src.GetString()
+                                    + GetParamString(mem.rst_src)
                                     + "};\n")
                         } else if (mem.vartype.dimensions.size == 1) {
                             wrFileModule.write("\t\t" + mem.name + " <= " + GetParamString(mem.rst_src) +";\n")
@@ -525,7 +519,7 @@ class SvWriter(var mod : module) {
                                             + "["
                                             + (k + mem.vartype.dimensions[1].lsb)
                                             + "] <= "
-                                            + mem.rst_src.GetString()
+                                            + GetParamString(mem.rst_src)
                                             + "["
                                             + (k + mem.rst_src.GetDimensions()[1].lsb)
                                             + "];\n")
@@ -561,7 +555,7 @@ class SvWriter(var mod : module) {
                             wrFileModule.write("\t\t"
                                     + mem.name
                                     + " <= "
-                                    + mem_src.sync_src.GetString()
+                                    + GetParamString(mem_src.sync_src)
                                     + ";\n")
                         } else if (mem.vartype.dimensions.size == 2) {
                             var power = mem.vartype.dimensions[1].GetWidth()
@@ -572,7 +566,7 @@ class SvWriter(var mod : module) {
                                             + "["
                                             + (k + mem.vartype.dimensions[1].lsb)
                                             + "] <= "
-                                            + mem_src.sync_src.GetString()
+                                            + GetParamString(mem_src.sync_src)
                                             + "["
                                             + (k + mem_src.sync_src.GetDimensions()[1].lsb)
                                             + "];\n")
@@ -582,7 +576,7 @@ class SvWriter(var mod : module) {
                                             + "["
                                             + (k + mem.vartype.dimensions[1].lsb)
                                             + "] <= "
-                                            + mem_src.sync_src.GetString()
+                                            + GetParamString(mem_src.sync_src)
                                             + ";\n")
                             }
                         } else if (mem.vartype.dimensions.size > 2)
@@ -592,7 +586,7 @@ class SvWriter(var mod : module) {
                                 wrFileModule.write("\t\t"
                                         + mem.name
                                         + " <= "
-                                        + mem_src.sync_src.GetString()
+                                        + GetParamString(mem_src.sync_src)
                                         + ";\n")
                             } else
                                 ERROR("Undimensioned mems (data) are currently not supported!\n")
@@ -607,7 +601,7 @@ class SvWriter(var mod : module) {
                                 + ") "
                                 + mem.name
                                 + " <= "
-                                + mem_src.sync_src.GetString()
+                                + GetParamString(mem_src.sync_src)
                                 + ";\n")
                     }
                 }
@@ -622,7 +616,7 @@ class SvWriter(var mod : module) {
             var subm_preambule = ""
             wrFileModule.write(submodule.value.src_module.name + " " + submodule.value.inst_name + " (\n")
             for (conn in submodule.value.Connections) {
-                wrFileModule.write("\t" + subm_preambule + "." + conn.key.name + "(" + conn.value.GetString() + ")\n")
+                wrFileModule.write("\t" + subm_preambule + "." + conn.key.name + "(" + GetParamString(conn.value) + ")\n")
                 subm_preambule = ", "
             }
             wrFileModule.write(");\n\n")

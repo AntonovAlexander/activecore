@@ -15,15 +15,6 @@ class VivadoCppWriter(var cyclix_module : Generic) {
 
     var tab_Counter = 0
 
-    fun getStringWithDim(param : hw_param) : String
-    {
-        if (param is hw_imm) {
-            if (param.dimensions.size > 1) throw Exception("cyclix: param print error")
-            return "ap_uint<" + param.dimensions[0].GetWidth() + ">(" + param.imm_value + ")"
-        }
-        return param.GetString()
-    }
-
     fun getDimString(in_range : hw_dim_range_static) : String
     {
         return ("[" + in_range.msb.toString() + ":" + in_range.lsb.toString() + "]")
@@ -125,13 +116,13 @@ class VivadoCppWriter(var cyclix_module : Generic) {
 
     fun append_cnct(expr : hw_exec, index : Int, str : String) : String {
         var cnct_string = ""
-        if (index == expr.params.lastIndex) cnct_string = str + getStringWithDim(expr.params[index])
+        if (index == expr.params.lastIndex) cnct_string = str + GetParamString(expr.params[index])
         else {
             // TODO: length cleanup
             var length = 0
             for (i in (index + 1) until expr.params.size) length += expr.params[i].vartype.dimensions[0].GetWidth()
             cnct_string = str +
-                    getStringWithDim(expr.params[index]) +
+                    GetParamString(expr.params[index]) +
                     ".concat((ap_uint<" + length + ">)" + append_cnct(expr, (index + 1), cnct_string) + ")"
         }
         return cnct_string
@@ -222,7 +213,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
                     wrFile.write(expr.wrvars[0].name +
                             dimstring +
                             " = '{default:" +
-                            getStringWithDim(expr.params[0]) +
+                            GetParamString(expr.params[0]) +
                             "};\n")
                 } else ERROR("assignment error")
             } else {
@@ -230,7 +221,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
                         dimstring +
                         " = " +
                         opstring +
-                        getStringWithDim(expr.params[0]) +
+                        GetParamString(expr.params[0]) +
                         ";\n")
             }
 
@@ -260,11 +251,11 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             wrFile.write(expr.wrvars[0].name +
                     dimstring +
                     " = (" +
-                    getStringWithDim(expr.params[0]) +
+                    GetParamString(expr.params[0]) +
                     " " +
                     opstring +
                     " " +
-                    getStringWithDim(expr.params[1]) +
+                    GetParamString(expr.params[1]) +
                     ");\n")
 
         } else if (expr.opcode == OP2_INDEXED) {
@@ -390,8 +381,9 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         if (param.type == PARAM_TYPE.VAR) {
             return param.GetString()
         } else {
+            if ((param as hw_imm).dimensions.size > 1) throw Exception("cyclix: param print error")
             when ((param as hw_imm).base_type) {
-                IMM_BASE_TYPE.DEC -> return(param.imm_value)
+                IMM_BASE_TYPE.DEC -> return("ap_uint<" + param.dimensions[0].GetWidth() + ">(" + param.imm_value + ")")
                 IMM_BASE_TYPE.BIN -> return(param.GetWidth().toString() + "'b" + param.imm_value)
                 IMM_BASE_TYPE.HEX -> return("0x" + param.imm_value)
                 else -> {
