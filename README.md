@@ -3,7 +3,7 @@
 
 ### Project description
 
-ActiveCore is a framework that demonstrates original hardware designing concept based on **"Micro-Language IP" (MLIP) cores**.
+ActiveCore is a framework that demonstrates original hardware designing concept based on **"Micro-Language IP"/"Microarchitecture-Level IP" (MLIP) cores**.
 
 MLIP core is a hardware generator that provides custom synthesizable execution kernel constructed in accordance to certain microarchitectural template. Selective functions of the microarchitecture are exposed for design-time behavioral-style programming, with scheduling, communication and synchronization "services" of the microarchitecture manageable using MLIP-specific API. I.e., each MLIP core offers custom computational model that reflects computational process organization inside a hardware microarchitecture.
 
@@ -26,11 +26,11 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
 
-	* **cyclix** (**cycli**c e**x**ecution) - generator of statically scheduled cyclic processing hardware targeting RTL and HLS flows. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Vivado HLS
+	* **cyclix** (**cycli**c e**x**ecution) - generator of hardware performing statically scheduled cyclic computations. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Vivado HLS
 
 	* **pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
 
-	* **reordex** (**reorde**red e**x**ecution, *in development*) - generator of co-processors with superscalar out-of-order microarchitecture and register renaming. Translates to cyclix MLIP
+	* **reordex** (**reorde**red e**x**ecution) - generator of co-processors with superscalar out-of-order microarchitecture and register renaming. Translates to cyclix MLIP
 
 * core generators based on MLIP cores (/designs/coregen):
 
