@@ -158,6 +158,7 @@ module arb_2m3s
 					s2.wdata 	= m0.wdata;
 					m0.ack 		= s2.ack;
 					m0_s2_rd_inprogress_next = !m0.we;
+					s2_busy = 1'b1;
 					end
 				end
 			else if (m0.addr[SFR_BITSEL])
@@ -171,6 +172,7 @@ module arb_2m3s
 					s1.wdata 	= m0.wdata;
 					m0.ack 		= s1.ack;
 					m0_s1_rd_inprogress_next = !m0.we;
+					s1_busy = 1'b1;
 					end
 				end
 			else
@@ -184,6 +186,7 @@ module arb_2m3s
 					s0.wdata 	= m0.wdata;
 					m0.ack 		= s0.ack;
 					m0_s0_rd_inprogress_next = !m0.we;
+					s0_busy = 1'b1;
 					end
 				end
 			end
@@ -201,6 +204,7 @@ module arb_2m3s
 					s2.wdata 	= m1.wdata;
 					m1.ack 		= s2.ack;
 					m1_s2_rd_inprogress_next = !m1.we;
+					s2_busy = 1'b1;
 					end
 				end
 			else if (m1.addr[SFR_BITSEL])
@@ -214,6 +218,7 @@ module arb_2m3s
 					s1.wdata 	= m1.wdata;
 					m1.ack 		= s1.ack;
 					m1_s1_rd_inprogress_next = !m1.we;
+					s1_busy = 1'b1;
 					end
 				end
 			else
@@ -227,6 +232,7 @@ module arb_2m3s
 					s0.wdata 	= m1.wdata;
 					m1.ack 		= s0.ack;
 					m1_s0_rd_inprogress_next = !m1.we;
+					s0_busy = 1'b1;
 					end
 				end
 			end
