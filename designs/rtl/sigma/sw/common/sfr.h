@@ -10,6 +10,7 @@
 
 #define SFR_TIMER_CTRL      (*(volatile unsigned int *)(0x00100020))
 #define SFR_TIMER_PERIOD    (*(volatile unsigned int *)(0x00100024))
+#define SFR_TIMER_VALUE     (*(volatile unsigned int *)(0x00100028))
 
 #define TIMER_START_FLAG    0x1
 #define TIMER_RELOAD_FLAG   0x2
