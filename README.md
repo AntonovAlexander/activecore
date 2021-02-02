@@ -26,7 +26,7 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
 
-	* **cyclix** (**cycli**c e**x**ecution) - generator of hardware performing statically scheduled cyclic computations. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Vivado HLS
+	* **cyclix** (**cycli**c e**x**ecution) - generator of hardware performing statically scheduled cyclic computations. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Xilinx HLS
 
 	* **pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
 

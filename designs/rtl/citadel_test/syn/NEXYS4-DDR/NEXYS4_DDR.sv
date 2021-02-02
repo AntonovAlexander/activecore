@@ -111,6 +111,7 @@ logic [31:0] citadel_databuf;
 citadel_gen citadel_inst (
 	.clk_i(clk_gen)
 	, .rst_i(srst)
+	
 	, .cmd_req_genfifo_req_i(cmd_req_genfifo_req)
 	, .cmd_req_genfifo_rdata_bi(cmd_req_genfifo_data)
 	, .cmd_req_genfifo_ack_o(cmd_req_genfifo_ack)
