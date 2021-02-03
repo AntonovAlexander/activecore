@@ -537,6 +537,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     rss_tags.add(cyclix_gen.indexed(ARF_map, cyclix_gen.subStruct(cmd_req_data, "fu_rs" + RF_rs_idx)))
                 }
                 var rd_tag = cyclix_gen.indexed(ARF_map, cyclix_gen.subStruct(cmd_req_data, "fu_rd"))
+                var rf_addr_tag = cyclix_gen.indexed(ARF_map, cyclix_gen.subStruct(cmd_req_data, "rf_addr"))
 
                 cyclix_gen.assign(
                     rob_wr_uop,
@@ -645,7 +646,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                         cyclix_gen.assign(
                             rob_wr_uop,
                             hw_fracs(hw_frac_SubStruct("rd_tag_prev")),
-                            cyclix_gen.indexed(ARF_map, cyclix_gen.subStruct(cmd_req_data, "rf_addr")))
+                            rf_addr_tag)
                         cyclix_gen.assign(
                             rob_wr_uop,
                             hw_fracs(hw_frac_SubStruct("rd_tag_prev_clr")),
@@ -677,7 +678,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                         cyclix_gen.assign(
                             rob_wr_uop,
                             hw_fracs(hw_frac_SubStruct("rs0_rdy")),
-                            cyclix_gen.indexed(PRF_rdy, cyclix_gen.subStruct(cmd_req_data, "fu_rs0")))
+                            cyclix_gen.indexed(PRF_rdy, rf_addr_tag))
 
                         for (RF_rs_idx in 1 until Exu_cfg_rf.RF_rs_num) {
                             cyclix_gen.assign(
@@ -699,7 +700,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                         cyclix_gen.assign(
                             rob_wr_uop,
                             hw_fracs(hw_frac_SubStruct("wb_wdata")),
-                            cyclix_gen.indexed(PRF, cyclix_gen.indexed(ARF_map, cyclix_gen.subStruct(cmd_req_data, "rf_addr"))))
+                            cyclix_gen.indexed(PRF, rf_addr_tag))
 
                         cyclix_gen.assign(rob_wr, 1)
                     }; cyclix_gen.endif()

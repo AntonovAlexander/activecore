@@ -93,7 +93,8 @@ localparam CSR_CITADEL_FU_ID_ADDR       = 32'h10000014;
 localparam CSR_CITADEL_FU_OPCODE_ADDR   = 32'h10000018;
 localparam CSR_CITADEL_FU_RS0_ADDR      = 32'h1000001C;
 localparam CSR_CITADEL_FU_RS1_ADDR      = 32'h10000020;
-localparam CSR_CITADEL_FU_RD_ADDR       = 32'h10000024;
+localparam CSR_CITADEL_FU_RS2_ADDR      = 32'h10000024;
+localparam CSR_CITADEL_FU_RD_ADDR       = 32'h10000028;
 
 localparam CSR_CITADEL_RDATA_ADDR       = 32'h10000040;
 
@@ -194,7 +195,12 @@ always @(posedge clk_gen)
                 testmem_udm_addr <= udm_addr[31:2];     // 4-byte aligned access only
                 testmem_udm_wdata <= udm_wdata;
                 end
-            if (udm_addr == CSR_CITADEL_CTRL_ADDR)      cmd_req_genfifo_req <= udm_wdata[0];
+            if (udm_addr == CSR_CITADEL_CTRL_ADDR)      begin
+                                                        cmd_req_genfifo_req <= udm_wdata[0];
+                                                        cmd_req_genfifo_data.fu_rs0_req <= udm_wdata[1];
+                                                        cmd_req_genfifo_data.fu_rs1_req <= udm_wdata[2];
+                                                        cmd_req_genfifo_data.fu_rs2_req <= udm_wdata[3];
+                                                        end
             if (udm_addr == CSR_CITADEL_EXEC_ADDR)      cmd_req_genfifo_data.exec <= udm_wdata;
             if (udm_addr == CSR_CITADEL_RF_WE_ADDR)     cmd_req_genfifo_data.rf_we <= udm_wdata;
             if (udm_addr == CSR_CITADEL_RF_ADDR_ADDR)   cmd_req_genfifo_data.rf_addr <= udm_wdata;
@@ -203,6 +209,7 @@ always @(posedge clk_gen)
             if (udm_addr == CSR_CITADEL_FU_OPCODE_ADDR) cmd_req_genfifo_data.fu_opcode <= udm_wdata;
             if (udm_addr == CSR_CITADEL_FU_RS0_ADDR)    cmd_req_genfifo_data.fu_rs0 <= udm_wdata;
             if (udm_addr == CSR_CITADEL_FU_RS1_ADDR)    cmd_req_genfifo_data.fu_rs1 <= udm_wdata;
+            if (udm_addr == CSR_CITADEL_FU_RS2_ADDR)    cmd_req_genfifo_data.fu_rs2 <= udm_wdata;
             if (udm_addr == CSR_CITADEL_FU_RD_ADDR)     cmd_req_genfifo_data.fu_rd <= udm_wdata;
             end
         
