@@ -57,10 +57,13 @@ task WAIT
     end
 endtask
 
-task CMD
+typedef enum logic unsigned [0:0] { RF=1'b0, EXEC=1'b1 } CMD;
+typedef enum logic unsigned [0:0] { RD=1'b0, WR=1'b1 } RF_CMD;
+
+task INIT_CMD
 	(
-		input logic unsigned [0:0] exec
-		, input logic unsigned [0:0] rf_we
+		input CMD
+		, input RF_CMD
 		, input logic unsigned [4:0] rf_addr
 		, input logic unsigned [31:0] rf_wdata
 		, input logic unsigned [1:0] fu_id
@@ -70,8 +73,8 @@ task CMD
 	);
 	begin
 	cmd_req_genfifo_req <= 1'b1;
-	cmd_req_genfifo_data.exec <= exec;
-	cmd_req_genfifo_data.rf_we <= rf_we;
+	cmd_req_genfifo_data.exec <= CMD;
+	cmd_req_genfifo_data.rf_we <= RF_CMD;
 	cmd_req_genfifo_data.rf_addr <= rf_addr;
 	cmd_req_genfifo_data.rf_wdata <= rf_wdata;
 	cmd_req_genfifo_data.fu_id <= fu_id;
@@ -86,12 +89,6 @@ task CMD
 	end
 endtask
 
-localparam exec_EXEC = 1'b1;
-localparam exec_RF   = 1'b0;
-localparam RF_RD = 1'b0;
-localparam RF_WR = 1'b1;
-
-
 task CMD_EXEC
 	(
 		input logic unsigned [1:0] fu_id
@@ -100,7 +97,7 @@ task CMD_EXEC
 		, input logic unsigned [4:0] fu_rd
 	);
 	begin
-	CMD(exec_EXEC, 0, 0, 0, fu_id, fu_rs0, fu_rs1, fu_rd);
+	INIT_CMD(EXEC, RD, 0, 0, fu_id, fu_rs0, fu_rs1, fu_rd);
 	end
 endtask
 
@@ -110,7 +107,7 @@ task CMD_RF_LOAD
 		, input logic unsigned [31:0] rf_wdata
 	);
 	begin
-	CMD(exec_RF, RF_WR, rf_addr, rf_wdata, 0, 0, 0, 0);
+	INIT_CMD(RF, WR, rf_addr, rf_wdata, 0, 0, 0, 0);
 	end
 endtask
 
@@ -119,7 +116,7 @@ task CMD_RF_STORE
 		input logic unsigned [4:0] rf_addr
 	);
 	begin
-	CMD(exec_RF, RF_RD, rf_addr, 32'hdeadbeef, 0, 0, 0, 0);
+	INIT_CMD(RF, RD, rf_addr, 32'hdeadbeef, 0, 0, 0, 0);
 	end
 endtask
 
