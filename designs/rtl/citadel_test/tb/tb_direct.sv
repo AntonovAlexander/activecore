@@ -67,8 +67,12 @@ task INIT_CMD
 		, input logic unsigned [4:0] rf_addr
 		, input logic unsigned [31:0] rf_wdata
 		, input logic unsigned [1:0] fu_id
+		, input logic unsigned [0:0] fu_rs0_req
 		, input logic unsigned [4:0] fu_rs0
+		, input logic unsigned [0:0] fu_rs1_req
 		, input logic unsigned [4:0] fu_rs1
+		, input logic unsigned [0:0] fu_rs2_req
+		, input logic unsigned [4:0] fu_rs2
 		, input logic unsigned [4:0] fu_rd
 	);
 	begin
@@ -78,8 +82,12 @@ task INIT_CMD
 	cmd_req_genfifo_data.rf_addr <= rf_addr;
 	cmd_req_genfifo_data.rf_wdata <= rf_wdata;
 	cmd_req_genfifo_data.fu_id <= fu_id;
+	cmd_req_genfifo_data.fu_rs0_req <= fu_rs0_req;
 	cmd_req_genfifo_data.fu_rs0 <= fu_rs0;
+	cmd_req_genfifo_data.fu_rs1_req <= fu_rs1_req;
 	cmd_req_genfifo_data.fu_rs1 <= fu_rs1;
+	cmd_req_genfifo_data.fu_rs2_req <= fu_rs2_req;
+	cmd_req_genfifo_data.fu_rs2 <= fu_rs2;
 	cmd_req_genfifo_data.fu_rd <= fu_rd;
 	do begin
         @(posedge CLK_100MHZ);
@@ -92,12 +100,52 @@ endtask
 task CMD_EXEC
 	(
 		input logic unsigned [1:0] fu_id
+		, input logic unsigned [0:0] fu_rs0_req
+		, input logic unsigned [4:0] fu_rs0
+		, input logic unsigned [0:0] fu_rs1_req
+		, input logic unsigned [4:0] fu_rs1
+		, input logic unsigned [0:0] fu_rs2_req
+		, input logic unsigned [4:0] fu_rs2
+		, input logic unsigned [4:0] fu_rd
+	);
+	begin
+	INIT_CMD(EXEC, RD, 0, 0, fu_id, fu_rs0_req, fu_rs0, fu_rs1_req, fu_rs1, fu_rs2_req, fu_rs2, fu_rd);
+	end
+endtask
+
+task CMD_1RS
+	(
+		input logic unsigned [1:0] fu_id
+		, input logic unsigned [4:0] fu_rs0
+		, input logic unsigned [4:0] fu_rd
+	);
+	begin
+	CMD_EXEC(fu_id, 1, fu_rs0, 0, 0, 0, 0, fu_rd);
+	end
+endtask
+
+task CMD_2RS
+	(
+		input logic unsigned [1:0] fu_id
 		, input logic unsigned [4:0] fu_rs0
 		, input logic unsigned [4:0] fu_rs1
 		, input logic unsigned [4:0] fu_rd
 	);
 	begin
-	INIT_CMD(EXEC, RD, 0, 0, fu_id, fu_rs0, fu_rs1, fu_rd);
+	CMD_EXEC(fu_id, 1, fu_rs0, 1, fu_rs1, 0, 0, fu_rd);
+	end
+endtask
+
+task CMD_3RS
+	(
+		input logic unsigned [1:0] fu_id
+		, input logic unsigned [4:0] fu_rs0
+		, input logic unsigned [4:0] fu_rs1
+		, input logic unsigned [4:0] fu_rs2
+		, input logic unsigned [4:0] fu_rd
+	);
+	begin
+	CMD_EXEC(fu_id, 1, fu_rs0, 1, fu_rs1, 1, fu_rs2, fu_rd);
 	end
 endtask
 
@@ -107,7 +155,7 @@ task CMD_RF_LOAD
 		, input logic unsigned [31:0] rf_wdata
 	);
 	begin
-	INIT_CMD(RF, WR, rf_addr, rf_wdata, 0, 0, 0, 0);
+	INIT_CMD(RF, WR, rf_addr, rf_wdata, 0, 0, 0, 0, 0, 0, 0, 0);
 	end
 endtask
 
@@ -116,7 +164,7 @@ task CMD_RF_STORE
 		input logic unsigned [4:0] rf_addr
 	);
 	begin
-	INIT_CMD(RF, RD, rf_addr, 32'hdeadbeef, 0, 0, 0, 0);
+	INIT_CMD(RF, RD, rf_addr, 32'hdeadbeef, 0, 0, 0, 0, 0, 0, 0, 0);
 	end
 endtask
 
@@ -166,8 +214,8 @@ initial
 	CMD_RF_LOAD(3, $shortrealtobits(3.0));
 	CMD_RF_LOAD(15, $shortrealtobits(15.0));
 	
-	CMD_EXEC(0, 0, 1, 5);
-	CMD_EXEC(0, 2, 5, 6);
+	CMD_2RS(0, 0, 1, 5);
+	CMD_2RS(0, 2, 5, 6);
 
 	CMD_RF_STORE(0);
 	CMD_RF_STORE(1);

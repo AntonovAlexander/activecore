@@ -249,6 +249,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size)-1, 0, "0")
         cmd_req_struct.addu("fu_opcode",     0, 0, "0")
         for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+            cmd_req_struct.addu("fu_rs" + RF_rs_idx + "_req", 0, 0, "0")
             cmd_req_struct.addu("fu_rs" + RF_rs_idx, MultiExu_cfg_rf.ARF_addr_width-1, 0, "0")
         }
         cmd_req_struct.addu("fu_rd",    MultiExu_cfg_rf.ARF_addr_width-1, 0, "0")
@@ -575,10 +576,11 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                 run {
 
                     for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                        // fetching rdy flags from PRF_rdy and masking with rsX_req
                         cyclix_gen.assign(
                             rob_wr_uop,
                             hw_fracs(hw_frac_SubStruct("rs" + RF_rs_idx + "_rdy")),
-                            cyclix_gen.indexed(PRF_rdy, rss_tags[RF_rs_idx]))
+                            cyclix_gen.bor(cyclix_gen.indexed(PRF_rdy, rss_tags[RF_rs_idx]), !cyclix_gen.subStruct(cmd_req_data, "fu_rs" + RF_rs_idx + "_req")) )
                     }
 
                     cyclix_gen.assign(
