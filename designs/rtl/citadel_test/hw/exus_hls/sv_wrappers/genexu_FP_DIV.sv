@@ -19,14 +19,14 @@ module genexu_FP_DIV (
 
 
 fp_div fp_div_inst (
-    .ap_clk(clk_i),
-    .ap_rst(rst_i),
-    .ap_start(stream_req_bus_genfifo_req_i),
-    .ap_done(),
-    .ap_idle(stream_req_bus_genfifo_ack_o),
-    .ap_ready(stream_resp_bus_genfifo_req_o),
-    .datain({stream_req_bus_genfifo_rdata_bi.rd_tag, stream_req_bus_genfifo_rdata_bi.rs2_rdata, stream_req_bus_genfifo_rdata_bi.rs1_rdata, stream_req_bus_genfifo_rdata_bi.rs0_rdata, stream_req_bus_genfifo_rdata_bi.opcode}),
-    .ap_return({stream_resp_bus_genfifo_wdata_bo.wdata, stream_resp_bus_genfifo_wdata_bo.tag})
+    .ap_clk(clk_i)
+    , .ap_rst(rst_i)
+    , .ap_start(stream_req_bus_genfifo_req_i)
+    , .ap_done()
+    , .ap_idle(stream_req_bus_genfifo_ack_o)
+    , .ap_ready(stream_resp_bus_genfifo_req_o)
+    , .datain({stream_req_bus_genfifo_rdata_bi.rd_tag, stream_req_bus_genfifo_rdata_bi.rs2_rdata, stream_req_bus_genfifo_rdata_bi.rs1_rdata, stream_req_bus_genfifo_rdata_bi.rs0_rdata, stream_req_bus_genfifo_rdata_bi.opcode})
+    , .ap_return({stream_resp_bus_genfifo_wdata_bo.wdata, stream_resp_bus_genfifo_wdata_bo.tag})
 );
 
 

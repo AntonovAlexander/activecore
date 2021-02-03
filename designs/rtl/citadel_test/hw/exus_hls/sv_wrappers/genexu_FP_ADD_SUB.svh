@@ -18,7 +18,7 @@ typedef struct packed {
 `ifndef __genstructdel_req_struct_
 `define __genstructdel_req_struct_
 typedef struct packed {
-	logic unsigned [0:0] opcode;
+	logic unsigned [31:0] opcode;
 	logic unsigned [31:0] rs0_rdata;
 	logic unsigned [31:0] rs1_rdata;
 	logic unsigned [31:0] rs2_rdata;
