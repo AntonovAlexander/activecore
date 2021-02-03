@@ -142,7 +142,7 @@ always @(posedge CLK_100MHZ)
 	begin
 	if (cmd_resp_genfifo_req && cmd_resp_genfifo_ack)
 		begin
-		$display("DATA OUTPUT: 0x%x", cmd_resp_genfifo_data);
+		$display("DATA OUTPUT: hex: 0x%x, shortreal: %f", cmd_resp_genfifo_data, $bitstoshortreal(cmd_resp_genfifo_data));
 		end
 	end
 
@@ -158,13 +158,13 @@ initial
 	WAIT(10);
 	
 	// fetching results
-	CMD_RF_LOAD(0, 32'hbadc0ffe);
-	CMD_RF_LOAD(7, 32'h7);
-	CMD_RF_LOAD(9, 32'h9);
-	CMD_RF_LOAD(1, 32'h1);
-	CMD_RF_LOAD(2, 32'h2);
-	CMD_RF_LOAD(3, 32'h3);
-	CMD_RF_LOAD(15, 32'hfafae00f);
+	CMD_RF_LOAD(0, $shortrealtobits(2.4));
+	CMD_RF_LOAD(7, $shortrealtobits(7.0));
+	CMD_RF_LOAD(9, $shortrealtobits(9.0));
+	CMD_RF_LOAD(1, $shortrealtobits(1.0));
+	CMD_RF_LOAD(2, $shortrealtobits(2.0));
+	CMD_RF_LOAD(3, $shortrealtobits(3.0));
+	CMD_RF_LOAD(15, $shortrealtobits(15.0));
 	
 	CMD_EXEC(0, 0, 1, 5);
 	CMD_EXEC(0, 2, 5, 6);
