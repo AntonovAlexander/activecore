@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_direct_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_citadel_gen_sv " />
+            <top_module name="\$unit_tb_udm_sv " />
+            <top_module name="glbl" />
+            <top_module name="tb_direct" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="193fs"></ZoomStartTime>
+      <ZoomEndTime time="403fs"></ZoomEndTime>
+      <Cursor1Time time="274fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="565"></NameColumnWidth>
+      <ValueColumnWidth column_width="164"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="18" />
+   <wvobject fp_name="/tb_direct/CLK_100MHZ" type="logic">
+      <obj_property name="ElementShortName">CLK_100MHZ</obj_property>
+      <obj_property name="ObjectShortName">CLK_100MHZ</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/RST" type="logic">
+      <obj_property name="ElementShortName">RST</obj_property>
+      <obj_property name="ObjectShortName">RST</obj_property>
+   </wvobject>
+   <wvobject fp_name="group104" type="group">
+      <obj_property name="label">CMD input</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_req_genfifo_req_i" type="array">
+         <obj_property name="ElementShortName">cmd_req_genfifo_req_i[0:0]</obj_property>
+         <obj_property name="ObjectShortName">cmd_req_genfifo_req_i[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_req_genfifo_ack_o" type="array">
+         <obj_property name="ElementShortName">cmd_req_genfifo_ack_o[0:0]</obj_property>
+         <obj_property name="ObjectShortName">cmd_req_genfifo_ack_o[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_req_genfifo_rdata_bi" type="array">
+         <obj_property name="ElementShortName">cmd_req_genfifo_rdata_bi</obj_property>
+         <obj_property name="ObjectShortName">cmd_req_genfifo_rdata_bi</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group105" type="group">
+      <obj_property name="label">CMD output</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_resp_genfifo_req_o" type="array">
+         <obj_property name="ElementShortName">cmd_resp_genfifo_req_o[0:0]</obj_property>
+         <obj_property name="ObjectShortName">cmd_resp_genfifo_req_o[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_resp_genfifo_ack_i" type="array">
+         <obj_property name="ElementShortName">cmd_resp_genfifo_ack_i[0:0]</obj_property>
+         <obj_property name="ObjectShortName">cmd_resp_genfifo_ack_i[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/cmd_resp_genfifo_wdata_bo" type="array">
+         <obj_property name="ElementShortName">cmd_resp_genfifo_wdata_bo[31:0]</obj_property>
+         <obj_property name="ObjectShortName">cmd_resp_genfifo_wdata_bo[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/gennew_renamed_uop" type="array">
+      <obj_property name="ElementShortName">gennew_renamed_uop</obj_property>
+      <obj_property name="ObjectShortName">gennew_renamed_uop</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genrenamed_uop_buf" type="array">
+      <obj_property name="ElementShortName">genrenamed_uop_buf</obj_property>
+      <obj_property name="ObjectShortName">genrenamed_uop_buf</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genARF_map" type="array">
+      <obj_property name="ElementShortName">genARF_map[15:0][4:0]</obj_property>
+      <obj_property name="ObjectShortName">genARF_map[15:0][4:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genPRF_mapped" type="array">
+      <obj_property name="ElementShortName">genPRF_mapped[31:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF_mapped[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genPRF_rdy" type="array">
+      <obj_property name="ElementShortName">genPRF_rdy[31:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF_rdy[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genPRF" type="array">
+      <obj_property name="ElementShortName">genPRF[31:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF[31:0][31:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genrob" type="array">
+      <obj_property name="ElementShortName">genrob[7:0]</obj_property>
+      <obj_property name="ObjectShortName">genrob[7:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genrob_full" type="array">
+      <obj_property name="ElementShortName">genrob_full[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genrob_full[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genrob_wr" type="array">
+      <obj_property name="ElementShortName">genrob_wr[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genrob_wr[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genrob_wr_ptr" type="array">
+      <obj_property name="ElementShortName">genrob_wr_ptr[2:0]</obj_property>
+      <obj_property name="ObjectShortName">genrob_wr_ptr[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genrob_rd" type="array">
+      <obj_property name="ElementShortName">genrob_rd[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genrob_rd[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genrob_head" type="array">
+      <obj_property name="ElementShortName">genrob_head</obj_property>
+      <obj_property name="ObjectShortName">genrob_head</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="group90" type="group">
+      <obj_property name="label">EXUs</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="group151" type="group">
+         <obj_property name="label">FP_ADD_SUB_0</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/clk_i" type="array">
+            <obj_property name="ElementShortName">clk_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">clk_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/rst_i" type="array">
+            <obj_property name="ElementShortName">rst_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">rst_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/stream_req_bus_genfifo_req_i" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/stream_req_bus_genfifo_ack_o" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/stream_req_bus_genfifo_rdata_bi" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/stream_resp_bus_genfifo_req_o" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/stream_resp_bus_genfifo_ack_i" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/stream_resp_bus_genfifo_wdata_bo" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group160" type="group">
+         <obj_property name="label">FP_ADD_SUB_1</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_1/clk_i" type="array">
+            <obj_property name="ElementShortName">clk_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">clk_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_1/rst_i" type="array">
+            <obj_property name="ElementShortName">rst_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">rst_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_1/stream_req_bus_genfifo_req_i" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_1/stream_req_bus_genfifo_ack_o" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_1/stream_req_bus_genfifo_rdata_bi" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_1/stream_resp_bus_genfifo_req_o" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_1/stream_resp_bus_genfifo_ack_i" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_1/stream_resp_bus_genfifo_wdata_bo" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group169" type="group">
+         <obj_property name="label">FP_MUL</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_MUL_0/clk_i" type="array">
+            <obj_property name="ElementShortName">clk_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">clk_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_MUL_0/rst_i" type="array">
+            <obj_property name="ElementShortName">rst_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">rst_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_MUL_0/stream_req_bus_genfifo_req_i" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_MUL_0/stream_req_bus_genfifo_ack_o" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_MUL_0/stream_req_bus_genfifo_rdata_bi" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_MUL_0/stream_resp_bus_genfifo_req_o" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_MUL_0/stream_resp_bus_genfifo_ack_i" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_MUL_0/stream_resp_bus_genfifo_wdata_bo" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group178" type="group">
+         <obj_property name="label">FP_DIV</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_DIV_0/clk_i" type="array">
+            <obj_property name="ElementShortName">clk_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">clk_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_DIV_0/rst_i" type="array">
+            <obj_property name="ElementShortName">rst_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">rst_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_DIV_0/stream_req_bus_genfifo_req_i" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_DIV_0/stream_req_bus_genfifo_ack_o" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_DIV_0/stream_req_bus_genfifo_rdata_bi" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_DIV_0/stream_resp_bus_genfifo_req_o" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_DIV_0/stream_resp_bus_genfifo_ack_i" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_DIV_0/stream_resp_bus_genfifo_wdata_bo" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group187" type="group">
+         <obj_property name="label">FP_FMA</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_FMA_0/clk_i" type="array">
+            <obj_property name="ElementShortName">clk_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">clk_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_FMA_0/rst_i" type="array">
+            <obj_property name="ElementShortName">rst_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">rst_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_FMA_0/stream_req_bus_genfifo_req_i" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_FMA_0/stream_req_bus_genfifo_ack_o" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_FMA_0/stream_req_bus_genfifo_rdata_bi" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_FMA_0/stream_resp_bus_genfifo_req_o" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_FMA_0/stream_resp_bus_genfifo_ack_i" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_FMA_0/stream_resp_bus_genfifo_wdata_bo" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group196" type="group">
+      <obj_property name="label">fp_add_sub_inst0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/fp_add_sub_inst/ap_clk" type="logic">
+         <obj_property name="ElementShortName">ap_clk</obj_property>
+         <obj_property name="ObjectShortName">ap_clk</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/fp_add_sub_inst/ap_rst" type="logic">
+         <obj_property name="ElementShortName">ap_rst</obj_property>
+         <obj_property name="ObjectShortName">ap_rst</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/fp_add_sub_inst/ap_idle" type="logic">
+         <obj_property name="ElementShortName">ap_idle</obj_property>
+         <obj_property name="ObjectShortName">ap_idle</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/fp_add_sub_inst/ap_start" type="logic">
+         <obj_property name="ElementShortName">ap_start</obj_property>
+         <obj_property name="ObjectShortName">ap_start</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/fp_add_sub_inst/ap_ready" type="logic">
+         <obj_property name="ElementShortName">ap_ready</obj_property>
+         <obj_property name="ObjectShortName">ap_ready</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/fp_add_sub_inst/datain" type="array">
+         <obj_property name="ElementShortName">datain[159:0]</obj_property>
+         <obj_property name="ObjectShortName">datain[159:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/fp_add_sub_inst/ap_done" type="logic">
+         <obj_property name="ElementShortName">ap_done</obj_property>
+         <obj_property name="ObjectShortName">ap_done</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/fp_add_sub_inst/ap_return" type="array">
+         <obj_property name="ElementShortName">ap_return[63:0]</obj_property>
+         <obj_property name="ObjectShortName">ap_return[63:0]</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>
