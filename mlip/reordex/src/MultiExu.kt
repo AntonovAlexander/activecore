@@ -247,7 +247,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         cmd_req_struct.addu("rf_we",       0,  0, "0")
         cmd_req_struct.addu("rf_addr",    MultiExu_cfg_rf.ARF_addr_width-1, 0, "0")
         cmd_req_struct.addu("rf_wdata",    Exu_cfg_rf.RF_width-1, 0, "0")
-        cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size)-1, 0, "0")
+        cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size), 0, "0")      // for ExecUnits and wb_ext
         cmd_req_struct.addu("fu_opcode",     0, 0, "0")
         for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
             cmd_req_struct.addu("fu_rs" + RF_rs_idx + "_req", 0, 0, "0")
@@ -280,22 +280,32 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         var TranslateInfo = __TranslateInfo()
 
-        var iq = cyclix_gen.global("geniq", iq_struct, iq_size-1, 0)
-        var iq_wr_ptr = cyclix_gen.uglobal("geniq_wr_ptr", GetWidthToContain(iq_size)-1, 0, "0")
-        var iq_wr_ptr_prev = cyclix_gen.ulocal("geniq_wr_ptr_prev", GetWidthToContain(iq_size)-1, 0, "0")
-        var iq_wr_ptr_inc = cyclix_gen.ulocal("geniq_wr_ptr_inc", GetWidthToContain(iq_size)-1, 0, "0")
-        var iq_wr_ptr_dec = cyclix_gen.ulocal("geniq_wr_ptr_dec", GetWidthToContain(iq_size)-1, 0, "0")
-        var iq_wr = cyclix_gen.ulocal("geniq_wr", 0, 0, "0")      // new entry entered ROB tail
-        var iq_rd = cyclix_gen.ulocal("geniq_rd", 0, 0, "0")      // entry removed from ROB head
-        var iq_full = cyclix_gen.uglobal("geniq_full", 0, 0, "0")      // entry removed from ROB head
-
+        var IQ_insts = ArrayList<__iq_info>()
         var ExUnits_insts = ArrayList<ArrayList<cyclix.hw_subproc>>()
 
         var exu_req = cyclix_gen.local(cyclix_gen.GetGenName("exu_req"), Exu_cfg_rf.req_struct)
         var exu_resp = cyclix_gen.local(cyclix_gen.GetGenName("exu_resp"), Exu_cfg_rf.resp_struct)
 
+        var ExUnit_idx = 0
         for (ExUnit in ExecUnits) {
 
+            // generating IQ
+            var iq_info = __iq_info(
+                cyclix_gen.global("geniq" + ExUnit_idx, iq_struct, iq_size-1, 0),
+                cyclix_gen.uglobal("geniq" + ExUnit_idx + "_wr_ptr", GetWidthToContain(iq_size)-1, 0, "0"),
+                cyclix_gen.ulocal("geniq" + ExUnit_idx + "_wr_ptr_prev", GetWidthToContain(iq_size)-1, 0, "0"),
+                cyclix_gen.ulocal("geniq" + ExUnit_idx + "_wr_ptr_inc", GetWidthToContain(iq_size)-1, 0, "0"),
+                cyclix_gen.ulocal("geniq" + ExUnit_idx + "_wr_ptr_dec", GetWidthToContain(iq_size)-1, 0, "0"),
+                cyclix_gen.ulocal("geniq" + ExUnit_idx + "_wr", 0, 0, "0"),      // new entry entered IQ tail
+                cyclix_gen.ulocal("geniq" + ExUnit_idx + "_rd", 0, 0, "0"),      // entry removed from IQ head
+                cyclix_gen.uglobal("geniq" + ExUnit_idx + "_full", 0, 0, "0"),      // entry removed from IQ head
+                cyclix_gen.local("geniq" + ExUnit_idx + "_head", iq_struct),
+                hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString())
+            )
+            IQ_insts.add(iq_info)
+            ExUnit_idx += 1
+
+            // generating submodules
             var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, Exu_cfg_rf.req_struct, Exu_cfg_rf.resp_struct)
 
             var var_dict = mutableMapOf<hw_var, hw_var>()
@@ -325,6 +335,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
             exu_cyclix_gen.end()
 
+            // generating submodule instances
             var ExUnit_insts = ArrayList<cyclix.hw_subproc>()
             for (exu_num in 0 until ExUnit.value.exu_num) {
                 var exu_inst = cyclix_gen.subproc(exu_cyclix_gen.name + "_" + exu_num, exu_cyclix_gen)
@@ -341,128 +352,147 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             TranslateInfo.exu_assocs.put(ExUnit.value.ExecUnit, exu_info)
         }
 
-        cyclix_gen.assign(iq_wr_ptr_prev, iq_wr_ptr)
-        cyclix_gen.add_gen(iq_wr_ptr_inc, iq_wr_ptr, 1)
-        cyclix_gen.sub_gen(iq_wr_ptr_dec, iq_wr_ptr, 1)
+        // adding IQ for stores
+        var iq_info = __iq_info(
+            cyclix_gen.global("genwb", iq_struct, iq_size-1, 0),
+            cyclix_gen.uglobal("genwb_wr_ptr", GetWidthToContain(iq_size)-1, 0, "0"),
+            cyclix_gen.ulocal("genwb_wr_ptr_prev", GetWidthToContain(iq_size)-1, 0, "0"),
+            cyclix_gen.ulocal("genwb_wr_ptr_inc", GetWidthToContain(iq_size)-1, 0, "0"),
+            cyclix_gen.ulocal("genwb_wr_ptr_dec", GetWidthToContain(iq_size)-1, 0, "0"),
+            cyclix_gen.ulocal("genwb_wr", 0, 0, "0"),      // new entry entered IQ tail
+            cyclix_gen.ulocal("genwb_rd", 0, 0, "0"),      // entry removed from IQ head
+            cyclix_gen.uglobal("genwb_full", 0, 0, "0"),      // entry removed from IQ head
+            cyclix_gen.local("genwb_head", iq_struct),
+            hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString())
+        )
+        IQ_insts.add(iq_info)
 
-        // committing ROB head
-        var iq_head = cyclix_gen.local("geniq_head", iq_struct)
-        cyclix_gen.assign(iq_head, cyclix_gen.indexed(iq, 0))
-        cyclix_gen.begif(cyclix_gen.band(cyclix_gen.subStruct(iq_head, "enb"), cyclix_gen.subStruct(iq_head, "rdy")))
-        run {
+        for (IQ_inst in IQ_insts) {
 
-            // external wb (stores)
-            cyclix_gen.begif(cyclix_gen.subStruct(iq_head, "wb_ext"))
+            // generating iq ptrs
+            cyclix_gen.assign(IQ_inst.iq_wr_ptr_prev, IQ_inst.iq_wr_ptr)
+            cyclix_gen.add_gen(IQ_inst.iq_wr_ptr_inc, IQ_inst.iq_wr_ptr, 1)
+            cyclix_gen.sub_gen(IQ_inst.iq_wr_ptr_dec, IQ_inst.iq_wr_ptr, 1)
+
+            // committing IQ head
+            cyclix_gen.assign(IQ_inst.iq_head, cyclix_gen.indexed(IQ_inst.iq, 0))
+            cyclix_gen.begif(cyclix_gen.band(cyclix_gen.subStruct(IQ_inst.iq_head, "enb"), cyclix_gen.subStruct(IQ_inst.iq_head, "rdy")))
             run {
-                cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(cmd_resp, cyclix_gen.subStruct(iq_head, "rs0_rdata")))
-                run {
-                    cyclix_gen.assign(iq_rd, 1)
-                }; cyclix_gen.endif()
-            }; cyclix_gen.endif()
 
-            // loads and execs
-            cyclix_gen.begelse()
-            run {
-                cyclix_gen.begif(cyclix_gen.subStruct(iq_head, "rd_tag_prev_clr"))
+                // external wb (stores)
+                cyclix_gen.begif(cyclix_gen.subStruct(IQ_inst.iq_head, "wb_ext"))
                 run {
-                    // PRF written, and previous tag can be remapped
-                    cyclix_gen.assign(
-                        PRF_mapped,
-                        hw_fracs(hw_frac_V(cyclix_gen.subStruct(iq_head, "rd_tag_prev"))),
-                        0)
-                }; cyclix_gen.endif()
-                cyclix_gen.assign(iq_rd, 1)
-            }; cyclix_gen.endif()
-
-            // ROB processing
-            cyclix_gen.begif(iq_rd)
-            run {
-                cyclix_gen.assign(iq_full, 0)
-                // shifting ops
-                var iq_shift_iter = cyclix_gen.begforrange_asc(iq, hw_imm(0), hw_imm(iq.vartype.dimensions.last().msb-1))
-                run {
-                    cyclix_gen.assign(
-                        iq,
-                        hw_fracs(hw_frac_V(iq_shift_iter.iter_num)),
-                        cyclix_gen.indexed(iq, iq_shift_iter.iter_num_next))
-                }; cyclix_gen.endloop()
-                cyclix_gen.assign(
-                    iq,
-                    hw_fracs(hw_frac_C(iq.vartype.dimensions.last().msb)),
-                    0)
-                cyclix_gen.assign(iq_wr_ptr, iq_wr_ptr_dec)
-            }; cyclix_gen.endif()
-        }; cyclix_gen.endif()
-
-        // issuing operations from ROB to FUs
-        MSG("Translating: issuing operations from ROB to FUs")
-        var iq_iter = cyclix_gen.begforall_asc(iq)
-        run {
-            cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "enb"))
-            run {
-                var rss_rdy = cyclix_gen.ulocal(cyclix_gen.GetGenName("rss_rdy"), 0, 0, "0")
-                cyclix_gen.assign(rss_rdy, 1)
-                for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
-                    cyclix_gen.band_gen(rss_rdy, rss_rdy, cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_rdy"))
-                }
-                cyclix_gen.begif(rss_rdy)
-                run {
-                    cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "fu_req"))
+                    cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(cmd_resp, cyclix_gen.subStruct(IQ_inst.iq_head, "rs0_rdata")))
                     run {
-                        // writing op to FU
-                        var fu_id = 0
-                        for (exu_num in 0 until ExUnits_insts.size) {
+                        cyclix_gen.assign(IQ_inst.iq_rd, 1)
+                    }; cyclix_gen.endif()
+                }; cyclix_gen.endif()
 
-                            for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
+                // loads and execs
+                cyclix_gen.begelse()
+                run {
+                    cyclix_gen.begif(cyclix_gen.subStruct(IQ_inst.iq_head, "rd_tag_prev_clr"))
+                    run {
+                        // PRF written, and previous tag can be remapped
+                        cyclix_gen.assign(
+                            PRF_mapped,
+                            hw_fracs(hw_frac_V(cyclix_gen.subStruct(IQ_inst.iq_head, "rd_tag_prev"))),
+                            0)
+                    }; cyclix_gen.endif()
+                    cyclix_gen.assign(IQ_inst.iq_rd, 1)
+                }; cyclix_gen.endif()
 
-                                cyclix_gen.begif(!cyclix_gen.subStruct(cyclix_gen.indexed(iq, iq_iter.iter_num), "fu_pending"))
-                                run {
+                // IQ processing
+                cyclix_gen.begif(IQ_inst.iq_rd)
+                run {
+                    cyclix_gen.assign(IQ_inst.iq_full, 0)
+                    // shifting ops
+                    var iq_shift_iter = cyclix_gen.begforrange_asc(IQ_inst.iq, hw_imm(0), hw_imm(IQ_inst.iq.vartype.dimensions.last().msb-1))
+                    run {
+                        cyclix_gen.assign(
+                            IQ_inst.iq,
+                            hw_fracs(hw_frac_V(iq_shift_iter.iter_num)),
+                            cyclix_gen.indexed(IQ_inst.iq, iq_shift_iter.iter_num_next))
+                    }; cyclix_gen.endloop()
+                    cyclix_gen.assign(
+                        IQ_inst.iq,
+                        hw_fracs(hw_frac_C(IQ_inst.iq.vartype.dimensions.last().msb)),
+                        0)
+                    cyclix_gen.assign(IQ_inst.iq_wr_ptr, IQ_inst.iq_wr_ptr_dec)
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
 
-                                    cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(iq_iter.iter_elem, "fu_id"), fu_id))
+            // issuing operations from IQ to FUs
+            MSG("Translating: issuing operations from IQ to FUs")
+            var iq_iter = cyclix_gen.begforall_asc(IQ_inst.iq)
+            run {
+                cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "enb"))
+                run {
+                    var rss_rdy = cyclix_gen.ulocal(cyclix_gen.GetGenName("rss_rdy"), 0, 0, "0")
+                    cyclix_gen.assign(rss_rdy, 1)
+                    for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                        cyclix_gen.band_gen(rss_rdy, rss_rdy, cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_rdy"))
+                    }
+                    cyclix_gen.begif(rss_rdy)
+                    run {
+                        cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "fu_req"))
+                        run {
+                            // writing op to FU
+                            var fu_id = 0
+                            for (exu_num in 0 until ExUnits_insts.size) {
+
+                                for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
+
+                                    cyclix_gen.begif(!cyclix_gen.subStruct(cyclix_gen.indexed(IQ_inst.iq, iq_iter.iter_num), "fu_pending"))
                                     run {
 
-                                        // filling exu_req with iq data
-                                        cyclix_gen.assign(
-                                            exu_req,
-                                            hw_fracs(hw_frac_SubStruct("opcode")),
-                                            cyclix_gen.subStruct(iq_iter.iter_elem, "fu_opcode"))
+                                        cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(iq_iter.iter_elem, "fu_id"), fu_id))
+                                        run {
 
-                                        for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                                            // filling exu_req with iq data
                                             cyclix_gen.assign(
                                                 exu_req,
-                                                hw_fracs(hw_frac_SubStruct("rs" + RF_rs_idx + "_rdata")),
-                                                cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_rdata"))
-                                        }
+                                                hw_fracs(hw_frac_SubStruct("opcode")),
+                                                cyclix_gen.subStruct(iq_iter.iter_elem, "fu_opcode"))
 
-                                        cyclix_gen.assign(
-                                            exu_req,
-                                            hw_fracs(hw_frac_SubStruct("rd_tag")),
-                                            cyclix_gen.subStruct(iq_iter.iter_elem, "rd_tag"))
+                                            for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                                                cyclix_gen.assign(
+                                                    exu_req,
+                                                    hw_fracs(hw_frac_SubStruct("rs" + RF_rs_idx + "_rdata")),
+                                                    cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_rdata"))
+                                            }
 
-                                        cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(ExUnits_insts[exu_num][exu_inst_num], cyclix.STREAM_REQ_BUS_NAME, exu_req))
-                                        run {
                                             cyclix_gen.assign(
-                                                iq,
-                                                hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("fu_pending")),
-                                                1)
+                                                exu_req,
+                                                hw_fracs(hw_frac_SubStruct("rd_tag")),
+                                                cyclix_gen.subStruct(iq_iter.iter_elem, "rd_tag"))
+
+                                            cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(ExUnits_insts[exu_num][exu_inst_num], cyclix.STREAM_REQ_BUS_NAME, exu_req))
+                                            run {
+                                                cyclix_gen.assign(
+                                                    IQ_inst.iq,
+                                                    hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("fu_pending")),
+                                                    1)
+                                            }; cyclix_gen.endif()
+
                                         }; cyclix_gen.endif()
 
                                     }; cyclix_gen.endif()
 
-                                }; cyclix_gen.endif()
-
+                                }
+                                fu_id++
                             }
-                            fu_id++
-                        }
+                        }; cyclix_gen.endif()
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
-            }; cyclix_gen.endif()
-        }; cyclix_gen.endloop()
+            }; cyclix_gen.endloop()
+
+        }
 
         var renamed_uop_buf = cyclix_gen.global("genrenamed_uop_buf", iq_struct)
 
-        // broadcasting FU results to ROB and renamed buffer
-        MSG("Translating: broadcasting FU results to ROB")
+        // broadcasting FU results to IQ and renamed buffer
+        MSG("Translating: broadcasting FU results to IQ")
         var fu_id = 0
         for (exu_num in 0 until ExUnits_insts.size) {
             for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
@@ -479,55 +509,59 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                         hw_fracs(hw_frac_V(cyclix_gen.subStruct(exu_resp, "tag"))),
                         cyclix_gen.subStruct(exu_resp, "wdata"))
 
-                    // broadcasting FU results to ROB
-                    iq_iter = cyclix_gen.begforall_asc(iq)
-                    run {
+                    // broadcasting FU results to IQ
+                    for (IQ_inst in IQ_insts) {
 
-                        cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "enb"))
+                        var iq_iter = cyclix_gen.begforall_asc(IQ_inst.iq)
                         run {
 
-                            for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
-                                cyclix_gen.begif(!cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_rdy"))
-                                run {
-                                    cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_tag"), cyclix_gen.subStruct(exu_resp, "tag")))
+                            cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "enb"))
+                            run {
+
+                                for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                                    cyclix_gen.begif(!cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_rdy"))
                                     run {
-                                        // setting ROB entry ready
+                                        cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_tag"), cyclix_gen.subStruct(exu_resp, "tag")))
+                                        run {
+                                            // setting IQ entry ready
+                                            cyclix_gen.assign(
+                                                IQ_inst.iq,
+                                                hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rs" + RF_rs_idx + "_rdata")),
+                                                cyclix_gen.subStruct(exu_resp, "wdata"))
+                                            cyclix_gen.assign(
+                                                IQ_inst.iq,
+                                                hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rs" + RF_rs_idx + "_rdy")),
+                                                1)
+                                        }; cyclix_gen.endif()
+                                    }; cyclix_gen.endif()
+                                }
+
+                                //// setting rdy if data generated ////
+                                // wb_ext //
+                                cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "wb_ext"))
+                                run {
+                                    cyclix_gen.assign(
+                                        IQ_inst.iq,
+                                        hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rdy")),
+                                        cyclix_gen.subStruct(cyclix_gen.indexed(IQ_inst.iq, iq_iter.iter_num), "rs0_rdy"))
+                                }; cyclix_gen.endif()
+                                // fu_req //
+                                cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "fu_pending"))
+                                run {
+                                    cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(iq_iter.iter_elem, "rd_tag"), cyclix_gen.subStruct(exu_resp, "tag")))
+                                    run {
                                         cyclix_gen.assign(
-                                            iq,
-                                            hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rs" + RF_rs_idx + "_rdata")),
-                                            cyclix_gen.subStruct(exu_resp, "wdata"))
-                                        cyclix_gen.assign(
-                                            iq,
-                                            hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rs" + RF_rs_idx + "_rdy")),
+                                            IQ_inst.iq,
+                                            hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rdy")),
                                             1)
                                     }; cyclix_gen.endif()
                                 }; cyclix_gen.endif()
-                            }
 
-                            //// setting rdy if data generated ////
-                            // wb_ext //
-                            cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "wb_ext"))
-                            run {
-                                cyclix_gen.assign(
-                                    iq,
-                                    hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rdy")),
-                                    cyclix_gen.subStruct(cyclix_gen.indexed(iq, iq_iter.iter_num), "rs0_rdy"))
-                            }; cyclix_gen.endif()
-                            // fu_req //
-                            cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "fu_pending"))
-                            run {
-                                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(iq_iter.iter_elem, "rd_tag"), cyclix_gen.subStruct(exu_resp, "tag")))
-                                run {
-                                    cyclix_gen.assign(
-                                        iq,
-                                        hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rdy")),
-                                        1)
-                                }; cyclix_gen.endif()
                             }; cyclix_gen.endif()
 
-                        }; cyclix_gen.endif()
+                        }; cyclix_gen.endloop()
 
-                    }; cyclix_gen.endloop()
+                    }
 
                     // broadcasting FU results to renamed buffer
                     cyclix_gen.begif(cyclix_gen.subStruct(renamed_uop_buf, "enb"))
@@ -538,7 +572,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                             run {
                                 cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(renamed_uop_buf, "rs" + RF_rs_idx + "_tag"), cyclix_gen.subStruct(exu_resp, "tag")))
                                 run {
-                                    // setting ROB entry ready
+                                    // setting IQ entry ready
                                     cyclix_gen.assign(
                                         renamed_uop_buf,
                                         hw_fracs(hw_frac_SubStruct("rs" + RF_rs_idx + "_rdata")),
@@ -568,46 +602,55 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         // acquiring new operation to iq tail
         cyclix_gen.begif(cyclix_gen.subStruct(renamed_uop_buf, "enb"))
         run {
-            cyclix_gen.begif(!iq_full)
-            run {
-                // signaling iq_wr
-                cyclix_gen.assign(iq_wr, 1)
 
-                // putting new uop in ROB
-                cyclix_gen.assign(
-                    iq,
-                    hw_fracs(hw_frac_V(iq_wr_ptr)),
-                    renamed_uop_buf
-                )
+            for (IQ_inst in IQ_insts) {
 
-                // iq_wr_ptr update
-                cyclix_gen.begif(iq_wr)
+                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(renamed_uop_buf, "fu_id"), IQ_inst.iq_num))
                 run {
-                    // asserting iq_full - checking if data written to last available entry
-                    cyclix_gen.begif(cyclix_gen.eq2(iq_wr_ptr, iq.vartype.dimensions.last().msb))
+
+                    cyclix_gen.begif(!IQ_inst.iq_full)
                     run {
-                        cyclix_gen.assign(iq_full, 1)
+                        // signaling iq_wr
+                        cyclix_gen.assign(IQ_inst.iq_wr, 1)
+
+                        // putting new uop in IQ
+                        cyclix_gen.assign(
+                            IQ_inst.iq,
+                            hw_fracs(hw_frac_V(IQ_inst.iq_wr_ptr)),
+                            renamed_uop_buf
+                        )
+
+                        // iq_wr_ptr update
+                        cyclix_gen.begif(IQ_inst.iq_wr)
+                        run {
+                            // asserting iq_full - checking if data written to last available entry
+                            cyclix_gen.begif(cyclix_gen.eq2(IQ_inst.iq_wr_ptr, IQ_inst.iq.vartype.dimensions.last().msb))
+                            run {
+                                cyclix_gen.assign(IQ_inst.iq_full, 1)
+                            }; cyclix_gen.endif()
+
+                            // incrementing iq_wr_ptr
+                            cyclix_gen.begif(IQ_inst.iq_rd)
+                            run {
+                                cyclix_gen.assign(IQ_inst.iq_wr_ptr, IQ_inst.iq_wr_ptr_prev)
+                            }; cyclix_gen.endif()
+                            cyclix_gen.begelse()
+                            run {
+                                cyclix_gen.assign(IQ_inst.iq_wr_ptr, IQ_inst.iq_wr_ptr_inc)
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endif()
+
+                        // clearing renamed uop buffer
+                        cyclix_gen.assign(
+                            renamed_uop_buf,
+                            hw_fracs(hw_frac_SubStruct("enb")),
+                            0
+                        )
+
                     }; cyclix_gen.endif()
 
-                    // incrementing iq_wr_ptr
-                    cyclix_gen.begif(iq_rd)
-                    run {
-                        cyclix_gen.assign(iq_wr_ptr, iq_wr_ptr_prev)
-                    }; cyclix_gen.endif()
-                    cyclix_gen.begelse()
-                    run {
-                        cyclix_gen.assign(iq_wr_ptr, iq_wr_ptr_inc)
-                    }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
-
-                // clearing renamed uop buffer
-                cyclix_gen.assign(
-                    renamed_uop_buf,
-                    hw_fracs(hw_frac_SubStruct("enb")),
-                    0
-                )
-
-            }; cyclix_gen.endif()
+            }
         }; cyclix_gen.endif()
 
         // renaming
@@ -639,6 +682,11 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                 // LOAD/STORE commutation
                 cyclix_gen.begif(!cyclix_gen.subStruct(cmd_req_data, "exec"))
                 run {
+                    cyclix_gen.assign(
+                        new_renamed_uop,
+                        hw_fracs(hw_frac_SubStruct("fu_id")),
+                        ExecUnits.size)
+
                     // LOAD
                     cyclix_gen.begif(cyclix_gen.subStruct(cmd_req_data, "rf_we"))
                     run {

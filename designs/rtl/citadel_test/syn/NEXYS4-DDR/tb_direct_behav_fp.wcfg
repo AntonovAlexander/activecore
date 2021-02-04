@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="193fs"></ZoomStartTime>
-      <ZoomEndTime time="403fs"></ZoomEndTime>
-      <Cursor1Time time="274fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="805001fs"></ZoomEndTime>
+      <Cursor1Time time="5000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="565"></NameColumnWidth>
       <ValueColumnWidth column_width="164"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="18" />
+   <WVObjectSize size="17" />
    <wvobject fp_name="/tb_direct/CLK_100MHZ" type="logic">
       <obj_property name="ElementShortName">CLK_100MHZ</obj_property>
       <obj_property name="ObjectShortName">CLK_100MHZ</obj_property>
@@ -89,32 +89,6 @@
    <wvobject fp_name="/tb_direct/citadel_inst/genPRF" type="array">
       <obj_property name="ElementShortName">genPRF[31:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">genPRF[31:0][31:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_direct/citadel_inst/geniq" type="array">
-      <obj_property name="ElementShortName">geniq[7:0]</obj_property>
-      <obj_property name="ObjectShortName">geniq[7:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_direct/citadel_inst/geniq_full" type="array">
-      <obj_property name="ElementShortName">geniq_full[0:0]</obj_property>
-      <obj_property name="ObjectShortName">geniq_full[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_direct/citadel_inst/geniq_wr" type="array">
-      <obj_property name="ElementShortName">geniq_wr[0:0]</obj_property>
-      <obj_property name="ObjectShortName">geniq_wr[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_direct/citadel_inst/geniq_wr_ptr" type="array">
-      <obj_property name="ElementShortName">geniq_wr_ptr[2:0]</obj_property>
-      <obj_property name="ObjectShortName">geniq_wr_ptr[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_direct/citadel_inst/geniq_rd" type="array">
-      <obj_property name="ElementShortName">geniq_rd[0:0]</obj_property>
-      <obj_property name="ObjectShortName">geniq_rd[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_direct/citadel_inst/geniq_head" type="array">
-      <obj_property name="ElementShortName">geniq_head</obj_property>
-      <obj_property name="ObjectShortName">geniq_head</obj_property>
       <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="group90" type="group">
@@ -340,6 +314,211 @@
       <wvobject fp_name="/tb_direct/citadel_inst/genexu_FP_ADD_SUB_0/fp_add_sub_inst/ap_return" type="array">
          <obj_property name="ElementShortName">ap_return[63:0]</obj_property>
          <obj_property name="ObjectShortName">ap_return[63:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group385" type="group">
+      <obj_property name="label">IQ0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq0_wr_ptr_prev" type="array">
+         <obj_property name="ElementShortName">geniq0_wr_ptr_prev[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq0_wr_ptr_prev[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq0_wr_ptr_inc" type="array">
+         <obj_property name="ElementShortName">geniq0_wr_ptr_inc[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq0_wr_ptr_inc[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq0_wr_ptr_dec" type="array">
+         <obj_property name="ElementShortName">geniq0_wr_ptr_dec[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq0_wr_ptr_dec[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq0_wr" type="array">
+         <obj_property name="ElementShortName">geniq0_wr[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq0_wr[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq0_rd" type="array">
+         <obj_property name="ElementShortName">geniq0_rd[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq0_rd[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq0_head" type="array">
+         <obj_property name="ElementShortName">geniq0_head</obj_property>
+         <obj_property name="ObjectShortName">geniq0_head</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq0" type="array">
+         <obj_property name="ElementShortName">geniq0[7:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq0[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq0_wr_ptr" type="array">
+         <obj_property name="ElementShortName">geniq0_wr_ptr[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq0_wr_ptr[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq0_full" type="array">
+         <obj_property name="ElementShortName">geniq0_full[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq0_full[0:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group386" type="group">
+      <obj_property name="label">IQ1</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq1_wr_ptr_prev" type="array">
+         <obj_property name="ElementShortName">geniq1_wr_ptr_prev[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq1_wr_ptr_prev[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq1_wr_ptr_inc" type="array">
+         <obj_property name="ElementShortName">geniq1_wr_ptr_inc[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq1_wr_ptr_inc[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq1_wr_ptr_dec" type="array">
+         <obj_property name="ElementShortName">geniq1_wr_ptr_dec[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq1_wr_ptr_dec[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq1_wr" type="array">
+         <obj_property name="ElementShortName">geniq1_wr[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq1_wr[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq1_rd" type="array">
+         <obj_property name="ElementShortName">geniq1_rd[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq1_rd[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq1_head" type="array">
+         <obj_property name="ElementShortName">geniq1_head</obj_property>
+         <obj_property name="ObjectShortName">geniq1_head</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq1" type="array">
+         <obj_property name="ElementShortName">geniq1[7:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq1[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq1_wr_ptr" type="array">
+         <obj_property name="ElementShortName">geniq1_wr_ptr[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq1_wr_ptr[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq1_full" type="array">
+         <obj_property name="ElementShortName">geniq1_full[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq1_full[0:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group387" type="group">
+      <obj_property name="label">IQ2</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq2_wr_ptr_prev" type="array">
+         <obj_property name="ElementShortName">geniq2_wr_ptr_prev[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq2_wr_ptr_prev[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq2_wr_ptr_inc" type="array">
+         <obj_property name="ElementShortName">geniq2_wr_ptr_inc[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq2_wr_ptr_inc[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq2_wr_ptr_dec" type="array">
+         <obj_property name="ElementShortName">geniq2_wr_ptr_dec[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq2_wr_ptr_dec[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq2_wr" type="array">
+         <obj_property name="ElementShortName">geniq2_wr[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq2_wr[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq2_rd" type="array">
+         <obj_property name="ElementShortName">geniq2_rd[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq2_rd[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq2_head" type="array">
+         <obj_property name="ElementShortName">geniq2_head</obj_property>
+         <obj_property name="ObjectShortName">geniq2_head</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq2" type="array">
+         <obj_property name="ElementShortName">geniq2[7:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq2[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq2_wr_ptr" type="array">
+         <obj_property name="ElementShortName">geniq2_wr_ptr[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq2_wr_ptr[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq2_full" type="array">
+         <obj_property name="ElementShortName">geniq2_full[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq2_full[0:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group388" type="group">
+      <obj_property name="label">IQ3</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq3_wr_ptr_prev" type="array">
+         <obj_property name="ElementShortName">geniq3_wr_ptr_prev[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq3_wr_ptr_prev[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq3_wr_ptr_inc" type="array">
+         <obj_property name="ElementShortName">geniq3_wr_ptr_inc[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq3_wr_ptr_inc[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq3_wr_ptr_dec" type="array">
+         <obj_property name="ElementShortName">geniq3_wr_ptr_dec[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq3_wr_ptr_dec[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq3_wr" type="array">
+         <obj_property name="ElementShortName">geniq3_wr[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq3_wr[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq3_rd" type="array">
+         <obj_property name="ElementShortName">geniq3_rd[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq3_rd[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq3_head" type="array">
+         <obj_property name="ElementShortName">geniq3_head</obj_property>
+         <obj_property name="ObjectShortName">geniq3_head</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq3" type="array">
+         <obj_property name="ElementShortName">geniq3[7:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq3[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq3_wr_ptr" type="array">
+         <obj_property name="ElementShortName">geniq3_wr_ptr[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq3_wr_ptr[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/geniq3_full" type="array">
+         <obj_property name="ElementShortName">geniq3_full[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq3_full[0:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group398" type="group">
+      <obj_property name="label">IQ-wb</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_direct/citadel_inst/genwb_wr_ptr_prev" type="array">
+         <obj_property name="ElementShortName">genwb_wr_ptr_prev[2:0]</obj_property>
+         <obj_property name="ObjectShortName">genwb_wr_ptr_prev[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genwb_wr_ptr_inc" type="array">
+         <obj_property name="ElementShortName">genwb_wr_ptr_inc[2:0]</obj_property>
+         <obj_property name="ObjectShortName">genwb_wr_ptr_inc[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genwb_wr_ptr_dec" type="array">
+         <obj_property name="ElementShortName">genwb_wr_ptr_dec[2:0]</obj_property>
+         <obj_property name="ObjectShortName">genwb_wr_ptr_dec[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genwb_wr" type="array">
+         <obj_property name="ElementShortName">genwb_wr[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genwb_wr[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genwb_rd" type="array">
+         <obj_property name="ElementShortName">genwb_rd[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genwb_rd[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genwb_head" type="array">
+         <obj_property name="ElementShortName">genwb_head</obj_property>
+         <obj_property name="ObjectShortName">genwb_head</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genwb" type="array">
+         <obj_property name="ElementShortName">genwb[7:0]</obj_property>
+         <obj_property name="ObjectShortName">genwb[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genwb_wr_ptr" type="array">
+         <obj_property name="ElementShortName">genwb_wr_ptr[2:0]</obj_property>
+         <obj_property name="ObjectShortName">genwb_wr_ptr[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_direct/citadel_inst/genwb_full" type="array">
+         <obj_property name="ElementShortName">genwb_full[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genwb_full[0:0]</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>
