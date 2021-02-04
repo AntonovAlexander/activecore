@@ -247,7 +247,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         cmd_req_struct.addu("rf_we",       0,  0, "0")
         cmd_req_struct.addu("rf_addr",    MultiExu_cfg_rf.ARF_addr_width-1, 0, "0")
         cmd_req_struct.addu("rf_wdata",    Exu_cfg_rf.RF_width-1, 0, "0")
-        cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size), 0, "0")      // for ExecUnits and wb_ext
+        cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size)-1, 0, "0")
         cmd_req_struct.addu("fu_opcode",     0, 0, "0")
         for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
             cmd_req_struct.addu("fu_rs" + RF_rs_idx + "_req", 0, 0, "0")
@@ -266,7 +266,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         iq_struct.addu("rdy",     0, 0, "0")
         iq_struct.addu("fu_req",     0, 0, "0")
         iq_struct.addu("fu_pending",     0, 0, "0")
-        iq_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size)-1, 0, "0")
+        iq_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size), 0, "0")              // for ExecUnits and wb_ext
         iq_struct.addu("fu_opcode",     0, 0, "0")
         for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
             iq_struct.addu("rs" + RF_rs_idx + "_rdy",     0, 0, "0")
@@ -300,7 +300,8 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                 cyclix_gen.ulocal("geniq" + ExUnit_idx + "_rd", 0, 0, "0"),      // entry removed from IQ head
                 cyclix_gen.uglobal("geniq" + ExUnit_idx + "_full", 0, 0, "0"),      // entry removed from IQ head
                 cyclix_gen.local("geniq" + ExUnit_idx + "_head", iq_struct),
-                hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString())
+                hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()),
+                true
             )
             IQ_insts.add(iq_info)
             ExUnit_idx += 1
@@ -363,7 +364,8 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             cyclix_gen.ulocal("genwb_rd", 0, 0, "0"),      // entry removed from IQ head
             cyclix_gen.uglobal("genwb_full", 0, 0, "0"),      // entry removed from IQ head
             cyclix_gen.local("genwb_head", iq_struct),
-            hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString())
+            hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()),
+            false
         )
         IQ_insts.add(iq_info)
 
@@ -379,18 +381,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             cyclix_gen.begif(cyclix_gen.band(cyclix_gen.subStruct(IQ_inst.iq_head, "enb"), cyclix_gen.subStruct(IQ_inst.iq_head, "rdy")))
             run {
 
-                // external wb (stores)
-                cyclix_gen.begif(cyclix_gen.subStruct(IQ_inst.iq_head, "wb_ext"))
-                run {
-                    cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(cmd_resp, cyclix_gen.subStruct(IQ_inst.iq_head, "rs0_rdata")))
-                    run {
-                        cyclix_gen.assign(IQ_inst.iq_rd, 1)
-                    }; cyclix_gen.endif()
-                }; cyclix_gen.endif()
-
-                // loads and execs
-                cyclix_gen.begelse()
-                run {
+                if (IQ_inst.iq_exu) {
                     cyclix_gen.begif(cyclix_gen.subStruct(IQ_inst.iq_head, "rd_tag_prev_clr"))
                     run {
                         // PRF written, and previous tag can be remapped
@@ -400,7 +391,17 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                             0)
                     }; cyclix_gen.endif()
                     cyclix_gen.assign(IQ_inst.iq_rd, 1)
-                }; cyclix_gen.endif()
+                } else {
+                    cyclix_gen.assign(IQ_inst.iq_rd, 1)
+                    cyclix_gen.begif(cyclix_gen.subStruct(IQ_inst.iq_head, "wb_ext"))
+                    run {
+                        cyclix_gen.assign(IQ_inst.iq_rd, 0)
+                        cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(cmd_resp, cyclix_gen.subStruct(IQ_inst.iq_head, "rs0_rdata")))
+                        run {
+                            cyclix_gen.assign(IQ_inst.iq_rd, 1)
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endif()
+                }
 
                 // IQ processing
                 cyclix_gen.begif(IQ_inst.iq_rd)
