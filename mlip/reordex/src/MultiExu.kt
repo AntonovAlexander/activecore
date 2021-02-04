@@ -22,7 +22,7 @@ data class Exu_CFG(val ExecUnit : Exu,
                    val exu_num : Int,
                    val iq_length : Int)
 
-open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu_cfg_rf : MultiExu_CFG_RF, val iq_size : Int) {
+open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu_cfg_rf : MultiExu_CFG_RF, val out_iq_size : Int) {
 
     var ExecUnits  = mutableMapOf<String, Exu_CFG>()
 
@@ -291,11 +291,11 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
             // generating IQ
             var iq_info = __iq_info(
-                cyclix_gen.global("geniq" + ExUnit_idx, iq_struct, iq_size-1, 0),
-                cyclix_gen.uglobal("geniq" + ExUnit_idx + "_wr_ptr", GetWidthToContain(iq_size)-1, 0, "0"),
-                cyclix_gen.ulocal("geniq" + ExUnit_idx + "_wr_ptr_prev", GetWidthToContain(iq_size)-1, 0, "0"),
-                cyclix_gen.ulocal("geniq" + ExUnit_idx + "_wr_ptr_inc", GetWidthToContain(iq_size)-1, 0, "0"),
-                cyclix_gen.ulocal("geniq" + ExUnit_idx + "_wr_ptr_dec", GetWidthToContain(iq_size)-1, 0, "0"),
+                cyclix_gen.global("geniq" + ExUnit_idx, iq_struct, ExUnit.value.iq_length-1, 0),
+                cyclix_gen.uglobal("geniq" + ExUnit_idx + "_wr_ptr", GetWidthToContain(ExUnit.value.iq_length)-1, 0, "0"),
+                cyclix_gen.ulocal("geniq" + ExUnit_idx + "_wr_ptr_prev", GetWidthToContain(ExUnit.value.iq_length)-1, 0, "0"),
+                cyclix_gen.ulocal("geniq" + ExUnit_idx + "_wr_ptr_inc", GetWidthToContain(ExUnit.value.iq_length)-1, 0, "0"),
+                cyclix_gen.ulocal("geniq" + ExUnit_idx + "_wr_ptr_dec", GetWidthToContain(ExUnit.value.iq_length)-1, 0, "0"),
                 cyclix_gen.ulocal("geniq" + ExUnit_idx + "_wr", 0, 0, "0"),      // new entry entered IQ tail
                 cyclix_gen.ulocal("geniq" + ExUnit_idx + "_rd", 0, 0, "0"),      // entry removed from IQ head
                 cyclix_gen.uglobal("geniq" + ExUnit_idx + "_full", 0, 0, "0"),      // entry removed from IQ head
@@ -355,11 +355,11 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         // adding IQ for stores
         var iq_info = __iq_info(
-            cyclix_gen.global("genwb", iq_struct, iq_size-1, 0),
-            cyclix_gen.uglobal("genwb_wr_ptr", GetWidthToContain(iq_size)-1, 0, "0"),
-            cyclix_gen.ulocal("genwb_wr_ptr_prev", GetWidthToContain(iq_size)-1, 0, "0"),
-            cyclix_gen.ulocal("genwb_wr_ptr_inc", GetWidthToContain(iq_size)-1, 0, "0"),
-            cyclix_gen.ulocal("genwb_wr_ptr_dec", GetWidthToContain(iq_size)-1, 0, "0"),
+            cyclix_gen.global("genwb", iq_struct, out_iq_size-1, 0),
+            cyclix_gen.uglobal("genwb_wr_ptr", GetWidthToContain(out_iq_size)-1, 0, "0"),
+            cyclix_gen.ulocal("genwb_wr_ptr_prev", GetWidthToContain(out_iq_size)-1, 0, "0"),
+            cyclix_gen.ulocal("genwb_wr_ptr_inc", GetWidthToContain(out_iq_size)-1, 0, "0"),
+            cyclix_gen.ulocal("genwb_wr_ptr_dec", GetWidthToContain(out_iq_size)-1, 0, "0"),
             cyclix_gen.ulocal("genwb_wr", 0, 0, "0"),      // new entry entered IQ tail
             cyclix_gen.ulocal("genwb_rd", 0, 0, "0"),      // entry removed from IQ head
             cyclix_gen.uglobal("genwb_full", 0, 0, "0"),      // entry removed from IQ head

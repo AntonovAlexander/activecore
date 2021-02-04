@@ -261,7 +261,7 @@ class EXU_FP_FMA() : reordex.Exu("FP_FMA", Exu_cfg_rf) {
     }
 }
 
-class test_multiexu(name_in : String) : reordex.MultiExu(name_in, Exu_cfg_rf, MultiExu_CFG_RF(16, false, 32), 8) {
+class test_multiexu(name_in : String) : reordex.MultiExu(name_in, Exu_cfg_rf, MultiExu_CFG_RF(16, false, 32), 4) {
 
     init {
         //add_exu(EXU_ADD(2), 2)
@@ -269,8 +269,8 @@ class test_multiexu(name_in : String) : reordex.MultiExu(name_in, Exu_cfg_rf, Mu
         //add_exu(EXU_SHIFT(1), 1)
 
         add_exu(EXU_FP_ADD_SUB(), 2, 4)
-        add_exu(EXU_FP_MUL(), 1, 4)
-        add_exu(EXU_FP_DIV(), 1, 4)
-        add_exu(EXU_FP_FMA(), 1, 4)
+        add_exu(EXU_FP_MUL(), 1, 3)
+        add_exu(EXU_FP_DIV(), 1, 3)
+        add_exu(EXU_FP_FMA(), 1, 3)
     }
 }
