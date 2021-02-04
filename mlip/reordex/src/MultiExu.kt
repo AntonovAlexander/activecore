@@ -19,15 +19,16 @@ data class MultiExu_CFG_RF(val ARF_depth : Int,
 }
 
 data class Exu_CFG(val ExecUnit : Exu,
-                   val exu_num : Int)
+                   val exu_num : Int,
+                   val iq_length : Int)
 
-open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu_cfg_rf : MultiExu_CFG_RF, val rob_size : Int) {
+open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu_cfg_rf : MultiExu_CFG_RF, val iq_size : Int) {
 
     var ExecUnits  = mutableMapOf<String, Exu_CFG>()
 
-    fun add_exu(exu : Exu, exu_num: Int) {
-        if (ExecUnits.put(exu.name, Exu_CFG(exu, exu_num)) != null) {
-            ERROR("Stage addition problem!")
+    fun add_exu(exu : Exu, exu_num: Int, iq_length: Int) {
+        if (ExecUnits.put(exu.name, Exu_CFG(exu, exu_num, iq_length)) != null) {
+            ERROR("Exu addition error!")
         }
     }
 
@@ -260,33 +261,33 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         // TODO: external memory interface
 
-        var rob_struct = hw_struct("rob_struct")
-        rob_struct.addu("enb",     0, 0, "0")
-        rob_struct.addu("rdy",     0, 0, "0")
-        rob_struct.addu("fu_req",     0, 0, "0")
-        rob_struct.addu("fu_pending",     0, 0, "0")
-        rob_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size)-1, 0, "0")
-        rob_struct.addu("fu_opcode",     0, 0, "0")
+        var iq_struct = hw_struct("iq_struct")
+        iq_struct.addu("enb",     0, 0, "0")
+        iq_struct.addu("rdy",     0, 0, "0")
+        iq_struct.addu("fu_req",     0, 0, "0")
+        iq_struct.addu("fu_pending",     0, 0, "0")
+        iq_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size)-1, 0, "0")
+        iq_struct.addu("fu_opcode",     0, 0, "0")
         for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
-            rob_struct.addu("rs" + RF_rs_idx + "_rdy",     0, 0, "0")
-            rob_struct.addu("rs" + RF_rs_idx + "_tag",     MultiExu_cfg_rf.PRF_addr_width-1, 0, "0")
-            rob_struct.addu("rs" + RF_rs_idx + "_rdata",     Exu_cfg_rf.RF_width-1, 0, "0")
+            iq_struct.addu("rs" + RF_rs_idx + "_rdy",     0, 0, "0")
+            iq_struct.addu("rs" + RF_rs_idx + "_tag",     MultiExu_cfg_rf.PRF_addr_width-1, 0, "0")
+            iq_struct.addu("rs" + RF_rs_idx + "_rdata",     Exu_cfg_rf.RF_width-1, 0, "0")
         }
-        rob_struct.addu("rd_tag",     MultiExu_cfg_rf.PRF_addr_width-1, 0, "0")
-        rob_struct.addu("rd_tag_prev",     MultiExu_cfg_rf.PRF_addr_width-1, 0, "0")                 // freeing
-        rob_struct.addu("rd_tag_prev_clr",     0, 0, "0")
-        rob_struct.addu("wb_ext",     0, 0, "0")
+        iq_struct.addu("rd_tag",     MultiExu_cfg_rf.PRF_addr_width-1, 0, "0")
+        iq_struct.addu("rd_tag_prev",     MultiExu_cfg_rf.PRF_addr_width-1, 0, "0")                 // freeing
+        iq_struct.addu("rd_tag_prev_clr",     0, 0, "0")
+        iq_struct.addu("wb_ext",     0, 0, "0")
 
         var TranslateInfo = __TranslateInfo()
 
-        var rob = cyclix_gen.global("genrob", rob_struct, rob_size-1, 0)
-        var rob_wr_ptr = cyclix_gen.uglobal("genrob_wr_ptr", GetWidthToContain(rob_size)-1, 0, "0")
-        var rob_wr_ptr_prev = cyclix_gen.ulocal("genrob_wr_ptr_prev", GetWidthToContain(rob_size)-1, 0, "0")
-        var rob_wr_ptr_inc = cyclix_gen.ulocal("genrob_wr_ptr_inc", GetWidthToContain(rob_size)-1, 0, "0")
-        var rob_wr_ptr_dec = cyclix_gen.ulocal("genrob_wr_ptr_dec", GetWidthToContain(rob_size)-1, 0, "0")
-        var rob_wr = cyclix_gen.ulocal("genrob_wr", 0, 0, "0")      // new entry entered ROB tail
-        var rob_rd = cyclix_gen.ulocal("genrob_rd", 0, 0, "0")      // entry removed from ROB head
-        var rob_full = cyclix_gen.uglobal("genrob_full", 0, 0, "0")      // entry removed from ROB head
+        var iq = cyclix_gen.global("geniq", iq_struct, iq_size-1, 0)
+        var iq_wr_ptr = cyclix_gen.uglobal("geniq_wr_ptr", GetWidthToContain(iq_size)-1, 0, "0")
+        var iq_wr_ptr_prev = cyclix_gen.ulocal("geniq_wr_ptr_prev", GetWidthToContain(iq_size)-1, 0, "0")
+        var iq_wr_ptr_inc = cyclix_gen.ulocal("geniq_wr_ptr_inc", GetWidthToContain(iq_size)-1, 0, "0")
+        var iq_wr_ptr_dec = cyclix_gen.ulocal("geniq_wr_ptr_dec", GetWidthToContain(iq_size)-1, 0, "0")
+        var iq_wr = cyclix_gen.ulocal("geniq_wr", 0, 0, "0")      // new entry entered ROB tail
+        var iq_rd = cyclix_gen.ulocal("geniq_rd", 0, 0, "0")      // entry removed from ROB head
+        var iq_full = cyclix_gen.uglobal("geniq_full", 0, 0, "0")      // entry removed from ROB head
 
         var ExUnits_insts = ArrayList<ArrayList<cyclix.hw_subproc>>()
 
@@ -340,73 +341,73 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             TranslateInfo.exu_assocs.put(ExUnit.value.ExecUnit, exu_info)
         }
 
-        cyclix_gen.assign(rob_wr_ptr_prev, rob_wr_ptr)
-        cyclix_gen.add_gen(rob_wr_ptr_inc, rob_wr_ptr, 1)
-        cyclix_gen.sub_gen(rob_wr_ptr_dec, rob_wr_ptr, 1)
+        cyclix_gen.assign(iq_wr_ptr_prev, iq_wr_ptr)
+        cyclix_gen.add_gen(iq_wr_ptr_inc, iq_wr_ptr, 1)
+        cyclix_gen.sub_gen(iq_wr_ptr_dec, iq_wr_ptr, 1)
 
         // committing ROB head
-        var rob_head = cyclix_gen.local("genrob_head", rob_struct)
-        cyclix_gen.assign(rob_head, cyclix_gen.indexed(rob, 0))
-        cyclix_gen.begif(cyclix_gen.band(cyclix_gen.subStruct(rob_head, "enb"), cyclix_gen.subStruct(rob_head, "rdy")))
+        var iq_head = cyclix_gen.local("geniq_head", iq_struct)
+        cyclix_gen.assign(iq_head, cyclix_gen.indexed(iq, 0))
+        cyclix_gen.begif(cyclix_gen.band(cyclix_gen.subStruct(iq_head, "enb"), cyclix_gen.subStruct(iq_head, "rdy")))
         run {
 
             // external wb (stores)
-            cyclix_gen.begif(cyclix_gen.subStruct(rob_head, "wb_ext"))
+            cyclix_gen.begif(cyclix_gen.subStruct(iq_head, "wb_ext"))
             run {
-                cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(cmd_resp, cyclix_gen.subStruct(rob_head, "rs0_rdata")))
+                cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(cmd_resp, cyclix_gen.subStruct(iq_head, "rs0_rdata")))
                 run {
-                    cyclix_gen.assign(rob_rd, 1)
+                    cyclix_gen.assign(iq_rd, 1)
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
 
             // loads and execs
             cyclix_gen.begelse()
             run {
-                cyclix_gen.begif(cyclix_gen.subStruct(rob_head, "rd_tag_prev_clr"))
+                cyclix_gen.begif(cyclix_gen.subStruct(iq_head, "rd_tag_prev_clr"))
                 run {
                     // PRF written, and previous tag can be remapped
                     cyclix_gen.assign(
                         PRF_mapped,
-                        hw_fracs(hw_frac_V(cyclix_gen.subStruct(rob_head, "rd_tag_prev"))),
+                        hw_fracs(hw_frac_V(cyclix_gen.subStruct(iq_head, "rd_tag_prev"))),
                         0)
                 }; cyclix_gen.endif()
-                cyclix_gen.assign(rob_rd, 1)
+                cyclix_gen.assign(iq_rd, 1)
             }; cyclix_gen.endif()
 
             // ROB processing
-            cyclix_gen.begif(rob_rd)
+            cyclix_gen.begif(iq_rd)
             run {
-                cyclix_gen.assign(rob_full, 0)
+                cyclix_gen.assign(iq_full, 0)
                 // shifting ops
-                var rob_shift_iter = cyclix_gen.begforrange_asc(rob, hw_imm(0), hw_imm(rob.vartype.dimensions.last().msb-1))
+                var iq_shift_iter = cyclix_gen.begforrange_asc(iq, hw_imm(0), hw_imm(iq.vartype.dimensions.last().msb-1))
                 run {
                     cyclix_gen.assign(
-                        rob,
-                        hw_fracs(hw_frac_V(rob_shift_iter.iter_num)),
-                        cyclix_gen.indexed(rob, rob_shift_iter.iter_num_next))
+                        iq,
+                        hw_fracs(hw_frac_V(iq_shift_iter.iter_num)),
+                        cyclix_gen.indexed(iq, iq_shift_iter.iter_num_next))
                 }; cyclix_gen.endloop()
                 cyclix_gen.assign(
-                    rob,
-                    hw_fracs(hw_frac_C(rob.vartype.dimensions.last().msb)),
+                    iq,
+                    hw_fracs(hw_frac_C(iq.vartype.dimensions.last().msb)),
                     0)
-                cyclix_gen.assign(rob_wr_ptr, rob_wr_ptr_dec)
+                cyclix_gen.assign(iq_wr_ptr, iq_wr_ptr_dec)
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
 
         // issuing operations from ROB to FUs
         MSG("Translating: issuing operations from ROB to FUs")
-        var rob_iter = cyclix_gen.begforall_asc(rob)
+        var iq_iter = cyclix_gen.begforall_asc(iq)
         run {
-            cyclix_gen.begif(cyclix_gen.subStruct(rob_iter.iter_elem, "enb"))
+            cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "enb"))
             run {
                 var rss_rdy = cyclix_gen.ulocal(cyclix_gen.GetGenName("rss_rdy"), 0, 0, "0")
                 cyclix_gen.assign(rss_rdy, 1)
                 for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
-                    cyclix_gen.band_gen(rss_rdy, rss_rdy, cyclix_gen.subStruct(rob_iter.iter_elem, "rs" + RF_rs_idx + "_rdy"))
+                    cyclix_gen.band_gen(rss_rdy, rss_rdy, cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_rdy"))
                 }
                 cyclix_gen.begif(rss_rdy)
                 run {
-                    cyclix_gen.begif(cyclix_gen.subStruct(rob_iter.iter_elem, "fu_req"))
+                    cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "fu_req"))
                     run {
                         // writing op to FU
                         var fu_id = 0
@@ -414,35 +415,35 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
                             for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
 
-                                cyclix_gen.begif(!cyclix_gen.subStruct(cyclix_gen.indexed(rob, rob_iter.iter_num), "fu_pending"))
+                                cyclix_gen.begif(!cyclix_gen.subStruct(cyclix_gen.indexed(iq, iq_iter.iter_num), "fu_pending"))
                                 run {
 
-                                    cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "fu_id"), fu_id))
+                                    cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(iq_iter.iter_elem, "fu_id"), fu_id))
                                     run {
 
-                                        // filling exu_req with rob data
+                                        // filling exu_req with iq data
                                         cyclix_gen.assign(
                                             exu_req,
                                             hw_fracs(hw_frac_SubStruct("opcode")),
-                                            cyclix_gen.subStruct(rob_iter.iter_elem, "fu_opcode"))
+                                            cyclix_gen.subStruct(iq_iter.iter_elem, "fu_opcode"))
 
                                         for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
                                             cyclix_gen.assign(
                                                 exu_req,
                                                 hw_fracs(hw_frac_SubStruct("rs" + RF_rs_idx + "_rdata")),
-                                                cyclix_gen.subStruct(rob_iter.iter_elem, "rs" + RF_rs_idx + "_rdata"))
+                                                cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_rdata"))
                                         }
 
                                         cyclix_gen.assign(
                                             exu_req,
                                             hw_fracs(hw_frac_SubStruct("rd_tag")),
-                                            cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"))
+                                            cyclix_gen.subStruct(iq_iter.iter_elem, "rd_tag"))
 
                                         cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(ExUnits_insts[exu_num][exu_inst_num], cyclix.STREAM_REQ_BUS_NAME, exu_req))
                                         run {
                                             cyclix_gen.assign(
-                                                rob,
-                                                hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("fu_pending")),
+                                                iq,
+                                                hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("fu_pending")),
                                                 1)
                                         }; cyclix_gen.endif()
 
@@ -458,7 +459,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             }; cyclix_gen.endif()
         }; cyclix_gen.endloop()
 
-        var renamed_uop_buf = cyclix_gen.global("genrenamed_uop_buf", rob_struct)
+        var renamed_uop_buf = cyclix_gen.global("genrenamed_uop_buf", iq_struct)
 
         // broadcasting FU results to ROB and renamed buffer
         MSG("Translating: broadcasting FU results to ROB")
@@ -479,25 +480,25 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                         cyclix_gen.subStruct(exu_resp, "wdata"))
 
                     // broadcasting FU results to ROB
-                    rob_iter = cyclix_gen.begforall_asc(rob)
+                    iq_iter = cyclix_gen.begforall_asc(iq)
                     run {
 
-                        cyclix_gen.begif(cyclix_gen.subStruct(rob_iter.iter_elem, "enb"))
+                        cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "enb"))
                         run {
 
                             for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
-                                cyclix_gen.begif(!cyclix_gen.subStruct(rob_iter.iter_elem, "rs" + RF_rs_idx + "_rdy"))
+                                cyclix_gen.begif(!cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_rdy"))
                                 run {
-                                    cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rs" + RF_rs_idx + "_tag"), cyclix_gen.subStruct(exu_resp, "tag")))
+                                    cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(iq_iter.iter_elem, "rs" + RF_rs_idx + "_tag"), cyclix_gen.subStruct(exu_resp, "tag")))
                                     run {
                                         // setting ROB entry ready
                                         cyclix_gen.assign(
-                                            rob,
-                                            hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rs" + RF_rs_idx + "_rdata")),
+                                            iq,
+                                            hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rs" + RF_rs_idx + "_rdata")),
                                             cyclix_gen.subStruct(exu_resp, "wdata"))
                                         cyclix_gen.assign(
-                                            rob,
-                                            hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rs" + RF_rs_idx + "_rdy")),
+                                            iq,
+                                            hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rs" + RF_rs_idx + "_rdy")),
                                             1)
                                     }; cyclix_gen.endif()
                                 }; cyclix_gen.endif()
@@ -505,21 +506,21 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
                             //// setting rdy if data generated ////
                             // wb_ext //
-                            cyclix_gen.begif(cyclix_gen.subStruct(rob_iter.iter_elem, "wb_ext"))
+                            cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "wb_ext"))
                             run {
                                 cyclix_gen.assign(
-                                    rob,
-                                    hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rdy")),
-                                    cyclix_gen.subStruct(cyclix_gen.indexed(rob, rob_iter.iter_num), "rs0_rdy"))
+                                    iq,
+                                    hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rdy")),
+                                    cyclix_gen.subStruct(cyclix_gen.indexed(iq, iq_iter.iter_num), "rs0_rdy"))
                             }; cyclix_gen.endif()
                             // fu_req //
-                            cyclix_gen.begif(cyclix_gen.subStruct(rob_iter.iter_elem, "fu_pending"))
+                            cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "fu_pending"))
                             run {
-                                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(rob_iter.iter_elem, "rd_tag"), cyclix_gen.subStruct(exu_resp, "tag")))
+                                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(iq_iter.iter_elem, "rd_tag"), cyclix_gen.subStruct(exu_resp, "tag")))
                                 run {
                                     cyclix_gen.assign(
-                                        rob,
-                                        hw_fracs(hw_frac_V(rob_iter.iter_num), hw_frac_SubStruct("rdy")),
+                                        iq,
+                                        hw_fracs(hw_frac_V(iq_iter.iter_num), hw_frac_SubStruct("rdy")),
                                         1)
                                 }; cyclix_gen.endif()
                             }; cyclix_gen.endif()
@@ -564,38 +565,38 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             fu_id++
         }
 
-        // acquiring new operation to rob tail
+        // acquiring new operation to iq tail
         cyclix_gen.begif(cyclix_gen.subStruct(renamed_uop_buf, "enb"))
         run {
-            cyclix_gen.begif(!rob_full)
+            cyclix_gen.begif(!iq_full)
             run {
-                // signaling rob_wr
-                cyclix_gen.assign(rob_wr, 1)
+                // signaling iq_wr
+                cyclix_gen.assign(iq_wr, 1)
 
                 // putting new uop in ROB
                 cyclix_gen.assign(
-                    rob,
-                    hw_fracs(hw_frac_V(rob_wr_ptr)),
+                    iq,
+                    hw_fracs(hw_frac_V(iq_wr_ptr)),
                     renamed_uop_buf
                 )
 
-                // rob_wr_ptr update
-                cyclix_gen.begif(rob_wr)
+                // iq_wr_ptr update
+                cyclix_gen.begif(iq_wr)
                 run {
-                    // asserting rob_full - checking if data written to last available entry
-                    cyclix_gen.begif(cyclix_gen.eq2(rob_wr_ptr, rob.vartype.dimensions.last().msb))
+                    // asserting iq_full - checking if data written to last available entry
+                    cyclix_gen.begif(cyclix_gen.eq2(iq_wr_ptr, iq.vartype.dimensions.last().msb))
                     run {
-                        cyclix_gen.assign(rob_full, 1)
+                        cyclix_gen.assign(iq_full, 1)
                     }; cyclix_gen.endif()
 
-                    // incrementing rob_wr_ptr
-                    cyclix_gen.begif(rob_rd)
+                    // incrementing iq_wr_ptr
+                    cyclix_gen.begif(iq_rd)
                     run {
-                        cyclix_gen.assign(rob_wr_ptr, rob_wr_ptr_prev)
+                        cyclix_gen.assign(iq_wr_ptr, iq_wr_ptr_prev)
                     }; cyclix_gen.endif()
                     cyclix_gen.begelse()
                     run {
-                        cyclix_gen.assign(rob_wr_ptr, rob_wr_ptr_inc)
+                        cyclix_gen.assign(iq_wr_ptr, iq_wr_ptr_inc)
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
 
@@ -610,7 +611,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         }; cyclix_gen.endif()
 
         // renaming
-        var new_renamed_uop = cyclix_gen.local("gennew_renamed_uop", rob_struct)
+        var new_renamed_uop = cyclix_gen.local("gennew_renamed_uop", iq_struct)
         cyclix_gen.begif(!cyclix_gen.subStruct(renamed_uop_buf, "enb"))         // checking if renamed uop buffer is empty
         run {
             cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(cmd_req, cmd_req_data))

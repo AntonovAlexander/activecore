@@ -13,7 +13,7 @@ import reordex.*
 
 val Exu_cfg_rf = Exu_CFG_RF(32, 3)
 
-class EXU_INTEGER(stage_num: Int) : reordex.Exu("INTEGER", Exu_cfg_rf, stage_num) {
+class EXU_INTEGER() : reordex.Exu("INTEGER", Exu_cfg_rf) {
 
     // ALU opcodes
     val aluop_ADD		= 0
@@ -126,7 +126,7 @@ class EXU_INTEGER(stage_num: Int) : reordex.Exu("INTEGER", Exu_cfg_rf, stage_num
     }
 }
 
-class EXU_ADD(stage_num: Int) : reordex.Exu("ADD", Exu_cfg_rf, stage_num) {
+class EXU_ADD() : reordex.Exu("ADD", Exu_cfg_rf) {
 
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op2         = ulocal("alu_op2", 31, 0, "0")
@@ -140,7 +140,7 @@ class EXU_ADD(stage_num: Int) : reordex.Exu("ADD", Exu_cfg_rf, stage_num) {
     }
 }
 
-class EXU_MUL(stage_num: Int) : reordex.Exu("MUL", Exu_cfg_rf, stage_num) {
+class EXU_MUL() : reordex.Exu("MUL", Exu_cfg_rf) {
 
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op2         = ulocal("alu_op2", 31, 0, "0")
@@ -154,7 +154,7 @@ class EXU_MUL(stage_num: Int) : reordex.Exu("MUL", Exu_cfg_rf, stage_num) {
     }
 }
 
-class EXU_XOR(stage_num: Int) : reordex.Exu("XOR", Exu_cfg_rf, stage_num) {
+class EXU_XOR() : reordex.Exu("XOR", Exu_cfg_rf) {
 
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op2         = ulocal("alu_op2", 31, 0, "0")
@@ -168,7 +168,7 @@ class EXU_XOR(stage_num: Int) : reordex.Exu("XOR", Exu_cfg_rf, stage_num) {
     }
 }
 
-class EXU_SHIFT(stage_num: Int) : reordex.Exu("SHIFT", Exu_cfg_rf, stage_num) {
+class EXU_SHIFT() : reordex.Exu("SHIFT", Exu_cfg_rf) {
 
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op2         = ulocal("alu_op2", 31, 0, "0")
@@ -182,7 +182,7 @@ class EXU_SHIFT(stage_num: Int) : reordex.Exu("SHIFT", Exu_cfg_rf, stage_num) {
     }
 }
 
-class EXU_FP_ADD_SUB(stage_num: Int) : reordex.Exu("FP_ADD_SUB", Exu_cfg_rf, stage_num) {
+class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", Exu_cfg_rf) {
 
     var opcode      = ulocal("opcode", 31, 0, "0")
     var rs0         = ulocal("rs0", 31, 0, "0")
@@ -207,7 +207,7 @@ class EXU_FP_ADD_SUB(stage_num: Int) : reordex.Exu("FP_ADD_SUB", Exu_cfg_rf, sta
     }
 }
 
-class EXU_FP_MUL(stage_num: Int) : reordex.Exu("FP_MUL", Exu_cfg_rf, stage_num) {
+class EXU_FP_MUL() : reordex.Exu("FP_MUL", Exu_cfg_rf) {
 
     var opcode      = ulocal("opcode", 31, 0, "0")
     var rs0         = ulocal("rs0", 31, 0, "0")
@@ -225,7 +225,7 @@ class EXU_FP_MUL(stage_num: Int) : reordex.Exu("FP_MUL", Exu_cfg_rf, stage_num) 
     }
 }
 
-class EXU_FP_DIV(stage_num: Int) : reordex.Exu("FP_DIV", Exu_cfg_rf, stage_num) {
+class EXU_FP_DIV() : reordex.Exu("FP_DIV", Exu_cfg_rf) {
 
     var opcode      = ulocal("opcode", 31, 0, "0")
     var rs0         = ulocal("rs0", 31, 0, "0")
@@ -243,7 +243,7 @@ class EXU_FP_DIV(stage_num: Int) : reordex.Exu("FP_DIV", Exu_cfg_rf, stage_num) 
     }
 }
 
-class EXU_FP_FMA(stage_num: Int) : reordex.Exu("FP_FMA", Exu_cfg_rf, stage_num) {
+class EXU_FP_FMA() : reordex.Exu("FP_FMA", Exu_cfg_rf) {
 
     var opcode      = ulocal("opcode", 31, 0, "0")
     var rs0         = ulocal("rs0", 31, 0, "0")
@@ -268,9 +268,9 @@ class test_multiexu(name_in : String) : reordex.MultiExu(name_in, Exu_cfg_rf, Mu
         //add_exu(EXU_XOR(4), 1)
         //add_exu(EXU_SHIFT(1), 1)
 
-        add_exu(EXU_FP_ADD_SUB(2), 2)
-        add_exu(EXU_FP_MUL(2), 1)
-        add_exu(EXU_FP_DIV(2), 1)
-        add_exu(EXU_FP_FMA(2), 1)
+        add_exu(EXU_FP_ADD_SUB(), 2, 4)
+        add_exu(EXU_FP_MUL(), 1, 4)
+        add_exu(EXU_FP_DIV(), 1, 4)
+        add_exu(EXU_FP_FMA(), 1, 4)
     }
 }

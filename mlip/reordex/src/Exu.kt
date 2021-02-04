@@ -30,7 +30,7 @@ class Exu_CFG_RF(val RF_width : Int,
     }
 }
 
-open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val stage_num: Int) : hw_astc_stdif() {
+open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF) : hw_astc_stdif() {
 
     override var GenNamePrefix   = "reordex"
 
