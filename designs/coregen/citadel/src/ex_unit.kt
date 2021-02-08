@@ -193,7 +193,6 @@ class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", Exu_cfg_rf) {
         run {
             result.assign(rs[0] - rs[1])
         }; endif()
-        resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), result)
     }
 }
 
@@ -201,7 +200,6 @@ class EXU_FP_MUL() : reordex.Exu("FP_MUL", Exu_cfg_rf) {
 
     init {
         result.assign(rs[0] * rs[1])
-        resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), result)
     }
 }
 
@@ -209,7 +207,6 @@ class EXU_FP_DIV() : reordex.Exu("FP_DIV", Exu_cfg_rf) {
 
     init {
         result.assign(rs[0] / rs[1])
-        resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), result)
     }
 }
 
@@ -217,7 +214,6 @@ class EXU_FP_FMA() : reordex.Exu("FP_FMA", Exu_cfg_rf) {
 
     init {
         result.assign((rs[0] * rs[1]) + rs[2])
-        resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), result)
     }
 }
 
