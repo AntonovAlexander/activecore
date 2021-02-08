@@ -184,24 +184,14 @@ class EXU_SHIFT() : reordex.Exu("SHIFT", Exu_cfg_rf) {
 
 class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", Exu_cfg_rf) {
 
-    var opcode      = ulocal("opcode", 31, 0, "0")
-    var rs0         = ulocal("rs0", 31, 0, "0")
-    var rs1         = ulocal("rs1", 31, 0, "0")
-    var rs2         = ulocal("rs2", 31, 0, "0")
-    var result      = ulocal("alu_result", 31, 0, "0")
-
     init {
-        opcode.assign(subStruct(req_data, "opcode"))
-        rs0.assign(subStruct(req_data, "rs0_rdata"))
-        rs1.assign(subStruct(req_data, "rs1_rdata"))
-        rs2.assign(subStruct(req_data, "rs2_rdata"))
         begif(eq2(opcode, 0))
         run {
-            result.assign(rs0 + rs1)
+            result.assign(rs[0] + rs[1])
         }; endif()
         begelse()
         run {
-            result.assign(rs0 - rs1)
+            result.assign(rs[0] - rs[1])
         }; endif()
         resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), result)
     }
@@ -209,59 +199,29 @@ class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", Exu_cfg_rf) {
 
 class EXU_FP_MUL() : reordex.Exu("FP_MUL", Exu_cfg_rf) {
 
-    var opcode      = ulocal("opcode", 31, 0, "0")
-    var rs0         = ulocal("rs0", 31, 0, "0")
-    var rs1         = ulocal("rs1", 31, 0, "0")
-    var rs2         = ulocal("rs2", 31, 0, "0")
-    var result      = ulocal("alu_result", 31, 0, "0")
-
     init {
-        opcode.assign(subStruct(req_data, "opcode"))
-        rs0.assign(subStruct(req_data, "rs0_rdata"))
-        rs1.assign(subStruct(req_data, "rs1_rdata"))
-        rs2.assign(subStruct(req_data, "rs2_rdata"))
-        result.assign(rs0 * rs1)
+        result.assign(rs[0] * rs[1])
         resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), result)
     }
 }
 
 class EXU_FP_DIV() : reordex.Exu("FP_DIV", Exu_cfg_rf) {
 
-    var opcode      = ulocal("opcode", 31, 0, "0")
-    var rs0         = ulocal("rs0", 31, 0, "0")
-    var rs1         = ulocal("rs1", 31, 0, "0")
-    var rs2         = ulocal("rs2", 31, 0, "0")
-    var result      = ulocal("alu_result", 31, 0, "0")
-
     init {
-        opcode.assign(subStruct(req_data, "opcode"))
-        rs0.assign(subStruct(req_data, "rs0_rdata"))
-        rs1.assign(subStruct(req_data, "rs1_rdata"))
-        rs2.assign(subStruct(req_data, "rs2_rdata"))
-        result.assign(rs0 / rs1)
+        result.assign(rs[0] / rs[1])
         resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), result)
     }
 }
 
 class EXU_FP_FMA() : reordex.Exu("FP_FMA", Exu_cfg_rf) {
 
-    var opcode      = ulocal("opcode", 31, 0, "0")
-    var rs0         = ulocal("rs0", 31, 0, "0")
-    var rs1         = ulocal("rs1", 31, 0, "0")
-    var rs2         = ulocal("rs2", 31, 0, "0")
-    var result      = ulocal("alu_result", 31, 0, "0")
-
     init {
-        opcode.assign(subStruct(req_data, "opcode"))
-        rs0.assign(subStruct(req_data, "rs0_rdata"))
-        rs1.assign(subStruct(req_data, "rs1_rdata"))
-        rs2.assign(subStruct(req_data, "rs2_rdata"))
-        result.assign((rs0 * rs1) + rs2)
+        result.assign((rs[0] * rs[1]) + rs[2])
         resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), result)
     }
 }
 
-class test_multiexu(name_in : String) : reordex.MultiExu(name_in, Exu_cfg_rf, MultiExu_CFG_RF(16, false, 32), 4) {
+class test_multiexu(name_in : String) : reordex.MultiExu(name_in, Exu_cfg_rf, MultiExu_CFG_RF(32, true, 64), 4) {
 
     init {
         //add_exu(EXU_ADD(2), 2)

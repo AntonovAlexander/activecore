@@ -40,10 +40,21 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF) : hw_astc_stdif()
     var req_data = local(GetGenName("req_data"), Exu_cfg_rf.req_struct)
     var resp_data = local(GetGenName("resp_data"), Exu_cfg_rf.resp_struct)
 
+    var opcode      = ulocal("opcode", 31, 0, "0")
+    var rs          = ArrayList<hw_var>()
+    var result      = ulocal("result", Exu_cfg_rf.RF_width-1, 0, "0")
+
     init {
         if (FROZEN_FLAG) ERROR("Failed to begin stage " + name + ": ASTC frozen")
         if (this.size != 0) ERROR("reordex ASTC inconsistent!")
         add(hw_exec(OP_EXU))
+
+        opcode.assign(subStruct(req_data, "opcode"))
+        for (rs_num in 0 until Exu_cfg_rf.RF_rs_num) {
+            rs.add(ulocal("rs" + rs_num, Exu_cfg_rf.RF_width-1, 0, "0"))
+            rs[rs_num].assign(subStruct(req_data, "rs" + rs_num + "_rdata"))
+        }
+
     }
 
     fun endexu() {

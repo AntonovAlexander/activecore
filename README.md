@@ -26,11 +26,11 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
 
-	* **cyclix** (**cycli**c e**x**ecution) - generator of hardware performing statically scheduled cyclic computations. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Xilinx HLS
+	* **cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Xilinx HLS
 
 	* **pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
 
-	* **reordex** (**reorde**red e**x**ecution) - generator of co-processors with superscalar out-of-order microarchitecture and register renaming. Translates to cyclix MLIP
+	* **reordex** (**reorde**red e**x**ecution) - generator of co-processors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to cyclix MLIP
 
 * core generators based on MLIP cores (/designs/coregen):
 
@@ -38,7 +38,7 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 
-	* **citadel** (*in development*) - experimental co-processor, based on reordex MLIP core
+	* **citadel** - experimental OoO FPU co-processor, based on reordex MLIP core
 
 Other reusable cores:
 
