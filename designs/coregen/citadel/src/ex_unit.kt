@@ -217,7 +217,7 @@ class EXU_FP_FMA() : reordex.Exu("FP_FMA", Exu_cfg_rf) {
     }
 }
 
-class test_multiexu(name_in : String) : reordex.MultiExu(name_in, Exu_cfg_rf, MultiExu_CFG_RF(32, true, 64), 4) {
+class test_multiexu(name : String) : reordex.MultiExu(name, Exu_cfg_rf, MultiExu_CFG_RF(32, true, 64), 4) {
 
     init {
         //add_exu(EXU_ADD(2), 2)

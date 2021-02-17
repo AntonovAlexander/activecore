@@ -22,7 +22,7 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 * **hwast** - generic AST constructor for behavioral HW specifications (/hwast)
 
-* MLIP cores based on hwast (/mlip):
+* Demo MLIP cores based on hwast (/mlip):
 
 	* **rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
 
@@ -32,25 +32,25 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **reordex** (**reorde**red e**x**ecution) - generator of co-processors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to cyclix MLIP
 
-* core generators based on MLIP cores (/designs/coregen):
+* Demo core generators based on MLIP cores (/designs/coregen):
 
 	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on pipex MLIP core
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 
-	* **citadel** - experimental OoO FPU co-processor, based on reordex MLIP core
+	* **citadel** - OoO FPU coprocessor, based on reordex MLIP core
 
-Other reusable cores:
+* Auxiliary reusable cores:
 
-* **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Reference lab work manual included. Location: /designs/rtl/udm
+	* **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Reference lab work manual included. Location: /designs/rtl/udm
 
-* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, interrupt controller, timer, Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equivalent to UDM bus protocol. Location: /designs/rtl/sigma_tile
+	* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, interrupt controller, timer, Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equivalent to UDM bus protocol. Location: /designs/rtl/sigma_tile
 
-Demo FPGA-based SoCs:
+* Demo FPGA-based SoCs:
 
-* **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Reference lab work manual included. Location: /designs/rtl/sigma
+	* **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Reference lab work manual included. Location: /designs/rtl/sigma
 
-* **Magma** - NUMA MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
+	* **Magma** - NUMA MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
 
 ### Publications
 
