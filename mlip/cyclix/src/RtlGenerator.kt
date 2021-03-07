@@ -56,118 +56,19 @@ class RtlGenerator(var cyclix_module : Generic) {
     }
 
     fun export_expr(rtl_gen : hw_astc,
-                    expr : hw_exec,
-                    rst : hw_port) {
+                    expr : hw_exec) {
 
         println("#### Cyclix: exporting expression: " + expr.opcode.default_string)
         // for (param in expr.params) println("param: " + param.GetString())
         // for (wrvar in expr.wrvars) println("wrvar: " + wrvar.name)
 
-        var fractions = hw_fracs()
-        for (src_fraction in expr.assign_tgt_fractured.depow_fractions) {
-            if (src_fraction is hw_frac_C) fractions.add(src_fraction)
-            else if (src_fraction is hw_frac_V) fractions.add(hw_frac_V(TranslateVar(src_fraction.index, var_dict)))
-            else if (src_fraction is hw_frac_CC) fractions.add(src_fraction)
-            else if (src_fraction is hw_frac_CV) fractions.add(hw_frac_CV(src_fraction.msb, TranslateVar(src_fraction.lsb, var_dict)))
-            else if (src_fraction is hw_frac_VC) fractions.add(hw_frac_VC(TranslateVar(src_fraction.msb, var_dict), src_fraction.lsb))
-            else if (src_fraction is hw_frac_VV) fractions.add(hw_frac_VV(TranslateVar(src_fraction.msb, var_dict), TranslateVar(src_fraction.lsb, var_dict)))
-            else if (src_fraction is hw_frac_SubStruct) fractions.add(src_fraction)
-            else ERROR("dimensions error")
-        }
-
-        if ((expr.opcode == OP1_ASSIGN)) {
-            rtl_gen.assign(TranslateVar(expr.wrvars[0], var_dict), fractions, TranslateParam(expr.params[0], var_dict))
-
-        } else if ((expr.opcode == OP2_ARITH_ADD)
-            || (expr.opcode == OP2_ARITH_SUB)
-            || (expr.opcode == OP2_ARITH_MUL)
-            || (expr.opcode == OP2_ARITH_DIV)
-            || (expr.opcode == OP2_ARITH_SLL)
-            || (expr.opcode == OP2_ARITH_SRL)
-            || (expr.opcode == OP2_ARITH_SRA)
-
-            || (expr.opcode == OP1_LOGICAL_NOT)
-            || (expr.opcode == OP2_LOGICAL_AND)
-            || (expr.opcode == OP2_LOGICAL_OR)
-            || (expr.opcode == OP2_LOGICAL_G)
-            || (expr.opcode == OP2_LOGICAL_L)
-            || (expr.opcode == OP2_LOGICAL_GEQ)
-            || (expr.opcode == OP2_LOGICAL_LEQ)
-            || (expr.opcode == OP2_LOGICAL_EQ2)
-            || (expr.opcode == OP2_LOGICAL_NEQ2)
-            || (expr.opcode == OP2_LOGICAL_EQ4)
-            || (expr.opcode == OP2_LOGICAL_NEQ4)
-
-            || (expr.opcode == OP1_COMPLEMENT)
-            || (expr.opcode == OP1_BITWISE_NOT)
-            || (expr.opcode == OP2_BITWISE_AND)
-            || (expr.opcode == OP2_BITWISE_OR)
-            || (expr.opcode == OP2_BITWISE_XOR)
-            || (expr.opcode == OP2_BITWISE_XNOR)
-
-            || (expr.opcode == OP1_REDUCT_AND)
-            || (expr.opcode == OP1_REDUCT_NAND)
-            || (expr.opcode == OP1_REDUCT_OR)
-            || (expr.opcode == OP1_REDUCT_NOR)
-            || (expr.opcode == OP1_REDUCT_XOR)
-            || (expr.opcode == OP1_REDUCT_XNOR)
-
-            || (expr.opcode == OP2_INDEXED)
-            || (expr.opcode == OP3_RANGED)
-            || (expr.opcode == OPS_CNCT)) {
-
-            var params = ArrayList<hw_param>()
-            for (param in expr.params) {
-                params.add(TranslateParam(param, var_dict))
-            }
-            rtl_gen.AddExpr_op_gen(expr.opcode, TranslateVar(expr.wrvars[0], var_dict), params)
-
-        } else if (expr.opcode == OP2_SUBSTRUCT) {
-            rtl_gen.subStruct_gen(
-                TranslateVar(expr.wrvars[0], var_dict),
-                TranslateVar(expr.rdvars[0], var_dict),
-                expr.subStructvar_name
-            )
-
-        } else if (expr.opcode == OP1_IF) {
-
-            rtl_gen.begif(TranslateParam(expr.params[0], var_dict))
-            run {
-                for (child_expr in expr.expressions) {
-                    export_expr(rtl_gen, child_expr, rst)
-                }
-            }; rtl_gen.endif()
-
-        } else if (expr.opcode == OP1_CASE) {
-
-            rtl_gen.begcase(TranslateParam(expr.params[0], var_dict))
-            run {
-                for (casebranch in expr.expressions) {
-                    if (casebranch.opcode != OP1_CASEBRANCH) ERROR("non-branch op in case")
-                    rtl_gen.begbranch(TranslateParam(casebranch.params[0], var_dict))
-                    for (subexpr in casebranch.expressions) {
-                        export_expr(rtl_gen, subexpr, rst)
-                    }
-                    rtl_gen.endbranch()
-                }
-            }; rtl_gen.endcase()
-
-        } else if (expr.opcode == OP1_WHILE) {
-
-            rtl_gen.begwhile(TranslateParam(expr.params[0], var_dict))
-            run {
-                for (child_expr in expr.expressions) {
-                    export_expr(rtl_gen, child_expr, rst)
-                }
-            }; rtl_gen.endloop()
-
-        } else if (expr.opcode == OP_FIFO_WR_UNBLK) {
+        if (expr.opcode == OP_FIFO_WR_UNBLK) {
 
             var fifo = TranslateFifoOut((expr as hw_exec_fifo_wr_unblk).fifo)
             var wdata_translated = TranslateParam(expr.params[0], var_dict)
             var fifo_rdy = TranslateVar(expr.wrvars[0], var_dict)
 
-            rtl_gen.begif(rtl_gen.lnot(rst))
+            rtl_gen.begif(rtl_gen.lnot((rtl_gen as hw_astc_stdif).getPortByName("rst_i")))
             run {
                 rtl_gen.assign(fifo.ext_req, 1)
                 rtl_gen.begif(fifo.reqbuf_req)
@@ -190,7 +91,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             var fifo_rdy = TranslateVar(expr.wrvars[0], var_dict)
             var rdata_translated = TranslateVar(expr.wrvars[1], var_dict)
 
-            rtl_gen.begif(rtl_gen.lnot(rst))
+            rtl_gen.begif(rtl_gen.lnot((rtl_gen as hw_astc_stdif).getPortByName("rst_i")))
             run {
                 // default: inactive
                 rtl_gen.assign(fifo_rdy, 0)
@@ -230,7 +131,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             println(submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_req.name)
             println("DBG: END")
 
-            rtl_gen.begif(rtl_gen.lnot(rst))
+            rtl_gen.begif(rtl_gen.lnot((rtl_gen as hw_astc_stdif).getPortByName("rst_i")))
             run {
                 rtl_gen.assign(submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_req, 1)
                 rtl_gen.begif(submod_insts_fifos_in[subproc]!![fifo_name]!!.reqbuf_req)
@@ -255,7 +156,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             var fifo_rdy = TranslateVar(expr.wrvars[0], var_dict)
             var rdata_translated = TranslateVar(expr.wrvars[1], var_dict)
 
-            rtl_gen.begif(rtl_gen.lnot(rst))
+            rtl_gen.begif(rtl_gen.lnot((rtl_gen as hw_astc_stdif).getPortByName("rst_i")))
             run {
                 // default: inactive
                 rtl_gen.assign(fifo_rdy, 0)
@@ -275,7 +176,7 @@ class RtlGenerator(var cyclix_module : Generic) {
                 }; rtl_gen.endif()
             }; rtl_gen.endif()
 
-        } else ERROR("Reconstruction of expression failed: opcode undefined: " + expr.opcode.default_string)
+        } else rtl_gen.hwast_export_expr(expr, var_dict, ::export_expr)
 
         // println("#### Cyclix: exporting expression complete!")
     }
@@ -437,7 +338,7 @@ class RtlGenerator(var cyclix_module : Generic) {
 
                         // Generating payload
                         for (expr in cyclix_module.proc.expressions) {
-                            export_expr(rtl_gen, expr, rst)
+                            export_expr(rtl_gen, expr)
                         }
 
                         rtl_gen.assign(streambuf_enb, 1)
@@ -448,7 +349,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             } else {
                 // Generating payload
                 for (expr in cyclix_module.proc.expressions) {
-                    export_expr(rtl_gen, expr, rst)
+                    export_expr(rtl_gen, expr)
                 }
             }
 

@@ -1474,6 +1474,109 @@ open class hw_astc() : ArrayList<hw_exec>() {
         }; endloop()
         return bit_position(found, position)
     }
+
+    fun hwast_export_expr(expr : hw_exec, var_dict : MutableMap<hw_var, hw_var>, export_subexpr : (astc_gen : hw_astc, expr : hw_exec) -> Unit) {
+
+        var fractions = hw_fracs()
+        for (src_fraction in expr.assign_tgt_fractured.depow_fractions) {
+            if (src_fraction is hw_frac_C) fractions.add(src_fraction)
+            else if (src_fraction is hw_frac_V) fractions.add(hw_frac_V(TranslateVar(src_fraction.index, var_dict)))
+            else if (src_fraction is hw_frac_CC) fractions.add(src_fraction)
+            else if (src_fraction is hw_frac_CV) fractions.add(hw_frac_CV(src_fraction.msb, TranslateVar(src_fraction.lsb, var_dict)))
+            else if (src_fraction is hw_frac_VC) fractions.add(hw_frac_VC(TranslateVar(src_fraction.msb, var_dict), src_fraction.lsb))
+            else if (src_fraction is hw_frac_VV) fractions.add(hw_frac_VV(TranslateVar(src_fraction.msb, var_dict), TranslateVar(src_fraction.lsb, var_dict)))
+            else if (src_fraction is hw_frac_SubStruct) fractions.add(src_fraction)
+            else ERROR("dimensions error")
+        }
+
+        if ((expr.opcode == OP1_ASSIGN)) {
+            assign(TranslateVar(expr.wrvars[0], var_dict), fractions, TranslateParam(expr.params[0], var_dict))
+
+        } else if ((expr.opcode == OP2_ARITH_ADD)
+                || (expr.opcode == OP2_ARITH_SUB)
+                || (expr.opcode == OP2_ARITH_MUL)
+                || (expr.opcode == OP2_ARITH_DIV)
+                || (expr.opcode == OP2_ARITH_SLL)
+                || (expr.opcode == OP2_ARITH_SRL)
+                || (expr.opcode == OP2_ARITH_SRA)
+
+                || (expr.opcode == OP1_LOGICAL_NOT)
+                || (expr.opcode == OP2_LOGICAL_AND)
+                || (expr.opcode == OP2_LOGICAL_OR)
+                || (expr.opcode == OP2_LOGICAL_G)
+                || (expr.opcode == OP2_LOGICAL_L)
+                || (expr.opcode == OP2_LOGICAL_GEQ)
+                || (expr.opcode == OP2_LOGICAL_LEQ)
+                || (expr.opcode == OP2_LOGICAL_EQ2)
+                || (expr.opcode == OP2_LOGICAL_NEQ2)
+                || (expr.opcode == OP2_LOGICAL_EQ4)
+                || (expr.opcode == OP2_LOGICAL_NEQ4)
+
+                || (expr.opcode == OP1_COMPLEMENT)
+                || (expr.opcode == OP1_BITWISE_NOT)
+                || (expr.opcode == OP2_BITWISE_AND)
+                || (expr.opcode == OP2_BITWISE_OR)
+                || (expr.opcode == OP2_BITWISE_XOR)
+                || (expr.opcode == OP2_BITWISE_XNOR)
+
+                || (expr.opcode == OP1_REDUCT_AND)
+                || (expr.opcode == OP1_REDUCT_NAND)
+                || (expr.opcode == OP1_REDUCT_OR)
+                || (expr.opcode == OP1_REDUCT_NOR)
+                || (expr.opcode == OP1_REDUCT_XOR)
+                || (expr.opcode == OP1_REDUCT_XNOR)
+
+                || (expr.opcode == OP2_INDEXED)
+                || (expr.opcode == OP3_RANGED)
+                || (expr.opcode == OPS_CNCT)) {
+
+            var params = ArrayList<hw_param>()
+            for (param in expr.params) {
+                params.add(TranslateParam(param, var_dict))
+            }
+            AddExpr_op_gen(expr.opcode, TranslateVar(expr.wrvars[0], var_dict), params)
+
+        } else if (expr.opcode == OP2_SUBSTRUCT) {
+            subStruct_gen(
+                    TranslateVar(expr.wrvars[0], var_dict),
+                    TranslateVar(expr.rdvars[0], var_dict),
+                    expr.subStructvar_name
+            )
+
+        } else if (expr.opcode == OP1_IF) {
+
+            begif(TranslateParam(expr.params[0], var_dict))
+            run {
+                for (child_expr in expr.expressions) {
+                    export_subexpr(this, child_expr)
+                }
+            }; endif()
+
+        } else if (expr.opcode == OP1_CASE) {
+
+            begcase(TranslateParam(expr.params[0], var_dict))
+            run {
+                for (casebranch in expr.expressions) {
+                    if (casebranch.opcode != OP1_CASEBRANCH) ERROR("non-branch op in case")
+                    begbranch(TranslateParam(casebranch.params[0], var_dict))
+                    for (subexpr in casebranch.expressions) {
+                        export_subexpr(this, subexpr)
+                    }
+                    endbranch()
+                }
+            }; endcase()
+
+        } else if (expr.opcode == OP1_WHILE) {
+
+            begwhile(TranslateParam(expr.params[0], var_dict))
+            run {
+                for (child_expr in expr.expressions) {
+                    export_subexpr(this, child_expr)
+                }
+            }; endloop()
+
+        } else ERROR("Reconstruction of expression failed: opcode undefined: " + expr.opcode.default_string)
+    }
 }
 
 open class hw_astc_stdif() : hw_astc() {
@@ -2022,5 +2125,4 @@ open class hw_astc_stdif() : hw_astc() {
         AddExpr(new_expr)
         return genvar
     }
-
 }
