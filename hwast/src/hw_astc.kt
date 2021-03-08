@@ -1475,7 +1475,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return bit_position(found, position)
     }
 
-    fun import_expr(expr : hw_exec, var_dict : MutableMap<hw_var, hw_var>, process_subexpr : (astc_gen : hw_astc, expr : hw_exec) -> Unit) {
+    fun import_expr(DEBUG_FLAG : Boolean, expr : hw_exec, var_dict : MutableMap<hw_var, hw_var>, process_subexpr : (astc_gen : hw_astc, expr : hw_exec) -> Unit) {
 
         var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, var_dict)
 
