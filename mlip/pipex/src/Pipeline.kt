@@ -1323,6 +1323,13 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                     StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict.put(notnew, new_global)
                 }
             }
+
+            for (pContext_local_dict_entry in StageAssocList[CUR_STAGE_INDEX].pContext_local_dict) {
+                StageAssocList[CUR_STAGE_INDEX].var_dict.put(pContext_local_dict_entry.key, pContext_local_dict_entry.value)
+            }
+            for (global_assoc in TranslateInfo.__global_assocs) {
+                StageAssocList[CUR_STAGE_INDEX].var_dict.put(global_assoc.key, global_assoc.value.cyclix_global)
+            }
         }
 
         // Generating logic //

@@ -60,6 +60,8 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
     var pContext_srcglbl_dict   = mutableMapOf<hw_var, hw_var>()    // src global bufs for not-new local (non-sticky) variables
 
+    var var_dict            = mutableMapOf<hw_var, hw_var>()
+
     var global_tgts         = ArrayList<hw_global>()
     var assign_succ_assocs  = mutableMapOf<hw_pipex_var, __assign_succ_buf>()
 
@@ -73,12 +75,7 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
     var scopipe_handles      = ArrayList<hw_scopipe_handle>()
 
     fun TranslateVar(src : hw_var) : hw_var {
-        if (pContext_local_dict.contains(src)) return pContext_local_dict[src] as hw_var
-        else if (TranslateInfo.__global_assocs.containsKey(src)) return TranslateInfo.__global_assocs[src]!!.cyclix_global
-        else {
-            ERROR("Translation of variable " + src.name + " failed!")
-            return src
-        }
+        return var_dict[src]!!
     }
 
     fun TranslateParam(src : hw_param) : hw_param {
