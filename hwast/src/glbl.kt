@@ -89,3 +89,18 @@ fun TranslateParam(param : hw_param, var_dict: MutableMap<hw_var, hw_var>) : hw_
         throw Exception()
     }
 }
+
+fun ReconstructFractions(fracs_in : hw_fracs, var_dict: MutableMap<hw_var, hw_var>) : hw_fracs {
+    var fractions = hw_fracs()
+    for (src_fraction in fracs_in) {
+        if (src_fraction is hw_frac_C) fractions.add(src_fraction)
+        else if (src_fraction is hw_frac_V) fractions.add(hw_frac_V(TranslateVar(src_fraction.index, var_dict)))
+        else if (src_fraction is hw_frac_CC) fractions.add(src_fraction)
+        else if (src_fraction is hw_frac_CV) fractions.add(hw_frac_CV(src_fraction.msb, TranslateVar(src_fraction.lsb, var_dict)))
+        else if (src_fraction is hw_frac_VC) fractions.add(hw_frac_VC(TranslateVar(src_fraction.msb, var_dict), src_fraction.lsb))
+        else if (src_fraction is hw_frac_VV) fractions.add(hw_frac_VV(TranslateVar(src_fraction.msb, var_dict), TranslateVar(src_fraction.lsb, var_dict)))
+        else if (src_fraction is hw_frac_SubStruct) fractions.add(src_fraction)
+        else ERROR("dimensions error")
+    }
+    return fractions
+}

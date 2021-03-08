@@ -702,17 +702,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                                TranslateInfo: __TranslateInfo,
                                curStageAssoc : __pstage_info) {
 
-        var fractions = hw_fracs()
-        for (src_fraction in expr.assign_tgt_fractured.depow_fractions) {
-            if (src_fraction is hw_frac_C) fractions.add(src_fraction)
-            else if (src_fraction is hw_frac_V) fractions.add(hw_frac_V(curStageAssoc.TranslateVar(src_fraction.index)))
-            else if (src_fraction is hw_frac_CC) fractions.add(src_fraction)
-            else if (src_fraction is hw_frac_CV) fractions.add(hw_frac_CV(src_fraction.msb, curStageAssoc.TranslateVar(src_fraction.lsb)))
-            else if (src_fraction is hw_frac_VC) fractions.add(hw_frac_VC(curStageAssoc.TranslateVar(src_fraction.msb), src_fraction.lsb))
-            else if (src_fraction is hw_frac_VV) fractions.add(hw_frac_VV(curStageAssoc.TranslateVar(src_fraction.msb), curStageAssoc.TranslateVar(src_fraction.lsb)))
-            else if (src_fraction is hw_frac_SubStruct) fractions.add(src_fraction)
-            else ERROR("dimensions error")
-        }
+        var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, curStageAssoc.var_dict)
 
         if (DEBUG_FLAG) {
             MSG(DEBUG_FLAG, "Reconstructing expression: " + expr.opcode.default_string)
