@@ -1475,7 +1475,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return bit_position(found, position)
     }
 
-    fun hwast_export_expr(expr : hw_exec, var_dict : MutableMap<hw_var, hw_var>, export_subexpr : (astc_gen : hw_astc, expr : hw_exec) -> Unit) {
+    fun import_expr(expr : hw_exec, var_dict : MutableMap<hw_var, hw_var>, process_subexpr : (astc_gen : hw_astc, expr : hw_exec) -> Unit) {
 
         var fractions = hw_fracs()
         for (src_fraction in expr.assign_tgt_fractured.depow_fractions) {
@@ -1548,7 +1548,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             begif(TranslateParam(expr.params[0], var_dict))
             run {
                 for (child_expr in expr.expressions) {
-                    export_subexpr(this, child_expr)
+                    process_subexpr(this, child_expr)
                 }
             }; endif()
 
@@ -1560,7 +1560,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     if (casebranch.opcode != OP1_CASEBRANCH) ERROR("non-branch op in case")
                     begbranch(TranslateParam(casebranch.params[0], var_dict))
                     for (subexpr in casebranch.expressions) {
-                        export_subexpr(this, subexpr)
+                        process_subexpr(this, subexpr)
                     }
                     endbranch()
                 }
@@ -1571,7 +1571,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             begwhile(TranslateParam(expr.params[0], var_dict))
             run {
                 for (child_expr in expr.expressions) {
-                    export_subexpr(this, child_expr)
+                    process_subexpr(this, child_expr)
                 }
             }; endloop()
 

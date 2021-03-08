@@ -176,7 +176,7 @@ class RtlGenerator(var cyclix_module : Generic) {
                 }; rtl_gen.endif()
             }; rtl_gen.endif()
 
-        } else rtl_gen.hwast_export_expr(expr, var_dict, ::export_expr)
+        } else rtl_gen.import_expr(expr, var_dict, ::export_expr)
 
         // println("#### Cyclix: exporting expression complete!")
     }
