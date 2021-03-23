@@ -703,11 +703,9 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
     fun reconstruct_expression(DEBUG_FLAG : Boolean,
                                cyclix_gen : cyclix.Generic,
                                expr : hw_exec,
-                               curStage : hw_stage,
-                               TranslateInfo: __TranslateInfo,
-                               curStageAssoc : __pstage_info) {
+                               context: pipex_import_expr_context) {
 
-        var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, curStageAssoc.var_dict)
+        var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, context.curStageAssoc.var_dict)
 
         if (DEBUG_FLAG) {
             MSG(DEBUG_FLAG, "Reconstructing expression: " + expr.opcode.default_string)
@@ -717,15 +715,15 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         if ((expr.opcode == OP1_ASSIGN)) {
 
             if (expr.wrvars[0] is hw_global) {
-                cyclix_gen.begif(!curStageAssoc.pctrl_stalled_glbl)
+                cyclix_gen.begif(!context.curStageAssoc.pctrl_stalled_glbl)
                 run {
-                    cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
+                    cyclix_gen.begif(context.curStageAssoc.pctrl_active_glbl)
                     run {
-                        cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, curStageAssoc.TranslateParam(expr.params[0]))
+                        cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, context.curStageAssoc.TranslateParam(expr.params[0]))
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
             } else {
-                cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, curStageAssoc.TranslateParam(expr.params[0]))
+                cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, context.curStageAssoc.TranslateParam(expr.params[0]))
             }
 
         } else if ((expr.opcode == OP2_ARITH_ADD)
@@ -768,45 +766,41 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
 
             cyclix_gen.AddExpr_op_gen(
                 expr.opcode,
-                curStageAssoc.TranslateVar(expr.wrvars[0]),
-                curStageAssoc.TranslateParams(expr.params)
+                context.curStageAssoc.TranslateVar(expr.wrvars[0]),
+                context.curStageAssoc.TranslateParams(expr.params)
             )
 
         } else if (expr.opcode == OP2_SUBSTRUCT) {
             cyclix_gen.subStruct_gen(
-                curStageAssoc.TranslateVar(expr.wrvars[0]),
-                curStageAssoc.TranslateVar(expr.rdvars[0]),
+                context.curStageAssoc.TranslateVar(expr.wrvars[0]),
+                context.curStageAssoc.TranslateVar(expr.rdvars[0]),
                 expr.subStructvar_name
             )
 
         } else if (expr.opcode == OP1_IF) {
 
-            cyclix_gen.begif(curStageAssoc.TranslateParam(expr.params[0]))
+            cyclix_gen.begif(context.curStageAssoc.TranslateParam(expr.params[0]))
             run {
                 for (subexpr in expr.expressions) {
                     reconstruct_expression(DEBUG_FLAG,
                         cyclix_gen,
                         subexpr,
-                        curStage,
-                        TranslateInfo,
-                        curStageAssoc)
+                        context)
                 }
             }; cyclix_gen.endif()
 
         } else if (expr.opcode == OP1_CASE) {
 
-            cyclix_gen.begcase(curStageAssoc.TranslateParam(expr.params[0]))
+            cyclix_gen.begcase(context.curStageAssoc.TranslateParam(expr.params[0]))
             run {
                 for (casebranch in expr.expressions) {
                     if (casebranch.opcode != OP1_CASEBRANCH) ERROR("non-branch op in case")
-                    cyclix_gen.begbranch(curStageAssoc.TranslateParam(casebranch.params[0]))
+                    cyclix_gen.begbranch(context.curStageAssoc.TranslateParam(casebranch.params[0]))
                     for (subexpr in casebranch.expressions) {
                         reconstruct_expression(DEBUG_FLAG,
                             cyclix_gen,
                             subexpr,
-                            curStage,
-                            TranslateInfo,
-                            curStageAssoc)
+                            context)
                     }
                     cyclix_gen.endbranch()
                 }
@@ -814,72 +808,70 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
 
         } else if (expr.opcode == OP1_WHILE) {
 
-            cyclix_gen.begwhile(curStageAssoc.TranslateParam(expr.params[0]))
+            cyclix_gen.begwhile(context.curStageAssoc.TranslateParam(expr.params[0]))
             run {
                 for (subexpr in expr.expressions) {
                     reconstruct_expression(DEBUG_FLAG,
                         cyclix_gen,
                         subexpr,
-                        curStage,
-                        TranslateInfo,
-                        curStageAssoc)
+                        context)
                 }
             }; cyclix_gen.endloop()
 
         } else if (expr.opcode == OP_PKILL) {
-            curStageAssoc.pkill_cmd_internal(cyclix_gen)
+            context.curStageAssoc.pkill_cmd_internal(cyclix_gen)
 
         } else if (expr.opcode == OP_PSTALL) {
-            curStageAssoc.pstall_ifactive_cmd(cyclix_gen)
+            context.curStageAssoc.pstall_ifactive_cmd(cyclix_gen)
 
         } else if (expr.opcode == OP_PFLUSH) {
-            curStageAssoc.pflush_cmd_internal(cyclix_gen)
+            context.curStageAssoc.pflush_cmd_internal(cyclix_gen)
 
         } else if (expr.opcode == OP_RD_PREV) {
-            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
+            cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, context.TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
 
         } else if (expr.opcode == OP_ASSIGN_SUCC) {
-            cyclix_gen.assign(curStageAssoc.assign_succ_assocs[expr.wrvars[0]]!!.req, 1)
-            cyclix_gen.assign(curStageAssoc.assign_succ_assocs[expr.wrvars[0]]!!.buf, fractions, curStageAssoc.TranslateParam(expr.params[0]))
+            cyclix_gen.assign(context.curStageAssoc.assign_succ_assocs[expr.wrvars[0]]!!.req, 1)
+            cyclix_gen.assign(context.curStageAssoc.assign_succ_assocs[expr.wrvars[0]]!!.buf, fractions, context.curStageAssoc.TranslateParam(expr.params[0]))
 
         } else if (expr.opcode == OP_RD_REMOTE) {
-            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, TranslateInfo.__stage_assocs[(expr as hw_exec_read_remote).stage]!!.TranslateVar(expr.remote_var))
+            cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, context.TranslateInfo.__stage_assocs[(expr as hw_exec_read_remote).stage]!!.TranslateVar(expr.remote_var))
 
         } else if (expr.opcode == OP_ISACTIVE) {
-            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_active_glbl)
+            cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_active_glbl)
 
         } else if (expr.opcode == OP_ISWORKING) {
-            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_working)
+            cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_working)
 
         } else if (expr.opcode == OP_ISSTALLED) {
-            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_stalled_glbl)
+            cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_stalled_glbl)
 
         } else if (expr.opcode == OP_ISSUCC) {
-            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_succ)
+            cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_succ)
 
         } else if (expr.opcode == OP_ISKILLED) {
-            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_killed_glbl)
+            cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_killed_glbl)
 
         } else if (expr.opcode == OP_ISFINISHED) {
             cyclix_gen.assign(
-                curStageAssoc.TranslateVar(expr.wrvars[0]),
-                TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_finish
+                context.curStageAssoc.TranslateVar(expr.wrvars[0]),
+                context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_finish
             )
 
         } else if (expr.opcode == OP_FIFO_WR_UNBLK) {
-            var wdata_translated = curStageAssoc.TranslateParam(expr.params[0])
-            var ack_translated = curStageAssoc.TranslateVar(expr.wrvars[0])
-            var fifo_wr_translated = TranslateInfo.__fifo_wr_assocs[(expr as hw_exec_fifo_wr_unblk).fifo]!!
-            cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
+            var wdata_translated = context.curStageAssoc.TranslateParam(expr.params[0])
+            var ack_translated = context.curStageAssoc.TranslateVar(expr.wrvars[0])
+            var fifo_wr_translated = context.TranslateInfo.__fifo_wr_assocs[(expr as hw_exec_fifo_wr_unblk).fifo]!!
+            cyclix_gen.begif(context.curStageAssoc.pctrl_active_glbl)
             run {
                 cyclix_gen.assign(ack_translated, cyclix_gen.fifo_wr_unblk(fifo_wr_translated, wdata_translated))
             }; cyclix_gen.endif()
 
         } else if (expr.opcode == OP_FIFO_RD_UNBLK) {
-            var ack_translated = curStageAssoc.TranslateVar(expr.wrvars[0])
-            var rdata_translated = curStageAssoc.TranslateVar(expr.wrvars[1])
-            var fifo_rd_translated = TranslateInfo.__fifo_rd_assocs[(expr as hw_exec_fifo_rd_unblk).fifo]!!
-            cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
+            var ack_translated = context.curStageAssoc.TranslateVar(expr.wrvars[0])
+            var rdata_translated = context.curStageAssoc.TranslateVar(expr.wrvars[1])
+            var fifo_rd_translated = context.TranslateInfo.__fifo_rd_assocs[(expr as hw_exec_fifo_rd_unblk).fifo]!!
+            cyclix_gen.begif(context.curStageAssoc.pctrl_active_glbl)
             run {
                 cyclix_gen.assign(ack_translated, cyclix_gen.fifo_rd_unblk(fifo_rd_translated, rdata_translated))
             }; cyclix_gen.endif()
@@ -887,26 +879,26 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         } else if (expr.opcode == OP_MCOPIPE_REQ) {
 
             var mcopipe_if              = (expr as hw_exec_mcopipe_req).mcopipe_if
-            var mcopipe_if_assoc        = TranslateInfo.__mcopipe_if_assocs[mcopipe_if]!!
+            var mcopipe_if_assoc        = context.TranslateInfo.__mcopipe_if_assocs[mcopipe_if]!!
             var mcopipe_handle          = expr.mcopipe_handle
-            var mcopipe_handle_assoc    = TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!
+            var mcopipe_handle_assoc    = context.TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!
 
-            var rdreq_pending_translated    = curStageAssoc.TranslateVar(mcopipe_handle_assoc.rdreq_pending)
-            var tid_translated              = curStageAssoc.TranslateVar(mcopipe_handle_assoc.tid)
-            var if_id_translated            = curStageAssoc.TranslateVar(mcopipe_handle_assoc.if_id)
+            var rdreq_pending_translated    = context.curStageAssoc.TranslateVar(mcopipe_handle_assoc.rdreq_pending)
+            var tid_translated              = context.curStageAssoc.TranslateVar(mcopipe_handle_assoc.tid)
+            var if_id_translated            = context.curStageAssoc.TranslateVar(mcopipe_handle_assoc.if_id)
 
-            cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
+            cyclix_gen.begif(context.curStageAssoc.pctrl_active_glbl)
             run {
 
                 cyclix_gen.begif(cyclix_gen.bnot(mcopipe_if_assoc.full_flag))
                 run {
 
                     // translating params
-                    var cmd_translated      = curStageAssoc.TranslateParam(expr.params[0])
-                    var wdata_translated    = curStageAssoc.TranslateParam(expr.params[1])
+                    var cmd_translated      = context.curStageAssoc.TranslateParam(expr.params[0])
+                    var wdata_translated    = context.curStageAssoc.TranslateParam(expr.params[1])
 
                     // finding id
-                    var handle_id = TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!.indexOf(expr.mcopipe_if)
+                    var handle_id = context.TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!.indexOf(expr.mcopipe_if)
 
                     var req_struct = cyclix_gen.local(GetGenName("req_struct"),
                         mcopipe_if_assoc.req_fifo.vartype,
@@ -919,7 +911,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                     run {
 
                         // req management
-                        cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), 1)
+                        cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), 1)
                         cyclix_gen.assign(rdreq_pending_translated, cyclix_gen.lnot(cmd_translated))
                         cyclix_gen.assign(tid_translated, mcopipe_if_assoc.wr_ptr)
                         cyclix_gen.assign(if_id_translated, hw_imm(mcopipe_handle_assoc.if_id.vartype.dimensions, handle_id.toString()))
@@ -939,32 +931,32 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
         } else if (expr.opcode == OP_MCOPIPE_RESP) {
 
             var mcopipe_handle          = (expr as hw_exec_mcopipe_resp).mcopipe_handle
-            var mcopipe_handle_assoc    = TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!
+            var mcopipe_handle_assoc    = context.TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!
 
-            var resp_done_translated    = curStageAssoc.TranslateVar(mcopipe_handle_assoc.resp_done)
-            var rdata_translated        = curStageAssoc.TranslateVar(mcopipe_handle_assoc.rdata)
+            var resp_done_translated    = context.curStageAssoc.TranslateVar(mcopipe_handle_assoc.resp_done)
+            var rdata_translated        = context.curStageAssoc.TranslateVar(mcopipe_handle_assoc.rdata)
 
             cyclix_gen.begif(resp_done_translated)
             run {
-                cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[1]), rdata_translated)
+                cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[1]), rdata_translated)
             }; cyclix_gen.endif()
 
-            cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), resp_done_translated)
+            cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), resp_done_translated)
 
         } else if (expr.opcode == OP_SCOPIPE_REQ) {
 
             var scopipe_if              = (expr as hw_exec_scopipe_req).scopipe_if
-            var scopipe_if_assoc        = TranslateInfo.__scopipe_if_assocs[scopipe_if]!!
+            var scopipe_if_assoc        = context.TranslateInfo.__scopipe_if_assocs[scopipe_if]!!
             var scopipe_handle          = expr.scopipe_handle
-            var scopipe_handle_assoc    = TranslateInfo.__scopipe_handle_assocs[scopipe_handle]!!
+            var scopipe_handle_assoc    = context.TranslateInfo.__scopipe_handle_assocs[scopipe_handle]!!
 
-            var if_id_translated        = curStageAssoc.TranslateVar(scopipe_handle_assoc.if_id)
-            var we_translated           = curStageAssoc.TranslateVar(scopipe_handle_assoc.we)
+            var if_id_translated        = context.curStageAssoc.TranslateVar(scopipe_handle_assoc.if_id)
+            var we_translated           = context.curStageAssoc.TranslateVar(scopipe_handle_assoc.we)
 
             // finding id
-            var handle_id = TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(expr.scopipe_if)
+            var handle_id = context.TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(expr.scopipe_if)
 
-            cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
+            cyclix_gen.begif(context.curStageAssoc.pctrl_active_glbl)
             run {
 
                 var req_struct = cyclix_gen.local(GetGenName("req_struct"),
@@ -973,30 +965,30 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
 
                 cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(scopipe_if_assoc.req_fifo, req_struct))
                 run {
-                    cyclix_gen.subStruct_gen(curStageAssoc.TranslateVar(expr.wrvars[0]),  req_struct, "we")
-                    cyclix_gen.subStruct_gen(curStageAssoc.TranslateVar(expr.wrvars[1]),  req_struct, "wdata")
+                    cyclix_gen.subStruct_gen(context.curStageAssoc.TranslateVar(expr.wrvars[0]),  req_struct, "we")
+                    cyclix_gen.subStruct_gen(context.curStageAssoc.TranslateVar(expr.wrvars[1]),  req_struct, "wdata")
                     cyclix_gen.assign(if_id_translated, hw_imm(scopipe_handle_assoc.if_id.vartype.dimensions, handle_id.toString()))
 
-                    cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[2]), 1)
+                    cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[2]), 1)
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
 
         } else if (expr.opcode == OP_SCOPIPE_RESP) {
 
             var scopipe_handle          = (expr as hw_exec_scopipe_resp).scopipe_handle
-            var scopipe_handle_assoc    = TranslateInfo.__scopipe_handle_assocs[scopipe_handle]!!
+            var scopipe_handle_assoc    = context.TranslateInfo.__scopipe_handle_assocs[scopipe_handle]!!
 
-            var if_id_translated        = curStageAssoc.TranslateVar(scopipe_handle_assoc.if_id)
-            var we_translated           = curStageAssoc.TranslateVar(scopipe_handle_assoc.we)
+            var if_id_translated        = context.curStageAssoc.TranslateVar(scopipe_handle_assoc.if_id)
+            var we_translated           = context.curStageAssoc.TranslateVar(scopipe_handle_assoc.we)
 
-            cyclix_gen.begif(curStageAssoc.pctrl_active_glbl)
+            cyclix_gen.begif(context.curStageAssoc.pctrl_active_glbl)
             run {
-                for (scopipe_if in TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!) {
-                    var scopipe_if_assoc        = TranslateInfo.__scopipe_if_assocs[scopipe_if]!!
+                for (scopipe_if in context.TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!) {
+                    var scopipe_if_assoc        = context.TranslateInfo.__scopipe_if_assocs[scopipe_if]!!
 
-                    cyclix_gen.begif(cyclix_gen.eq2(if_id_translated, TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(scopipe_if)))
+                    cyclix_gen.begif(cyclix_gen.eq2(if_id_translated, context.TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(scopipe_if)))
                     run {
-                        cyclix_gen.assign(curStageAssoc.TranslateVar(expr.wrvars[0]), cyclix_gen.fifo_wr_unblk(scopipe_if_assoc.resp_fifo, curStageAssoc.TranslateVar(expr.rdvars[0])))
+                        cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), cyclix_gen.fifo_wr_unblk(scopipe_if_assoc.resp_fifo, context.curStageAssoc.TranslateVar(expr.rdvars[0])))
                     }; cyclix_gen.endif()
                 }
             }; cyclix_gen.endif()
@@ -1543,9 +1535,8 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                 reconstruct_expression(DEBUG_FLAG,
                     cyclix_gen,
                     expr,
-                    curStage,
-                    TranslateInfo,
-                    curStageAssoc)
+                    pipex_import_expr_context(curStageAssoc.var_dict, curStage, TranslateInfo, curStageAssoc)
+                )
             }
 
             // forming nevictable pctrl
