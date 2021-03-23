@@ -38,6 +38,11 @@ class hw_exec_read_remote(stage_in : hw_stage, remote_var_in : hw_pipex_var) : h
     var remote_var = remote_var_in
 }
 
+open class pipex_import_expr_context(var_dict : MutableMap<hw_var, hw_var>,
+                                     var curStage : hw_stage,
+                                     var TranslateInfo: __TranslateInfo,
+                                     var curStageAssoc : __pstage_info) : import_expr_context(var_dict)
+
 open class Pipeline(name_in : String) : hw_astc_stdif() {
 
     val name = name_in

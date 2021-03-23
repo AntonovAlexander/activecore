@@ -8,6 +8,8 @@
 
 package hwast
 
+open class import_expr_context(var var_dict : MutableMap<hw_var, hw_var>)
+
 // AST constructor for behavioral HW specifications
 open class hw_astc() : ArrayList<hw_exec>() {
 
@@ -1475,12 +1477,12 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return bit_position(found, position)
     }
 
-    fun import_expr(DEBUG_FLAG : Boolean, expr : hw_exec, var_dict : MutableMap<hw_var, hw_var>, process_subexpr : (astc_gen : hw_astc, expr : hw_exec) -> Unit) {
+    fun import_expr(DEBUG_FLAG : Boolean, expr : hw_exec, context : import_expr_context, process_subexpr : (astc_gen : hw_astc, expr : hw_exec) -> Unit) {
 
-        var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, var_dict)
+        var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, context.var_dict)
 
         if ((expr.opcode == OP1_ASSIGN)) {
-            assign(TranslateVar(expr.wrvars[0], var_dict), fractions, TranslateParam(expr.params[0], var_dict))
+            assign(TranslateVar(expr.wrvars[0], context.var_dict), fractions, TranslateParam(expr.params[0], context.var_dict))
 
         } else if ((expr.opcode == OP2_ARITH_ADD)
                 || (expr.opcode == OP2_ARITH_SUB)
@@ -1522,20 +1524,20 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
             var params = ArrayList<hw_param>()
             for (param in expr.params) {
-                params.add(TranslateParam(param, var_dict))
+                params.add(TranslateParam(param, context.var_dict))
             }
-            AddExpr_op_gen(expr.opcode, TranslateVar(expr.wrvars[0], var_dict), params)
+            AddExpr_op_gen(expr.opcode, TranslateVar(expr.wrvars[0], context.var_dict), params)
 
         } else if (expr.opcode == OP2_SUBSTRUCT) {
             subStruct_gen(
-                    TranslateVar(expr.wrvars[0], var_dict),
-                    TranslateVar(expr.rdvars[0], var_dict),
+                    TranslateVar(expr.wrvars[0], context.var_dict),
+                    TranslateVar(expr.rdvars[0], context.var_dict),
                     expr.subStructvar_name
             )
 
         } else if (expr.opcode == OP1_IF) {
 
-            begif(TranslateParam(expr.params[0], var_dict))
+            begif(TranslateParam(expr.params[0], context.var_dict))
             run {
                 for (child_expr in expr.expressions) {
                     process_subexpr(this, child_expr)
@@ -1544,11 +1546,11 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
         } else if (expr.opcode == OP1_CASE) {
 
-            begcase(TranslateParam(expr.params[0], var_dict))
+            begcase(TranslateParam(expr.params[0], context.var_dict))
             run {
                 for (casebranch in expr.expressions) {
                     if (casebranch.opcode != OP1_CASEBRANCH) ERROR("non-branch op in case")
-                    begbranch(TranslateParam(casebranch.params[0], var_dict))
+                    begbranch(TranslateParam(casebranch.params[0], context.var_dict))
                     for (subexpr in casebranch.expressions) {
                         process_subexpr(this, subexpr)
                     }
@@ -1558,7 +1560,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
         } else if (expr.opcode == OP1_WHILE) {
 
-            begwhile(TranslateParam(expr.params[0], var_dict))
+            begwhile(TranslateParam(expr.params[0], context.var_dict))
             run {
                 for (child_expr in expr.expressions) {
                     process_subexpr(this, child_expr)
@@ -2101,6 +2103,7 @@ open class hw_astc_stdif() : hw_astc() {
         AddExpr(new_expr)
         return genvar
     }
+
     fun fifo_wr_blk(fifo : hw_fifo_out, wdata : hw_param) {
         var new_expr = hw_exec_fifo_wr_blk(fifo)
         new_expr.AddRdParam(wdata)
