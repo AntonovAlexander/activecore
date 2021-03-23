@@ -701,9 +701,12 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
     }
 
     fun reconstruct_expression(DEBUG_FLAG : Boolean,
-                               cyclix_gen : cyclix.Generic,
+                               cyclix_gen : hw_astc,
                                expr : hw_exec,
-                               context: pipex_import_expr_context) {
+                               context : import_expr_context) {
+
+        cyclix_gen as cyclix.Generic
+        context as pipex_import_expr_context
 
         var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, context.curStageAssoc.var_dict)
 
@@ -993,9 +996,7 @@ open class Pipeline(name_in : String) : hw_astc_stdif() {
                 }
             }; cyclix_gen.endif()
 
-        } else {
-            ERROR("Reconstruction of expression failed: opcode undefined: " + expr.opcode.default_string)
-        }
+        } else cyclix_gen.import_expr(DEBUG_FLAG, expr, context, ::reconstruct_expression)
     }
 
     fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
