@@ -55,7 +55,8 @@ class RtlGenerator(var cyclix_module : Generic) {
         return ret_var!!
     }
 
-    fun export_expr(rtl_gen : hw_astc,
+    fun export_expr(DEBUG_FLAG : Boolean,
+                    rtl_gen : hw_astc,
                     expr : hw_exec,
                     context : import_expr_context) {
 
@@ -339,7 +340,7 @@ class RtlGenerator(var cyclix_module : Generic) {
 
                         // Generating payload
                         for (expr in cyclix_module.proc.expressions) {
-                            export_expr(rtl_gen, expr, import_expr_context(var_dict))
+                            export_expr(false, rtl_gen, expr, import_expr_context(var_dict))
                         }
 
                         rtl_gen.assign(streambuf_enb, 1)
@@ -350,7 +351,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             } else {
                 // Generating payload
                 for (expr in cyclix_module.proc.expressions) {
-                    export_expr(rtl_gen, expr, import_expr_context(var_dict))
+                    export_expr(false, rtl_gen, expr, import_expr_context(var_dict))
                 }
             }
 

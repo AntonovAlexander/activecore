@@ -1477,7 +1477,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return bit_position(found, position)
     }
 
-    fun import_expr(DEBUG_FLAG : Boolean, expr : hw_exec, context : import_expr_context, process_subexpr : (astc_gen : hw_astc, expr : hw_exec, context : import_expr_context) -> Unit) {
+    fun import_expr(DEBUG_FLAG : Boolean, expr : hw_exec, context : import_expr_context, process_subexpr : (DEBUG_FLAG : Boolean, astc_gen : hw_astc, expr : hw_exec, context : import_expr_context) -> Unit) {
 
         var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, context.var_dict)
 
@@ -1540,7 +1540,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             begif(TranslateParam(expr.params[0], context.var_dict))
             run {
                 for (child_expr in expr.expressions) {
-                    process_subexpr(this, child_expr, context)
+                    process_subexpr(DEBUG_FLAG, this, child_expr, context)
                 }
             }; endif()
 
@@ -1552,7 +1552,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     if (casebranch.opcode != OP1_CASEBRANCH) ERROR("non-branch op in case")
                     begbranch(TranslateParam(casebranch.params[0], context.var_dict))
                     for (subexpr in casebranch.expressions) {
-                        process_subexpr(this, subexpr, context)
+                        process_subexpr(DEBUG_FLAG, this, subexpr, context)
                     }
                     endbranch()
                 }
@@ -1563,7 +1563,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             begwhile(TranslateParam(expr.params[0], context.var_dict))
             run {
                 for (child_expr in expr.expressions) {
-                    process_subexpr(this, child_expr, context)
+                    process_subexpr(DEBUG_FLAG, this, child_expr, context)
                 }
             }; endloop()
 
