@@ -29,23 +29,21 @@ enum class PSTAGE_MODE {
     BUFFERED, FALL_THROUGH
 }
 
-
-open class hw_exec_stage_stat(stage_in : hw_stage, opcode : hw_opcode) : hw_exec(opcode) {
-    var stage = stage_in
+enum class PIPELINE_CF_MODE {
+    STALLABLE, CREDIT_BASED
 }
 
-class hw_exec_read_remote(stage_in : hw_stage, remote_var_in : hw_pipex_var) : hw_exec_stage_stat(stage_in, OP_RD_REMOTE) {
-    var remote_var = remote_var_in
-}
+
+open class hw_exec_stage_stat(var stage : hw_stage, opcode : hw_opcode) : hw_exec(opcode)
+
+class hw_exec_read_remote(stage : hw_stage, var remote_var : hw_pipex_var) : hw_exec_stage_stat(stage, OP_RD_REMOTE)
 
 open class pipex_import_expr_context(var_dict : MutableMap<hw_var, hw_var>,
                                      var curStage : hw_stage,
                                      var TranslateInfo: __TranslateInfo,
                                      var curStageAssoc : __pstage_info) : import_expr_context(var_dict)
 
-open class Pipeline(name_in : String) : hw_astc_stdif() {
-
-    val name = name_in
+open class Pipeline(val name : String, val pipe_cf_mode : PIPELINE_CF_MODE) : hw_astc_stdif() {
 
     override var GenNamePrefix   = "pipex"
 

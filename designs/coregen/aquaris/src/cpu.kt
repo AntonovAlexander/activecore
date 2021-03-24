@@ -9,9 +9,9 @@
 package aquaris
 
 import hwast.*
-import pipex.PSTAGE_MODE
+import pipex.*
 
-class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADDR : Int, val irq_width : Int) : pipex.Pipeline(name) {
+class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADDR : Int, val irq_width : Int) : pipex.Pipeline(name, PIPELINE_CF_MODE.STALLABLE) {
 
     //// base opcodes ////
     val opcode_LOAD			= 0x03
