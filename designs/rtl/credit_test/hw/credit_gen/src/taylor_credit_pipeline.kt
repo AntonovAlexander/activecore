@@ -1,7 +1,7 @@
 import hwast.*
 import pipex.*
 
-class taylor_credit_pipeline() : pipex.Pipeline("test_credit", PIPELINE_CF_MODE.CREDIT_BASED) {
+class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELINE_CF_MODE.CREDIT_BASED) {
 
     val x = ulocal("x", 15, 0, "0")
     val div6 = hw_imm(16, IMM_BASE_TYPE.HEX, "2a")
@@ -15,21 +15,22 @@ class taylor_credit_pipeline() : pipex.Pipeline("test_credit", PIPELINE_CF_MODE.
     val y = ulocal("y", 15, 0, "0")
 
     //// interfaces ////
-    var ext_data_if = scopipe_if("instr_mem",
-        hw_type(VAR_TYPE.UNSIGNED, 31, 0),
-        hw_type(VAR_TYPE.UNSIGNED, 31, 0))
-    var ext_data_handle = scopipe_handle(ext_data_if)
-    var ext_data_busreq = ulocal("ext_data_busreq", 31, 0, "0")
-    var ext_data_req_done = ulocal_sticky("instr_req_done", 0, 0, "0")
+    var ext_datain    = ufifo_in("ext_datain", 15, 0)
+    var ext_dataout   = ufifo_out("ext_dataout", 15, 0)
 
     var ST_TERM1 = stage_handler("ST_TERM1", PSTAGE_MODE.FALL_THROUGH)
     var ST_TERM2 = stage_handler("ST_TERM2", PSTAGE_MODE.FALL_THROUGH)
-    var ST_RESULT = stage_handler("ST_RESULT", PSTAGE_MODE.FALL_THROUGH)
+    var ST_GENRESULT = stage_handler("ST_GENRESULT", PSTAGE_MODE.FALL_THROUGH)
+    var ST_SENDRESULT = stage_handler("ST_SENDRESULT", PSTAGE_MODE.FALL_THROUGH)
 
     init {
 
         ST_TERM1.begin()
         run {
+            begif(!fifo_rd_unblk(ext_datain, x))
+            run {
+                pstall()
+            }; endif()
             term0.assign(x)
             pow2.assign(srl(mul(x, x), 8))
             pow3.assign(srl(mul(pow2, x), 8))
@@ -42,9 +43,17 @@ class taylor_credit_pipeline() : pipex.Pipeline("test_credit", PIPELINE_CF_MODE.
             term2.assign(srl(mul(pow5, div120), 8))
         }; endstage()
 
-        ST_RESULT.begin()
+        ST_GENRESULT.begin()
         run {
             y.assign(add(sub(term0, term1), term2))
+        }; endstage()
+
+        ST_SENDRESULT.begin()
+        run {
+            begif(!fifo_wr_unblk(ext_dataout, y))
+            run {
+                pstall()
+            }; endif()
         }; endstage()
     }
 }
