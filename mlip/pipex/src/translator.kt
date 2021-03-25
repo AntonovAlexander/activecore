@@ -59,6 +59,7 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
 
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
     var pContext_srcglbl_dict   = mutableMapOf<hw_var, hw_var>()    // src global bufs for not-new local (non-sticky) variables
+    var newaccums_srcglbl_dict  = mutableMapOf<hw_var, hw_var>()
 
     var var_dict            = mutableMapOf<hw_var, hw_var>()
 

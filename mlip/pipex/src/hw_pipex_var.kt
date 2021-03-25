@@ -47,6 +47,26 @@ class hw_local(name : String, vartype : hw_type, defimm : hw_imm)
 
     constructor(name : String, vartype : hw_type, defval : String)
         : this(name, vartype, hw_imm(defval))
+
+    fun accum(depow_fractions: hw_fracs, src: hw_param) {
+        if (default_astc is Pipeline) (default_astc as Pipeline).accum(depow_fractions, this, src)
+        else ERROR("accum cmd is out of place!")
+    }
+
+    fun accum(depow_fractions: hw_fracs, src: Int) {
+        if (default_astc is Pipeline) (default_astc as Pipeline).accum(depow_fractions, this, src)
+        else ERROR("accum cmd is out of place!")
+    }
+
+    fun accum(src: hw_param) {
+        if (default_astc is Pipeline) (default_astc as Pipeline).accum(this, src)
+        else ERROR("accum cmd is out of place!")
+    }
+
+    fun accum(src: Int) {
+        if (default_astc is Pipeline) (default_astc as Pipeline).accum(this, src)
+        else ERROR("accum cmd is out of place!")
+    }
 }
 
 class hw_local_sticky(name : String, vartype : hw_type, defimm : hw_imm)

@@ -76,7 +76,7 @@ fun TranslateVar(var_in : hw_var, var_dict: MutableMap<hw_var, hw_var>) : hw_var
         for (var_entry in var_dict) {
             println("-- " + var_entry.key.name)
         }
-        ERROR("Var translation error")
+        ERROR("Translation error for var " + var_in.name + "!")
     }
     throw Exception()
 }

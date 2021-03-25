@@ -92,11 +92,11 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     // regfile control signals
     var rs1_req         = ulocal("rs1_req", 0, 0, "0")
     var rs1_addr        = ulocal("rs1_addr", 4, 0, "0")
-    var rs1_rdata       = ulocal_sticky("rs1_rdata", 31, 0, "0")
+    var rs1_rdata       = ulocal("rs1_rdata", 31, 0, "0")
 
     var rs2_req         = ulocal("rs2_req", 0, 0, "0")
     var rs2_addr        = ulocal("rs2_addr", 4, 0, "0")
-    var rs2_rdata       = ulocal_sticky("rs2_rdata", 31, 0, "0")
+    var rs2_rdata       = ulocal("rs2_rdata", 31, 0, "0")
 
     var csr_rdata       = ulocal("csr_rdata", 31, 0, "0")
 
@@ -179,7 +179,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         1)
     var instr_handle = mcopipe_handle(instr_mem)
     var instr_busreq = local("instr_busreq", busreq_mem_struct)
-    var instr_req_done = ulocal_sticky("instr_req_done", 0, 0, "0")
+    var instr_req_done = ulocal("instr_req_done", 0, 0, "0")
 
     var data_mem = mcopipe_if("data_mem",
         hw_type(busreq_mem_struct),
@@ -187,11 +187,11 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         1)
     var data_handle = mcopipe_handle(data_mem)
     var data_busreq = local("data_busreq", busreq_mem_struct)
-    var data_req_done = ulocal_sticky("data_req_done", 0, 0, "0")
+    var data_req_done = ulocal("data_req_done", 0, 0, "0")
 
     var irq_fifo    = ufifo_in("irq_fifo", irq_width-1, 0)
-    var irq_mcause  = ulocal_sticky("irq_mcause", irq_width-1, 0, "0")
-    var irq_recv    = ulocal_sticky("irq_recv", 0, 0, "0")
+    var irq_mcause  = ulocal("irq_mcause", irq_width-1, 0, "0")
+    var irq_recv    = ulocal("irq_recv", 0, 0, "0")
     var MIRQEN      = uglobal("MIRQEN", 0, 0, "1")
     var MRETADDR    = uglobal("MRETADDR", 31, 0, "0")
 
@@ -218,7 +218,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
         begif(!instr_req_done)
         run {
-            instr_req_done.assign(instr_mem.rdreq(instr_handle, instr_busreq))
+            instr_req_done.accum(instr_mem.rdreq(instr_handle, instr_busreq))
         }; endif()
         begif(!instr_req_done)
         run {
@@ -730,7 +730,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 run {
                     begif(fw_stage.readremote(rd_rdy))
                     run {
-                        rs1_rdata.assign(fw_stage.readremote(rd_wdata))
+                        rs1_rdata.accum(fw_stage.readremote(rd_wdata))
                     }; endif()
                 }; endif()
             }; endif()
@@ -741,7 +741,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 run {
                     begif(fw_stage.readremote(rd_rdy))
                     run {
-                        rs2_rdata.assign(fw_stage.readremote(rd_wdata))
+                        rs2_rdata.accum(fw_stage.readremote(rd_wdata))
                     }; endif()
                 }; endif()
             }; endif()
@@ -761,7 +761,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 run {
                     begif(fw_stage.readremote(rd_rdy))
                     run {
-                        rs1_rdata.assign(fw_stage.readremote(rd_wdata))
+                        rs1_rdata.accum(fw_stage.readremote(rd_wdata))
                     }; endif()
                     begelse()
                     run {
@@ -776,7 +776,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 run {
                     begif(fw_stage.readremote(rd_rdy))
                     run {
-                        rs2_rdata.assign(fw_stage.readremote(rd_wdata))
+                        rs2_rdata.accum(fw_stage.readremote(rd_wdata))
                     }; endif()
                     begelse()
                     run {
@@ -862,7 +862,8 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         run {
             begif(!irq_recv)
             run {
-                irq_recv.assign(fifo_rd_unblk(irq_fifo, irq_mcause))
+                irq_recv.accum(fifo_rd_unblk(irq_fifo, irq_mcause))
+                irq_mcause.accum(irq_mcause)
             }; endif()
             begif(irq_recv)
             run {
@@ -1133,7 +1134,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 data_busreq.assign(hw_fracs("be"), mem_be)
                 data_busreq.assign(hw_fracs("wdata"), mem_wdata)
 
-                data_req_done.assign(data_mem.req(data_handle, mem_cmd, data_busreq))
+                data_req_done.accum(data_mem.req(data_handle, mem_cmd, data_busreq))
             }; endif()
 
             begif(!data_req_done)

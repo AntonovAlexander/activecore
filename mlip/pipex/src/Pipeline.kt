@@ -575,12 +575,31 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
     }
 
     fun assign_succ(tgt : hw_pipex_var, src: hw_param) {
-        var dummy_depow_fractions = hw_fracs()
-        assign_succ(dummy_depow_fractions, tgt, src)
+        assign_succ(hw_fracs(), tgt, src)
     }
 
     fun assign_succ(tgt : hw_pipex_var, src: Int) {
         assign_succ(tgt, hw_imm(src))
+    }
+
+    fun accum(depow_fractions: hw_fracs, tgt : hw_local, src: hw_param) {
+        var new_expr = hw_exec(OP_ACCUM)
+        new_expr.AddWrVar(tgt)
+        new_expr.AddRdParam(src)
+        new_expr.assign_tgt_fractured = hw_fractured(tgt, depow_fractions)
+        AddExpr(new_expr)
+    }
+
+    fun accum(depow_fractions: hw_fracs, tgt : hw_local, src: Int) {
+        accum(depow_fractions, tgt, hw_imm(src))
+    }
+
+    fun accum(tgt : hw_local, src: hw_param) {
+        accum(hw_fracs(), tgt, src)
+    }
+
+    fun accum(tgt : hw_local, src: Int) {
+        accum(tgt, hw_imm(src))
     }
 
     fun readprev(src : hw_pipex_var) : hw_pipex_var {
@@ -747,6 +766,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, context.TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
 
         } else if (expr.opcode == OP_ACCUM) {
+            cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, context.curStageAssoc.TranslateParam(expr.params[0]))
             cyclix_gen.assign(context.curStageAssoc.accum_assocs[expr.wrvars[0]]!!.req, 1)
             cyclix_gen.assign(context.curStageAssoc.accum_assocs[expr.wrvars[0]]!!.buf, fractions, context.curStageAssoc.TranslateParam(expr.params[0]))
 
@@ -1220,6 +1240,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 }
             }
 
+            // generating global sources
             for (notnew in pContext_notnew) {
                 if (notnew is hw_local) {
                     var new_global = cyclix_gen.global(
@@ -1227,6 +1248,16 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                         notnew.vartype,
                         notnew.defimm)
                     StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict.put(notnew, new_global)
+                }
+            }
+            for (accum_assoc in StageAssocList[CUR_STAGE_INDEX].accum_assocs) {
+                if (!StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict.containsKey(accum_assoc.key)) {
+                    var new_global = cyclix_gen.global(
+                        (StageAssocList[CUR_STAGE_INDEX].name_prefix + accum_assoc.key.name + "_genglbl"),
+                        accum_assoc.key.vartype,
+                        accum_assoc.key.defimm)
+                    StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict.put(accum_assoc.key, new_global)
+                    StageAssocList[CUR_STAGE_INDEX].newaccums_srcglbl_dict.put(accum_assoc.key, new_global)
                 }
             }
 
@@ -1302,12 +1333,6 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 cyclix_gen.assign(curStageAssoc.pctrl_rdy, !curStageAssoc.pctrl_occupied)
             }
 
-            // Fetching locals from src_glbls
-            MSG(DEBUG_FLAG, "Fetching locals from src_glbls")
-            for (src_glbl in curStageAssoc.pContext_srcglbl_dict) {
-                cyclix_gen.assign(curStageAssoc.pContext_local_dict[src_glbl.key] as hw_var, src_glbl.value)
-            }
-
             // Forming mcopipe_handles_last list
             MSG(DEBUG_FLAG ,"Detecting last mcopipe handles")
             for (mcopipe_handle in curStageAssoc.mcopipe_handles) {
@@ -1352,6 +1377,21 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                             cyclix_gen.assign(curStageAssoc.TranslateVar(sticky_new), sticky_new.defimm)
                         }
                     }; cyclix_gen.endif()
+                }
+
+                MSG(DEBUG_FLAG, "#### Initializing new newaccums descriptors ####")
+                if (curStageAssoc.newaccums_srcglbl_dict.size != 0) {
+                    cyclix_gen.begif(curStageAssoc.pctrl_new)
+                    run {
+                        for (srcglbl in curStageAssoc.newaccums_srcglbl_dict) {
+                            cyclix_gen.assign(srcglbl.value, srcglbl.key.defimm)
+                        }
+                    }; cyclix_gen.endif()
+                }
+
+                MSG(DEBUG_FLAG, "Fetching locals from src_glbls")
+                for (src_glbl in curStageAssoc.pContext_srcglbl_dict) {
+                    cyclix_gen.assign(curStageAssoc.pContext_local_dict[src_glbl.key] as hw_var, src_glbl.value)
                 }
 
                 MSG(DEBUG_FLAG, "#### Acquiring mcopipe rdata ####")
@@ -1442,8 +1482,14 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 }
             }; cyclix_gen.endif()
 
-            // Saving synced defaults (for indexed succ assignments)
-            MSG(DEBUG_FLAG, "#### Saving synced targets ####")
+            // Saving accum defaults (for indexed assignments)
+            MSG(DEBUG_FLAG, "#### Saving accum targets ####")
+            for (accum_assoc in curStageAssoc.accum_assocs) {
+                cyclix_gen.assign(accum_assoc.value.buf, curStageAssoc.TranslateVar(accum_assoc.key))
+            }
+
+            // Saving succ defaults (for indexed assignments)
+            MSG(DEBUG_FLAG, "#### Saving succ targets ####")
             for (assign_succ_assoc in curStageAssoc.assign_succ_assocs) {
                 cyclix_gen.assign(assign_succ_assoc.value.buf, curStageAssoc.TranslateVar(assign_succ_assoc.key))
             }
@@ -1518,8 +1564,8 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 }
             }
 
-            // asserting synced signals
-            MSG(DEBUG_FLAG, "#### Asserting synced signals ####")
+            // asserting succ signals
+            MSG(DEBUG_FLAG, "#### Asserting succ signals ####")
             if (curStageAssoc.assign_succ_assocs.size > 0) {
                 cyclix_gen.begif(curStageAssoc.pctrl_succ)
                 run {
@@ -1529,6 +1575,15 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                             cyclix_gen.assign(curStageAssoc.TranslateVar(assign_succ_assoc.key), assign_succ_assoc.value.buf)
                         }; cyclix_gen.endif()
                     }
+                }; cyclix_gen.endif()
+            }
+
+            // asserting accum signals
+            MSG(DEBUG_FLAG, "#### Asserting accum signals ####")
+            for (accum_assoc in curStageAssoc.accum_assocs) {
+                cyclix_gen.begif(accum_assoc.value.req)
+                run {
+                    cyclix_gen.assign(curStageAssoc.pContext_srcglbl_dict[accum_assoc.key]!! , accum_assoc.value.buf)
                 }; cyclix_gen.endif()
             }
 
