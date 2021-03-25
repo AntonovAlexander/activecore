@@ -25,7 +25,7 @@ val OP_PFLUSH       = hw_opcode("pflush")
 val OP_ASSIGN_SUCC  = hw_opcode("assign_succ")
 val OP_RD_PREV     = hw_opcode("rd_prev")
 
-enum class PSTAGE_MODE {
+enum class PSTAGE_BUSY_MODE {
     BUFFERED, FALL_THROUGH
 }
 
@@ -60,13 +60,17 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
 
     var Stages  = mutableMapOf<String, hw_stage>()
 
-    fun stage_handler(name_in : String, mode_in : PSTAGE_MODE) : hw_stage {
-        if (FROZEN_FLAG) ERROR("Failed to add stage " + name_in + ": ASTC frozen")
-        var new_stage = hw_stage(name_in, mode_in, this)
+    fun stage_handler(name : String, mode : PSTAGE_BUSY_MODE, BUF_SIZE : Int) : hw_stage {
+        if (FROZEN_FLAG) ERROR("Failed to add stage " + name + ": ASTC frozen")
+        var new_stage = hw_stage(name, mode, BUF_SIZE, this)
         if (Stages.put(new_stage.name, new_stage) != null) {
             ERROR("Stage addition problem!")
         }
         return new_stage
+    }
+
+    fun stage_handler(name : String, mode : PSTAGE_BUSY_MODE) : hw_stage {
+        return stage_handler(name, mode, 1)
     }
 
     fun begstage(stage : hw_stage) {
@@ -1288,7 +1292,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             cyclix_gen.bor_gen(curStageAssoc.pctrl_occupied, curStageAssoc.pctrl_active_glbl, curStageAssoc.pctrl_killed_glbl)
 
             // rdy signal: before processing
-            if (curStage.mode == PSTAGE_MODE.BUFFERED) {
+            if (curStage.mode == PSTAGE_BUSY_MODE.BUFFERED) {
                 cyclix_gen.assign(curStageAssoc.pctrl_rdy, !curStageAssoc.pctrl_occupied)
             }
 
@@ -1560,7 +1564,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             }; cyclix_gen.endif()
 
             // rdy signal: after processing
-            if (curStage.mode == PSTAGE_MODE.FALL_THROUGH) {
+            if (curStage.mode == PSTAGE_BUSY_MODE.FALL_THROUGH) {
                 cyclix_gen.assign(curStageAssoc.pctrl_rdy, !curStageAssoc.pctrl_stalled_glbl)
             }
 

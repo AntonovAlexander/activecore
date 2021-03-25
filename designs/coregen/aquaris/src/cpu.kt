@@ -1211,7 +1211,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         // execution schedules
         if (num_stages == 1) {
 
-            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
+            var EXEC = stage_handler("EXEC", PSTAGE_BUSY_MODE.FALL_THROUGH)
             EXEC.begin()
             run {
                 process_pc()
@@ -1239,8 +1239,8 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
         } else if (num_stages == 2) {
 
-            var IFETCH = stage_handler("IFETCH", PSTAGE_MODE.FALL_THROUGH)
-            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
+            var IFETCH = stage_handler("IFETCH", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var EXEC = stage_handler("EXEC", PSTAGE_BUSY_MODE.FALL_THROUGH)
 
             IFETCH.begin()
             run {
@@ -1276,9 +1276,9 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
         } else if (num_stages == 3) {
 
-            var IFETCH = stage_handler("IFETCH", PSTAGE_MODE.FALL_THROUGH)
-            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
-            var MEMWB = stage_handler("MEMWB", PSTAGE_MODE.FALL_THROUGH)
+            var IFETCH = stage_handler("IFETCH", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var EXEC = stage_handler("EXEC", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var MEMWB = stage_handler("MEMWB", PSTAGE_BUSY_MODE.FALL_THROUGH)
 
             IFETCH.begin()
             run {
@@ -1318,10 +1318,10 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
         } else if (num_stages == 4) {
 
-            var IFETCH = stage_handler("IFETCH", PSTAGE_MODE.FALL_THROUGH)
-            var IDECODE = stage_handler("IDECODE", PSTAGE_MODE.FALL_THROUGH)
-            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
-            var MEMWB = stage_handler("MEMWB", PSTAGE_MODE.FALL_THROUGH)
+            var IFETCH = stage_handler("IFETCH", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var IDECODE = stage_handler("IDECODE", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var EXEC = stage_handler("EXEC", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var MEMWB = stage_handler("MEMWB", PSTAGE_BUSY_MODE.FALL_THROUGH)
 
             IFETCH.begin()
             run {
@@ -1366,11 +1366,11 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
         } else if (num_stages == 5) {
 
-            var IFETCH = stage_handler("IFETCH", PSTAGE_MODE.FALL_THROUGH)
-            var IDECODE = stage_handler("IDECODE", PSTAGE_MODE.FALL_THROUGH)
-            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
-            var MEM = stage_handler("MEM", PSTAGE_MODE.FALL_THROUGH)
-            var WB = stage_handler("WB", PSTAGE_MODE.FALL_THROUGH)
+            var IFETCH = stage_handler("IFETCH", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var IDECODE = stage_handler("IDECODE", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var EXEC = stage_handler("EXEC", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var MEM = stage_handler("MEM", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var WB = stage_handler("WB", PSTAGE_BUSY_MODE.FALL_THROUGH)
 
             IFETCH.begin()
             run {
@@ -1420,12 +1420,12 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
         } else if (num_stages == 6) {
 
-            var IADDR = stage_handler("IADDR", PSTAGE_MODE.FALL_THROUGH)
-            var IFETCH = stage_handler("IFETCH", PSTAGE_MODE.FALL_THROUGH)
-            var IDECODE = stage_handler("IDECODE", PSTAGE_MODE.FALL_THROUGH)
-            var EXEC = stage_handler("EXEC", PSTAGE_MODE.FALL_THROUGH)
-            var MEM = stage_handler("MEM", PSTAGE_MODE.FALL_THROUGH)
-            var WB = stage_handler("WB", PSTAGE_MODE.FALL_THROUGH)
+            var IADDR = stage_handler("IADDR", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var IFETCH = stage_handler("IFETCH", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var IDECODE = stage_handler("IDECODE", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var EXEC = stage_handler("EXEC", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var MEM = stage_handler("MEM", PSTAGE_BUSY_MODE.FALL_THROUGH)
+            var WB = stage_handler("WB", PSTAGE_BUSY_MODE.FALL_THROUGH)
 
             IADDR.begin()
             run {
