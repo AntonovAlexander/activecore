@@ -38,8 +38,8 @@ data class __scopipe_if_info(val req_fifo : hw_fifo_in,
 data class __scopipe_handle_info(val if_id : hw_var,
                                  val we : hw_var)
 
-data class __assign_succ_buf(val req : hw_var,
-                             val buf : hw_var)
+data class __assign_buf(val req : hw_var,
+                        val buf : hw_var)
 
 data class __pstage_info(val TranslateInfo : __TranslateInfo,
                                    val name_prefix : String,
@@ -62,8 +62,8 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
 
     var var_dict            = mutableMapOf<hw_var, hw_var>()
 
-    var global_tgts         = ArrayList<hw_global>()
-    var assign_succ_assocs  = mutableMapOf<hw_pipex_var, __assign_succ_buf>()
+    var assign_succ_assocs  = mutableMapOf<hw_pipex_var, __assign_buf>()
+    var accum_assocs        = mutableMapOf<hw_pipex_var, __assign_buf>()
 
     var mcopipe_handle_reqs  = ArrayList<hw_mcopipe_handle>()
     var mcopipe_handle_resps = ArrayList<hw_mcopipe_handle>()

@@ -22,8 +22,9 @@ val OP_PSTALL       = hw_opcode("pstall")
 val OP_PKILL        = hw_opcode("pkill")
 val OP_PFLUSH       = hw_opcode("pflush")
 
+val OP_ACCUM        = hw_opcode("accum")
 val OP_ASSIGN_SUCC  = hw_opcode("assign_succ")
-val OP_RD_PREV     = hw_opcode("rd_prev")
+val OP_RD_PREV      = hw_opcode("rd_prev")
 
 enum class PSTAGE_BUSY_MODE {
     BUFFERED, FALL_THROUGH
@@ -649,17 +650,18 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
         if ((expression.opcode == OP1_IF) || (expression.opcode == OP1_WHILE)) {
             for (subexpression in expression.expressions) ProcessSyncOp(subexpression, Translate_info, pstage_info, cyclix_gen)
 
-        } else if (expression.opcode == OP1_ASSIGN) {
-            if (expression.wrvars[0] is hw_global) {
-                if (!pstage_info.global_tgts.contains(expression.wrvars[0] as hw_global))
-                    pstage_info.global_tgts.add(expression.wrvars[0] as hw_global)
+        } else if (expression.opcode == OP_ACCUM) {
+            if (!pstage_info.accum_assocs.containsKey(expression.wrvars[0])) {
+                val req = cyclix_gen.ulocal(GetGenName("accumreq"), 0, 0, "0")
+                val buf = cyclix_gen.local(GetGenName("accumbuf"), expression.wrvars[0].vartype, expression.wrvars[0].defimm)
+                pstage_info.accum_assocs.put((expression.wrvars[0] as hw_pipex_var), __assign_buf(req, buf))
             }
 
         } else if (expression.opcode == OP_ASSIGN_SUCC) {
             if (!pstage_info.assign_succ_assocs.containsKey(expression.wrvars[0])) {
-                val req = cyclix_gen.ulocal(GetGenName("syncreq"), 0, 0, "0")
-                val buf = cyclix_gen.local(GetGenName("syncbuf"), expression.wrvars[0].vartype, expression.wrvars[0].defimm)
-                pstage_info.assign_succ_assocs.put((expression.wrvars[0] as hw_pipex_var), __assign_succ_buf(req, buf))
+                val req = cyclix_gen.ulocal(GetGenName("succreq"), 0, 0, "0")
+                val buf = cyclix_gen.local(GetGenName("succbuf"), expression.wrvars[0].vartype, expression.wrvars[0].defimm)
+                pstage_info.assign_succ_assocs.put((expression.wrvars[0] as hw_pipex_var), __assign_buf(req, buf))
             }
 
         } else if (expression.opcode == OP_RD_REMOTE) {
@@ -743,6 +745,10 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
 
         } else if (expr.opcode == OP_RD_PREV) {
             cyclix_gen.assign(context.curStageAssoc.TranslateVar(expr.wrvars[0]), fractions, context.TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
+
+        } else if (expr.opcode == OP_ACCUM) {
+            cyclix_gen.assign(context.curStageAssoc.accum_assocs[expr.wrvars[0]]!!.req, 1)
+            cyclix_gen.assign(context.curStageAssoc.accum_assocs[expr.wrvars[0]]!!.buf, fractions, context.curStageAssoc.TranslateParam(expr.params[0]))
 
         } else if (expr.opcode == OP_ASSIGN_SUCC) {
             cyclix_gen.assign(context.curStageAssoc.assign_succ_assocs[expr.wrvars[0]]!!.req, 1)
