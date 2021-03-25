@@ -2,7 +2,7 @@ import hwast.*
 import ariele.*
 
 fun main() {
-    println("taylor credit: generating")
+    println("taylor credit: generating...")
 
     var taylor_credit = taylor_credit_pipeline()
 

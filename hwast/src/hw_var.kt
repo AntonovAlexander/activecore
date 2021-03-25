@@ -51,6 +51,9 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     constructor(name: String, src_struct: hw_struct)
             : this(name, src_struct, 0, 0)
 
+    constructor(name : String, msb : Int, lsb : Int, defval : String)
+            : this(name, VAR_TYPE.UNSIGNED, msb, lsb, hw_imm(defval))
+
     fun assign(depow_fracs: hw_fracs, src: hw_param) {
         default_astc.assign(this, depow_fracs, src)
     }

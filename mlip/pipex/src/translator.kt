@@ -130,4 +130,6 @@ class __TranslateInfo() {
     var __scopipe_handle_reqdict = mutableMapOf<hw_scopipe_handle, ArrayList<hw_scopipe_if>>()
 
     var __stage_assocs = mutableMapOf<hw_stage, __pstage_info>()
+
+    var gencredit_counter = DUMMY_VAR
 }

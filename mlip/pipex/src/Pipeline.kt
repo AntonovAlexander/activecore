@@ -43,7 +43,7 @@ open class pipex_import_expr_context(var_dict : MutableMap<hw_var, hw_var>,
                                      var TranslateInfo: __TranslateInfo,
                                      var curStageAssoc : __pstage_info) : import_expr_context(var_dict)
 
-open class Pipeline(val name : String, val pipe_cf_mode : PIPELINE_CF_MODE) : hw_astc_stdif() {
+open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) : hw_astc_stdif() {
 
     override var GenNamePrefix   = "pipex"
 
@@ -632,6 +632,7 @@ open class Pipeline(val name : String, val pipe_cf_mode : PIPELINE_CF_MODE) : hw
     }
 
     fun validate() {
+        if ((pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) && (Stages.size < 3)) ERROR("Can't make credit-based mechanism for stage number < 3")
         for (wrvar in wrvars) {
             if (!wrvar.value.write_done) WARNING("signal " + wrvar.value.name + " is not initialized")
         }
@@ -1068,6 +1069,7 @@ open class Pipeline(val name : String, val pipe_cf_mode : PIPELINE_CF_MODE) : hw
                 ProcessSyncOp(expression, TranslateInfo, pstage_info, cyclix_gen)
             }
         }
+        if (pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) TranslateInfo.gencredit_counter = cyclix_gen.uglobal("gencredit_counter", GetWidthToContain(Stages.size)-1, 0, "0")
 
         // Generating resources //
         MSG(DEBUG_FLAG, "Generating resources")
@@ -1490,6 +1492,21 @@ open class Pipeline(val name : String, val pipe_cf_mode : PIPELINE_CF_MODE) : hw
                 cyclix_gen.assign(curStageAssoc.pctrl_finish, curStageAssoc.pctrl_occupied)
                 cyclix_gen.assign(curStageAssoc.pctrl_succ, curStageAssoc.pctrl_active_glbl)
             }; cyclix_gen.endif()
+
+            // credit counter processing
+            if (pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) {
+                if (CUR_STAGE_INDEX == 0) {
+                    cyclix_gen.begif(curStageAssoc.pctrl_succ)
+                    run {
+                        cyclix_gen.add_gen(TranslateInfo.gencredit_counter, TranslateInfo.gencredit_counter, 1)
+                    }; cyclix_gen.endif()
+                } else if (CUR_STAGE_INDEX == StageList.lastIndex) {
+                    cyclix_gen.begif(curStageAssoc.pctrl_succ)
+                    run {
+                        cyclix_gen.sub_gen(TranslateInfo.gencredit_counter, TranslateInfo.gencredit_counter, 1)
+                    }; cyclix_gen.endif()
+                }
+            }
 
             // asserting synced signals
             MSG(DEBUG_FLAG, "#### Asserting synced signals ####")
