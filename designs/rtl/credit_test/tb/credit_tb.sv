@@ -29,11 +29,7 @@ logic dataout_req, dataout_ack;
 logic [15:0] dataout;
 assign dataout_ack = 1'b1;
 
-always @(posedge clk) datain <= (datain == 400) ? 0 : (datain + 1);
-	//begin
-	//if (datain == 400) datain <= 0;
-	//else datain <= datain + 1;
-	//end
+always @(posedge clk) datain = (datain == 400) ? 0 : (datain + 1);
 
 taylor_credit_pipeline taylor_credit_pipeline_inst (
 	.clk_i(clk)
@@ -72,11 +68,12 @@ task RESET_ALL ();
 	#(`HALF_PERIOD);
 	rst = 1;
 	#(`HALF_PERIOD*6);
+	#1;
 	rst = 0;
 	end
 endtask
 
-always #`HALF_PERIOD clk <= ~clk;
+always #`HALF_PERIOD clk = ~clk;
 
 initial
 	begin
