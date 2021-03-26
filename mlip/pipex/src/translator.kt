@@ -59,12 +59,13 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
 
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
     var pContext_srcglbl_dict   = mutableMapOf<hw_var, hw_var>()    // src global bufs for not-new local (non-sticky) variables
-    var newaccums_srcglbl_dict  = mutableMapOf<hw_var, hw_var>()
 
     var var_dict            = mutableMapOf<hw_var, hw_var>()
 
     var assign_succ_assocs  = mutableMapOf<hw_pipex_var, __assign_buf>()
+
     var accum_tgts          = ArrayList<hw_var>()
+    var newaccums           = ArrayList<hw_var>()
 
     var mcopipe_handle_reqs  = ArrayList<hw_mcopipe_handle>()
     var mcopipe_handle_resps = ArrayList<hw_mcopipe_handle>()

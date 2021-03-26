@@ -1257,7 +1257,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                         accum_tgt.vartype,
                         accum_tgt.defimm)
                     StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict.put(accum_tgt, new_global)
-                    StageAssocList[CUR_STAGE_INDEX].newaccums_srcglbl_dict.put(accum_tgt, new_global)
+                    StageAssocList[CUR_STAGE_INDEX].newaccums.add(accum_tgt)
                 }
             }
 
@@ -1380,11 +1380,11 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 }
 
                 MSG(DEBUG_FLAG, "#### Initializing new newaccums descriptors ####")
-                if (curStageAssoc.newaccums_srcglbl_dict.size != 0) {
+                if (curStageAssoc.newaccums.size != 0) {
                     cyclix_gen.begif(curStageAssoc.pctrl_new)
                     run {
-                        for (srcglbl in curStageAssoc.newaccums_srcglbl_dict) {
-                            cyclix_gen.assign(srcglbl.value, srcglbl.key.defimm)
+                        for (newaccum in curStageAssoc.newaccums) {
+                            cyclix_gen.assign(curStageAssoc.pContext_srcglbl_dict[newaccum]!!, newaccum.defimm)
                         }
                     }; cyclix_gen.endif()
                 }
