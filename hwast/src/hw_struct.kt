@@ -44,6 +44,10 @@ class hw_struct(var name: String) : ArrayList<hw_structvar>() {
         }
     }
 
+    fun add(name: String, vartype : hw_type, defimm: hw_imm) {
+        add(hw_structvar(name, vartype, defimm))
+    }
+
     fun add(name: String, vartype : hw_type, defval : String) {
         add(hw_structvar(name, vartype, defval))
     }

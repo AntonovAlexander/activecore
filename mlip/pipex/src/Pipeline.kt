@@ -1197,6 +1197,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
 
         // Generate resources for locals
         for (CUR_STAGE_INDEX in 0 until StageList.size) {
+            var curStage = StageList[CUR_STAGE_INDEX]
             var pstage_info = TranslateInfo.__stage_assocs[StageList[CUR_STAGE_INDEX]]
 
             var prev_wr_pvarlist    = ArrayList<hw_var>()
@@ -1261,6 +1262,14 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 }
             }
 
+            if (curStage.BUF_SIZE != 1) {
+                var stage_buf_struct = hw_struct(StageAssocList[CUR_STAGE_INDEX].name_prefix + "TESTSTRUCT")
+                for (srcglbl in StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict) {
+                    stage_buf_struct.add(srcglbl.key.name, srcglbl.key.vartype, srcglbl.key.defimm)
+                }
+                cyclix_gen.global(StageAssocList[CUR_STAGE_INDEX].name_prefix + "TESTCONTAINER", stage_buf_struct, curStage.BUF_SIZE-1, 0)
+            }
+
             for (pContext_local_dict_entry in StageAssocList[CUR_STAGE_INDEX].pContext_local_dict) {
                 StageAssocList[CUR_STAGE_INDEX].var_dict.put(pContext_local_dict_entry.key, pContext_local_dict_entry.value)
             }
@@ -1269,10 +1278,8 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             }
         }
 
-        // Generating logic //
         MSG(DEBUG_FLAG, "Generating logic")
 
-        // mcopipe processing
         MSG(DEBUG_FLAG, "mcopipe processing")
         for (mcopipe_if in TranslateInfo.__mcopipe_if_assocs) {
             cyclix_gen.assign(mcopipe_if.value.wr_done, 0)
@@ -1283,12 +1290,12 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             cyclix_gen.add_gen(mcopipe_if.value.rd_ptr_next, mcopipe_if.value.rd_ptr, 1)
         }
 
-        // rdbuf processing
         MSG(DEBUG_FLAG, "rdbuf logic")
         for (global in TranslateInfo.__global_assocs) {
             cyclix_gen.assign(global.value.cyclix_global_buf, global.value.cyclix_global)
         }
 
+        MSG(DEBUG_FLAG, "logic of stages")
         for (CUR_STAGE_INDEX in StageList.lastIndex downTo 0) {
 
             var curStage        = StageList[CUR_STAGE_INDEX]
