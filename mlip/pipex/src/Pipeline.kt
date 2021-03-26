@@ -1267,7 +1267,8 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 for (srcglbl in StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict) {
                     stage_buf_struct.add(srcglbl.key.name, srcglbl.key.vartype, srcglbl.key.defimm)
                 }
-                cyclix_gen.global(StageAssocList[CUR_STAGE_INDEX].name_prefix + "TESTCONTAINER", stage_buf_struct, curStage.BUF_SIZE-1, 0)
+                StageAssocList[CUR_STAGE_INDEX].TESTCONTAINER = cyclix_gen.global(StageAssocList[CUR_STAGE_INDEX].name_prefix + "TESTCONTAINER", stage_buf_struct, curStage.BUF_SIZE-1, 0)
+                StageAssocList[CUR_STAGE_INDEX].TESTCONTAINER_COUNTER = cyclix_gen.uglobal(StageAssocList[CUR_STAGE_INDEX].name_prefix + "TESTCONTAINER_COUNTER", GetWidthToContain(curStage.BUF_SIZE)-1, 0, "0")
             }
 
             for (pContext_local_dict_entry in StageAssocList[CUR_STAGE_INDEX].pContext_local_dict) {
