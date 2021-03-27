@@ -34,6 +34,7 @@ class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELI
             begif(!datain_done)
             run {
                 datain_done.accum(fifo_rd_unblk(ext_datain, x))
+                x.accum(x)
             }; endif()
             begif(!datain_done)
             run {
