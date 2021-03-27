@@ -76,8 +76,8 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
     var scopipe_handle_resps = ArrayList<hw_scopipe_handle>()
     var scopipe_handles      = ArrayList<hw_scopipe_handle>()
 
-    var TESTCONTAINER = DUMMY_VAR
-    var TESTCONTAINER_COUNTER = DUMMY_VAR
+    var TRX_BUF = DUMMY_VAR
+    var TRX_BUF_COUNTER = DUMMY_VAR
 
     fun TranslateVar(src : hw_var) : hw_var {
         return var_dict[src]!!

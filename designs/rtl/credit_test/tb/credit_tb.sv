@@ -81,7 +81,7 @@ initial
 	RESET_ALL();
 	$display ("### RESET COMPLETE! ###");
 
-	WAIT(100);
+	WAIT(1000);
 	$display ("### SIMULATION COMPLETE! ###");
 	$stop();
 	end

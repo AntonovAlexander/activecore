@@ -1267,12 +1267,12 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             }
 
             if (curStage.BUF_SIZE != 1) {
-                var stage_buf_struct = hw_struct(curStageInfo.name_prefix + "TESTSTRUCT")
+                var stage_buf_struct = hw_struct(curStageInfo.name_prefix + "TRX_BUF_STRUCT")
                 for (srcglbl in curStageInfo.pContext_srcglbl_dict) {
                     stage_buf_struct.add(srcglbl.key.name, srcglbl.key.vartype, srcglbl.key.defimm)
                 }
-                curStageInfo.TESTCONTAINER = cyclix_gen.global(curStageInfo.name_prefix + "TESTCONTAINER", stage_buf_struct, curStage.BUF_SIZE-1, 0)
-                curStageInfo.TESTCONTAINER_COUNTER = cyclix_gen.uglobal(curStageInfo.name_prefix + "TESTCONTAINER_COUNTER", GetWidthToContain(curStage.BUF_SIZE)-1, 0, "0")
+                curStageInfo.TRX_BUF = cyclix_gen.global(curStageInfo.name_prefix + "TRX_BUF", stage_buf_struct, curStage.BUF_SIZE-1, 0)
+                curStageInfo.TRX_BUF_COUNTER = cyclix_gen.uglobal(curStageInfo.name_prefix + "TRX_BUF_COUNTER", GetWidthToContain(curStage.BUF_SIZE)-1, 0, "0")
             }
 
             for (pContext_local_dict_entry in curStageInfo.pContext_local_dict) {
@@ -1403,7 +1403,11 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
 
                 MSG(DEBUG_FLAG, "Fetching locals from src_glbls")
                 for (src_glbl in curStageInfo.pContext_srcglbl_dict) {
-                    cyclix_gen.assign(curStageInfo.pContext_local_dict[src_glbl.key] as hw_var, src_glbl.value)
+                    if (curStage.BUF_SIZE == 1) {
+                        cyclix_gen.assign(curStageInfo.pContext_local_dict[src_glbl.key] as hw_var, src_glbl.value)
+                    } else {
+                        cyclix_gen.assign(curStageInfo.pContext_local_dict[src_glbl.key] as hw_var, cyclix_gen.subStruct(curStageInfo.TRX_BUF[0], src_glbl.key.name))
+                    }
                 }
 
                 MSG(DEBUG_FLAG, "#### Acquiring mcopipe rdata ####")
@@ -1610,12 +1614,12 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                         if (TranslateInfo.StageList[CUR_STAGE_INDEX+1].BUF_SIZE != 1) {
                             for (local in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].pContext_local_dict) {
                                 if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_local_dict.containsKey(local.key)) {
-                                    var fracs = hw_fracs(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER)
+                                    var fracs = hw_fracs(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER)
                                     fracs.add(hw_frac_SubStruct(local.key.name))
-                                    cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TESTCONTAINER, fracs, curStageInfo.TranslateVar(local.key))
+                                    cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF, fracs, curStageInfo.TranslateVar(local.key))
                                 }
                             }
-                            cyclix_gen.add_gen(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER, 1)
+                            cyclix_gen.add_gen(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, 1)
                         }
 
                         // propagating pctrls
@@ -1631,9 +1635,9 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 cyclix_gen.assign(curStageInfo.pctrl_stalled_glbl, 0)
                 if (curStage.BUF_SIZE != 1) {
                     for (BUF_INDEX in 0 until curStage.BUF_SIZE-1) {
-                        cyclix_gen.assign(curStageInfo.TESTCONTAINER, hw_fracs(BUF_INDEX), curStageInfo.TESTCONTAINER[BUF_INDEX+1])
+                        cyclix_gen.assign(curStageInfo.TRX_BUF, hw_fracs(BUF_INDEX), curStageInfo.TRX_BUF[BUF_INDEX+1])
                     }
-                    cyclix_gen.sub_gen(curStageInfo.TESTCONTAINER_COUNTER, curStageInfo.TESTCONTAINER_COUNTER, 1)
+                    cyclix_gen.sub_gen(curStageInfo.TRX_BUF_COUNTER, curStageInfo.TRX_BUF_COUNTER, 1)
                 }
 
             }; cyclix_gen.endif()
