@@ -1542,13 +1542,11 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 }
             }; cyclix_gen.endif()
 
-            // Saving succ defaults (for indexed assignments)
-            MSG(DEBUG_FLAG, "#### Saving succ targets ####")
+            MSG(DEBUG_FLAG, "#### Saving succ targets ####")        // for indexed assignments
             for (assign_succ_assoc in curStageInfo.assign_succ_assocs) {
                 cyclix_gen.assign(assign_succ_assoc.value.buf, curStageInfo.TranslateVar(assign_succ_assoc.key))
             }
 
-            // Generating payload expressions
             MSG(DEBUG_FLAG, "#### Generating payload expressions ####")
             for (expr in curStage.expressions) {
                 reconstruct_expression(DEBUG_FLAG,
@@ -1563,19 +1561,27 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 cyclix_gen.lor_gen(curStageInfo.pctrl_nevictable, curStageInfo.pctrl_nevictable, curStageInfo.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.rdreq_pending))
             }
 
-            // Processing of pstall from next pstage
             MSG(DEBUG_FLAG, "#### Processing of next pstage busyness ####")
-            if (CUR_STAGE_INDEX < TranslateInfo.StageList.lastIndex) {
-                cyclix_gen.begif(!TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_rdy)
-                run {
-                    // prepeat from next pstage requested
-                    curStageInfo.pstall_ifactive_cmd(cyclix_gen)
-                    // protection from evicting broken transaction with unfinished I/O by subsequent transaction
-                    cyclix_gen.begif(curStageInfo.pctrl_nevictable)
+            if (TranslateInfo.pipeline.pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) {
+                if (CUR_STAGE_INDEX == 0) {
+                    cyclix_gen.begif(cyclix_gen.eq2(TranslateInfo.gencredit_counter, TranslateInfo.StageList.size-1))
                     run {
-                        curStageInfo.pstall_ifoccupied_cmd(cyclix_gen)
+                        curStageInfo.pstall_ifactive_cmd(cyclix_gen)
                     }; cyclix_gen.endif()
-                }; cyclix_gen.endif()
+                }
+            } else {
+                if (CUR_STAGE_INDEX < TranslateInfo.StageList.lastIndex) {
+                    cyclix_gen.begif(!TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_rdy)
+                    run {
+                        // prepeat from next pstage requested
+                        curStageInfo.pstall_ifactive_cmd(cyclix_gen)
+                        // protection from evicting broken transaction with unfinished I/O by subsequent transaction
+                        cyclix_gen.begif(curStageInfo.pctrl_nevictable)
+                        run {
+                            curStageInfo.pstall_ifoccupied_cmd(cyclix_gen)
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endif()
+                }
             }
 
             // Forced stalling in case any last mcopipe pending reads are not satisfied

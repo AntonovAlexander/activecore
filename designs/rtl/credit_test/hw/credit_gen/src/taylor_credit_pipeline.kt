@@ -14,6 +14,9 @@ class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELI
     val pow5 = ulocal("pow5", 15, 0, "0")
     val y = ulocal("y", 15, 0, "0")
 
+    var datain_done = ulocal("datain_done", 0, 0, "0")
+    var dataout_done = ulocal("dataout_done", 0, 0, "0")
+
     //// interfaces ////
     var ext_datain    = ufifo_in("ext_datain", 15, 0)
     var ext_dataout   = ufifo_out("ext_dataout", 15, 0)
@@ -27,14 +30,21 @@ class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELI
 
         ST_TERM1.begin()
         run {
-            begif(!fifo_rd_unblk(ext_datain, x))
+
+            begif(!datain_done)
+            run {
+                datain_done.accum(fifo_rd_unblk(ext_datain, x))
+            }; endif()
+            begif(!datain_done)
             run {
                 pstall()
             }; endif()
+
             term0.assign(x)
             pow2.assign(srl(mul(x, x), 8))
             pow3.assign(srl(mul(pow2, x), 8))
             term1.assign(srl(mul(pow3, div6), 8))
+
         }; endstage()
 
         ST_TERM2.begin()
@@ -50,10 +60,16 @@ class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELI
 
         ST_SENDRESULT.begin()
         run {
-            begif(!fifo_wr_unblk(ext_dataout, y))
+
+            begif(!dataout_done)
+            run {
+                dataout_done.accum(fifo_wr_unblk(ext_dataout, y))
+            }; endif()
+            begif(!dataout_done)
             run {
                 pstall()
             }; endif()
+
         }; endstage()
     }
 }

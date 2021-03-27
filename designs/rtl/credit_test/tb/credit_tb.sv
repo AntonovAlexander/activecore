@@ -25,11 +25,19 @@ logic datain_req, datain_ack;
 logic [15:0] datain = 0;
 assign datain_req = 1'b1;
 
-logic dataout_req, dataout_ack;
+logic dataout_req;
+logic dataout_ack = 1'b1;
 logic [15:0] dataout;
-assign dataout_ack = 1'b1;
 
-always @(posedge clk) datain = (datain == 400) ? 0 : (datain + 1);
+always @(posedge clk)
+    begin
+    randcase
+        1  : dataout_ack <= 1'b1;
+        //10 : dataout_ack <= 1'b0;
+    endcase
+    end
+
+always @(posedge clk) if (datain_ack) datain = (datain == 400) ? 0 : (datain + 1);
 
 taylor_credit_pipeline taylor_credit_pipeline_inst (
 	.clk_i(clk)
@@ -81,7 +89,7 @@ initial
 	RESET_ALL();
 	$display ("### RESET COMPLETE! ###");
 
-	WAIT(1000);
+	WAIT(2000);
 	$display ("### SIMULATION COMPLETE! ###");
 	$stop();
 	end

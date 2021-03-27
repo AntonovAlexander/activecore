@@ -75,7 +75,6 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     //// signals ////
     var busreq_mem_struct = hw_struct(name + "_busreq_mem_struct")
 
-    var reset_active    = ulocal("reset_active", 0, 0, "0")
     var curinstr_addr   = ulocal("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = ulocal("nextinstr_addr", 31, 0, "0")
     var instr_code      = ulocal("instr_code", 31, 0, "0")
