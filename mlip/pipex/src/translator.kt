@@ -137,7 +137,7 @@ class __TranslateInfo() {
     var __stage_assocs = mutableMapOf<hw_stage, __pstage_info>()
 
     var StageList = ArrayList<hw_stage>()
-    var StageAssocList = ArrayList<__pstage_info>()
+    var StageInfoList = ArrayList<__pstage_info>()
 
     var gencredit_counter = DUMMY_VAR
 }
