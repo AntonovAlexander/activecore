@@ -121,7 +121,7 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
     }
 }
 
-class __TranslateInfo() {
+class __TranslateInfo(var pipeline : Pipeline) {
     var __global_assocs = mutableMapOf<hw_var, __global_info>()
 
     var __fifo_wr_assocs = mutableMapOf<hw_fifo_out, hw_fifo_out>()
