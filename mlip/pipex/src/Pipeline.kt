@@ -1602,6 +1602,17 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                                 }
                             }
                         }
+                        // propagating transaction context (struct)
+                        if (StageList[CUR_STAGE_INDEX+1].BUF_SIZE != 1) {
+                            for (local in StageAssocList[CUR_STAGE_INDEX].pContext_local_dict) {
+                                if (StageAssocList[CUR_STAGE_INDEX+1].pContext_local_dict.containsKey(local.key)) {
+                                    var fracs = hw_fracs(StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER)
+                                    fracs.add(hw_frac_SubStruct(local.key.name))
+                                    cyclix_gen.assign(StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER, fracs, curStageAssoc.TranslateVar(local.key))
+                                }
+                            }
+                            cyclix_gen.add_gen(StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER, StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER, 1)
+                        }
 
                         // propagating pctrls
                         cyclix_gen.assign(StageAssocList[CUR_STAGE_INDEX+1].pctrl_active_glbl, curStageAssoc.pctrl_active_glbl)

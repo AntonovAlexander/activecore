@@ -449,7 +449,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun assign(tgt: hw_var, depow_fractions: hw_fracs, src: hw_param) {
         //if (src is hw_var)
-        //    println("ASSIGNMENT! tgt: " + tgt.name + " (struct: " + tgt.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.src_struct.name + ")")
+        //    println("ASSIGNMENT! tgt: " + tgt.name + " (struct: " + tgt.vartype.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
 
         process_depow_fractions(depow_fractions, tgt)
 
