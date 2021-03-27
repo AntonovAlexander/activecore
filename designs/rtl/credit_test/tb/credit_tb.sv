@@ -12,17 +12,12 @@
 `define HALF_PERIOD			10						// external 50 MHZ
 `define PERIOD				(2*`HALF_PERIOD)
 
-`define M0_RAND_SEED 	1
-`define M1_RAND_SEED 	2
-`define M2_RAND_SEED 	3
-`define M3_RAND_SEED 	4
-
 module credit_tb ();
 
 logic clk, rst;
 
 logic datain_req, datain_ack;
-logic [15:0] datain = 0;
+logic [15:0] datain = 1;
 assign datain_req = 1'b1;
 
 logic dataout_req;
@@ -37,7 +32,10 @@ always @(posedge clk)
     endcase
     end
 
-always @(posedge clk) if (datain_ack) datain = (datain == 400) ? 0 : (datain + 1);
+always @(posedge clk) if (datain_ack) datain = (datain == 400) ? 1 : (datain + 1);
+
+logic [15:0] dataout_buf;
+always @(posedge clk) if (dataout_req && dataout_ack) dataout_buf <= dataout;
 
 taylor_credit_pipeline taylor_credit_pipeline_inst (
 	.clk_i(clk)

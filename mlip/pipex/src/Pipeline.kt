@@ -1649,7 +1649,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             run {
                 // programming next stage in case transaction is able to propagate
                 if (CUR_STAGE_INDEX < TranslateInfo.StageList.lastIndex) {
-                    cyclix_gen.begif(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_rdy)
+                    if (pipeline_cf_mode != PIPELINE_CF_MODE.CREDIT_BASED) cyclix_gen.begif(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_rdy)
                     run {
                         // propagating transaction context
                         for (local in TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_local_dict) {
@@ -1682,7 +1682,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                         cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_active_glbl, curStageInfo.pctrl_active_glbl)
                         cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_killed_glbl, curStageInfo.pctrl_killed_glbl)
                         cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_stalled_glbl, 0)
-                    }; cyclix_gen.endif()
+                    }; if (pipeline_cf_mode != PIPELINE_CF_MODE.CREDIT_BASED) cyclix_gen.endif()
                 }
 
                 // clearing itself
