@@ -42,20 +42,21 @@ data class __assign_buf(val req : hw_var,
                         val buf : hw_var)
 
 data class __pstage_info(val TranslateInfo : __TranslateInfo,
-                                   val name_prefix : String,
+                         val name_prefix : String,
+                         val TRX_BUF_SIZE : Int,
 
-                                   val pctrl_new : hw_var,
-                                   val pctrl_working : hw_var,
-                                   val pctrl_succ : hw_var,
-                                   val pctrl_occupied : hw_var,
-                                   val pctrl_finish : hw_var,
-                                   val pctrl_flushreq : hw_var,
-                                   val pctrl_nevictable : hw_var,
-                                   val pctrl_rdy : hw_var,
+                         val pctrl_new : hw_var,
+                         val pctrl_working : hw_var,
+                         val pctrl_succ : hw_var,
+                         val pctrl_occupied : hw_var,
+                         val pctrl_finish : hw_var,
+                         val pctrl_flushreq : hw_var,
+                         val pctrl_nevictable : hw_var,
+                         val pctrl_rdy : hw_var,
 
-                                   val pctrl_active_glbl : hw_var,
-                                   val pctrl_stalled_glbl : hw_var,
-                                   val pctrl_killed_glbl : hw_var) {
+                         val pctrl_active_glbl : hw_var,
+                         val pctrl_stalled_glbl : hw_var,
+                         val pctrl_killed_glbl : hw_var) {
 
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
     var pContext_srcglbl_dict   = mutableMapOf<hw_var, hw_var>()    // src global bufs for not-new local (non-sticky) variables
