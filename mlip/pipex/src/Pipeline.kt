@@ -1105,22 +1105,22 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
         MSG(DEBUG_FLAG, "Generating resources")
 
         // Put stages info in ArrayLists
-        var StageList = ArrayList<hw_stage>()
-        for (stage in Stages) StageList.add(stage.value)
-        var StageAssocList = ArrayList<__pstage_info>()
-        for (stageAssoc in TranslateInfo.__stage_assocs) StageAssocList.add(stageAssoc.value)
+        for (stage in Stages) TranslateInfo.StageList.add(stage.value)
+        for (stageAssoc in TranslateInfo.__stage_assocs) TranslateInfo.StageAssocList.add(stageAssoc.value)
 
         MSG(DEBUG_FLAG, "Processing genvars")
-        for (CUR_STAGE_INDEX in 0 until StageList.size) {
-            for (genvar in StageList[CUR_STAGE_INDEX].genvars) {
+        for (CUR_STAGE_INDEX in 0 until TranslateInfo.StageList.size) {
+            for (genvar in TranslateInfo.StageList[CUR_STAGE_INDEX].genvars) {
                 var genvar_local = cyclix_gen.local(GetGenName("var"), genvar.vartype, genvar.defimm)
-                StageAssocList[CUR_STAGE_INDEX].pContext_local_dict.put(genvar, genvar_local)
+                TranslateInfo.StageAssocList[CUR_STAGE_INDEX].pContext_local_dict.put(genvar, genvar_local)
             }
         }
 
         // Generate resources for (m/s)copipes
-        for (CUR_STAGE_INDEX in 0 until StageList.size) {
-            var pstage_info = TranslateInfo.__stage_assocs[StageList[CUR_STAGE_INDEX]]
+        for (CUR_STAGE_INDEX in 0 until TranslateInfo.StageList.size) {
+
+            var curStage = TranslateInfo.StageList[CUR_STAGE_INDEX]
+            var curStage_info = TranslateInfo.StageAssocList[CUR_STAGE_INDEX]
 
             var prev_req_mcopipelist    = ArrayList<hw_mcopipe_handle>()
             var cur_req_mcopipelist     = ArrayList<hw_mcopipe_handle>()
@@ -1132,63 +1132,67 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             var cur_resp_scopipelist    = ArrayList<hw_scopipe_handle>()
             var next_resp_scopipelist   = ArrayList<hw_scopipe_handle>()
 
-            for (STAGE_INDEX_ANLZ in 0 until StageList.size) {
+            for (STAGE_INDEX_ANLZ in 0 until TranslateInfo.StageList.size) {
+
+                var curStageAnlz = TranslateInfo.StageList[STAGE_INDEX_ANLZ]
+                var curStageAnlz_info = TranslateInfo.StageAssocList[STAGE_INDEX_ANLZ]
+
                 if (STAGE_INDEX_ANLZ < CUR_STAGE_INDEX) {
                     prev_req_mcopipelist =
-                        UniteArrayLists(prev_req_mcopipelist, StageAssocList[STAGE_INDEX_ANLZ].mcopipe_handle_reqs)
+                        UniteArrayLists(prev_req_mcopipelist, curStageAnlz_info.mcopipe_handle_reqs)
                     prev_req_scopipelist =
-                        UniteArrayLists(prev_req_scopipelist, StageAssocList[STAGE_INDEX_ANLZ].scopipe_handle_reqs)
+                        UniteArrayLists(prev_req_scopipelist, curStageAnlz_info.scopipe_handle_reqs)
 
                 } else if (STAGE_INDEX_ANLZ == CUR_STAGE_INDEX) {
                     cur_req_mcopipelist =
-                        UniteArrayLists(cur_req_mcopipelist, StageAssocList[STAGE_INDEX_ANLZ].mcopipe_handle_reqs)
+                        UniteArrayLists(cur_req_mcopipelist, curStageAnlz_info.mcopipe_handle_reqs)
                     cur_resp_mcopipelist =
-                        UniteArrayLists(cur_resp_mcopipelist, StageAssocList[STAGE_INDEX_ANLZ].mcopipe_handle_resps)
+                        UniteArrayLists(cur_resp_mcopipelist, curStageAnlz_info.mcopipe_handle_resps)
 
                     cur_req_scopipelist =
-                        UniteArrayLists(cur_req_scopipelist, StageAssocList[STAGE_INDEX_ANLZ].scopipe_handle_reqs)
+                        UniteArrayLists(cur_req_scopipelist, curStageAnlz_info.scopipe_handle_reqs)
                     cur_resp_scopipelist =
-                        UniteArrayLists(cur_resp_scopipelist, StageAssocList[STAGE_INDEX_ANLZ].scopipe_handle_resps)
+                        UniteArrayLists(cur_resp_scopipelist, curStageAnlz_info.scopipe_handle_resps)
 
                 } else {
                     next_resp_mcopipelist = UniteArrayLists(
                         next_resp_mcopipelist,
-                        StageAssocList[STAGE_INDEX_ANLZ].mcopipe_handle_resps
+                        curStageAnlz_info.mcopipe_handle_resps
                     )
                     next_resp_scopipelist = UniteArrayLists(
                         next_resp_scopipelist,
-                        StageAssocList[STAGE_INDEX_ANLZ].scopipe_handle_resps
+                        curStageAnlz_info.scopipe_handle_resps
                     )
                 }
             }
 
-            StageAssocList[CUR_STAGE_INDEX].mcopipe_handles = UniteArrayLists(UniteArrayLists(cur_req_mcopipelist, cur_resp_mcopipelist), CrossArrayLists(prev_req_mcopipelist, next_resp_mcopipelist))
-            StageAssocList[CUR_STAGE_INDEX].scopipe_handles = UniteArrayLists(UniteArrayLists(cur_req_scopipelist, cur_resp_scopipelist), CrossArrayLists(prev_req_scopipelist, next_resp_scopipelist))
+            curStage_info.mcopipe_handles = UniteArrayLists(UniteArrayLists(cur_req_mcopipelist, cur_resp_mcopipelist), CrossArrayLists(prev_req_mcopipelist, next_resp_mcopipelist))
+            curStage_info.scopipe_handles = UniteArrayLists(UniteArrayLists(cur_req_scopipelist, cur_resp_scopipelist), CrossArrayLists(prev_req_scopipelist, next_resp_scopipelist))
 
-            for (mcopipe_handle in StageAssocList[CUR_STAGE_INDEX].mcopipe_handles) {
+            for (mcopipe_handle in curStage_info.mcopipe_handles) {
                 var mcopipe_handle_info = TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle] as __mcopipe_handle_info
 
-                StageList[CUR_STAGE_INDEX].AddRdVar(mcopipe_handle_info.if_id)
-                StageList[CUR_STAGE_INDEX].AddRdVar(mcopipe_handle_info.rdreq_pending)
-                StageList[CUR_STAGE_INDEX].AddRdVar(mcopipe_handle_info.tid)
-                StageList[CUR_STAGE_INDEX].AddRdVar(mcopipe_handle_info.resp_done)
-                StageList[CUR_STAGE_INDEX].AddRdVar(mcopipe_handle_info.rdata)
+                curStage.AddRdVar(mcopipe_handle_info.if_id)
+                curStage.AddRdVar(mcopipe_handle_info.rdreq_pending)
+                curStage.AddRdVar(mcopipe_handle_info.tid)
+                curStage.AddRdVar(mcopipe_handle_info.resp_done)
+                curStage.AddRdVar(mcopipe_handle_info.rdata)
 
-                StageList[CUR_STAGE_INDEX].AddWrVar(mcopipe_handle_info.if_id)
-                StageList[CUR_STAGE_INDEX].AddWrVar(mcopipe_handle_info.rdreq_pending)
-                StageList[CUR_STAGE_INDEX].AddWrVar(mcopipe_handle_info.tid)
-                StageList[CUR_STAGE_INDEX].AddWrVar(mcopipe_handle_info.resp_done)
-                StageList[CUR_STAGE_INDEX].AddWrVar(mcopipe_handle_info.rdata)
+                curStage.AddWrVar(mcopipe_handle_info.if_id)
+                curStage.AddWrVar(mcopipe_handle_info.rdreq_pending)
+                curStage.AddWrVar(mcopipe_handle_info.tid)
+                curStage.AddWrVar(mcopipe_handle_info.resp_done)
+                curStage.AddWrVar(mcopipe_handle_info.rdata)
             }
 
-            for (scopipe_handle in StageAssocList[CUR_STAGE_INDEX].scopipe_handles) {
+            for (scopipe_handle in curStage_info.scopipe_handles) {
                 var scopipe_handle_info = TranslateInfo.__scopipe_handle_assocs[scopipe_handle] as __scopipe_handle_info
 
-                StageList[CUR_STAGE_INDEX].AddRdVar(scopipe_handle_info.if_id)
-                StageList[CUR_STAGE_INDEX].AddRdVar(scopipe_handle_info.we)
+                curStage.AddRdVar(scopipe_handle_info.if_id)
+                curStage.AddRdVar(scopipe_handle_info.we)
 
-                StageList[CUR_STAGE_INDEX].AddWrVar(scopipe_handle_info.if_id)
-                StageList[CUR_STAGE_INDEX].AddWrVar(scopipe_handle_info.we)
+                curStage.AddWrVar(scopipe_handle_info.if_id)
+                curStage.AddWrVar(scopipe_handle_info.we)
             }
 
             // println("mcopipe analysis: " + StageList[CUR_STAGE_INDEX].name)
@@ -1196,25 +1200,25 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
         }
 
         // Generate resources for locals
-        for (CUR_STAGE_INDEX in 0 until StageList.size) {
-            var curStage = StageList[CUR_STAGE_INDEX]
-            var pstage_info = TranslateInfo.__stage_assocs[StageList[CUR_STAGE_INDEX]]
+        for (CUR_STAGE_INDEX in 0 until TranslateInfo.StageList.size) {
+            var curStage = TranslateInfo.StageList[CUR_STAGE_INDEX]
+            var curStage_info = TranslateInfo.StageAssocList[CUR_STAGE_INDEX]
 
             var prev_wr_pvarlist    = ArrayList<hw_var>()
             var cur_wr_pvarlist     = ArrayList<hw_var>()
             var cur_rd_pvarlist     = ArrayList<hw_var>()
             var next_rd_pvarlist    = ArrayList<hw_var>()
 
-            for (STAGE_INDEX_ANLZ in 0 until StageList.size) {
+            for (STAGE_INDEX_ANLZ in 0 until TranslateInfo.StageList.size) {
                 if (STAGE_INDEX_ANLZ < CUR_STAGE_INDEX) {
-                    prev_wr_pvarlist = UniteArrayLists(prev_wr_pvarlist, CrossArrayLists(StageList[STAGE_INDEX_ANLZ].wrvars, locals))
+                    prev_wr_pvarlist = UniteArrayLists(prev_wr_pvarlist, CrossArrayLists(TranslateInfo.StageList[STAGE_INDEX_ANLZ].wrvars, locals))
 
                 } else if (STAGE_INDEX_ANLZ == CUR_STAGE_INDEX) {
-                    cur_wr_pvarlist = UniteArrayLists(cur_wr_pvarlist, CrossArrayLists(StageList[STAGE_INDEX_ANLZ].wrvars, locals))
-                    cur_rd_pvarlist = UniteArrayLists(cur_rd_pvarlist, CrossArrayLists(StageList[STAGE_INDEX_ANLZ].rdvars, locals))
+                    cur_wr_pvarlist = UniteArrayLists(cur_wr_pvarlist, CrossArrayLists(TranslateInfo.StageList[STAGE_INDEX_ANLZ].wrvars, locals))
+                    cur_rd_pvarlist = UniteArrayLists(cur_rd_pvarlist, CrossArrayLists(TranslateInfo.StageList[STAGE_INDEX_ANLZ].rdvars, locals))
 
                 } else {
-                    next_rd_pvarlist = UniteArrayLists(next_rd_pvarlist, CrossArrayLists(StageList[STAGE_INDEX_ANLZ].rdvars, locals))
+                    next_rd_pvarlist = UniteArrayLists(next_rd_pvarlist, CrossArrayLists(TranslateInfo.StageList[STAGE_INDEX_ANLZ].rdvars, locals))
 
                 }
             }
@@ -1226,18 +1230,18 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             for (local in pContext_locals) {
                 if (local is hw_local) {
                     var new_local = cyclix_gen.local(
-                        (StageAssocList[CUR_STAGE_INDEX].name_prefix + local.name),
+                        (curStage_info.name_prefix + local.name),
                         local.vartype,
                         local.defimm
                     )
-                    StageAssocList[CUR_STAGE_INDEX].pContext_local_dict.put(local, new_local)
+                    curStage_info.pContext_local_dict.put(local, new_local)
                 } else if (local is hw_local_sticky) {
                     var new_local = cyclix_gen.global(
-                        (StageAssocList[CUR_STAGE_INDEX].name_prefix + local.name),
+                        (curStage_info.name_prefix + local.name),
                         local.vartype,
                         local.defimm
                     )
-                    StageAssocList[CUR_STAGE_INDEX].pContext_local_dict.put(local, new_local)
+                    curStage_info.pContext_local_dict.put(local, new_local)
                 }
             }
 
@@ -1245,37 +1249,37 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             for (notnew in pContext_notnew) {
                 if (notnew is hw_local) {
                     var new_global = cyclix_gen.global(
-                        (StageAssocList[CUR_STAGE_INDEX].name_prefix + notnew.name + "_genglbl"),
+                        (curStage_info.name_prefix + notnew.name + "_genglbl"),
                         notnew.vartype,
                         notnew.defimm)
-                    StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict.put(notnew, new_global)
+                    curStage_info.pContext_srcglbl_dict.put(notnew, new_global)
                 }
             }
-            for (accum_tgt in StageAssocList[CUR_STAGE_INDEX].accum_tgts) {
-                if (!StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict.containsKey(accum_tgt)) {
+            for (accum_tgt in curStage_info.accum_tgts) {
+                if (!curStage_info.pContext_srcglbl_dict.containsKey(accum_tgt)) {
                     var new_global = cyclix_gen.global(
-                        (StageAssocList[CUR_STAGE_INDEX].name_prefix + accum_tgt.name + "_genglbl"),
+                        (curStage_info.name_prefix + accum_tgt.name + "_genglbl"),
                         accum_tgt.vartype,
                         accum_tgt.defimm)
-                    StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict.put(accum_tgt, new_global)
-                    StageAssocList[CUR_STAGE_INDEX].newaccums.add(accum_tgt)
+                    curStage_info.pContext_srcglbl_dict.put(accum_tgt, new_global)
+                    curStage_info.newaccums.add(accum_tgt)
                 }
             }
 
             if (curStage.BUF_SIZE != 1) {
-                var stage_buf_struct = hw_struct(StageAssocList[CUR_STAGE_INDEX].name_prefix + "TESTSTRUCT")
-                for (srcglbl in StageAssocList[CUR_STAGE_INDEX].pContext_srcglbl_dict) {
+                var stage_buf_struct = hw_struct(curStage_info.name_prefix + "TESTSTRUCT")
+                for (srcglbl in curStage_info.pContext_srcglbl_dict) {
                     stage_buf_struct.add(srcglbl.key.name, srcglbl.key.vartype, srcglbl.key.defimm)
                 }
-                StageAssocList[CUR_STAGE_INDEX].TESTCONTAINER = cyclix_gen.global(StageAssocList[CUR_STAGE_INDEX].name_prefix + "TESTCONTAINER", stage_buf_struct, curStage.BUF_SIZE-1, 0)
-                StageAssocList[CUR_STAGE_INDEX].TESTCONTAINER_COUNTER = cyclix_gen.uglobal(StageAssocList[CUR_STAGE_INDEX].name_prefix + "TESTCONTAINER_COUNTER", GetWidthToContain(curStage.BUF_SIZE)-1, 0, "0")
+                curStage_info.TESTCONTAINER = cyclix_gen.global(curStage_info.name_prefix + "TESTCONTAINER", stage_buf_struct, curStage.BUF_SIZE-1, 0)
+                curStage_info.TESTCONTAINER_COUNTER = cyclix_gen.uglobal(curStage_info.name_prefix + "TESTCONTAINER_COUNTER", GetWidthToContain(curStage.BUF_SIZE)-1, 0, "0")
             }
 
-            for (pContext_local_dict_entry in StageAssocList[CUR_STAGE_INDEX].pContext_local_dict) {
-                StageAssocList[CUR_STAGE_INDEX].var_dict.put(pContext_local_dict_entry.key, pContext_local_dict_entry.value)
+            for (pContext_local_dict_entry in curStage_info.pContext_local_dict) {
+                curStage_info.var_dict.put(pContext_local_dict_entry.key, pContext_local_dict_entry.value)
             }
             for (global_assoc in TranslateInfo.__global_assocs) {
-                StageAssocList[CUR_STAGE_INDEX].var_dict.put(global_assoc.key, global_assoc.value.cyclix_global)
+                curStage_info.var_dict.put(global_assoc.key, global_assoc.value.cyclix_global)
             }
         }
 
@@ -1297,10 +1301,10 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
         }
 
         MSG(DEBUG_FLAG, "logic of stages")
-        for (CUR_STAGE_INDEX in StageList.lastIndex downTo 0) {
+        for (CUR_STAGE_INDEX in TranslateInfo.StageList.lastIndex downTo 0) {
 
-            var curStage        = StageList[CUR_STAGE_INDEX]
-            var curStageAssoc   = StageAssocList[CUR_STAGE_INDEX]
+            var curStage        = TranslateInfo.StageList[CUR_STAGE_INDEX]
+            var curStageAssoc   = TranslateInfo.StageAssocList[CUR_STAGE_INDEX]
 
             MSG(DEBUG_FLAG, "[[ Stage processing: " + curStage.name + " ]]")
 
@@ -1344,18 +1348,18 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             // Forming mcopipe_handles_last list
             MSG(DEBUG_FLAG ,"Detecting last mcopipe handles")
             for (mcopipe_handle in curStageAssoc.mcopipe_handles) {
-                if (CUR_STAGE_INDEX == StageList.lastIndex) {
+                if (CUR_STAGE_INDEX == TranslateInfo.StageList.lastIndex) {
                     curStageAssoc.mcopipe_handles_last.add(mcopipe_handle)
                 } else {
-                    if (!StageAssocList[CUR_STAGE_INDEX+1].mcopipe_handles_last.contains(mcopipe_handle)) {
+                    if (!TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].mcopipe_handles_last.contains(mcopipe_handle)) {
                         curStageAssoc.mcopipe_handles_last.add(mcopipe_handle)
                     }
                 }
             }
 
             // pipeline flush processing
-            if (CUR_STAGE_INDEX < StageList.lastIndex) {
-                cyclix_gen.bor_gen(curStageAssoc.pctrl_flushreq, curStageAssoc.pctrl_flushreq, StageAssocList[CUR_STAGE_INDEX+1].pctrl_flushreq)
+            if (CUR_STAGE_INDEX < TranslateInfo.StageList.lastIndex) {
+                cyclix_gen.bor_gen(curStageAssoc.pctrl_flushreq, curStageAssoc.pctrl_flushreq, TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].pctrl_flushreq)
             }
 
             // Analyzing local stickies
@@ -1365,7 +1369,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 if (local.key is hw_local_sticky) {
                     if (CUR_STAGE_INDEX == 0) {
                         local_stickies_new.add(local.key as hw_local_sticky)
-                    } else if (StageAssocList[CUR_STAGE_INDEX-1].pContext_local_dict.containsKey(local.key)) {
+                    } else if (TranslateInfo.StageAssocList[CUR_STAGE_INDEX-1].pContext_local_dict.containsKey(local.key)) {
                         local_stickies_notnew.add(local.key as hw_local_sticky)
                     } else {
                         local_stickies_new.add(local.key as hw_local_sticky)
@@ -1513,8 +1517,8 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
 
             // Processing of pstall from next pstage
             MSG(DEBUG_FLAG, "#### Processing of next pstage busyness ####")
-            if (CUR_STAGE_INDEX < StageList.lastIndex) {
-                cyclix_gen.begif(!StageAssocList[CUR_STAGE_INDEX+1].pctrl_rdy)
+            if (CUR_STAGE_INDEX < TranslateInfo.StageList.lastIndex) {
+                cyclix_gen.begif(!TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].pctrl_rdy)
                 run {
                     // prepeat from next pstage requested
                     curStageAssoc.pstall_ifactive_cmd(cyclix_gen)
@@ -1558,7 +1562,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                     run {
                         cyclix_gen.add_gen(TranslateInfo.gencredit_counter, TranslateInfo.gencredit_counter, 1)
                     }; cyclix_gen.endif()
-                } else if (CUR_STAGE_INDEX == StageList.lastIndex) {
+                } else if (CUR_STAGE_INDEX == TranslateInfo.StageList.lastIndex) {
                     cyclix_gen.begif(curStageAssoc.pctrl_succ)
                     run {
                         cyclix_gen.sub_gen(TranslateInfo.gencredit_counter, TranslateInfo.gencredit_counter, 1)
@@ -1584,40 +1588,40 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             cyclix_gen.begif(curStageAssoc.pctrl_finish)
             run {
                 // programming next stage in case transaction is able to propagate
-                if (CUR_STAGE_INDEX < StageList.lastIndex) {
-                    cyclix_gen.begif(StageAssocList[CUR_STAGE_INDEX+1].pctrl_rdy)
+                if (CUR_STAGE_INDEX < TranslateInfo.StageList.lastIndex) {
+                    cyclix_gen.begif(TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].pctrl_rdy)
                     run {
                         // propagating transaction context
-                        for (local in StageAssocList[CUR_STAGE_INDEX+1].pContext_local_dict) {
+                        for (local in TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].pContext_local_dict) {
                             if (curStageAssoc.pContext_local_dict.containsKey(local.key)) {
                                 // having data to propagate
                                 if (local.key is hw_local) {
                                     // propagating locals
-                                    if (StageAssocList[CUR_STAGE_INDEX+1].pContext_srcglbl_dict.containsKey(local.key)) {
-                                        cyclix_gen.assign(StageAssocList[CUR_STAGE_INDEX+1].pContext_srcglbl_dict[local.key]!!, curStageAssoc.TranslateVar(local.key))
+                                    if (TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].pContext_srcglbl_dict.containsKey(local.key)) {
+                                        cyclix_gen.assign(TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].pContext_srcglbl_dict[local.key]!!, curStageAssoc.TranslateVar(local.key))
                                     }
                                 } else {
                                     // propagating stickies
-                                    cyclix_gen.assign(StageAssocList[CUR_STAGE_INDEX+1].pContext_local_dict[local.key]!!, curStageAssoc.TranslateVar(local.key))
+                                    cyclix_gen.assign(TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].pContext_local_dict[local.key]!!, curStageAssoc.TranslateVar(local.key))
                                 }
                             }
                         }
                         // propagating transaction context (struct)
-                        if (StageList[CUR_STAGE_INDEX+1].BUF_SIZE != 1) {
-                            for (local in StageAssocList[CUR_STAGE_INDEX].pContext_local_dict) {
-                                if (StageAssocList[CUR_STAGE_INDEX+1].pContext_local_dict.containsKey(local.key)) {
-                                    var fracs = hw_fracs(StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER)
+                        if (TranslateInfo.StageList[CUR_STAGE_INDEX+1].BUF_SIZE != 1) {
+                            for (local in TranslateInfo.StageAssocList[CUR_STAGE_INDEX].pContext_local_dict) {
+                                if (TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].pContext_local_dict.containsKey(local.key)) {
+                                    var fracs = hw_fracs(TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER)
                                     fracs.add(hw_frac_SubStruct(local.key.name))
-                                    cyclix_gen.assign(StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER, fracs, curStageAssoc.TranslateVar(local.key))
+                                    cyclix_gen.assign(TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER, fracs, curStageAssoc.TranslateVar(local.key))
                                 }
                             }
-                            cyclix_gen.add_gen(StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER, StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER, 1)
+                            cyclix_gen.add_gen(TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER, TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].TESTCONTAINER_COUNTER, 1)
                         }
 
                         // propagating pctrls
-                        cyclix_gen.assign(StageAssocList[CUR_STAGE_INDEX+1].pctrl_active_glbl, curStageAssoc.pctrl_active_glbl)
-                        cyclix_gen.assign(StageAssocList[CUR_STAGE_INDEX+1].pctrl_killed_glbl, curStageAssoc.pctrl_killed_glbl)
-                        cyclix_gen.assign(StageAssocList[CUR_STAGE_INDEX+1].pctrl_stalled_glbl, 0)
+                        cyclix_gen.assign(TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].pctrl_active_glbl, curStageAssoc.pctrl_active_glbl)
+                        cyclix_gen.assign(TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].pctrl_killed_glbl, curStageAssoc.pctrl_killed_glbl)
+                        cyclix_gen.assign(TranslateInfo.StageAssocList[CUR_STAGE_INDEX+1].pctrl_stalled_glbl, 0)
                     }; cyclix_gen.endif()
                 }
 
