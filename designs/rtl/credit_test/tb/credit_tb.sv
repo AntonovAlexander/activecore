@@ -1,7 +1,7 @@
 /*
- * xbar_tb.sv
+ * credit_tb.sv
  *
- *  Created on: 05.06.2019
+ *  Created on: 26.03.2021
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
  *     License: See LICENSE file for details
  */
