@@ -777,7 +777,13 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
             cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
             run {
-                cyclix_gen.assign(context.curStageInfo.pContext_srcglbl_dict[expr.wrvars[0]]!!, fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+                if (context.curStageInfo.TRX_BUF_SIZE == 1) {
+                    cyclix_gen.assign(context.curStageInfo.pContext_srcglbl_dict[expr.wrvars[0]]!!, fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+                } else {
+                    var fracs = hw_fracs(0)
+                    fracs.add(hw_frac_SubStruct(expr.wrvars[0].name))
+                    cyclix_gen.assign(context.curStageInfo.TRX_BUF, fracs, context.curStageInfo.TranslateParam(expr.params[0]))
+                }
             }; cyclix_gen.endif()
 
         } else if (expr.opcode == OP_ASSIGN_SUCC) {

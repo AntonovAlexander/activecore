@@ -32,8 +32,8 @@ logic [15:0] dataout;
 always @(posedge clk)
     begin
     randcase
-        1  : dataout_ack <= 1'b1;
-        //10 : dataout_ack <= 1'b0;
+        1 : dataout_ack <= 1'b1;
+        9 : dataout_ack <= 1'b0;
     endcase
     end
 
@@ -89,7 +89,7 @@ initial
 	RESET_ALL();
 	$display ("### RESET COMPLETE! ###");
 
-	WAIT(2000);
+	WAIT(4000);
 	$display ("### SIMULATION COMPLETE! ###");
 	$stop();
 	end
