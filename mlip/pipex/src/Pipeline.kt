@@ -756,6 +756,12 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             }
 
         } else if (expr.opcode == OP_PKILL) {
+            if (context.TranslateInfo.pipeline.pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) {
+                var curStageIndex = context.TranslateInfo.StageList.indexOf(context.curStage)
+                if ((curStageIndex != 0) && (curStageIndex != context.TranslateInfo.StageList.lastIndex)) {
+                    ERROR("Attempting to kill transaction with credit-based mechanism at stage " + context.curStage.name)
+                }
+            }
             context.curStageInfo.pkill_cmd_internal(cyclix_gen)
 
         } else if (expr.opcode == OP_PSTALL) {
@@ -768,6 +774,9 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             context.curStageInfo.pstall_ifactive_cmd(cyclix_gen)
 
         } else if (expr.opcode == OP_PFLUSH) {
+            if (context.TranslateInfo.pipeline.pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) {
+                ERROR("Attempting to slush pipeline with credit-based mechanism at stage " + context.curStage.name)
+            }
             context.curStageInfo.pflush_cmd_internal(cyclix_gen)
 
         } else if (expr.opcode == OP_RD_PREV) {
