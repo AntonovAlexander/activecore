@@ -21,7 +21,7 @@ class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELI
     var ST_TERM1 = stage_handler("ST_TERM1", PSTAGE_BUSY_MODE.FALL_THROUGH)
     var ST_TERM2 = stage_handler("ST_TERM2", PSTAGE_BUSY_MODE.FALL_THROUGH)
     var ST_GENRESULT = stage_handler("ST_GENRESULT", PSTAGE_BUSY_MODE.FALL_THROUGH)
-    var ST_SENDRESULT = stage_handler("ST_SENDRESULT", PSTAGE_BUSY_MODE.FALL_THROUGH, 4)
+    var ST_SENDRESULT = stage_handler("ST_SENDRESULT", PSTAGE_BUSY_MODE.FALL_THROUGH)
 
     init {
 

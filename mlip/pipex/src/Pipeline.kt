@@ -61,17 +61,21 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
 
     var Stages  = mutableMapOf<String, hw_stage>()
 
-    fun stage_handler(name : String, busy_mode : PSTAGE_BUSY_MODE, BUF_SIZE : Int) : hw_stage {
+    fun stage_handler(name : String, busy_mode : PSTAGE_BUSY_MODE, buf_size_cfg : PSTAGE_BUF_SIZE_CFG) : hw_stage {
         if (FROZEN_FLAG) ERROR("Failed to add stage " + name + ": ASTC frozen")
-        var new_stage = hw_stage(name, busy_mode, BUF_SIZE, this)
+        var new_stage = hw_stage(name, busy_mode, buf_size_cfg, this)
         if (Stages.put(new_stage.name, new_stage) != null) {
             ERROR("Stage addition problem!")
         }
         return new_stage
     }
 
+    fun stage_handler(name : String, busy_mode : PSTAGE_BUSY_MODE, BUF_SIZE : Int) : hw_stage {
+        return stage_handler(name, busy_mode, PSTAGE_BUF_SIZE_CFG(BUF_SIZE))
+    }
+
     fun stage_handler(name : String, busy_mode : PSTAGE_BUSY_MODE) : hw_stage {
-        return stage_handler(name, busy_mode, 1)
+        return stage_handler(name, busy_mode, PSTAGE_BUF_SIZE_CFG())
     }
 
     fun begstage(stage : hw_stage) {
@@ -936,6 +940,13 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
         } else cyclix_gen.import_expr(DEBUG_FLAG, expr, context, ::reconstruct_expression)
     }
 
+    fun check_bufsize(stage : hw_stage, actual_bufsize: Int) {
+        if ((stage.BUF_SIZE.cfg_mode == PSTAGE_BUF_SIZE_CFG_MODE.EXACT) && (stage.BUF_SIZE.SIZE != actual_bufsize)) {
+            WARNING("Overriding pstage buffer size for stage " + stage.name + ", given: " + stage.BUF_SIZE.SIZE + ", actual: " + actual_bufsize)
+            throw Exception()
+        }
+    }
+
     fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
 
         MSG("Translating to cyclix: beginning")
@@ -1086,11 +1097,16 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             var pctrl_killed_glbl   = cyclix_gen.uglobal((name_prefix + "genpctrl_killed_glbl"), 0, 0, "0")
 
             var pstage_buf_size = 1
-            if (CUR_STAGE_INDEX != 0) {
+            if (CUR_STAGE_INDEX == 0) {
+                check_bufsize(stage, 1)
+                pstage_buf_size = 1
+            } else {
                 if (pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) {
                     if (CUR_STAGE_INDEX == TranslateInfo.StageList.lastIndex) {
+                        check_bufsize(stage, TranslateInfo.StageList.size-1)
                         pstage_buf_size = TranslateInfo.StageList.size-1
                     } else {
+                        check_bufsize(stage, 1)
                         pstage_buf_size = 1
                     }
                 } else {

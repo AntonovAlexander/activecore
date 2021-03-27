@@ -14,7 +14,10 @@ enum class PSTAGE_BUF_SIZE_CFG_MODE {
     AUTO, EXACT
 }
 
-data class PSTAGE_BUF_SIZE_CFG(val cfg_mode : PSTAGE_BUF_SIZE_CFG_MODE, val SIZE : Int)
+data class PSTAGE_BUF_SIZE_CFG(val cfg_mode : PSTAGE_BUF_SIZE_CFG_MODE, val SIZE : Int) {
+    constructor(SIZE : Int) : this(PSTAGE_BUF_SIZE_CFG_MODE.EXACT, SIZE)
+    constructor() : this(PSTAGE_BUF_SIZE_CFG_MODE.AUTO, 0)
+}
 
 class hw_stage(val name : String, val busy_mode : PSTAGE_BUSY_MODE, val BUF_SIZE : PSTAGE_BUF_SIZE_CFG, val pipeline : Pipeline) : hwast.hw_exec(OP_STAGE) {
 
