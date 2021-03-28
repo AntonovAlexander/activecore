@@ -15,8 +15,7 @@ class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELI
     val term0_min_term1 = ulocal("term0_min_term1", 15, 0, "0")
     val y               = ulocal("y", 15, 0, "0")
 
-    var datain_done = ulocal("datain_done", 0, 0, "0")
-    var dataout_done = ulocal("dataout_done", 0, 0, "0")
+    var datain_done     = ulocal("datain_done", 0, 0, "0")
 
     //// interfaces ////
     var ext_datain    = ufifo_in("ext_datain", 15, 0)
@@ -74,11 +73,7 @@ class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELI
         ST_SENDRESULT.begin()
         run {
 
-            begif(!dataout_done)
-            run {
-                dataout_done.accum(fifo_wr_unblk(ext_dataout, y))
-            }; endif()
-            begif(!dataout_done)
+            begif(!fifo_wr_unblk(ext_dataout, y))
             run {
                 pstall()
             }; endif()
