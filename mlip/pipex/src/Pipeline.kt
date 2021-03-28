@@ -30,7 +30,7 @@ enum class PSTAGE_BUSY_MODE {
     BUFFERED, FALL_THROUGH
 }
 
-enum class PIPELINE_CF_MODE {
+enum class PIPELINE_FC_MODE {
     STALLABLE, CREDIT_BASED
 }
 
@@ -44,7 +44,7 @@ open class pipex_import_expr_context(var_dict : MutableMap<hw_var, hw_var>,
                                      var TranslateInfo: __TranslateInfo,
                                      var curStageInfo : __pstage_info) : import_expr_context(var_dict)
 
-open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) : hw_astc_stdif() {
+open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_FC_MODE) : hw_astc_stdif() {
 
     override var GenNamePrefix   = "pipex"
 
@@ -660,7 +660,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
     }
 
     fun validate() {
-        if ((pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) && (Stages.size < 3)) ERROR("Can't make credit-based mechanism for stage number < 3")
+        if ((pipeline_cf_mode == PIPELINE_FC_MODE.CREDIT_BASED) && (Stages.size < 3)) ERROR("Can't make credit-based mechanism for stage number < 3")
         for (wrvar in wrvars) {
             if (!wrvar.value.write_done) WARNING("signal " + wrvar.value.name + " is not initialized")
         }
@@ -756,7 +756,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             }
 
         } else if (expr.opcode == OP_PKILL) {
-            if (context.TranslateInfo.pipeline.pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) {
+            if (context.TranslateInfo.pipeline.pipeline_cf_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
                 var curStageIndex = context.TranslateInfo.StageList.indexOf(context.curStage)
                 if ((curStageIndex != 0) && (curStageIndex != context.TranslateInfo.StageList.lastIndex)) {
                     ERROR("Attempting to kill transaction with credit-based mechanism at stage " + context.curStage.name)
@@ -765,7 +765,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             context.curStageInfo.pkill_cmd_internal(cyclix_gen)
 
         } else if (expr.opcode == OP_PSTALL) {
-            if (context.TranslateInfo.pipeline.pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) {
+            if (context.TranslateInfo.pipeline.pipeline_cf_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
                 var curStageIndex = context.TranslateInfo.StageList.indexOf(context.curStage)
                 if ((curStageIndex != 0) && (curStageIndex != context.TranslateInfo.StageList.lastIndex)) {
                     ERROR("Attempting to stall transaction with credit-based mechanism at stage " + context.curStage.name)
@@ -774,7 +774,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             context.curStageInfo.pstall_ifactive_cmd(cyclix_gen)
 
         } else if (expr.opcode == OP_PFLUSH) {
-            if (context.TranslateInfo.pipeline.pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) {
+            if (context.TranslateInfo.pipeline.pipeline_cf_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
                 ERROR("Attempting to slush pipeline with credit-based mechanism at stage " + context.curStage.name)
             }
             context.curStageInfo.pflush_cmd_internal(cyclix_gen)
@@ -1122,7 +1122,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 check_bufsize(stage, 1)
                 pstage_buf_size = 1
             } else {
-                if (pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) {
+                if (pipeline_cf_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
                     if (CUR_STAGE_INDEX == TranslateInfo.StageList.lastIndex) {
                         check_bufsize(stage, TranslateInfo.StageList.size-1)
                         pstage_buf_size = TranslateInfo.StageList.size-1
@@ -1159,7 +1159,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                 ProcessSyncOp(expression, TranslateInfo, pstage_info, cyclix_gen)
             }
         }
-        if (pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) TranslateInfo.gencredit_counter = cyclix_gen.uglobal("gencredit_counter", GetWidthToContain(Stages.size)-1, 0, "0")
+        if (pipeline_cf_mode == PIPELINE_FC_MODE.CREDIT_BASED) TranslateInfo.gencredit_counter = cyclix_gen.uglobal("gencredit_counter", GetWidthToContain(Stages.size)-1, 0, "0")
 
         // Generating resources //
         MSG(DEBUG_FLAG, "Generating resources")
@@ -1577,7 +1577,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             }
 
             MSG(DEBUG_FLAG, "#### Processing of next pstage busyness ####")
-            if (TranslateInfo.pipeline.pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) {
+            if (TranslateInfo.pipeline.pipeline_cf_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
                 if (CUR_STAGE_INDEX == 0) {
                     cyclix_gen.begif(cyclix_gen.eq2(TranslateInfo.gencredit_counter, TranslateInfo.StageList.size-1))
                     run {
@@ -1625,7 +1625,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             }; cyclix_gen.endif()
 
             // credit counter processing
-            if (pipeline_cf_mode == PIPELINE_CF_MODE.CREDIT_BASED) {
+            if (pipeline_cf_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
                 if (CUR_STAGE_INDEX == 0) {
                     cyclix_gen.begif(curStageInfo.pctrl_succ)
                     run {
@@ -1658,7 +1658,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
             run {
                 // programming next stage in case transaction is able to propagate
                 if (CUR_STAGE_INDEX < TranslateInfo.StageList.lastIndex) {
-                    if (pipeline_cf_mode != PIPELINE_CF_MODE.CREDIT_BASED) cyclix_gen.begif(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_rdy)
+                    if (pipeline_cf_mode != PIPELINE_FC_MODE.CREDIT_BASED) cyclix_gen.begif(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_rdy)
                     run {
                         // propagating transaction context
                         for (local in TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_local_dict) {
@@ -1691,7 +1691,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_CF_MODE) 
                         cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_active_glbl, curStageInfo.pctrl_active_glbl)
                         cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_killed_glbl, curStageInfo.pctrl_killed_glbl)
                         cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_stalled_glbl, 0)
-                    }; if (pipeline_cf_mode != PIPELINE_CF_MODE.CREDIT_BASED) cyclix_gen.endif()
+                    }; if (pipeline_cf_mode != PIPELINE_FC_MODE.CREDIT_BASED) cyclix_gen.endif()
                 }
 
                 // clearing itself

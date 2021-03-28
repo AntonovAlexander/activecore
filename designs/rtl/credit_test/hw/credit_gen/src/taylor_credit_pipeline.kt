@@ -1,7 +1,7 @@
 import hwast.*
 import pipex.*
 
-class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELINE_CF_MODE.CREDIT_BASED) {
+class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELINE_FC_MODE.CREDIT_BASED) {
 
     val x               = ulocal("x", 15, 0, "0")
     val div6            = hw_imm(16, IMM_BASE_TYPE.HEX, "2a")

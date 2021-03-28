@@ -6,7 +6,7 @@ import pipex.*
 class slave_pipe(name        : String,
                  num_masters    : Int,
                  req_vartype    : hw_type,
-                 resp_vartype   : hw_type) : pipex.Pipeline(name, PIPELINE_CF_MODE.STALLABLE) {
+                 resp_vartype   : hw_type) : pipex.Pipeline(name, PIPELINE_FC_MODE.STALLABLE) {
 
     var master_ifs = ArrayList<hw_scopipe_if>()
     var master_handle = scopipe_handle("master", req_vartype, resp_vartype)
