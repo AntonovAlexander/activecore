@@ -116,14 +116,14 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
         return ret_var
     }
 
-    fun local(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_local {
-        var ret_var = hw_local(name, hw_type(src_struct_in, dimensions), "0")
+    fun local(name: String, src_struct: hw_struct, dimensions: hw_dim_static): hw_local {
+        var ret_var = hw_local(name, hw_type(src_struct, dimensions), "0")
         add_local(ret_var)
         return ret_var
     }
 
-    fun local(name: String, src_struct_in: hw_struct): hw_local {
-        var ret_var = hw_local(name, hw_type(src_struct_in), "0")
+    fun local(name: String, src_struct: hw_struct): hw_local {
+        var ret_var = hw_local(name, hw_type(src_struct), "0")
         add_local(ret_var)
         return ret_var
     }
@@ -224,14 +224,14 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
         return ret_var
     }
 
-    fun local_sticky(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(src_struct_in, dimensions), "0")
+    fun local_sticky(name: String, src_struct: hw_struct, dimensions: hw_dim_static): hw_local_sticky {
+        var ret_var = hw_local_sticky(name, hw_type(src_struct, dimensions), "0")
         add_local_sticky(ret_var)
         return ret_var
     }
 
-    fun local_sticky(name: String, src_struct_in: hw_struct): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(src_struct_in), "0")
+    fun local_sticky(name: String, src_struct: hw_struct): hw_local_sticky {
+        var ret_var = hw_local_sticky(name, hw_type(src_struct), "0")
         add_local_sticky(ret_var)
         return ret_var
     }
@@ -332,14 +332,14 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
         return ret_var
     }
 
-    fun global(name: String, src_struct_in: hw_struct, dimensions: hw_dim_static): hw_global {
-        var ret_var = hw_global(name, hw_type(src_struct_in, dimensions), "0")
+    fun global(name: String, src_struct: hw_struct, dimensions: hw_dim_static): hw_global {
+        var ret_var = hw_global(name, hw_type(src_struct, dimensions), "0")
         add_global(ret_var)
         return ret_var
     }
 
-    fun global(name: String, src_struct_in: hw_struct): hw_global {
-        var ret_var = hw_global(name, hw_type(src_struct_in), "0")
+    fun global(name: String, src_struct: hw_struct): hw_global {
+        var ret_var = hw_global(name, hw_type(src_struct), "0")
         add_global(ret_var)
         return ret_var
     }
@@ -1036,6 +1036,14 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
         for (mcopipe_handle in mcopipe_handles) {
             val name_prefix = "genmcopipe_handle_" + mcopipe_handle.name + "_genvar_"
 
+            var mcopipe_handle_struct = hw_struct("genmcopipe_handle_" + mcopipe_handle.name + "_struct")
+            mcopipe_handle_struct.addu("if_id", GetWidthToContain(TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!.size)-1, 0, "0")
+            mcopipe_handle_struct.addu("resp_done", 0, 0, "0")
+            mcopipe_handle_struct.add ("rdata", mcopipe_handle.rdata_vartype, "0")
+            mcopipe_handle_struct.addu("rdreq_pending", 0, 0, "0")
+            mcopipe_handle_struct.addu("tid", (mcopipe_handle.trx_id_width-1), 0, "0")
+
+
             var if_id           = ulocal_sticky((name_prefix + "if_id"), GetWidthToContain(TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!.size)-1, 0, "0")
             var resp_done       = ulocal_sticky((name_prefix + "resp_done"), 0, 0, "0")
             var rdata           =  local_sticky((name_prefix + "rdata"), mcopipe_handle.rdata_vartype, "0")
@@ -1043,6 +1051,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var tid             = ulocal_sticky((name_prefix + "tid"), (mcopipe_handle.trx_id_width-1), 0, "0")
 
             TranslateInfo.__mcopipe_handle_assocs.put(mcopipe_handle, __mcopipe_handle_info(
+                mcopipe_handle_struct,
                 if_id,
                 resp_done,
                 rdata,
@@ -1313,6 +1322,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var stage_buf_struct = hw_struct(curStageInfo.name_prefix + "TRX_BUF_STRUCT")
             for (srcglbl in curStageInfo.pContext_srcglbls) {
                 stage_buf_struct.add(srcglbl.name, srcglbl.vartype, srcglbl.defimm)
+            }
+            for (cur_mcopipe_handle in curStageInfo.mcopipe_handles) {
+                stage_buf_struct.add("genmcopipe_handle_" + cur_mcopipe_handle.name, TranslateInfo.__mcopipe_handle_assocs[cur_mcopipe_handle]!!.struct_descr)
             }
             curStageInfo.TRX_BUF = cyclix_gen.global(curStageInfo.name_prefix + "TRX_BUF", stage_buf_struct, curStageInfo.TRX_BUF_SIZE-1, 0)
             curStageInfo.TRX_BUF_COUNTER = cyclix_gen.uglobal(curStageInfo.name_prefix + "TRX_BUF_COUNTER", GetWidthToContain(curStageInfo.TRX_BUF_SIZE)-1, 0, "0")

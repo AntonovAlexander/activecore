@@ -26,7 +26,8 @@ data class __mcopipe_if_info(   val wr_done : hw_var,
                                 val req_fifo : hw_fifo_out,
                                 var resp_fifo : hw_fifo_in )
 
-data class __mcopipe_handle_info(val if_id : hw_var,
+data class __mcopipe_handle_info(val struct_descr : hw_struct,
+                                 val if_id : hw_var,
                                  val resp_done : hw_var,
                                  val rdata : hw_var,
                                  val rdreq_pending : hw_var,
