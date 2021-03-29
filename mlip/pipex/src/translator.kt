@@ -59,14 +59,13 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
                          val pctrl_killed_glbl : hw_var) {
 
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
-    var pContext_srcglbls       = ArrayList<hw_var>()               // src global bufs for not-new local (non-sticky) variables
+    var pContext_srcglbls       = ArrayList<hw_var>()               // locals with required src global bufs
+    var accum_tgts              = ArrayList<hw_var>()               // targets for accumulation
+    var newaccums               = ArrayList<hw_var>()               // new targets for accumulation (without driver on previous stage)
 
     var var_dict            = mutableMapOf<hw_var, hw_var>()
 
     var assign_succ_assocs  = mutableMapOf<hw_pipex_var, __assign_buf>()
-
-    var accum_tgts          = ArrayList<hw_var>()
-    var newaccums           = ArrayList<hw_var>()
 
     var mcopipe_handle_reqs  = ArrayList<hw_mcopipe_handle>()
     var mcopipe_handle_resps = ArrayList<hw_mcopipe_handle>()

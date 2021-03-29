@@ -1249,9 +1249,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 curStage.AddWrVar(scopipe_handle_info.if_id)
                 curStage.AddWrVar(scopipe_handle_info.we)
             }
-
-            // println("mcopipe analysis: " + StageList[CUR_STAGE_INDEX].name)
-            // println("mcopipe_handles: " + StageAssocList[CUR_STAGE_INDEX].mcopipe_handles.size)
         }
 
         // Generate resources for locals
