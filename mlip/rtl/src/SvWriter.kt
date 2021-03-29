@@ -74,9 +74,9 @@ class SvWriter(var mod : module) {
     fun export_structvar(preambule_uncond : String, preambule_cond : String, trailer : String, structvar : hw_structvar, wrFile : java.io.OutputStreamWriter) {
         var dimstring = ""
         if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
-            if (!structvar.vartype.dimensions.isSingle()) {
+            if (!structvar.vartype.dimensions.isEmpty()) {
                 for (dim in structvar.vartype.dimensions) {
-                    dimstring += ("" + getDimString(dim))
+                    dimstring += (" " + getDimString(dim))
                 }
             }
             wrFile.write(preambule_uncond
@@ -86,25 +86,29 @@ class SvWriter(var mod : module) {
                     + dimstring
                     + trailer)
         } else {
-            if (structvar.vartype.dimensions.size > 0) {
-                for (DIM_INDEX in 1 until structvar.vartype.dimensions.size) {
-                    dimstring += (" [" + structvar.vartype.dimensions[DIM_INDEX].msb + ":" + structvar.vartype.dimensions[DIM_INDEX].lsb + "]")
-                }
-                var sign_string = ""
-                if (structvar.vartype.VarType == VAR_TYPE.UNSIGNED) sign_string = "unsigned "
-                else sign_string = "signed "
-                wrFile.write(preambule_uncond
-                        + preambule_cond
-                        + sign_string
-                        + "["
-                        + structvar.vartype.dimensions[0].msb.toString()
-                        + ":"
-                        + structvar.vartype.dimensions[0].lsb.toString()
-                        + "] "
-                        + structvar.name
-                        + dimstring
-                        + trailer)
-            } else ERROR("Dimensions error")
+            var msb = 0
+            var lsb = 0
+            if (!structvar.vartype.dimensions.isEmpty()) {
+                msb = structvar.vartype.dimensions[0].msb
+                lsb = structvar.vartype.dimensions[0].lsb
+            }
+            for (DIM_INDEX in 1 until structvar.vartype.dimensions.size) {
+                dimstring += (" [" + structvar.vartype.dimensions[DIM_INDEX].msb + ":" + structvar.vartype.dimensions[DIM_INDEX].lsb + "]")
+            }
+            var sign_string = ""
+            if (structvar.vartype.VarType == VAR_TYPE.UNSIGNED) sign_string = "unsigned "
+            else sign_string = "signed "
+            wrFile.write(preambule_uncond
+                    + preambule_cond
+                    + sign_string
+                    + "["
+                    + msb
+                    + ":"
+                    + lsb
+                    + "] "
+                    + structvar.name
+                    + dimstring
+                    + trailer)
         }
     }
 
@@ -378,6 +382,7 @@ class SvWriter(var mod : module) {
             wrFileInterface.write("`ifndef " + STRUCT_DECL_STRING + "\n")
             wrFileInterface.write("`define " + STRUCT_DECL_STRING + "\n")
             wrFileInterface.write("typedef struct packed {\n")
+            if (hw_struct.value.isEmpty()) hw_struct.value.addu("DUMMY", 0, 0, "0")
             for (structvar in hw_struct.value) {
                 export_structvar("\t", "logic ", ";\n", structvar, wrFileInterface)
             }
@@ -449,6 +454,7 @@ class SvWriter(var mod : module) {
         }
         for (hw_struct in structsInternalToPrint) {
             wrFileModule.write("typedef struct packed {\n")
+            if (hw_struct.value.isEmpty()) hw_struct.value.addu("DUMMY", 0, 0, "0")
             for (structvar in hw_struct.value) {
                 export_structvar("\t", "logic ", ";\n", structvar, wrFileModule)
             }

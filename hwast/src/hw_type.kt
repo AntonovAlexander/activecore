@@ -25,7 +25,7 @@ data class hw_type(var VarType : VAR_TYPE, var src_struct: hw_struct, var dimens
     }
     constructor(src_struct : hw_struct, dimensions : hw_dim_static) : this(VAR_TYPE.STRUCTURED, src_struct, dimensions)
     constructor(src_struct : hw_struct, msb: Int, lsb: Int) : this(VAR_TYPE.STRUCTURED, src_struct, hw_dim_static(msb, lsb))
-    constructor(src_struct : hw_struct) : this(VAR_TYPE.STRUCTURED, src_struct, hw_dim_static(0, 0))
+    constructor(src_struct : hw_struct) : this(VAR_TYPE.STRUCTURED, src_struct, hw_dim_static())
 
     fun Print() {
         if (VarType == VAR_TYPE.STRUCTURED) println("Vartype: structured, src_struct: " + src_struct.name)

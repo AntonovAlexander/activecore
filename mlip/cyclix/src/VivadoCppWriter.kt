@@ -65,9 +65,9 @@ class VivadoCppWriter(var cyclix_module : Generic) {
     fun export_structvar(preambule : String, prename : String, structvar : hw_structvar, postString : String, wrFile : java.io.OutputStreamWriter) {
         var dimstring = ""
         if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
-            if (!structvar.vartype.dimensions.isSingle()) {
+            if (!structvar.vartype.dimensions.isEmpty()) {
                 for (dim in structvar.vartype.dimensions) {
-                    dimstring += ("" + getDimString(dim))
+                    dimstring += (" " + getDimString(dim))
                 }
             }
             wrFile.write(preambule
@@ -78,26 +78,30 @@ class VivadoCppWriter(var cyclix_module : Generic) {
                     + dimstring
                     + postString)
         } else {
-            if (structvar.vartype.dimensions.size > 0) {
-                if (structvar.vartype.dimensions[0].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is not 0!")
-                for (DIM_INDEX in 1 until structvar.vartype.dimensions.size) {
-                    if (structvar.vartype.dimensions[DIM_INDEX].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is not 0!")
-                    dimstring += (" [" + (structvar.vartype.dimensions[DIM_INDEX].msb + 1) + "]")
-                }
+            var msb = 0
+            var lsb = 0
+            if (!structvar.vartype.dimensions.isEmpty()) {
+                msb = structvar.vartype.dimensions[0].msb
+                lsb = structvar.vartype.dimensions[0].lsb
+            }
+            if (lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is not 0!")
+            for (DIM_INDEX in 1 until structvar.vartype.dimensions.size) {
+                if (structvar.vartype.dimensions[DIM_INDEX].lsb != 0) CRITICAL("lsb of variable " + structvar.name + " is not 0!")
+                dimstring += (" [" + (structvar.vartype.dimensions[DIM_INDEX].msb + 1) + "]")
+            }
 
-                var typename = "ap_int"
-                if (structvar.vartype.VarType == VAR_TYPE.UNSIGNED) typename = "ap_uint"
+            var typename = "ap_int"
+            if (structvar.vartype.VarType == VAR_TYPE.UNSIGNED) typename = "ap_uint"
 
-                wrFile.write(preambule
-                        + typename
-                        + "<"
-                        + (structvar.vartype.dimensions[0].msb + 1)
-                        + "> "
-                        + prename
-                        + structvar.name
-                        + dimstring
-                        + postString)
-            } else ERROR("Dimensions error")
+            wrFile.write(preambule
+                    + typename
+                    + "<"
+                    + (msb + 1)
+                    + "> "
+                    + prename
+                    + structvar.name
+                    + dimstring
+                    + postString)
         }
     }
 
@@ -120,7 +124,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         else {
             // TODO: length cleanup
             var length = 0
-            for (i in (index + 1) until expr.params.size) length += expr.params[i].vartype.dimensions[0].GetWidth()
+            for (i in (index + 1) until expr.params.size) length += expr.params[i].GetWidth()
             cnct_string = str +
                     GetParamString(expr.params[index]) +
                     ".concat((ap_uint<" + length + ">)" + append_cnct(expr, (index + 1), cnct_string) + ")"

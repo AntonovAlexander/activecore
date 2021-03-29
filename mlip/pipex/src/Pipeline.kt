@@ -786,13 +786,9 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_FC_MODE) 
             cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
             cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
             run {
-                if (context.curStageInfo.TRX_BUF_SIZE == 1) {
-                    cyclix_gen.assign(context.curStageInfo.pContext_srcglbl_dict[expr.wrvars[0]]!!, fractions, context.curStageInfo.TranslateParam(expr.params[0]))
-                } else {
-                    var fracs = hw_fracs(0)
-                    fracs.add(hw_frac_SubStruct(expr.wrvars[0].name))
-                    cyclix_gen.assign(context.curStageInfo.TRX_BUF, fracs, context.curStageInfo.TranslateParam(expr.params[0]))
-                }
+                var fracs = hw_fracs(0)
+                fracs.add(hw_frac_SubStruct(expr.wrvars[0].name))
+                cyclix_gen.assign(context.curStageInfo.TRX_BUF, fracs, context.curStageInfo.TranslateParam(expr.params[0]))
             }; cyclix_gen.endif()
 
         } else if (expr.opcode == OP_ASSIGN_SUCC) {
@@ -1307,32 +1303,22 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_FC_MODE) 
             // generating global sources
             for (notnew in pContext_notnew) {
                 if (notnew is hw_local) {
-                    var new_global = cyclix_gen.global(
-                        (curStageInfo.name_prefix + notnew.name + "_genglbl"),
-                        notnew.vartype,
-                        notnew.defimm)
-                    curStageInfo.pContext_srcglbl_dict.put(notnew, new_global)
+                    curStageInfo.pContext_srcglbls.add(notnew)
                 }
             }
             for (accum_tgt in curStageInfo.accum_tgts) {
-                if (!curStageInfo.pContext_srcglbl_dict.containsKey(accum_tgt)) {
-                    var new_global = cyclix_gen.global(
-                        (curStageInfo.name_prefix + accum_tgt.name + "_genglbl"),
-                        accum_tgt.vartype,
-                        accum_tgt.defimm)
-                    curStageInfo.pContext_srcglbl_dict.put(accum_tgt, new_global)
+                if (!curStageInfo.pContext_srcglbls.contains(accum_tgt)) {
+                    curStageInfo.pContext_srcglbls.add(accum_tgt)
                     curStageInfo.newaccums.add(accum_tgt)
                 }
             }
 
-            if (curStageInfo.TRX_BUF_SIZE != 1) {
-                var stage_buf_struct = hw_struct(curStageInfo.name_prefix + "TRX_BUF_STRUCT")
-                for (srcglbl in curStageInfo.pContext_srcglbl_dict) {
-                    stage_buf_struct.add(srcglbl.key.name, srcglbl.key.vartype, srcglbl.key.defimm)
-                }
-                curStageInfo.TRX_BUF = cyclix_gen.global(curStageInfo.name_prefix + "TRX_BUF", stage_buf_struct, curStageInfo.TRX_BUF_SIZE-1, 0)
-                curStageInfo.TRX_BUF_COUNTER = cyclix_gen.uglobal(curStageInfo.name_prefix + "TRX_BUF_COUNTER", GetWidthToContain(curStageInfo.TRX_BUF_SIZE)-1, 0, "0")
+            var stage_buf_struct = hw_struct(curStageInfo.name_prefix + "TRX_BUF_STRUCT")
+            for (srcglbl in curStageInfo.pContext_srcglbls) {
+                stage_buf_struct.add(srcglbl.name, srcglbl.vartype, srcglbl.defimm)
             }
+            curStageInfo.TRX_BUF = cyclix_gen.global(curStageInfo.name_prefix + "TRX_BUF", stage_buf_struct, curStageInfo.TRX_BUF_SIZE-1, 0)
+            curStageInfo.TRX_BUF_COUNTER = cyclix_gen.uglobal(curStageInfo.name_prefix + "TRX_BUF_COUNTER", GetWidthToContain(curStageInfo.TRX_BUF_SIZE)-1, 0, "0")
 
             for (pContext_local_dict_entry in curStageInfo.pContext_local_dict) {
                 curStageInfo.var_dict.put(pContext_local_dict_entry.key, pContext_local_dict_entry.value)
@@ -1455,18 +1441,16 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_FC_MODE) 
                     cyclix_gen.begif(curStageInfo.pctrl_new)
                     run {
                         for (newaccum in curStageInfo.newaccums) {
-                            cyclix_gen.assign(curStageInfo.pContext_srcglbl_dict[newaccum]!!, newaccum.defimm)
+                            var fracs = hw_fracs(0)
+                            fracs.add(hw_frac_SubStruct(newaccum.name))
+                            cyclix_gen.assign(curStageInfo.TRX_BUF, fracs, newaccum.defimm)
                         }
                     }; cyclix_gen.endif()
                 }
 
                 MSG(DEBUG_FLAG, "Fetching locals from src_glbls")
-                for (src_glbl in curStageInfo.pContext_srcglbl_dict) {
-                    if (curStageInfo.TRX_BUF_SIZE == 1) {
-                        cyclix_gen.assign(curStageInfo.pContext_local_dict[src_glbl.key] as hw_var, src_glbl.value)
-                    } else {
-                        cyclix_gen.assign(curStageInfo.pContext_local_dict[src_glbl.key] as hw_var, cyclix_gen.subStruct(curStageInfo.TRX_BUF[0], src_glbl.key.name))
-                    }
+                for (src_glbl in curStageInfo.pContext_srcglbls) {
+                    cyclix_gen.assign(curStageInfo.pContext_local_dict[src_glbl]!!, cyclix_gen.subStruct(curStageInfo.TRX_BUF[0], src_glbl.name))
                 }
 
                 MSG(DEBUG_FLAG, "#### Acquiring mcopipe rdata ####")
@@ -1537,9 +1521,11 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_FC_MODE) 
                             for (local in curStageInfo.pContext_local_dict) {
                                 if (local.key is hw_local_sticky) cyclix_gen.assign(local.value, local.value.defimm)
                             }
-                            for (srcglbl in curStageInfo.pContext_srcglbl_dict) {
-                                cyclix_gen.assign(srcglbl.value, srcglbl.value.defimm)
-                                cyclix_gen.assign(curStageInfo.TranslateVar(srcglbl.key), srcglbl.value.defimm)
+                            for (srcglbl in curStageInfo.pContext_srcglbls) {
+                                cyclix_gen.assign(curStageInfo.TranslateVar(srcglbl), srcglbl.defimm)
+                                var fracs = hw_fracs(0)
+                                fracs.add(hw_frac_SubStruct(srcglbl.name))
+                                cyclix_gen.assign(curStageInfo.TRX_BUF, fracs, srcglbl.defimm)
                             }
                         }; cyclix_gen.endif()
                     } else {
@@ -1666,8 +1652,10 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_FC_MODE) 
                                 // having data to propagate
                                 if (local.key is hw_local) {
                                     // propagating locals
-                                    if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_srcglbl_dict.containsKey(local.key)) {
-                                        cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_srcglbl_dict[local.key]!!, curStageInfo.TranslateVar(local.key))
+                                    if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_srcglbls.contains(local.key)) {
+                                        var fracs = hw_fracs(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER)
+                                        fracs.add(hw_frac_SubStruct(local.key.name))
+                                        cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF, fracs, curStageInfo.TranslateVar(local.key))
                                     }
                                 } else {
                                     // propagating stickies
@@ -1675,17 +1663,7 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_FC_MODE) 
                                 }
                             }
                         }
-                        // propagating transaction context (struct)
-                        if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_SIZE != 1) {
-                            for (local in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].pContext_local_dict) {
-                                if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_local_dict.containsKey(local.key)) {
-                                    var fracs = hw_fracs(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER)
-                                    fracs.add(hw_frac_SubStruct(local.key.name))
-                                    cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF, fracs, curStageInfo.TranslateVar(local.key))
-                                }
-                            }
-                            cyclix_gen.add_gen(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, 1)
-                        }
+                        cyclix_gen.add_gen(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, 1)
 
                         // propagating pctrls
                         cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_active_glbl, curStageInfo.pctrl_active_glbl)
@@ -1698,12 +1676,10 @@ open class Pipeline(val name : String, val pipeline_cf_mode : PIPELINE_FC_MODE) 
                 cyclix_gen.assign(curStageInfo.pctrl_active_glbl, 0)
                 cyclix_gen.assign(curStageInfo.pctrl_killed_glbl, 0)
                 cyclix_gen.assign(curStageInfo.pctrl_stalled_glbl, 0)
-                if (curStageInfo.TRX_BUF_SIZE != 1) {
-                    for (BUF_INDEX in 0 until curStageInfo.TRX_BUF_SIZE-1) {
-                        cyclix_gen.assign(curStageInfo.TRX_BUF, hw_fracs(BUF_INDEX), curStageInfo.TRX_BUF[BUF_INDEX+1])
-                    }
-                    cyclix_gen.sub_gen(curStageInfo.TRX_BUF_COUNTER, curStageInfo.TRX_BUF_COUNTER, 1)
+                for (BUF_INDEX in 0 until curStageInfo.TRX_BUF_SIZE-1) {
+                    cyclix_gen.assign(curStageInfo.TRX_BUF, hw_fracs(BUF_INDEX), curStageInfo.TRX_BUF[BUF_INDEX+1])
                 }
+                cyclix_gen.sub_gen(curStageInfo.TRX_BUF_COUNTER, curStageInfo.TRX_BUF_COUNTER, 1)
 
             }; cyclix_gen.endif()
 

@@ -147,8 +147,17 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun op2_gen_dimensions(opcode: hw_opcode, dim0: hw_dim_static, dim1: hw_dim_static): hw_dim_static {
-        val op1_primary_dimension = dim0[0]
-        val op2_primary_dimension = dim1[0]
+
+        var dim0_anlz = hw_dim_static()
+        for (dim in dim0) dim0_anlz.add(dim)
+        if (dim0_anlz.isEmpty()) dim0_anlz.add(hw_dim_range_static(0, 0))
+
+        var dim1_anlz = hw_dim_static()
+        for (dim in dim1) dim1_anlz.add(dim)
+        if (dim1_anlz.isEmpty()) dim1_anlz.add(hw_dim_range_static(0, 0))
+
+        val op1_primary_dimension = dim0_anlz[0]
+        val op2_primary_dimension = dim1_anlz[0]
         val op1_length = op1_primary_dimension.GetWidth()
         val op2_length = op2_primary_dimension.GetWidth()
         val max_length = kotlin.math.max(op1_length, op2_length)
@@ -157,9 +166,9 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
         // ADD, SUB //
         if ((opcode == OP2_ARITH_ADD) || (opcode == OP2_ARITH_SUB)) {
-            if (dim0.size != dim1.size) ERROR("Dimensions incorrect")
-            for (i: Int in 1 until dim0.size) {
-                if (dim0[i].CheckEqual(dim1[i])) gen_dim.add(dim0[i])
+            if (dim0_anlz.size != dim1_anlz.size) ERROR("Dimensions incorrect")
+            for (i: Int in 1 until dim0_anlz.size) {
+                if (dim0_anlz[i].CheckEqual(dim1_anlz[i])) gen_dim.add(dim0_anlz[i])
                 else ERROR("Dimensions incorrect")
             }
             val gen_length = max_length + 1
@@ -169,11 +178,11 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
         // MUL //
         else if (opcode == OP2_ARITH_MUL) {
-            if (dim0.size != dim1.size) {
+            if (dim0_anlz.size != dim1_anlz.size) {
                 ERROR("Dimensions incorrect")
             }
-            for (i: Int in 1 until dim0.size) {
-                if (dim0[i].CheckEqual(dim1[i])) gen_dim.add(dim0[i])
+            for (i: Int in 1 until dim0_anlz.size) {
+                if (dim0_anlz[i].CheckEqual(dim1_anlz[i])) gen_dim.add(dim0_anlz[i])
                 else ERROR("Dimensions incorrect")
             }
             val gen_length = op1_length + op2_length
@@ -183,9 +192,9 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
         // DIV, BITWISE //
         else if ((opcode == OP2_ARITH_DIV) || (opcode == OP2_ARITH_MOD) || (opcode == OP2_BITWISE_AND) || (opcode == OP2_BITWISE_OR) || (opcode == OP2_BITWISE_XOR) || (opcode == OP2_BITWISE_XNOR)) {
-            if (dim0.size != dim1.size) ERROR("Dimensions incorrect")
-            for (i: Int in 1 until dim0.size) {
-                if (dim0[i].CheckEqual(dim1[i])) gen_dim.add(dim0[i])
+            if (dim0_anlz.size != dim1_anlz.size) ERROR("Dimensions incorrect")
+            for (i: Int in 1 until dim0_anlz.size) {
+                if (dim0_anlz[i].CheckEqual(dim1_anlz[i])) gen_dim.add(dim0_anlz[i])
                 else ERROR("Dimensions incorrect")
             }
             val gen_length = max_length
@@ -205,25 +214,22 @@ open class hw_astc() : ArrayList<hw_exec>() {
                 || (opcode == OP2_LOGICAL_EQ4)
                 || (opcode == OP2_LOGICAL_NEQ4)) {
 
-            if ((dim0.size != 1) || (dim1.size != 1)) ERROR("Dimensions incorrect")
+            if ((dim0_anlz.size != 1) || (dim1_anlz.size != 1)) ERROR("Dimensions incorrect")
             val new_range = hw_dim_range_static(0, 0)
             gen_dim.add(0, new_range)
         }
 
         // SHIFT //
         else if ((opcode == OP2_ARITH_SLL) || (opcode == OP2_ARITH_SRL) || (opcode == OP2_ARITH_SRA)) {
-            if (dim1.size != 1) ERROR("Dimensions incorrect")
-            for (i in 0 until dim0.size) gen_dim.add(dim0[i])
+            if (dim1_anlz.size != 1) ERROR("Dimensions incorrect")
+            for (i in 0 until dim0_anlz.size) gen_dim.add(dim0_anlz[i])
         }
 
         // INDEXED //
         else if (opcode == OP2_INDEXED) {
-            if (dim1.size > 1) ERROR("Dimensions incorrect")
-            if (dim0.size > 1) {
-                for (i in 0 until (dim0.size-1)) gen_dim.add(dim0[i])
-            } else {
-                val new_range = hw_dim_range_static(0, 0)
-                gen_dim.add(0, new_range)
+            if (dim1_anlz.size > 1) ERROR("Dimensions incorrect")
+            if (dim0_anlz.size > 1) {
+                for (i in 0 until (dim0_anlz.size-1)) gen_dim.add(dim0_anlz[i])
             }
         } else ERROR("Opcode unrecognized")
 
@@ -231,6 +237,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun op_generate_genvar(opcode: hw_opcode, params: ArrayList<hw_param>): hw_var {
+        println("op_generate_genvar, opcode: " + opcode.default_string)
         if ((opcode == OP1_BITWISE_NOT)
                 || (opcode == OP1_LOGICAL_NOT)
                 || (opcode == OP1_COMPLEMENT)
@@ -251,7 +258,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             else if (opcode == OP1_LOGICAL_NOT) gen_dim.add(hw_dim_range_static(0, 0))
             else {
                 // TODO: vectored operations
-                if (params[0].GetDimensions().size != 1) ERROR("Reduct param dimensions error!")
+                if (params[0].GetDimensions().size > 1) ERROR("Reduct param dimensions error!")
                 for (param in params[0].GetDimensions()) {
                     gen_dim.add(param)
                 }
@@ -327,7 +334,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             return hw_var(GetGenName("var"), hw_type(curVarType, curStruct, gendim), "0")
         } else if (opcode == OP3_RANGED) {
             if (params.size != 3) ERROR("params incorrect for operation " + opcode.default_string + " - number of params: " + params.size + ", expected: 3")
-            if ((params[0].GetDimensions().size != 1) || (params[1].GetDimensions().size != 1) || (params[2].GetDimensions().size != 1))
+            if ((params[0].GetDimensions().size > 1) || (params[1].GetDimensions().size > 1) || (params[2].GetDimensions().size > 1))
                 ERROR("params incorrect for operation")
 
             var gendim = hw_dim_static()
@@ -346,8 +353,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
             var width = 0
             for (i in 0 until params.size) {
-                if (params[i].GetDimensions().size != 1) ERROR("params incorrect for operation")
-                width += params[i].GetDimensions().get(0).GetWidth()
+                if (params[i].GetDimensions().size > 1) ERROR("params incorrect for operation")
+                width += params[i].GetWidth()
             }
 
             var gendim = hw_dim_static()

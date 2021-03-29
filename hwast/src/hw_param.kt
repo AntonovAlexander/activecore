@@ -23,6 +23,7 @@ open class hw_param (var vartype : hw_type, var token_printable : String) {
     }
 
     fun GetWidth() : Int {
-        return vartype.dimensions.last().GetWidth()
+        if (vartype.dimensions.size == 0) return 1;
+        else return vartype.dimensions.last().GetWidth()
     }
 }
