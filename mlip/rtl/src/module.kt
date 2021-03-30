@@ -360,7 +360,7 @@ open class module(val name : String) : hw_astc_stdif() {
 
         // asserting defaults to iftargets
         for (iftarget in cproc.iftargets) {
-            iftarget.assign(iftarget.defimm)
+            assign(iftarget, iftarget.defimm)
         }
 
         // restoring stickies

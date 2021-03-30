@@ -68,15 +68,23 @@ fun WriteGenSrcHeader(wrFile : OutputStreamWriter, SrcType : String) {
     wrFile.write("// ===========================================================\n\n")
 }
 
+fun DisplayTranslationError(var_in : hw_var, var_dict: MutableMap<hw_var, hw_var>) {
+    MSG("Possible var translations for variable " + var_in.name + ":")
+    for (var_entry in var_dict) {
+        println("-- " + var_entry.key.name)
+    }
+    ERROR("Translation error for var " + var_in.name + "!")
+}
+
 fun TranslateVar(var_in : hw_var, var_dict: MutableMap<hw_var, hw_var>) : hw_var {
-    var ret_var = var_dict[var_in]
-    if (ret_var != null) return ret_var
-    else {
-        MSG("Possible var translations for variable " + var_in.name + ":")
-        for (var_entry in var_dict) {
-            println("-- " + var_entry.key.name)
-        }
-        ERROR("Translation error for var " + var_in.name + "!")
+    if (var_in is hw_var_frac) {
+        var src_var = var_dict[var_in.src_var]
+        if (src_var != null) return hw_var_frac(src_var, var_in.depow_fractions, var_in.vartype)
+        else DisplayTranslationError(var_in, var_dict)
+    } else {
+        var ret_var = var_dict[var_in]
+        if (ret_var != null) return ret_var
+        else DisplayTranslationError(var_in, var_dict)
     }
     throw Exception()
 }

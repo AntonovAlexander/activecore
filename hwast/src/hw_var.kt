@@ -218,13 +218,16 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     }
 
     fun GetFracRef(depow_fracs: hw_fracs) : hw_var_frac {
-        return hw_var_frac(this, depow_fracs, GetDepowered(depow_fracs))
+        depow_fracs.FillSubStructs(this)
+        var new_hw_var_frac = hw_var_frac(this, depow_fracs, GetDepowered(depow_fracs))
+        new_hw_var_frac.default_astc = default_astc
+        return new_hw_var_frac
     }
 
     fun GetFracRef(vararg depow_frac: hw_frac) : hw_var_frac {
         var depow_fracs = hw_fracs()
         for (frac in depow_frac) depow_fracs.add(frac)
-        return hw_var_frac(this, depow_fracs, GetDepowered(depow_fracs))
+        return GetFracRef(depow_fracs)
     }
 }
 
