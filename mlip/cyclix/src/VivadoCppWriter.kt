@@ -214,14 +214,14 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             var var_descr = expr.wrvars[0].GetDepowered(expr.assign_tgt_fractured.depow_fractions)
             if ((var_descr.VarType == VAR_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
                 if (opstring == "") {
-                    wrFile.write(expr.wrvars[0].name +
+                    wrFile.write(GetParamString(expr.wrvars[0]) +
                             dimstring +
                             " = '{default:" +
                             GetParamString(expr.params[0]) +
                             "};\n")
                 } else ERROR("assignment error")
             } else {
-                wrFile.write(expr.wrvars[0].name +
+                wrFile.write(GetParamString(expr.wrvars[0]) +
                         dimstring +
                         " = " +
                         opstring +
@@ -252,7 +252,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             || (expr.opcode == OP2_BITWISE_OR)
             || (expr.opcode == OP2_BITWISE_XOR)
             || (expr.opcode == OP2_BITWISE_XNOR)) {
-            wrFile.write(expr.wrvars[0].name +
+            wrFile.write(GetParamString(expr.wrvars[0]) +
                     dimstring +
                     " = (" +
                     GetParamString(expr.params[0]) +
@@ -263,7 +263,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
                     ");\n")
 
         } else if (expr.opcode == OP2_INDEXED) {
-            wrFile.write(expr.wrvars[0].name +
+            wrFile.write(GetParamString(expr.wrvars[0]) +
                     " = " +
                     expr.params[0].GetString() +
                     "[" +
@@ -271,7 +271,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
                     "];\n")
 
         } else if (expr.opcode == OP3_RANGED) {
-            wrFile.write(expr.wrvars[0].name +
+            wrFile.write(GetParamString(expr.wrvars[0]) +
                     " = " +
                     expr.params[0].GetString() +
                     ".range(" +
@@ -281,7 +281,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
                     ");\n")
 
         } else if (expr.opcode == OP2_SUBSTRUCT) {
-            wrFile.write(expr.wrvars[0].name +
+            wrFile.write(GetParamString(expr.wrvars[0]) +
                     " = " +
                     expr.params[0].GetString() +
                     "." +
@@ -292,7 +292,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
 
             var cnct_string = ""
             cnct_string = append_cnct(expr, 0, cnct_string)
-            wrFile.write(expr.wrvars[0].name +
+            wrFile.write(GetParamString(expr.wrvars[0]) +
                     " = " +
                     cnct_string +
                     ";\n")
@@ -338,16 +338,16 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             wrFile.write("}\n")
 
         } else if (expr.opcode == OP_FIFO_WR_UNBLK) {
-            wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_wr_unblk).fifo.name + ".write_nb(" + expr.params[0].GetString() + ");\n")
+            wrFile.write(GetParamString(expr.wrvars[0]) + " = " + (expr as hw_exec_fifo_wr_unblk).fifo.name + ".write_nb(" + expr.params[0].GetString() + ");\n")
 
         } else if (expr.opcode == OP_FIFO_RD_UNBLK) {
-            wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_rd_unblk).fifo.name + ".read_nb(" + expr.wrvars[1].name + ");\n")
+            wrFile.write(GetParamString(expr.wrvars[0]) + " = " + (expr as hw_exec_fifo_rd_unblk).fifo.name + ".read_nb(" + expr.wrvars[1].name + ");\n")
 
         } else if (expr.opcode == OP_FIFO_WR_BLK) {
-            wrFile.write((expr as hw_exec_fifo_wr_blk).fifo.name + ".write(" + expr.params[0].GetString() + ");\n")
+            wrFile.write((expr as hw_exec_fifo_wr_blk).fifo.name + ".write(" + GetParamString(expr.params[0]) + ");\n")
 
         } else if (expr.opcode == OP_FIFO_RD_BLK) {
-            wrFile.write(expr.wrvars[0].name + " = " + (expr as hw_exec_fifo_rd_blk).fifo.name + ".read();\n")
+            wrFile.write(GetParamString(expr.wrvars[0]) + " = " + (expr as hw_exec_fifo_rd_blk).fifo.name + ".read();\n")
 
         } else if (expr.opcode == OP_FIFO_INTERNAL_WR_UNBLK) {
             wrFile.write("OPERATION: OP_FIFO_INTERNAL_WR_UNBLK\n")
@@ -382,7 +382,11 @@ class VivadoCppWriter(var cyclix_module : Generic) {
     }
 
     fun GetParamString(param : hw_param) : String {
-        if (param is hw_var) {
+        if (param is hw_var_frac) {
+            var ret_string = param.name
+            for (fraction in param.depow_fractions) ret_string += getDimString(fraction)
+            return ret_string
+        } else if (param is hw_var) {
             return param.GetString()
         } else {
             if ((param as hw_imm).dimensions.size > 1) throw Exception("cyclix: param print error")
