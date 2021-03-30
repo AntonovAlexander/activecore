@@ -408,7 +408,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op(opcode, srcs)
     }
 
-    private fun process_depow_fractions(depow_fractions: hw_fracs, tgt: hw_var) {
+    private fun EnumerateSubStructs(depow_fractions: hw_fracs, tgt: hw_var) {
         var tgt_struct_ptr = tgt.vartype.src_struct
         for (fraction in depow_fractions) {
             if (fraction is hw_frac_SubStruct) {
@@ -442,7 +442,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     private fun assign_gen(tgt: hw_var, depow_fractions: hw_fracs, src: hw_param) {
-        process_depow_fractions(depow_fractions, tgt)
+        EnumerateSubStructs(depow_fractions, tgt)
         var new_expr = hw_exec(OP1_ASSIGN)
         new_expr.AddRdParam(src)
         new_expr.AddWrVar(tgt)
@@ -458,7 +458,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         //if (src is hw_var)
         //    println("ASSIGNMENT! tgt: " + tgt.name + " (struct: " + tgt.vartype.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
 
-        process_depow_fractions(depow_fractions, tgt)
+        EnumerateSubStructs(depow_fractions, tgt)
 
         var tgt_DePow_descr = tgt.GetDepowered(depow_fractions)
         //println("tgt_DePow_descr: struct: " + tgt_DePow_descr.src_struct.name)

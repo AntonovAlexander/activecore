@@ -215,6 +215,16 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
 
         return hw_type(ret_vartype, ret_struct, ret_dim)
     }
+
+    fun GetFracRef(depow_fracs: hw_fracs) : hw_var_frac {
+        return hw_var_frac(this, depow_fracs, GetDepowered(depow_fracs))
+    }
 }
 
 var DUMMY_VAR = hw_var("DUMMY_VAR", hw_type(VAR_TYPE.UNSIGNED, 0, 0), "0")
+
+class hw_var_frac(var src_var : hw_var, var depow_fractions: hw_fracs, vartype : hw_type) : hw_var(src_var.name, vartype, src_var.defimm) {
+    init {
+        hw_fractured(src_var, depow_fractions)
+    }
+}
