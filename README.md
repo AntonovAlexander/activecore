@@ -41,6 +41,8 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 	* **ariele** - full xbar generator, based on pipex MLIP core
 
+	* **taylor_credit_pipeline** - sin wave generator demonstrating usage of stallable and credit-based flow control mechanisms. Location: /designs/rtl/credit_test
+
 	* **citadel** - OoO FPU coprocessor, based on reordex MLIP core
 
 * Auxiliary reusable cores:
