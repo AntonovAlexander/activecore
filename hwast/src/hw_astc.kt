@@ -65,6 +65,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             cur_exec.AddGenVar(new_genvar)
         }
         new_genvar.default_astc = this
+        if (new_genvar is hw_var_frac) new_genvar.src_var.default_astc = this
     }
 
     fun DistributeVars(new_expr: hw_exec) {
