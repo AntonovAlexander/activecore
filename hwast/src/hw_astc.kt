@@ -408,41 +408,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op(opcode, srcs)
     }
 
-    private fun EnumerateSubStructs(depow_fractions: hw_fracs, tgt: hw_var) {
-        var tgt_struct_ptr = tgt.vartype.src_struct
-        for (fraction in depow_fractions) {
-            if (fraction is hw_frac_SubStruct) {
-                //println("Substruct found!")
-                if (tgt_struct_ptr != DUMMY_STRUCT) {
-                    var substr_found = false
-                    var SUBSTR_INDEX = 0
-                    for (structvar in tgt_struct_ptr) {
-                        //println("structvar: " + structvar.name)
-                        if (structvar.name == fraction.substruct_name) {
-
-                            //println("src_struct: " + tgt_struct_ptr.name)
-                            //println("subStructIndex: " + SUBSTR_INDEX)
-                            fraction.src_struct = tgt_struct_ptr
-                            fraction.subStructIndex = SUBSTR_INDEX
-
-                            if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
-                                tgt_struct_ptr = structvar.vartype.src_struct
-                            } else {
-                                tgt_struct_ptr = DUMMY_STRUCT
-                            }
-                            substr_found = true
-                            break
-                        }
-                        SUBSTR_INDEX += 1
-                    }
-                    if (!substr_found) ERROR("substruct " + (fraction as hw_frac_SubStruct).substruct_name + " not found!")
-                } else ERROR("substruct " + (fraction as hw_frac_SubStruct).substruct_name + " request for tgt " + tgt.name + " is inconsistent!")
-            }
-        }
-    }
-
     private fun assign_gen(tgt: hw_var, depow_fractions: hw_fracs, src: hw_param) {
-        EnumerateSubStructs(depow_fractions, tgt)
+        depow_fractions.FillSubStructs(tgt)
         var new_expr = hw_exec(OP1_ASSIGN)
         new_expr.AddRdParam(src)
         new_expr.AddWrVar(tgt)
@@ -458,7 +425,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         //if (src is hw_var)
         //    println("ASSIGNMENT! tgt: " + tgt.name + " (struct: " + tgt.vartype.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
 
-        EnumerateSubStructs(depow_fractions, tgt)
+        depow_fractions.FillSubStructs(tgt)
 
         var tgt_DePow_descr = tgt.GetDepowered(depow_fractions)
         //println("tgt_DePow_descr: struct: " + tgt_DePow_descr.src_struct.name)

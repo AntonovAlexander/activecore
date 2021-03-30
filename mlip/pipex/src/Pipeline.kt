@@ -1472,6 +1472,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                     var resp_done_translated        = curStageInfo.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.resp_done)
                     var rdata_translated            = curStageInfo.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.rdata)
 
+                    //println("genmcopipe_handle_" + mcopipe_handle.name)
+                    //var rdreq_pending = curStageInfo.TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
+                    //cyclix_gen.assign(rdreq_pending, hw_imm(123))
+
                     cyclix_gen.begif(rdreq_pending_translated)
                     run {
 

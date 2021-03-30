@@ -40,9 +40,9 @@ class hw_dim_static() : ArrayList<hw_dim_range_static>() {
     }
 
     fun isSingle(): Boolean {
-        if (size == 0) return true;
+        if (size == 0) return true
         if (size == 1) {
-            if (get(0).GetWidth() == 1) return true;
+            if (get(0).GetWidth() == 1) return true
         }
         return false;
     }

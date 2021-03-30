@@ -108,4 +108,37 @@ class hw_fracs() : ArrayList<hw_frac>() {
             this.add(fraction)
         }
     }
+
+    fun FillSubStructs(tgt: hw_var) {
+        var tgt_struct_ptr = tgt.vartype.src_struct
+        for (fraction in this) {
+            if (fraction is hw_frac_SubStruct) {
+                //println("Substruct found!")
+                if (tgt_struct_ptr != DUMMY_STRUCT) {
+                    var substr_found = false
+                    var SUBSTR_INDEX = 0
+                    for (structvar in tgt_struct_ptr) {
+                        //println("structvar: " + structvar.name)
+                        if (structvar.name == fraction.substruct_name) {
+
+                            //println("src_struct: " + tgt_struct_ptr.name)
+                            //println("subStructIndex: " + SUBSTR_INDEX)
+                            fraction.src_struct = tgt_struct_ptr
+                            fraction.subStructIndex = SUBSTR_INDEX
+
+                            if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                                tgt_struct_ptr = structvar.vartype.src_struct
+                            } else {
+                                tgt_struct_ptr = DUMMY_STRUCT
+                            }
+                            substr_found = true
+                            break
+                        }
+                        SUBSTR_INDEX += 1
+                    }
+                    if (!substr_found) ERROR("substruct " + (fraction as hw_frac_SubStruct).substruct_name + " not found!")
+                } else ERROR("substruct " + (fraction as hw_frac_SubStruct).substruct_name + " request for tgt " + tgt.name + " is inconsistent!")
+            }
+        }
+    }
 }

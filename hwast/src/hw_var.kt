@@ -170,7 +170,6 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
 
     fun GetDepowered(depow_fracs: hw_fracs): hw_type {
         var ret_dim = hw_dim_static()
-        ret_dim.clear()
         var ret_vartype : VAR_TYPE
         var ret_struct : hw_struct
 
@@ -179,26 +178,28 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
         ret_vartype = vartype.VarType
         ret_struct = vartype.src_struct
 
-        // detaching dimensions
+        // println("detaching dimensions")
         for (depow_fraction in depow_fracs) {
 
+            //println("depow_fraction ..." + depow_fraction.toString())
             if (ret_dim.isSingle()) {
-                // undimensioned var
+                // println("undimensioned var")
                 ret_dim.clear()
                 if (depow_fraction is hw_frac_SubStruct) {
-                    // retrieving structure
+                    // println("retrieving structure...")
                     ret_vartype = depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.VarType
                     ret_struct = depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.src_struct
                     for (dimension in depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.dimensions) {
                         ret_dim.add(dimension)
                     }
+                    // println("retrieving structure: done")
                 } else {
                     // indexing 1-bit (dim) var
                     ret_dim.add(hw_dim_range_static(0, 0))
                 }
 
             } else {
-                // dimensioned var
+                // println("dimensioned var")
                 if (depow_fraction is hw_frac_SubStruct) ERROR("Depower index generation incorrect, accessing substruct in multidimensional variable")
                 else {
                     if ((depow_fraction is hw_frac_C) || (depow_fraction is hw_frac_V)) {
@@ -217,6 +218,12 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     }
 
     fun GetFracRef(depow_fracs: hw_fracs) : hw_var_frac {
+        return hw_var_frac(this, depow_fracs, GetDepowered(depow_fracs))
+    }
+
+    fun GetFracRef(vararg depow_frac: hw_frac) : hw_var_frac {
+        var depow_fracs = hw_fracs()
+        for (frac in depow_frac) depow_fracs.add(frac)
         return hw_var_frac(this, depow_fracs, GetDepowered(depow_fracs))
     }
 }
