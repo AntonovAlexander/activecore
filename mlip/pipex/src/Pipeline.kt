@@ -844,9 +844,11 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var mcopipe_handle          = expr.mcopipe_handle
             var mcopipe_handle_assoc    = context.TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!
 
-            var rdreq_pending_translated    = context.curStageInfo.TranslateVar(mcopipe_handle_assoc.rdreq_pending)
-            var tid_translated              = context.curStageInfo.TranslateVar(mcopipe_handle_assoc.tid)
-            var if_id_translated            = context.curStageInfo.TranslateVar(mcopipe_handle_assoc.if_id)
+            var handleref = context.curStageInfo.TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
+
+            var if_id = handleref.GetFracRef(hw_frac_SubStruct("if_id"))
+            var rdreq_pending = handleref.GetFracRef(hw_frac_SubStruct("rdreq_pending"))
+            var tid = handleref.GetFracRef(hw_frac_SubStruct("tid"))
 
             cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
             run {
@@ -873,12 +875,12 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
                         // req management
                         cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), 1)
-                        cyclix_gen.assign(rdreq_pending_translated, cyclix_gen.lnot(cmd_translated))
-                        cyclix_gen.assign(tid_translated, mcopipe_if_assoc.wr_ptr)
-                        cyclix_gen.assign(if_id_translated, hw_imm(mcopipe_handle_assoc.if_id.vartype.dimensions, handle_id.toString()))
+                        cyclix_gen.assign(rdreq_pending, cyclix_gen.lnot(cmd_translated))
+                        cyclix_gen.assign(tid, mcopipe_if_assoc.wr_ptr)
+                        cyclix_gen.assign(if_id, hw_imm(if_id.vartype.dimensions, handle_id.toString()))
 
                         // mcopipe wr done
-                        cyclix_gen.begif(rdreq_pending_translated)
+                        cyclix_gen.begif(rdreq_pending)
                         run {
                             cyclix_gen.assign(mcopipe_if_assoc.wr_done, 1)
                         }; cyclix_gen.endif()
@@ -894,15 +896,16 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var mcopipe_handle          = (expr as hw_exec_mcopipe_resp).mcopipe_handle
             var mcopipe_handle_assoc    = context.TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!
 
-            var resp_done_translated    = context.curStageInfo.TranslateVar(mcopipe_handle_assoc.resp_done)
-            var rdata_translated        = context.curStageInfo.TranslateVar(mcopipe_handle_assoc.rdata)
+            var handleref = context.curStageInfo.TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
+            var resp_done = handleref.GetFracRef(hw_frac_SubStruct("resp_done"))
+            var rdata = handleref.GetFracRef(hw_frac_SubStruct("rdata"))
 
-            cyclix_gen.begif(resp_done_translated)
+            cyclix_gen.begif(resp_done)
             run {
-                cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[1]), rdata_translated)
+                cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[1]), rdata)
             }; cyclix_gen.endif()
 
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), resp_done_translated)
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), resp_done)
 
         } else if (expr.opcode == OP_SCOPIPE_REQ) {
 
@@ -1043,20 +1046,8 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             mcopipe_handle_struct.addu("rdreq_pending", 0, 0, "0")
             mcopipe_handle_struct.addu("tid", (mcopipe_handle.trx_id_width-1), 0, "0")
 
-
-            var if_id           = ulocal_sticky((name_prefix + "if_id"), GetWidthToContain(TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!.size)-1, 0, "0")
-            var resp_done       = ulocal_sticky((name_prefix + "resp_done"), 0, 0, "0")
-            var rdata           =  local_sticky((name_prefix + "rdata"), mcopipe_handle.rdata_vartype, "0")
-            var rdreq_pending   = ulocal_sticky((name_prefix + "rdreq_pending"), 0, 0, "0")
-            var tid             = ulocal_sticky((name_prefix + "tid"), (mcopipe_handle.trx_id_width-1), 0, "0")
-
             TranslateInfo.__mcopipe_handle_assocs.put(mcopipe_handle, __mcopipe_handle_info(
-                mcopipe_handle_struct,
-                if_id,
-                resp_done,
-                rdata,
-                rdreq_pending,
-                tid))
+                mcopipe_handle_struct))
         }
 
         // Generating scopipes' resources //
@@ -1232,22 +1223,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
             curStageInfo.mcopipe_handles = UniteArrayLists(UniteArrayLists(cur_req_mcopipelist, cur_resp_mcopipelist), CrossArrayLists(prev_req_mcopipelist, next_resp_mcopipelist))
             curStageInfo.scopipe_handles = UniteArrayLists(UniteArrayLists(cur_req_scopipelist, cur_resp_scopipelist), CrossArrayLists(prev_req_scopipelist, next_resp_scopipelist))
-
-            for (mcopipe_handle in curStageInfo.mcopipe_handles) {
-                var mcopipe_handle_info = TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle] as __mcopipe_handle_info
-
-                curStage.AddRdVar(mcopipe_handle_info.if_id)
-                curStage.AddRdVar(mcopipe_handle_info.rdreq_pending)
-                curStage.AddRdVar(mcopipe_handle_info.tid)
-                curStage.AddRdVar(mcopipe_handle_info.resp_done)
-                curStage.AddRdVar(mcopipe_handle_info.rdata)
-
-                curStage.AddWrVar(mcopipe_handle_info.if_id)
-                curStage.AddWrVar(mcopipe_handle_info.rdreq_pending)
-                curStage.AddWrVar(mcopipe_handle_info.tid)
-                curStage.AddWrVar(mcopipe_handle_info.resp_done)
-                curStage.AddWrVar(mcopipe_handle_info.rdata)
-            }
 
             for (scopipe_handle in curStageInfo.scopipe_handles) {
                 var scopipe_handle_info = TranslateInfo.__scopipe_handle_assocs[scopipe_handle] as __scopipe_handle_info
@@ -1463,97 +1438,60 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 }
 
                 MSG(DEBUG_FLAG, "#### Acquiring mcopipe rdata ####")
-                for (mcopipe_handle in curStageInfo.mcopipe_handles) {
+                for (BUF_INDEX in 0 until curStageInfo.TRX_BUF_SIZE) {
+                    for (mcopipe_handle in curStageInfo.mcopipe_handles) {
 
-                    ///
-                    var if_id_translated            = curStageInfo.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.if_id)
-                    var rdreq_pending_translated    = curStageInfo.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.rdreq_pending)
-                    var tid_translated              = curStageInfo.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.tid)
-                    var resp_done_translated        = curStageInfo.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.resp_done)
-                    var rdata_translated            = curStageInfo.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.rdata)
+                        var handleref = curStageInfo.TRX_BUF.GetFracRef(hw_frac_C(BUF_INDEX), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
 
-                    //println("genmcopipe_handle_" + mcopipe_handle.name)
-                    //var rdreq_pending = curStageInfo.TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
-                    //cyclix_gen.assign(rdreq_pending, hw_imm(123))
+                        var if_id = handleref.GetFracRef(hw_frac_SubStruct("if_id"))
+                        var rdreq_pending = handleref.GetFracRef(hw_frac_SubStruct("rdreq_pending"))
+                        var tid = handleref.GetFracRef(hw_frac_SubStruct("tid"))
+                        var resp_done = handleref.GetFracRef(hw_frac_SubStruct("resp_done"))
+                        var rdata = handleref.GetFracRef(hw_frac_SubStruct("rdata"))
 
-                    cyclix_gen.begif(rdreq_pending_translated)
-                    run {
+                        cyclix_gen.begif(rdreq_pending)
+                        run {
 
-                        var IF_NUM = 0
-                        for (mcopipe_if in TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!) {
-                            var mcopipe_if_assoc = TranslateInfo.__mcopipe_if_assocs[mcopipe_if]!!
+                            var IF_NUM = 0
+                            for (mcopipe_if in TranslateInfo.__mcopipe_handle_reqdict[mcopipe_handle]!!) {
+                                var mcopipe_if_assoc = TranslateInfo.__mcopipe_if_assocs[mcopipe_if]!!
 
-                            cyclix_gen.begif(cyclix_gen.eq2(if_id_translated, hw_imm(if_id_translated.vartype.dimensions, IF_NUM.toString())))
-                            run {
-
-                                cyclix_gen.begif(cyclix_gen.eq2(tid_translated, mcopipe_if_assoc.rd_ptr))
+                                cyclix_gen.begif(cyclix_gen.eq2(if_id, hw_imm(if_id.vartype.dimensions, IF_NUM.toString())))
                                 run {
 
-                                    var fifo_rdata = cyclix_gen.local(GetGenName("mcopipe_rdata"), mcopipe_if.rdata_vartype, "0")
-
-                                    cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(mcopipe_if_assoc.resp_fifo, fifo_rdata))
+                                    cyclix_gen.begif(cyclix_gen.eq2(tid, mcopipe_if_assoc.rd_ptr))
                                     run {
-                                        // acquiring data
-                                        cyclix_gen.assign(rdreq_pending_translated, 0)
-                                        cyclix_gen.assign(resp_done_translated, 1)
-                                        cyclix_gen.assign(rdata_translated, fifo_rdata)
 
-                                        // mcopipe rd done
-                                        cyclix_gen.assign(mcopipe_if_assoc.rd_done, 1)
+                                        var fifo_rdata = cyclix_gen.local(GetGenName("mcopipe_rdata"), mcopipe_if.rdata_vartype, "0")
+
+                                        cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(mcopipe_if_assoc.resp_fifo, fifo_rdata))
+                                        run {
+                                            // acquiring data
+                                            cyclix_gen.assign(rdreq_pending, 0)
+                                            cyclix_gen.assign(resp_done, 1)
+                                            cyclix_gen.assign(rdata, fifo_rdata)
+
+                                            // mcopipe rd done
+                                            cyclix_gen.assign(mcopipe_if_assoc.rd_done, 1)
+                                        }; cyclix_gen.endif()
+
                                     }; cyclix_gen.endif()
 
                                 }; cyclix_gen.endif()
+                                IF_NUM++
+                            }
 
-                            }; cyclix_gen.endif()
-                            IF_NUM++
-                        }
-
-                    }; cyclix_gen.endif()
-                }
-
-                // forming mcopipe rdreq inprogress attribute
-                MSG(DEBUG_FLAG, "#### Forming mcopipe rdreq inprogress attribute ####")
-                var mcopipe_rdreq_inprogress = cyclix_gen.ulocal(GetGenName(curStageInfo.name_prefix + "mcopipe_rdreq_inprogress"), 0, 0, "0")
-                cyclix_gen.assign(mcopipe_rdreq_inprogress, 0)
-                for (mcopipe_handle in curStageInfo.mcopipe_handles) {
-                    cyclix_gen.lor_gen(mcopipe_rdreq_inprogress, mcopipe_rdreq_inprogress, curStageInfo.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.rdreq_pending))
+                        }; cyclix_gen.endif()
+                    }
                 }
 
                 // do not start payload if flush requested
                 MSG(DEBUG_FLAG, "#### Pipeline flush processing ####")
                 cyclix_gen.begif(curStageInfo.pctrl_flushreq)
                 run {
-                    if (CUR_STAGE_INDEX == 0) {
-                        cyclix_gen.begif(mcopipe_rdreq_inprogress)
-                        run {
-                            curStageInfo.pkill_cmd_internal(cyclix_gen)
-                        }; cyclix_gen.endif()
-                        cyclix_gen.begelse()
-                        run {
-                            // Dropping transaction context //
-                            for (local in curStageInfo.pContext_local_dict) {
-                                if (local.key is hw_local_sticky) cyclix_gen.assign(local.value, local.value.defimm)
-                            }
-                            for (srcglbl in curStageInfo.pContext_srcglbls) {
-                                cyclix_gen.assign(curStageInfo.TranslateVar(srcglbl), srcglbl.defimm)
-                                var fracs = hw_fracs(0)
-                                fracs.add(hw_frac_SubStruct(srcglbl.name))
-                                cyclix_gen.assign(curStageInfo.TRX_BUF, fracs, srcglbl.defimm)
-                            }
-                        }; cyclix_gen.endif()
-                    } else {
-                        curStageInfo.pkill_cmd_internal(cyclix_gen)
-                    }
+                    if (CUR_STAGE_INDEX != 0) curStageInfo.pkill_cmd_internal(cyclix_gen)
                 }; cyclix_gen.endif()
 
-            }; cyclix_gen.endif()
-            cyclix_gen.begelse()
-            run {
-                for (mcopipe_handle in curStageInfo.mcopipe_handles) {
-                    var mcopipe_handle_assoc = TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!
-                    cyclix_gen.assign(curStageInfo.TranslateVar(mcopipe_handle_assoc.resp_done), 0)
-                    cyclix_gen.assign(curStageInfo.TranslateVar(mcopipe_handle_assoc.rdreq_pending), 0)
-                }
             }; cyclix_gen.endif()
 
             MSG(DEBUG_FLAG, "#### Saving succ targets ####")        // for indexed assignments
@@ -1570,11 +1508,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 )
             }
 
-            // forming nevictable pctrl
-            for (mcopipe_handle in curStageInfo.mcopipe_handles_last) {
-                cyclix_gen.lor_gen(curStageInfo.pctrl_nevictable, curStageInfo.pctrl_nevictable, curStageInfo.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.rdreq_pending))
-            }
-
             MSG(DEBUG_FLAG, "#### Processing of next pstage busyness ####")
             if (TranslateInfo.pipeline.pipeline_fc_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
                 if (CUR_STAGE_INDEX == 0) {
@@ -1589,26 +1522,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                     run {
                         // prepeat from next pstage requested
                         curStageInfo.pstall_ifactive_cmd(cyclix_gen)
-                        // protection from evicting broken transaction with unfinished I/O by subsequent transaction
-                        cyclix_gen.begif(curStageInfo.pctrl_nevictable)
-                        run {
-                            curStageInfo.pstall_ifoccupied_cmd(cyclix_gen)
-                        }; cyclix_gen.endif()
                     }; cyclix_gen.endif()
                 }
             }
-
-            // Forced stalling in case any last mcopipe pending reads are not satisfied
-            MSG(DEBUG_FLAG, "#### Forced stalling in case any last mcopipe pending reads are not satisfied ####")
-            for (mcopipe_handle in curStageInfo.mcopipe_handles_last) {
-                // check if mcopipe rd request is pending
-                cyclix_gen.begif(curStageInfo.TranslateVar(TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!.rdreq_pending))
-                run {
-                    // forced stalling
-                    curStageInfo.pstall_ifoccupied_cmd(cyclix_gen)
-                }; cyclix_gen.endif()
-            }
-            // TODO: forced stalling in case any last scopipe pending reads are not satisfied
 
             // pstage_finish and pstage_succ formation
             MSG(DEBUG_FLAG, "#### pctrl_finish and pctrl_succ formation ####")
@@ -1679,6 +1595,15 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                                 }
                             }
                         }
+                        // propagating mcopipe_handles
+                        for (mcopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].mcopipe_handles) {
+                            if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].mcopipe_handles.contains(mcopipe_handle)) {
+                                var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
+                                var nexthandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF.GetFracRef(hw_frac_V(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
+                                cyclix_gen.assign(nexthandleref, curhandleref)
+                            }
+                        }
+
                         cyclix_gen.add_gen(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, 1)
 
                         // propagating pctrls
@@ -1692,6 +1617,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 cyclix_gen.assign(curStageInfo.pctrl_active_glbl, 0)
                 cyclix_gen.assign(curStageInfo.pctrl_killed_glbl, 0)
                 cyclix_gen.assign(curStageInfo.pctrl_stalled_glbl, 0)
+                cyclix_gen.assign(curStageInfo.TRX_BUF, hw_fracs(0), 0)
                 for (BUF_INDEX in 0 until curStageInfo.TRX_BUF_SIZE-1) {
                     cyclix_gen.assign(curStageInfo.TRX_BUF, hw_fracs(BUF_INDEX), curStageInfo.TRX_BUF[BUF_INDEX+1])
                 }
