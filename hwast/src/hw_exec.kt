@@ -67,6 +67,8 @@ open class hw_exec(val opcode : hw_opcode) {
     var while_trailer = WHILE_TRAILER.EMPTY
 
     var params      = ArrayList<hw_param>()
+    var tgts        = ArrayList<hw_var>()
+
     var rdvars      = ArrayList<hw_var>()
     var wrvars      = ArrayList<hw_var>()
     var genvars     = ArrayList<hw_var>()
@@ -88,16 +90,18 @@ open class hw_exec(val opcode : hw_opcode) {
         cursor = new_val
     }
 
-    fun AddWrVar(new_wrvar : hw_var) {
-        new_wrvar.write_done = true
-        if (new_wrvar is hw_var_frac) new_wrvar.src_var.write_done = true
-        if (!wrvars.contains(new_wrvar)) wrvars.add(new_wrvar)
+    fun AddWrVar(new_var : hw_var) {
+        var real_var = new_var
+        if (new_var is hw_var_frac) real_var = new_var.src_var
+        if (!wrvars.contains(real_var)) wrvars.add(real_var)
+        real_var.write_done = true
     }
 
-    fun AddRdVar(new_rdvar : hw_var) {
-        new_rdvar.read_done = true
-        if (new_rdvar is hw_var_frac) new_rdvar.src_var.read_done = true
-        if (!rdvars.contains(new_rdvar)) rdvars.add(new_rdvar)
+    fun AddRdVar(new_var : hw_var) {
+        var real_var = new_var
+        if (new_var is hw_var_frac) real_var = new_var.src_var
+        if (!rdvars.contains(real_var)) rdvars.add(real_var)
+        real_var.read_done = true
     }
 
     fun AddGenVar(new_genvar : hw_var) {
@@ -106,15 +110,22 @@ open class hw_exec(val opcode : hw_opcode) {
         if (!genvars.contains(added_var)) genvars.add(added_var)
     }
 
-    fun AddRdParam(new_param : hw_param) {
+    fun AddParam(new_param : hw_param) {
         params.add(new_param)
         if (new_param is hw_var) AddRdVar(new_param)
     }
 
-    fun AddRdParams(new_params : ArrayList<hw_param>) {
-        for(new_param in new_params) {
-            AddRdParam(new_param)
-        }
+    fun AddParams(new_params : ArrayList<hw_param>) {
+        for(new_param in new_params) AddParam(new_param)
+    }
+
+    fun AddTgt(new_tgt : hw_var) {
+        tgts.add(new_tgt)
+        AddWrVar(new_tgt)
+    }
+
+    fun AddTgts(new_tgts : ArrayList<hw_var>) {
+        for (new_tgt in new_tgts) AddTgt(new_tgt)
     }
 
     fun AddIfTargetVar(new_ifvar : hw_var) {

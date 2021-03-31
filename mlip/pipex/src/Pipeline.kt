@@ -512,7 +512,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
         var new_expr = hw_exec_read_remote(remote_stage, remote_local)
         var genvar = hw_var(GetGenName("var"), remote_local.vartype, "0")
         remote_stage.AddRdVar(remote_local)
-        new_expr.AddWrVar(genvar)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
@@ -521,7 +521,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
     fun isactive(remote_stage : hw_stage) : hw_var {
         var new_expr = hw_exec_stage_stat(remote_stage, OP_ISACTIVE)
         var genvar = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
-        new_expr.AddWrVar(genvar)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
@@ -530,7 +530,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
     fun isworking(remote_stage : hw_stage) : hw_var {
         var new_expr = hw_exec_stage_stat(remote_stage, OP_ISWORKING)
         var genvar = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
-        new_expr.AddWrVar(genvar)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
@@ -539,7 +539,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
     fun isstalled(remote_stage : hw_stage) : hw_var {
         var new_expr = hw_exec_stage_stat(remote_stage, OP_ISSTALLED)
         var genvar = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
-        new_expr.AddWrVar(genvar)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
@@ -548,7 +548,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
     fun issucc(remote_stage : hw_stage) : hw_var {
         var new_expr = hw_exec_stage_stat(remote_stage, OP_ISSUCC)
         var genvar = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
-        new_expr.AddWrVar(genvar)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
@@ -568,8 +568,8 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
     fun assign_succ(depow_fractions: hw_fracs, tgt : hw_pipex_var, src: hw_param) {
         var new_expr = hw_exec(OP_ASSIGN_SUCC)
-        new_expr.AddWrVar(tgt)
-        new_expr.AddRdParam(src)
+        new_expr.AddTgt(tgt)
+        new_expr.AddParam(src)
         new_expr.assign_tgt_fractured = hw_fractured(tgt, depow_fractions)
         AddExpr(new_expr)
     }
@@ -588,8 +588,8 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
     fun accum(depow_fractions: hw_fracs, tgt : hw_local, src: hw_param) {
         var new_expr = hw_exec(OP_ACCUM)
-        new_expr.AddWrVar(tgt)
-        new_expr.AddRdParam(src)
+        new_expr.AddTgt(tgt)
+        new_expr.AddParam(src)
         new_expr.assign_tgt_fractured = hw_fractured(tgt, depow_fractions)
         AddExpr(new_expr)
     }
@@ -612,7 +612,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
         genvar.default_astc = this
         new_expr.AddRdVar(src)
         new_expr.AddGenVar(genvar)
-        new_expr.AddWrVar(genvar)
+        new_expr.AddTgt(genvar)
         AddExpr(new_expr)
         return genvar
     }
@@ -620,9 +620,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
     fun mcopipe_req(mcopipe_if : hw_mcopipe_if, mcopipe_handle : hw_mcopipe_handle, cmd : hw_param, wdata : hw_param) : hw_var {
         var new_expr = hw_exec_mcopipe_req(mcopipe_if, mcopipe_handle)
         var genvar = hw_var(GetGenName("mcopipe_req_rdy"), VAR_TYPE.UNSIGNED, 0, 0, "0")
-        new_expr.AddRdParam(cmd)
-        new_expr.AddRdParam(wdata)
-        new_expr.AddWrVar(genvar)
+        new_expr.AddParam(cmd)
+        new_expr.AddParam(wdata)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
@@ -631,9 +631,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
     fun mcopipe_resp(mcopipe_handle : hw_mcopipe_handle, rdata : hw_var) : hw_var {
         var new_expr = hw_exec_mcopipe_resp(mcopipe_handle)
         var genvar = hw_var(GetGenName("mcopipe_resp_rdy"), VAR_TYPE.UNSIGNED, 0, 0, "0")
-        new_expr.AddWrVar(genvar)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
-        new_expr.AddWrVar(rdata)
+        new_expr.AddTgt(rdata)
         AddExpr(new_expr)
         return genvar
     }
@@ -641,9 +641,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
     fun scopipe_req(scopipe_if : hw_scopipe_if, scopipe_handle : hw_scopipe_handle, cmd : hw_var, rdata : hw_var) : hw_var {
         var new_expr = hw_exec_scopipe_req(scopipe_if, scopipe_handle)
         var genvar = hw_var(GetGenName("scopipe_req_rdy"), VAR_TYPE.UNSIGNED, 0, 0, "0")
-        new_expr.AddWrVar(cmd)
-        new_expr.AddWrVar(rdata)
-        new_expr.AddWrVar(genvar)
+        new_expr.AddTgt(cmd)
+        new_expr.AddTgt(rdata)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
@@ -652,8 +652,8 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
     fun scopipe_resp(scopipe_handle : hw_scopipe_handle, wdata : hw_param) : hw_var {
         var new_expr = hw_exec_scopipe_resp(scopipe_handle)
         var genvar = hw_var(GetGenName("scopipe_resp_rdy"), VAR_TYPE.UNSIGNED, 0, 0, "0")
-        new_expr.AddRdParam(wdata)
-        new_expr.AddWrVar(genvar)
+        new_expr.AddParam(wdata)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
@@ -674,15 +674,15 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             for (subexpression in expression.expressions) ProcessSyncOp(subexpression, Translate_info, pstage_info, cyclix_gen)
 
         } else if (expression.opcode == OP_ACCUM) {
-            if (!pstage_info.accum_tgts.contains(expression.wrvars[0])) {
-                pstage_info.accum_tgts.add(expression.wrvars[0])
+            if (!pstage_info.accum_tgts.contains(expression.tgts[0])) {
+                pstage_info.accum_tgts.add(expression.tgts[0])
             }
 
         } else if (expression.opcode == OP_ASSIGN_SUCC) {
-            if (!pstage_info.assign_succ_assocs.containsKey(expression.wrvars[0])) {
+            if (!pstage_info.assign_succ_assocs.containsKey(expression.tgts[0])) {
                 val req = cyclix_gen.ulocal(GetGenName("succreq"), 0, 0, "0")
-                val buf = cyclix_gen.local(GetGenName("succbuf"), expression.wrvars[0].vartype, expression.wrvars[0].defimm)
-                pstage_info.assign_succ_assocs.put((expression.wrvars[0] as hw_pipex_var), __assign_buf(req, buf))
+                val buf = cyclix_gen.local(GetGenName("succbuf"), expression.tgts[0].vartype, expression.tgts[0].defimm)
+                pstage_info.assign_succ_assocs.put((expression.tgts[0] as hw_pipex_var), __assign_buf(req, buf))
             }
 
         } else if (expression.opcode == OP_RD_REMOTE) {
@@ -743,16 +743,16 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
         if ((expr.opcode == OP1_ASSIGN)) {
 
-            if (expr.wrvars[0] is hw_global) {
+            if (expr.tgts[0] is hw_global) {
                 cyclix_gen.begif(!context.curStageInfo.pctrl_stalled_glbl)
                 run {
                     cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
                     run {
-                        cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+                        cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
             } else {
-                cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+                cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
             }
 
         } else if (expr.opcode == OP_PKILL) {
@@ -780,48 +780,48 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             context.curStageInfo.pflush_cmd_internal(cyclix_gen)
 
         } else if (expr.opcode == OP_RD_PREV) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), fractions, context.TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
 
         } else if (expr.opcode == OP_ACCUM) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
             cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
             run {
                 var fracs = hw_fracs(0)
-                fracs.add(hw_frac_SubStruct(expr.wrvars[0].name))
+                fracs.add(hw_frac_SubStruct(expr.tgts[0].name))
                 cyclix_gen.assign(context.curStageInfo.TRX_BUF, fracs, context.curStageInfo.TranslateParam(expr.params[0]))
             }; cyclix_gen.endif()
 
         } else if (expr.opcode == OP_ASSIGN_SUCC) {
-            cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[expr.wrvars[0]]!!.req, 1)
-            cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[expr.wrvars[0]]!!.buf, fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+            cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[expr.tgts[0]]!!.req, 1)
+            cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[expr.tgts[0]]!!.buf, fractions, context.curStageInfo.TranslateParam(expr.params[0]))
 
         } else if (expr.opcode == OP_RD_REMOTE) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), fractions, context.TranslateInfo.__stage_assocs[(expr as hw_exec_read_remote).stage]!!.TranslateVar(expr.remote_var))
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.TranslateInfo.__stage_assocs[(expr as hw_exec_read_remote).stage]!!.TranslateVar(expr.remote_var))
 
         } else if (expr.opcode == OP_ISACTIVE) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_active_glbl)
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_active_glbl)
 
         } else if (expr.opcode == OP_ISWORKING) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_working)
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_working)
 
         } else if (expr.opcode == OP_ISSTALLED) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_stalled_glbl)
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_stalled_glbl)
 
         } else if (expr.opcode == OP_ISSUCC) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_succ)
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_succ)
 
         } else if (expr.opcode == OP_ISKILLED) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_killed_glbl)
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_killed_glbl)
 
         } else if (expr.opcode == OP_ISFINISHED) {
             cyclix_gen.assign(
-                context.curStageInfo.TranslateVar(expr.wrvars[0]),
+                context.curStageInfo.TranslateVar(expr.tgts[0]),
                 context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_finish
             )
 
         } else if (expr.opcode == OP_FIFO_WR_UNBLK) {
             var wdata_translated = context.curStageInfo.TranslateParam(expr.params[0])
-            var ack_translated = context.curStageInfo.TranslateVar(expr.wrvars[0])
+            var ack_translated = context.curStageInfo.TranslateVar(expr.tgts[0])
             var fifo_wr_translated = context.TranslateInfo.__fifo_wr_assocs[(expr as hw_exec_fifo_wr_unblk).fifo]!!
             cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
             run {
@@ -829,8 +829,8 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             }; cyclix_gen.endif()
 
         } else if (expr.opcode == OP_FIFO_RD_UNBLK) {
-            var ack_translated = context.curStageInfo.TranslateVar(expr.wrvars[0])
-            var rdata_translated = context.curStageInfo.TranslateVar(expr.wrvars[1])
+            var ack_translated = context.curStageInfo.TranslateVar(expr.tgts[0])
+            var rdata_translated = context.curStageInfo.TranslateVar(expr.tgts[1])
             var fifo_rd_translated = context.TranslateInfo.__fifo_rd_assocs[(expr as hw_exec_fifo_rd_unblk).fifo]!!
             cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
             run {
@@ -874,7 +874,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                     run {
 
                         // req management
-                        cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), 1)
+                        cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), 1)
                         cyclix_gen.assign(rdreq_pending, cyclix_gen.lnot(cmd_translated))
                         cyclix_gen.assign(tid, mcopipe_if_assoc.wr_ptr)
                         cyclix_gen.assign(if_id, hw_imm(if_id.vartype.dimensions, handle_id.toString()))
@@ -902,10 +902,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
             cyclix_gen.begif(resp_done)
             run {
-                cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[1]), rdata)
+                cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[1]), rdata)
             }; cyclix_gen.endif()
 
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), resp_done)
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), resp_done)
 
         } else if (expr.opcode == OP_SCOPIPE_REQ) {
 
@@ -929,11 +929,11 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
                 cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(scopipe_if_assoc.req_fifo, req_struct))
                 run {
-                    cyclix_gen.subStruct_gen(context.curStageInfo.TranslateVar(expr.wrvars[0]),  req_struct, "we")
-                    cyclix_gen.subStruct_gen(context.curStageInfo.TranslateVar(expr.wrvars[1]),  req_struct, "wdata")
+                    cyclix_gen.subStruct_gen(context.curStageInfo.TranslateVar(expr.tgts[0]),  req_struct, "we")
+                    cyclix_gen.subStruct_gen(context.curStageInfo.TranslateVar(expr.tgts[1]),  req_struct, "wdata")
                     cyclix_gen.assign(if_id_translated, hw_imm(scopipe_handle_assoc.if_id.vartype.dimensions, handle_id.toString()))
 
-                    cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[2]), 1)
+                    cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[2]), 1)
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
 
@@ -952,7 +952,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
                     cyclix_gen.begif(cyclix_gen.eq2(if_id_translated, context.TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(scopipe_if)))
                     run {
-                        cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.wrvars[0]), cyclix_gen.fifo_wr_unblk(scopipe_if_assoc.resp_fifo, context.curStageInfo.TranslateVar(expr.rdvars[0])))
+                        cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), cyclix_gen.fifo_wr_unblk(scopipe_if_assoc.resp_fifo, context.curStageInfo.TranslateVar(expr.rdvars[0])))
                     }; cyclix_gen.endif()
                 }
             }; cyclix_gen.endif()

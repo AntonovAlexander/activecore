@@ -81,8 +81,6 @@ open class hw_astc() : ArrayList<hw_exec>() {
         }
 
         for (cur_exec in this) {
-
-
             for (new_ifvar in new_expr.iftargets) {
                 cur_exec.AddIfTargetVar(new_ifvar)
             }
@@ -99,21 +97,21 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun AddExpr_op_gen(opcode: hw_opcode, tgt: hw_var, srcs: ArrayList<hw_param>) {
         var new_expr = hw_exec(opcode)
-        new_expr.AddWrVar(tgt)
+        new_expr.AddTgt(tgt)
         for (new_src in srcs) {
-            new_expr.AddRdParam(new_src)
+            new_expr.AddParam(new_src)
         }
         AddExpr(new_expr)
     }
 
     fun AddExpr_op_gen_withgen(opcode: hw_opcode, target: hw_var, params: ArrayList<hw_param>) {
         var new_expr = hw_exec(opcode)
-        new_expr.AddWrVar(target)
+        new_expr.AddTgt(target)
         //println("opcode: " + opcode.default_string)
         //println("params: " + params.size)
         for (new_param in params) {
             //println("param: " + new_param.GetString())
-            new_expr.AddRdParam(new_param)
+            new_expr.AddParam(new_param)
         }
         new_expr.AddGenVar(target)
         AddExpr(new_expr)
@@ -412,8 +410,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
     private fun assign_gen(tgt: hw_var, depow_fractions: hw_fracs, src: hw_param) {
         depow_fractions.FillSubStructs(tgt)
         var new_expr = hw_exec(OP1_ASSIGN)
-        new_expr.AddRdParam(src)
-        new_expr.AddWrVar(tgt)
+        new_expr.AddParam(src)
+        new_expr.AddTgt(tgt)
         new_expr.assign_tgt_fractured = hw_fractured(tgt, depow_fractions)
         AddExpr(new_expr)
     }
@@ -740,8 +738,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun subStruct_withgen(tgt: hw_var, src: hw_var, subStruct_name: String) {
         var new_expr = hw_exec(OP2_SUBSTRUCT)
-        new_expr.AddWrVar(tgt)
-        new_expr.AddRdParam(src)
+        new_expr.AddTgt(tgt)
+        new_expr.AddParam(src)
         new_expr.AddGenVar(tgt)
         new_expr.subStructvar_name = subStruct_name
         AddExpr(new_expr)
@@ -769,10 +767,10 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return hw_type(src.vartype.VarType, src.vartype.src_struct, src.vartype.dimensions)
     }
 
-    fun subStruct_gen(tgt: hw_var, src : hw_var, subStruct_name : String) {
+    fun subStruct_gen(tgt: hw_var, src : hw_param, subStruct_name : String) {
         var new_expr = hw_exec(OP2_SUBSTRUCT)
-        new_expr.AddWrVar(tgt)
-        new_expr.AddRdParam(src)
+        new_expr.AddTgt(tgt)
+        new_expr.AddParam(src)
         new_expr.subStructvar_name = subStruct_name
         AddExpr(new_expr)
     }
@@ -1091,7 +1089,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             val genvar = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
             new_expr.AddGenVar(genvar)
             assign_gen(genvar, cond)
-            new_expr.AddRdParam(genvar)
+            new_expr.AddParam(genvar)
             last().priority_conditions.add(genvar)
         } else {
             last().priority_conditions.add(cond)
@@ -1118,7 +1116,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         AddExpr_op2_gen(OP2_LOGICAL_AND, curif_cond, curif_cond, cond)
 
         var new_expr = hw_exec(OP1_IF)
-        new_expr.AddRdParam(curif_cond)
+        new_expr.AddParam(curif_cond)
         new_expr.AddGenVar(curif_cond)
 
         last().priority_conditions.add(curif_cond)
@@ -1141,7 +1139,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         AddExpr_op1_gen(OP1_LOGICAL_NOT, curif_cond, curif_cond)
 
         var new_expr = hw_exec(OP1_IF)
-        new_expr.AddRdParam(curif_cond)
+        new_expr.AddParam(curif_cond)
         new_expr.AddGenVar(curif_cond)
 
         last().priority_conditions.add(curif_cond)
@@ -1162,7 +1160,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun begcase(cond : hw_param) {
         var new_expr = hw_exec(OP1_CASE)
-        new_expr.AddRdParam(cond)
+        new_expr.AddParam(cond)
         AddExpr(new_expr)
         add(new_expr)
     }
@@ -1180,7 +1178,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     fun begbranch(cond : hw_param) {
         if (last().opcode != OP1_CASE) ERROR("begbranch without begcase!")
         var new_expr = hw_exec(OP1_CASEBRANCH)
-        new_expr.AddRdParam(cond)
+        new_expr.AddParam(cond)
         AddExpr(new_expr)
         add(new_expr)
     }
@@ -1207,7 +1205,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun begwhile(cond : hw_param) {
         var new_expr = hw_exec(OP1_WHILE)
-        new_expr.AddRdParam(cond)
+        new_expr.AddParam(cond)
 
         AddExpr(new_expr)
         add(new_expr)
@@ -1227,7 +1225,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         val genvar_iter_cont = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
         assign(genvar_iter_cont, 1)
         new_expr.AddGenVar(genvar_iter_cont)
-        new_expr.AddRdParam(genvar_iter_cont)
+        new_expr.AddParam(genvar_iter_cont)
         new_expr.while_trailer = WHILE_TRAILER.INCR_COUNTER
 
         val genvar_iter_num_next = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
@@ -1264,7 +1262,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         val genvar_iter_cont = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
         assign(genvar_iter_cont, 1)
         new_expr.AddGenVar(genvar_iter_cont)
-        new_expr.AddRdParam(genvar_iter_cont)
+        new_expr.AddParam(genvar_iter_cont)
         new_expr.while_trailer = WHILE_TRAILER.INCR_COUNTER
 
         val genvar_iter_num_next = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
@@ -1293,7 +1291,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         val genvar_iter_cont = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, 0, 0, "0")
         assign(genvar_iter_cont, 1)
         new_expr.AddGenVar(genvar_iter_cont)
-        new_expr.AddRdParam(genvar_iter_cont)
+        new_expr.AddParam(genvar_iter_cont)
         new_expr.while_trailer = WHILE_TRAILER.INCR_COUNTER
 
         val genvar_iter_num_next = hw_var(GetGenName("var"), VAR_TYPE.UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
@@ -1457,7 +1455,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, context.var_dict)
 
         if ((expr.opcode == OP1_ASSIGN)) {
-            assign(TranslateVar(expr.wrvars[0], context.var_dict), fractions, TranslateParam(expr.params[0], context.var_dict))
+            assign(TranslateVar(expr.tgts[0], context.var_dict), fractions, TranslateParam(expr.params[0], context.var_dict))
 
         } else if ((expr.opcode == OP2_ARITH_ADD)
                 || (expr.opcode == OP2_ARITH_SUB)
@@ -1501,12 +1499,12 @@ open class hw_astc() : ArrayList<hw_exec>() {
             for (param in expr.params) {
                 params.add(TranslateParam(param, context.var_dict))
             }
-            AddExpr_op_gen(expr.opcode, TranslateVar(expr.wrvars[0], context.var_dict), params)
+            AddExpr_op_gen(expr.opcode, TranslateVar(expr.tgts[0], context.var_dict), params)
 
         } else if (expr.opcode == OP2_SUBSTRUCT) {
             subStruct_gen(
-                    TranslateVar(expr.wrvars[0], context.var_dict),
-                    TranslateVar(expr.rdvars[0], context.var_dict),
+                    TranslateVar(expr.tgts[0], context.var_dict),
+                    TranslateParam(expr.params[0], context.var_dict),
                     expr.subStructvar_name
             )
 
@@ -2062,8 +2060,8 @@ open class hw_astc_stdif() : hw_astc() {
     fun fifo_wr_unblk(fifo : hw_fifo_out, wdata : hw_param) : hw_var {
         var new_expr = hw_exec_fifo_wr_unblk(fifo)
         var genvar = hw_var(GetGenName("fifo_rdy"), VAR_TYPE.UNSIGNED, 0, 0, "0")
-        new_expr.AddRdParam(wdata)
-        new_expr.AddWrVar(genvar)
+        new_expr.AddParam(wdata)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
@@ -2072,23 +2070,23 @@ open class hw_astc_stdif() : hw_astc() {
     fun fifo_rd_unblk(fifo : hw_fifo_in, rdata : hw_var) : hw_var {
         var new_expr = hw_exec_fifo_rd_unblk(fifo)
         var genvar = hw_var(GetGenName("fifo_rdy"), VAR_TYPE.UNSIGNED, 0, 0, "0")
-        new_expr.AddWrVar(genvar)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
-        new_expr.AddWrVar(rdata)
+        new_expr.AddTgt(rdata)
         AddExpr(new_expr)
         return genvar
     }
 
     fun fifo_wr_blk(fifo : hw_fifo_out, wdata : hw_param) {
         var new_expr = hw_exec_fifo_wr_blk(fifo)
-        new_expr.AddRdParam(wdata)
+        new_expr.AddParam(wdata)
         AddExpr(new_expr)
     }
 
     fun fifo_rd_blk(fifo : hw_fifo_in) : hw_var {
         var new_expr = hw_exec_fifo_rd_blk(fifo)
         var genvar = hw_var(GetGenName("fifo_rdata"), fifo.vartype, fifo.defimm)
-        new_expr.AddWrVar(genvar)
+        new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
