@@ -89,17 +89,15 @@ open class hw_exec(val opcode : hw_opcode) {
     }
 
     fun AddWrVar(new_wrvar : hw_var) {
-        var added_var = new_wrvar
-        if (added_var is hw_var_frac) added_var = added_var.src_var
-        added_var.write_done = true
-        if (!wrvars.contains(added_var)) wrvars.add(added_var)
+        new_wrvar.write_done = true
+        if (new_wrvar is hw_var_frac) new_wrvar.src_var.write_done = true
+        if (!wrvars.contains(new_wrvar)) wrvars.add(new_wrvar)
     }
 
     fun AddRdVar(new_rdvar : hw_var) {
-        var added_var = new_rdvar
-        if (added_var is hw_var_frac) added_var = added_var.src_var
-        added_var.read_done = true
-        if (!rdvars.contains(added_var)) rdvars.add(added_var)
+        new_rdvar.read_done = true
+        if (new_rdvar is hw_var_frac) new_rdvar.src_var.read_done = true
+        if (!rdvars.contains(new_rdvar)) rdvars.add(new_rdvar)
     }
 
     fun AddGenVar(new_genvar : hw_var) {

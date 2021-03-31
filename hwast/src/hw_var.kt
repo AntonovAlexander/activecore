@@ -217,14 +217,14 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
         return hw_type(ret_vartype, ret_struct, ret_dim)
     }
 
-    fun GetFracRef(depow_fracs: hw_fracs) : hw_var_frac {
+    open fun GetFracRef(depow_fracs: hw_fracs) : hw_var_frac {
         depow_fracs.FillSubStructs(this)
         var new_hw_var_frac = hw_var_frac(this, depow_fracs, GetDepowered(depow_fracs))
         new_hw_var_frac.default_astc = default_astc
         return new_hw_var_frac
     }
 
-    fun GetFracRef(vararg depow_frac: hw_frac) : hw_var_frac {
+    open fun GetFracRef(vararg depow_frac: hw_frac) : hw_var_frac {
         var depow_fracs = hw_fracs()
         for (frac in depow_frac) depow_fracs.add(frac)
         return GetFracRef(depow_fracs)
@@ -236,5 +236,21 @@ var DUMMY_VAR = hw_var("DUMMY_VAR", hw_type(VAR_TYPE.UNSIGNED, 0, 0), "0")
 class hw_var_frac(var src_var : hw_var, var depow_fractions: hw_fracs, vartype : hw_type) : hw_var(src_var.name, vartype, src_var.defimm) {
     init {
         hw_fractured(src_var, depow_fractions)
+    }
+
+    override fun GetFracRef(depow_fracs: hw_fracs) : hw_var_frac {
+        depow_fracs.FillSubStructs(this)
+        var new_depow_fracs = hw_fracs()
+        for (frac in depow_fractions) new_depow_fracs.add(frac)
+        for (frac in depow_fracs) new_depow_fracs.add(frac)
+        var new_hw_var_frac = hw_var_frac(src_var, new_depow_fracs, GetDepowered(depow_fracs))
+        new_hw_var_frac.default_astc = default_astc
+        return new_hw_var_frac
+    }
+
+    override fun GetFracRef(vararg depow_frac: hw_frac) : hw_var_frac {
+        var depow_fracs = hw_fracs()
+        for (frac in depow_frac) depow_fracs.add(frac)
+        return GetFracRef(depow_fracs)
     }
 }
