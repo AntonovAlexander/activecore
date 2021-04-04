@@ -11,8 +11,10 @@ import sigma
 from sigma import *
 
 
-udm = udm('COM4', 921600)
+udm = udm('COM1', 921600)
 print("")
 
 sigma = sigma(udm)
 sigma.run_app_tests()
+
+udm.disconnect()
