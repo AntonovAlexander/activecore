@@ -46,7 +46,8 @@ always @(posedge clk_i) sw_reset_o <= rst_i | sw_reset;
 
 logic timer_inprogress, timer_reload;
 logic [31:0] timer_period;
-logic [31:0] timer_value;
+logic [31:0] timer_value, timer_value_inc;
+assign timer_value_inc = timer_value + 1;
 
 always @(posedge clk_i)
 	begin
@@ -83,13 +84,13 @@ always @(posedge clk_i)
 
 		if (timer_inprogress)
 			begin
-			if (timer_value == timer_period)
+			if (timer_value_inc == timer_period)
 				begin
 				timer_inprogress <= timer_reload;
 				irq_timer <= 1'b1;
 				timer_value <= 0;
 				end
-			else timer_value <= timer_value + 1;
+			else timer_value <= timer_value_inc;
 			end
 
 		if (host.req)
