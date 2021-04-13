@@ -50,6 +50,8 @@ class slave_pipe(name        : String,
                         begif(!mcmd_accepted)
                         run {
                             mcmd_accepted.accum(master_ifs[mnum_rr].req(master_handle, mreq_we, mreq_wdata))
+                            mreq_we.accum(mreq_we)
+                            mreq_wdata.accum(mreq_wdata)
                             begif(mcmd_accepted)
                             run {
                                 rr_arb.assign(mnum_rr_next)
@@ -73,8 +75,6 @@ class slave_pipe(name        : String,
             begif(!scmd_accepted)
             run {
                 scmd_accepted.accum(slave_if.req(slave_handle, mreq_we, mreq_wdata))
-                mreq_we.accum(mreq_we)
-                mreq_wdata.accum(mreq_wdata)
             }; endif()
 
             begif(!scmd_accepted)
