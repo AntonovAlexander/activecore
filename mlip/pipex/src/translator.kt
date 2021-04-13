@@ -31,8 +31,7 @@ data class __mcopipe_handle_info(val struct_descr : hw_struct)
 data class __scopipe_if_info(val req_fifo : hw_fifo_in,
                              var resp_fifo : hw_fifo_out)
 
-data class __scopipe_handle_info(val if_id : hw_var,
-                                 val we : hw_var)
+data class __scopipe_handle_info(val struct_descr : hw_struct)
 
 data class __assign_buf(val req : hw_var,
                         val buf : hw_var)

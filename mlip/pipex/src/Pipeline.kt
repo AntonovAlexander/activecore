@@ -200,114 +200,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
         return ret_var
     }
 
-    private fun add_local_sticky(new_local_sticky: hw_local_sticky) {
-        if (FROZEN_FLAG) ERROR("Failed to add local_sticky " + new_local_sticky.name + ": ASTC frozen")
-
-        if (wrvars.containsKey(new_local_sticky.name)) ERROR("Naming conflict for local_sticky: " + new_local_sticky.name)
-        if (rdvars.containsKey(new_local_sticky.name)) ERROR("Naming conflict for local_sticky: " + new_local_sticky.name)
-
-        wrvars.put(new_local_sticky.name, new_local_sticky)
-        rdvars.put(new_local_sticky.name, new_local_sticky)
-        locals.add(new_local_sticky)
-        new_local_sticky.default_astc = this
-    }
-
-    fun local_sticky(name: String, vartype: hw_type, defimm: hw_imm): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, vartype, defimm)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun local_sticky(name: String, vartype: hw_type, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, vartype, defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun local_sticky(name: String, src_struct: hw_struct, dimensions: hw_dim_static): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(src_struct, dimensions), "0")
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun local_sticky(name: String, src_struct: hw_struct): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(src_struct), "0")
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun ulocal_sticky(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defimm)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun ulocal_sticky(name: String, dimensions: hw_dim_static, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun ulocal_sticky(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defimm)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun ulocal_sticky(name: String, msb: Int, lsb: Int, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun ulocal_sticky(name: String, defimm: hw_imm): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, defimm.imm_value), defimm)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun ulocal_sticky(name: String, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.UNSIGNED, defval), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun slocal_sticky(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, dimensions), defimm)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun slocal_sticky(name: String, dimensions: hw_dim_static, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, dimensions), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun slocal_sticky(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defimm)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun slocal_sticky(name: String, msb: Int, lsb: Int, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun slocal_sticky(name: String, defimm: hw_imm): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, defimm.imm_value), defimm)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
-    fun slocal_sticky(name: String, defval: String): hw_local_sticky {
-        var ret_var = hw_local_sticky(name, hw_type(VAR_TYPE.SIGNED, defval), defval)
-        add_local_sticky(ret_var)
-        return ret_var
-    }
-
     private fun add_global(new_global: hw_global) {
         if (FROZEN_FLAG) ERROR("Failed to add global " + new_global.name + ": ASTC frozen")
 
@@ -846,9 +738,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
             var handleref = context.curStageInfo.TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
 
-            var if_id = handleref.GetFracRef(hw_frac_SubStruct("if_id"))
-            var rdreq_pending = handleref.GetFracRef(hw_frac_SubStruct("rdreq_pending"))
-            var tid = handleref.GetFracRef(hw_frac_SubStruct("tid"))
+            var if_id           = handleref.GetFracRef(hw_frac_SubStruct("if_id"))
+            var rdreq_pending   = handleref.GetFracRef(hw_frac_SubStruct("rdreq_pending"))
+            var tid             = handleref.GetFracRef(hw_frac_SubStruct("tid"))
 
             cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
             run {
@@ -896,9 +788,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var mcopipe_handle          = (expr as hw_exec_mcopipe_resp).mcopipe_handle
             var mcopipe_handle_assoc    = context.TranslateInfo.__mcopipe_handle_assocs[mcopipe_handle]!!
 
-            var handleref = context.curStageInfo.TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
-            var resp_done = handleref.GetFracRef(hw_frac_SubStruct("resp_done"))
-            var rdata = handleref.GetFracRef(hw_frac_SubStruct("rdata"))
+            var handleref   = context.curStageInfo.TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
+
+            var resp_done   = handleref.GetFracRef(hw_frac_SubStruct("resp_done"))
+            var rdata       = handleref.GetFracRef(hw_frac_SubStruct("rdata"))
 
             cyclix_gen.begif(resp_done)
             run {
@@ -914,8 +807,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var scopipe_handle          = expr.scopipe_handle
             var scopipe_handle_assoc    = context.TranslateInfo.__scopipe_handle_assocs[scopipe_handle]!!
 
-            var if_id_translated        = context.curStageInfo.TranslateVar(scopipe_handle_assoc.if_id)
-            var we_translated           = context.curStageInfo.TranslateVar(scopipe_handle_assoc.we)
+            var handleref = context.curStageInfo.TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
+
+            var if_id   = handleref.GetFracRef(hw_frac_SubStruct("if_id"))
+            var we      = handleref.GetFracRef(hw_frac_SubStruct("we"))
 
             // finding id
             var handle_id = context.TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(expr.scopipe_if)
@@ -931,7 +826,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 run {
                     cyclix_gen.subStruct_gen(context.curStageInfo.TranslateVar(expr.tgts[0]),  req_struct, "we")
                     cyclix_gen.subStruct_gen(context.curStageInfo.TranslateVar(expr.tgts[1]),  req_struct, "wdata")
-                    cyclix_gen.assign(if_id_translated, hw_imm(scopipe_handle_assoc.if_id.vartype.dimensions, handle_id.toString()))
+                    cyclix_gen.assign(if_id, hw_imm(if_id.vartype.dimensions, handle_id.toString()))
 
                     cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[2]), 1)
                 }; cyclix_gen.endif()
@@ -942,15 +837,17 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var scopipe_handle          = (expr as hw_exec_scopipe_resp).scopipe_handle
             var scopipe_handle_assoc    = context.TranslateInfo.__scopipe_handle_assocs[scopipe_handle]!!
 
-            var if_id_translated        = context.curStageInfo.TranslateVar(scopipe_handle_assoc.if_id)
-            var we_translated           = context.curStageInfo.TranslateVar(scopipe_handle_assoc.we)
+            var handleref = context.curStageInfo.TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
+
+            var if_id   = handleref.GetFracRef(hw_frac_SubStruct("if_id"))
+            var we      = handleref.GetFracRef(hw_frac_SubStruct("we"))
 
             cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
             run {
                 for (scopipe_if in context.TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!) {
                     var scopipe_if_assoc        = context.TranslateInfo.__scopipe_if_assocs[scopipe_if]!!
 
-                    cyclix_gen.begif(cyclix_gen.eq2(if_id_translated, context.TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(scopipe_if)))
+                    cyclix_gen.begif(cyclix_gen.eq2(if_id, context.TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(scopipe_if)))
                     run {
                         cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), cyclix_gen.fifo_wr_unblk(scopipe_if_assoc.resp_fifo, context.curStageInfo.TranslateVar(expr.rdvars[0])))
                     }; cyclix_gen.endif()
@@ -1080,12 +977,12 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
         for (scopipe_handle in scopipe_handles) {
             val name_prefix = "genscopipe_handle_" + scopipe_handle.name + "_genvar_"
 
-            var if_id           = ulocal_sticky((name_prefix + "if_id"), GetWidthToContain(TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.size)-1, 0, "0")
-            var we              = ulocal_sticky((name_prefix + "we"), 0, 0, "0")
+            var scopipe_handle_struct = hw_struct("genscopipe_handle_" + scopipe_handle.name + "_struct")
+            scopipe_handle_struct.addu("if_id", GetWidthToContain(TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.size)-1, 0, "0")
+            scopipe_handle_struct.addu("we", 0, 0, "0")
 
             TranslateInfo.__scopipe_handle_assocs.put(scopipe_handle, __scopipe_handle_info(
-                if_id,
-                we))
+                scopipe_handle_struct))
         }
 
         freeze()
@@ -1223,16 +1120,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
             curStageInfo.mcopipe_handles = UniteArrayLists(UniteArrayLists(cur_req_mcopipelist, cur_resp_mcopipelist), CrossArrayLists(prev_req_mcopipelist, next_resp_mcopipelist))
             curStageInfo.scopipe_handles = UniteArrayLists(UniteArrayLists(cur_req_scopipelist, cur_resp_scopipelist), CrossArrayLists(prev_req_scopipelist, next_resp_scopipelist))
-
-            for (scopipe_handle in curStageInfo.scopipe_handles) {
-                var scopipe_handle_info = TranslateInfo.__scopipe_handle_assocs[scopipe_handle] as __scopipe_handle_info
-
-                curStage.AddRdVar(scopipe_handle_info.if_id)
-                curStage.AddRdVar(scopipe_handle_info.we)
-
-                curStage.AddWrVar(scopipe_handle_info.if_id)
-                curStage.AddWrVar(scopipe_handle_info.we)
-            }
         }
 
         // Generate resources for locals
@@ -1271,13 +1158,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                         local.defimm
                     )
                     curStageInfo.pContext_local_dict.put(local, new_local)
-                } else if (local is hw_local_sticky) {
-                    var new_local = cyclix_gen.global(
-                        (curStageInfo.name_prefix + local.name),
-                        local.vartype,
-                        local.defimm
-                    )
-                    curStageInfo.pContext_local_dict.put(local, new_local)
                 }
             }
 
@@ -1300,6 +1180,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             }
             for (cur_mcopipe_handle in curStageInfo.mcopipe_handles) {
                 stage_buf_struct.add("genmcopipe_handle_" + cur_mcopipe_handle.name, TranslateInfo.__mcopipe_handle_assocs[cur_mcopipe_handle]!!.struct_descr)
+            }
+            for (cur_scopipe_handle in curStageInfo.scopipe_handles) {
+                stage_buf_struct.add("genscopipe_handle_" + cur_scopipe_handle.name, TranslateInfo.__scopipe_handle_assocs[cur_scopipe_handle]!!.struct_descr)
             }
             curStageInfo.TRX_BUF = cyclix_gen.global(curStageInfo.name_prefix + "TRX_BUF", stage_buf_struct, curStageInfo.TRX_BUF_SIZE-1, 0)
             curStageInfo.TRX_BUF_COUNTER = cyclix_gen.uglobal(curStageInfo.name_prefix + "TRX_BUF_COUNTER", GetWidthToContain(curStageInfo.TRX_BUF_SIZE)-1, 0, "0")
@@ -1391,34 +1274,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 cyclix_gen.bor_gen(curStageInfo.pctrl_flushreq, curStageInfo.pctrl_flushreq, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_flushreq)
             }
 
-            // Analyzing local stickies
-            var local_stickies_new      = ArrayList<hw_local_sticky>()
-            var local_stickies_notnew   = ArrayList<hw_local_sticky>()
-            for (local in curStageInfo.pContext_local_dict) {
-                if (local.key is hw_local_sticky) {
-                    if (CUR_STAGE_INDEX == 0) {
-                        local_stickies_new.add(local.key as hw_local_sticky)
-                    } else if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX-1].pContext_local_dict.containsKey(local.key)) {
-                        local_stickies_notnew.add(local.key as hw_local_sticky)
-                    } else {
-                        local_stickies_new.add(local.key as hw_local_sticky)
-                    }
-                }
-            }
-
             // not a bubble
             cyclix_gen.begif(curStageInfo.pctrl_occupied)
             run {
-
-                MSG(DEBUG_FLAG, "#### Initializing new psticky descriptors ####")
-                if (local_stickies_new.size != 0) {
-                    cyclix_gen.begif(curStageInfo.pctrl_new)
-                    run {
-                        for (sticky_new in local_stickies_new) {
-                            cyclix_gen.assign(curStageInfo.TranslateVar(sticky_new), sticky_new.defimm)
-                        }
-                    }; cyclix_gen.endif()
-                }
 
                 MSG(DEBUG_FLAG, "#### Initializing new newaccums descriptors ####")
                 if (curStageInfo.newaccums.size != 0) {
@@ -1589,17 +1447,24 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                                         fracs.add(hw_frac_SubStruct(local.key.name))
                                         cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF, fracs, curStageInfo.TranslateVar(local.key))
                                     }
-                                } else {
-                                    // propagating stickies
-                                    cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_local_dict[local.key]!!, curStageInfo.TranslateVar(local.key))
                                 }
                             }
                         }
+
                         // propagating mcopipe_handles
                         for (mcopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].mcopipe_handles) {
                             if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].mcopipe_handles.contains(mcopipe_handle)) {
                                 var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
                                 var nexthandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF.GetFracRef(hw_frac_V(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
+                                cyclix_gen.assign(nexthandleref, curhandleref)
+                            }
+                        }
+
+                        // propagating scopipe_handles
+                        for (scopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].scopipe_handles) {
+                            if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].scopipe_handles.contains(scopipe_handle)) {
+                                var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
+                                var nexthandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF.GetFracRef(hw_frac_V(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
                                 cyclix_gen.assign(nexthandleref, curhandleref)
                             }
                         }

@@ -69,13 +69,6 @@ class hw_local(name : String, vartype : hw_type, defimm : hw_imm)
     }
 }
 
-class hw_local_sticky(name : String, vartype : hw_type, defimm : hw_imm)
-    : hw_pipex_var(name, vartype, defimm) {
-
-    constructor(name : String, vartype : hw_type, defval : String)
-        : this(name, vartype, hw_imm(defval))
-}
-
 class hw_global(name : String, vartype : hw_type, defimm : hw_imm)
     : hw_pipex_var(name, vartype, defimm) {
 

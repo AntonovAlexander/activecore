@@ -8,20 +8,20 @@ class slave_pipe(name        : String,
                  req_vartype    : hw_type,
                  resp_vartype   : hw_type) : pipex.Pipeline(name, PIPELINE_FC_MODE.STALLABLE) {
 
-    var master_ifs = ArrayList<hw_scopipe_if>()
-    var master_handle = scopipe_handle("master", req_vartype, resp_vartype)
+    var master_ifs      = ArrayList<hw_scopipe_if>()
+    var master_handle   = scopipe_handle("master", req_vartype, resp_vartype)
 
-    var slave_if = mcopipe_if("slave", req_vartype, resp_vartype, 4)
-    var slave_handle = mcopipe_handle(slave_if)
+    var slave_if        = mcopipe_if("slave", req_vartype, resp_vartype, 4)
+    var slave_handle    = mcopipe_handle(slave_if)
 
-    var mreq_we       = ulocal_sticky("mreq_we", 0, 0, "0")
-    var mreq_wdata    =  local_sticky("mreq_wdata", req_vartype, "0")
+    var mreq_we         = ulocal("mreq_we", 0, 0, "0")
+    var mreq_wdata      =  local("mreq_wdata", req_vartype, "0")
 
     var rr_arb          = uglobal("rr_arb", (GetWidthToContain(num_masters)-1), 0, "0")
-    var rdata           = local_sticky("rdata", resp_vartype, "0")
+    var rdata           = local("rdata", resp_vartype, "0")
 
-    var mcmd_accepted   = ulocal_sticky("mcmd_accepted", 0, 0, "0")
-    var scmd_accepted   = ulocal_sticky("scmd_accepted", 0, 0, "0")
+    var mcmd_accepted   = ulocal("mcmd_accepted", 0, 0, "0")
+    var scmd_accepted   = ulocal("scmd_accepted", 0, 0, "0")
 
     init {
 
@@ -49,7 +49,7 @@ class slave_pipe(name        : String,
 
                         begif(!mcmd_accepted)
                         run {
-                            mcmd_accepted.assign(master_ifs[mnum_rr].req(master_handle, mreq_we, mreq_wdata))
+                            mcmd_accepted.accum(master_ifs[mnum_rr].req(master_handle, mreq_we, mreq_wdata))
                             begif(mcmd_accepted)
                             run {
                                 rr_arb.assign(mnum_rr_next)
@@ -72,7 +72,9 @@ class slave_pipe(name        : String,
             // sending command
             begif(!scmd_accepted)
             run {
-                scmd_accepted.assign(slave_if.req(slave_handle, mreq_we, mreq_wdata))
+                scmd_accepted.accum(slave_if.req(slave_handle, mreq_we, mreq_wdata))
+                mreq_we.accum(mreq_we)
+                mreq_wdata.accum(mreq_wdata)
             }; endif()
 
             begif(!scmd_accepted)
