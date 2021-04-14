@@ -7,7 +7,7 @@
  */
 
 
-module slave_mem_model
+module slave_mem_model_ooo
 #(
 	parameter MEMSIZE32 = 1024
 )

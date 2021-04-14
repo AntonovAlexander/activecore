@@ -232,7 +232,7 @@ ariele_xbar DUV
 	.s3_rdata_bi(slave_3_rdata)
 );
 
-slave_mem_model
+slave_mem_model_inorder
 #(
 	.MEMSIZE32(SLAVE_MEMSIZE32)
 ) slave_0_mem_model (
@@ -242,15 +242,13 @@ slave_mem_model
 	.slave_req(slave_0_req),
 	.slave_addr(slave_0_addr),
 	.slave_cmd(slave_0_we),
-	//.slave_reqtid(),
 	.slave_wdata(slave_0_wdata),
 	.slave_ack(slave_0_ack),
-	//.slave_resptid(),
 	.slave_rdata(slave_0_rdata),
 	.slave_resp(slave_0_resp)
 );
 
-slave_mem_model
+slave_mem_model_inorder
 #(
 	.MEMSIZE32(SLAVE_MEMSIZE32)
 ) slave_1_mem_model (
@@ -260,15 +258,13 @@ slave_mem_model
 	.slave_req(slave_1_req),
 	.slave_addr(slave_1_addr),
 	.slave_cmd(slave_1_we),
-	//.slave_reqtid(),
 	.slave_wdata(slave_1_wdata),
 	.slave_ack(slave_1_ack),
-	//.slave_resptid(),
 	.slave_rdata(slave_1_rdata),
 	.slave_resp(slave_1_resp)
 );
 
-slave_mem_model
+slave_mem_model_inorder
 #(
 	.MEMSIZE32(SLAVE_MEMSIZE32)
 ) slave_2_mem_model (
@@ -278,15 +274,13 @@ slave_mem_model
 	.slave_req(slave_2_req),
 	.slave_addr(slave_2_addr),
 	.slave_cmd(slave_2_we),
-	//.slave_reqtid(),
 	.slave_wdata(slave_2_wdata),
 	.slave_ack(slave_2_ack),
-	//.slave_resptid(),
 	.slave_rdata(slave_2_rdata),
 	.slave_resp(slave_2_resp)
 );
 
-slave_mem_model
+slave_mem_model_inorder
 #(
 	.MEMSIZE32(SLAVE_MEMSIZE32)
 ) slave_3_mem_model (
@@ -296,10 +290,8 @@ slave_mem_model
 	.slave_req(slave_3_req),
 	.slave_addr(slave_3_addr),
 	.slave_cmd(slave_3_we),
-	//.slave_reqtid(),
 	.slave_wdata(slave_3_wdata),
 	.slave_ack(slave_3_ack),
-	//.slave_resptid(),
 	.slave_rdata(slave_3_rdata),
 	.slave_resp(slave_3_resp)
 );
