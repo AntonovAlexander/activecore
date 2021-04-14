@@ -32,7 +32,6 @@ class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELI
 
         ST_ACQ_POW2.begin()
         run {
-
             begif(!datain_done)
             run {
                 datain_done.accum(fifo_rd_unblk(ext_datain, x))
@@ -42,10 +41,8 @@ class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELI
             run {
                 pstall()
             }; endif()
-
             term0.assign(x)
             pow2.assign(srl(mul(x, x), 8))
-
         }; endstage()
 
         ST_POW3.begin()
@@ -72,12 +69,10 @@ class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELI
 
         ST_SENDRESULT.begin()
         run {
-
             begif(!fifo_wr_unblk(ext_dataout, y))
             run {
                 pstall()
             }; endif()
-
         }; endstage()
     }
 }

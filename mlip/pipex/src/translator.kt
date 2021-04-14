@@ -46,12 +46,10 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
                          val pctrl_occupied : hw_var,
                          val pctrl_finish : hw_var,
                          val pctrl_flushreq : hw_var,
-                         val pctrl_nevictable : hw_var,
                          val pctrl_rdy : hw_var,
 
                          val pctrl_active_glbl : hw_var,
-                         val pctrl_stalled_glbl : hw_var,
-                         val pctrl_killed_glbl : hw_var) {
+                         val pctrl_stalled_glbl : hw_var) {
 
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
     var pContext_srcglbls       = ArrayList<hw_var>()               // locals with required src global bufs
@@ -93,21 +91,12 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
         cyclix_gen.begif(pctrl_active_glbl)
         run {
             cyclix_gen.assign(pctrl_active_glbl, 0)
-            cyclix_gen.assign(pctrl_killed_glbl, 1)
         }; cyclix_gen.endif()
     }
 
     fun pstall_ifactive_cmd(cyclix_gen : cyclix.Generic) {
         cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, pctrl_active_glbl)
         cyclix_gen.assign(pctrl_active_glbl, 0)
-    }
-
-    fun pstall_ifoccupied_cmd(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.bor_gen(pctrl_occupied, pctrl_active_glbl, pctrl_killed_glbl)
-        cyclix_gen.begif(pctrl_occupied)
-        run {
-            cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, 1)
-        }; cyclix_gen.endif()
     }
 
     fun pflush_cmd_internal(cyclix_gen : cyclix.Generic) {

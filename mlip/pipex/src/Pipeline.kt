@@ -15,7 +15,6 @@ val OP_ISACTIVE     = hw_opcode("isactive")
 val OP_ISWORKING    = hw_opcode("isworking")
 val OP_ISSTALLED    = hw_opcode("isstalled")
 val OP_ISSUCC       = hw_opcode("issucc")
-val OP_ISKILLED     = hw_opcode("iskilled")
 val OP_ISFINISHED   = hw_opcode("isfinished")
 
 val OP_PSTALL       = hw_opcode("pstall")
@@ -702,9 +701,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
         } else if (expr.opcode == OP_ISSUCC) {
             cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_succ)
 
-        } else if (expr.opcode == OP_ISKILLED) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_killed_glbl)
-
         } else if (expr.opcode == OP_ISFINISHED) {
             cyclix_gen.assign(
                 context.curStageInfo.TranslateVar(expr.tgts[0]),
@@ -1003,12 +999,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var pctrl_occupied      = cyclix_gen.ulocal((name_prefix + "genpctrl_occupied"), 0, 0, "0")
             var pctrl_finish        = cyclix_gen.ulocal((name_prefix + "genpctrl_finish"), 0, 0, "0")
             var pctrl_flushreq      = cyclix_gen.ulocal((name_prefix + "genpctrl_flushreq"), 0, 0, "0")
-            var pctrl_nevictable    = cyclix_gen.ulocal((name_prefix + "genpctrl_nevictable"), 0, 0, "0")
             var pctrl_rdy           = cyclix_gen.ulocal((name_prefix + "genpctrl_rdy"), 0, 0, "0")
 
             var pctrl_active_glbl   = cyclix_gen.uglobal((name_prefix + "genpctrl_active_glbl"), 0, 0, "0")
             var pctrl_stalled_glbl  = cyclix_gen.uglobal((name_prefix + "genpctrl_stalled_glbl"), 0, 0, "0")
-            var pctrl_killed_glbl   = cyclix_gen.uglobal((name_prefix + "genpctrl_killed_glbl"), 0, 0, "0")
 
             var pstage_buf_size = 1
             if (CUR_STAGE_INDEX == 0) {
@@ -1041,11 +1035,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 pctrl_occupied,
                 pctrl_finish,
                 pctrl_flushreq,
-                pctrl_nevictable,
                 pctrl_rdy,
                 pctrl_active_glbl,
-                pctrl_stalled_glbl,
-                pctrl_killed_glbl)
+                pctrl_stalled_glbl)
 
             TranslateInfo.__stage_assocs.put(stage, pstage_info)
             for (expression in stage.expressions) {
@@ -1231,26 +1223,24 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             run {
                 cyclix_gen.assign(curStageInfo.pctrl_new, 0)
 
-                // reattempt execution
+                // reactivate stalled transaction
                 cyclix_gen.assign(curStageInfo.pctrl_stalled_glbl, 0)
-                cyclix_gen.assign(curStageInfo.pctrl_active_glbl, cyclix_gen.lnot(curStageInfo.pctrl_killed_glbl))
+                cyclix_gen.assign(curStageInfo.pctrl_active_glbl, 1)
             }; cyclix_gen.endif()
             cyclix_gen.begelse()
             run {
                 if (CUR_STAGE_INDEX == 0) {
                     // new transaction
                     cyclix_gen.assign(curStageInfo.pctrl_active_glbl, 1)
-                    cyclix_gen.assign(curStageInfo.pctrl_killed_glbl, 0)
                 }
-                cyclix_gen.lor_gen(curStageInfo.pctrl_new, curStageInfo.pctrl_active_glbl, curStageInfo.pctrl_killed_glbl)
+                cyclix_gen.assign(curStageInfo.pctrl_new, curStageInfo.pctrl_active_glbl)
             }; cyclix_gen.endif()
 
             cyclix_gen.assign(curStageInfo.pctrl_finish, 0)
             cyclix_gen.assign(curStageInfo.pctrl_flushreq, 0)
-            cyclix_gen.assign(curStageInfo.pctrl_nevictable, 0)
 
             // Generating "occupied" pctrl
-            cyclix_gen.bor_gen(curStageInfo.pctrl_occupied, curStageInfo.pctrl_active_glbl, curStageInfo.pctrl_killed_glbl)
+            cyclix_gen.assign(curStageInfo.pctrl_occupied, curStageInfo.pctrl_active_glbl)
 
             // rdy signal: before processing
             if (curStage.busy_mode == PSTAGE_BUSY_MODE.BUFFERED) {
@@ -1473,14 +1463,12 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
                         // propagating pctrls
                         cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_active_glbl, curStageInfo.pctrl_active_glbl)
-                        cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_killed_glbl, curStageInfo.pctrl_killed_glbl)
                         cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_stalled_glbl, 0)
                     }; if (pipeline_fc_mode != PIPELINE_FC_MODE.CREDIT_BASED) cyclix_gen.endif()
                 }
 
                 // clearing itself
                 cyclix_gen.assign(curStageInfo.pctrl_active_glbl, 0)
-                cyclix_gen.assign(curStageInfo.pctrl_killed_glbl, 0)
                 cyclix_gen.assign(curStageInfo.pctrl_stalled_glbl, 0)
                 cyclix_gen.assign(curStageInfo.TRX_BUF, hw_fracs(0), 0)
                 for (BUF_INDEX in 0 until curStageInfo.TRX_BUF_SIZE-1) {
