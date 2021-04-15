@@ -1029,6 +1029,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var pstage_info = __pstage_info(TranslateInfo,
                 name_prefix,
                 pstage_buf_size,
+                pctrl_active,
                 pctrl_new,
                 pctrl_working,
                 pctrl_succ,
@@ -1036,7 +1037,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 pctrl_finish,
                 pctrl_flushreq,
                 pctrl_rdy,
-                pctrl_active,
                 pctrl_stalled_glbl)
 
             TranslateInfo.__stage_assocs.put(stage, pstage_info)
@@ -1451,7 +1451,12 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                             for (mcopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].mcopipe_handles) {
                                 if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].mcopipe_handles.contains(mcopipe_handle)) {
                                     var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
-                                    var nexthandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF.GetFracRef(hw_frac_V(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
+                                    var tgt_fracs = hw_fracs(0)
+                                    if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_SIZE != 1) {
+                                        tgt_fracs = hw_fracs(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER)
+                                    }
+                                    tgt_fracs.add(hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
+                                    var nexthandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF.GetFracRef(tgt_fracs)
                                     cyclix_gen.assign(nexthandleref, curhandleref)
                                 }
                             }
@@ -1460,7 +1465,12 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                             for (scopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].scopipe_handles) {
                                 if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].scopipe_handles.contains(scopipe_handle)) {
                                     var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
-                                    var nexthandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF.GetFracRef(hw_frac_V(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
+                                    var tgt_fracs = hw_fracs(0)
+                                    if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_SIZE != 1) {
+                                        tgt_fracs = hw_fracs(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER)
+                                    }
+                                    tgt_fracs.add(hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
+                                    var nexthandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF.GetFracRef(tgt_fracs)
                                     cyclix_gen.assign(nexthandleref, curhandleref)
                                 }
                             }
