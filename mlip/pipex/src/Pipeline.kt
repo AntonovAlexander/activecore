@@ -637,7 +637,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             if (expr.tgts[0] is hw_global) {
                 cyclix_gen.begif(!context.curStageInfo.pctrl_stalled_glbl)
                 run {
-                    cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
+                    cyclix_gen.begif(context.curStageInfo.pctrl_active)
                     run {
                         cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
                     }; cyclix_gen.endif()
@@ -675,7 +675,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
         } else if (expr.opcode == OP_ACCUM) {
             cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
-            cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
+            cyclix_gen.begif(context.curStageInfo.pctrl_active)
             run {
                 var fracs = hw_fracs(0)
                 fracs.add(hw_frac_SubStruct(expr.tgts[0].name))
@@ -690,7 +690,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.TranslateInfo.__stage_assocs[(expr as hw_exec_read_remote).stage]!!.TranslateVar(expr.remote_var))
 
         } else if (expr.opcode == OP_ISACTIVE) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_active_glbl)
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_active)
 
         } else if (expr.opcode == OP_ISWORKING) {
             cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.pctrl_working)
@@ -711,7 +711,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var wdata_translated = context.curStageInfo.TranslateParam(expr.params[0])
             var ack_translated = context.curStageInfo.TranslateVar(expr.tgts[0])
             var fifo_wr_translated = context.TranslateInfo.__fifo_wr_assocs[(expr as hw_exec_fifo_wr_unblk).fifo]!!
-            cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
+            cyclix_gen.begif(context.curStageInfo.pctrl_active)
             run {
                 cyclix_gen.assign(ack_translated, cyclix_gen.fifo_wr_unblk(fifo_wr_translated, wdata_translated))
             }; cyclix_gen.endif()
@@ -720,7 +720,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var ack_translated = context.curStageInfo.TranslateVar(expr.tgts[0])
             var rdata_translated = context.curStageInfo.TranslateVar(expr.tgts[1])
             var fifo_rd_translated = context.TranslateInfo.__fifo_rd_assocs[(expr as hw_exec_fifo_rd_unblk).fifo]!!
-            cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
+            cyclix_gen.begif(context.curStageInfo.pctrl_active)
             run {
                 cyclix_gen.assign(ack_translated, cyclix_gen.fifo_rd_unblk(fifo_rd_translated, rdata_translated))
             }; cyclix_gen.endif()
@@ -738,7 +738,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var rdreq_pending   = handleref.GetFracRef(hw_frac_SubStruct("rdreq_pending"))
             var tid             = handleref.GetFracRef(hw_frac_SubStruct("tid"))
 
-            cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
+            cyclix_gen.begif(context.curStageInfo.pctrl_active)
             run {
 
                 cyclix_gen.begif(cyclix_gen.bnot(mcopipe_if_assoc.full_flag))
@@ -811,7 +811,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             // finding id
             var handle_id = context.TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(expr.scopipe_if)
 
-            cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
+            cyclix_gen.begif(context.curStageInfo.pctrl_active)
             run {
 
                 var req_struct = cyclix_gen.local(GetGenName("req_struct"),
@@ -838,7 +838,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var if_id   = handleref.GetFracRef(hw_frac_SubStruct("if_id"))
             var we      = handleref.GetFracRef(hw_frac_SubStruct("we"))
 
-            cyclix_gen.begif(context.curStageInfo.pctrl_active_glbl)
+            cyclix_gen.begif(context.curStageInfo.pctrl_active)
             run {
                 for (scopipe_if in context.TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!) {
                     var scopipe_if_assoc        = context.TranslateInfo.__scopipe_if_assocs[scopipe_if]!!
@@ -1001,7 +1001,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             var pctrl_flushreq      = cyclix_gen.ulocal((name_prefix + "genpctrl_flushreq"), 0, 0, "0")
             var pctrl_rdy           = cyclix_gen.ulocal((name_prefix + "genpctrl_rdy"), 0, 0, "0")
 
-            var pctrl_active_glbl   = cyclix_gen.uglobal((name_prefix + "genpctrl_active_glbl"), 0, 0, "0")
+            var pctrl_active        = cyclix_gen.ulocal((name_prefix + "genpctrl_active"), 0, 0, "0")
             var pctrl_stalled_glbl  = cyclix_gen.uglobal((name_prefix + "genpctrl_stalled_glbl"), 0, 0, "0")
 
             var pstage_buf_size = 1
@@ -1036,7 +1036,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 pctrl_finish,
                 pctrl_flushreq,
                 pctrl_rdy,
-                pctrl_active_glbl,
+                pctrl_active,
                 pctrl_stalled_glbl)
 
             TranslateInfo.__stage_assocs.put(stage, pstage_info)
@@ -1227,26 +1227,28 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
                 // reactivate stalled transaction
                 cyclix_gen.assign(curStageInfo.pctrl_stalled_glbl, 0)
-                cyclix_gen.assign(curStageInfo.pctrl_active_glbl, 1)
+                cyclix_gen.assign(curStageInfo.pctrl_active, 1)
             }; cyclix_gen.endif()
             cyclix_gen.begelse()
             run {
                 if (CUR_STAGE_INDEX == 0) {
                     // new transaction
-                    cyclix_gen.assign(curStageInfo.pctrl_active_glbl, 1)
+                    cyclix_gen.assign(curStageInfo.pctrl_active, 1)
+                } else {
+                    cyclix_gen.assign(curStageInfo.pctrl_active, curStageInfo.TRX_BUF_COUNTER_NEMPTY)
                 }
-                cyclix_gen.assign(curStageInfo.pctrl_new, curStageInfo.pctrl_active_glbl)
+                cyclix_gen.assign(curStageInfo.pctrl_new, curStageInfo.pctrl_active)
             }; cyclix_gen.endif()
 
             cyclix_gen.assign(curStageInfo.pctrl_finish, 0)
             cyclix_gen.assign(curStageInfo.pctrl_flushreq, 0)
 
             // Generating "occupied" pctrl
-            cyclix_gen.assign(curStageInfo.pctrl_occupied, curStageInfo.pctrl_active_glbl)
+            cyclix_gen.assign(curStageInfo.pctrl_occupied, curStageInfo.pctrl_active)
 
             // rdy signal: before processing
             if (curStage.busy_mode == PSTAGE_BUSY_MODE.BUFFERED) {
-                cyclix_gen.assign(curStageInfo.pctrl_rdy, !curStageInfo.pctrl_occupied)
+                cyclix_gen.assign(curStageInfo.pctrl_rdy, !curStageInfo.TRX_BUF_COUNTER_FULL)
             }
 
             // Forming mcopipe_handles_last list
@@ -1376,7 +1378,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 }
             }
 
-            // pstage_finish and pstage_succ formation
+            // pctrl_finish and pctrl_succ formation
             MSG(DEBUG_FLAG, "#### pctrl_finish and pctrl_succ formation ####")
             cyclix_gen.begif(curStageInfo.pctrl_stalled_glbl)
             run {
@@ -1386,7 +1388,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             cyclix_gen.begelse()
             run {
                 cyclix_gen.assign(curStageInfo.pctrl_finish, curStageInfo.pctrl_occupied)
-                cyclix_gen.assign(curStageInfo.pctrl_succ, curStageInfo.pctrl_active_glbl)
+                cyclix_gen.assign(curStageInfo.pctrl_succ, curStageInfo.pctrl_active)
             }; cyclix_gen.endif()
 
             // credit counter processing
@@ -1418,64 +1420,64 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 }; cyclix_gen.endif()
             }
 
-            // processing context in case transaction is finished
+            // processing context in case transaction is ready to propagate
             cyclix_gen.begif(curStageInfo.pctrl_finish)
             run {
                 // programming next stage in case transaction is able to propagate
-                if (CUR_STAGE_INDEX < TranslateInfo.StageList.lastIndex) {
-                    if (pipeline_fc_mode != PIPELINE_FC_MODE.CREDIT_BASED) cyclix_gen.begif(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_rdy)
-                    run {
-                        // propagating transaction context
-                        for (local in TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_local_dict) {
-                            if (curStageInfo.pContext_local_dict.containsKey(local.key)) {
-                                // having data to propagate
-                                if (local.key is hw_local) {
-                                    // propagating locals
-                                    if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_srcglbls.contains(local.key)) {
-                                        var fracs = hw_fracs(0)
-                                        if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_SIZE != 1) {
-                                            fracs = hw_fracs(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER)
+                cyclix_gen.begif(curStageInfo.pctrl_succ)
+                run {
+                    if (CUR_STAGE_INDEX < TranslateInfo.StageList.lastIndex) {
+                        if (pipeline_fc_mode != PIPELINE_FC_MODE.CREDIT_BASED) cyclix_gen.begif(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_rdy)
+                        run {
+                            // propagating transaction context
+                            for (local in TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_local_dict) {
+                                if (curStageInfo.pContext_local_dict.containsKey(local.key)) {
+                                    // having data to propagate
+                                    if (local.key is hw_local) {
+                                        // propagating locals
+                                        if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_srcglbls.contains(local.key)) {
+                                            var fracs = hw_fracs(0)
+                                            if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_SIZE != 1) {
+                                                fracs = hw_fracs(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER)
+                                            }
+                                            fracs.add(hw_frac_SubStruct(local.key.name))
+                                            cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF, fracs, curStageInfo.TranslateVar(local.key))
                                         }
-                                        fracs.add(hw_frac_SubStruct(local.key.name))
-                                        cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF, fracs, curStageInfo.TranslateVar(local.key))
                                     }
                                 }
                             }
-                        }
 
-                        // propagating mcopipe_handles
-                        for (mcopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].mcopipe_handles) {
-                            if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].mcopipe_handles.contains(mcopipe_handle)) {
-                                var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
-                                var nexthandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF.GetFracRef(hw_frac_V(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
-                                cyclix_gen.assign(nexthandleref, curhandleref)
+                            // propagating mcopipe_handles
+                            for (mcopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].mcopipe_handles) {
+                                if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].mcopipe_handles.contains(mcopipe_handle)) {
+                                    var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
+                                    var nexthandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF.GetFracRef(hw_frac_V(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
+                                    cyclix_gen.assign(nexthandleref, curhandleref)
+                                }
                             }
-                        }
 
-                        // propagating scopipe_handles
-                        for (scopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].scopipe_handles) {
-                            if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].scopipe_handles.contains(scopipe_handle)) {
-                                var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
-                                var nexthandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF.GetFracRef(hw_frac_V(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
-                                cyclix_gen.assign(nexthandleref, curhandleref)
+                            // propagating scopipe_handles
+                            for (scopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].scopipe_handles) {
+                                if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].scopipe_handles.contains(scopipe_handle)) {
+                                    var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
+                                    var nexthandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF.GetFracRef(hw_frac_V(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
+                                    cyclix_gen.assign(nexthandleref, curhandleref)
+                                }
                             }
-                        }
 
-                        cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER_NEMPTY, 1)
-                        cyclix_gen.begif(cyclix_gen.eq2(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_SIZE-1))
-                        run {
-                            cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER_FULL, 1)
-                        }; cyclix_gen.endif()
-                        cyclix_gen.add_gen(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, 1)
+                            cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER_NEMPTY, 1)
+                            cyclix_gen.begif(cyclix_gen.eq2(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_SIZE-1))
+                            run {
+                                cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER_FULL, 1)
+                            }; cyclix_gen.endif()
+                            cyclix_gen.add_gen(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, 1)
 
-                        // propagating pctrls
-                        cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_active_glbl, curStageInfo.pctrl_active_glbl)
-                        cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_stalled_glbl, 0)
-                    }; if (pipeline_fc_mode != PIPELINE_FC_MODE.CREDIT_BASED) cyclix_gen.endif()
-                }
+                        }; if (pipeline_fc_mode != PIPELINE_FC_MODE.CREDIT_BASED) cyclix_gen.endif()
+                    }
+                }; cyclix_gen.endif()
 
                 // clearing itself
-                cyclix_gen.assign(curStageInfo.pctrl_active_glbl, 0)
+                cyclix_gen.assign(curStageInfo.pctrl_active, 0)
                 cyclix_gen.assign(curStageInfo.pctrl_stalled_glbl, 0)
                 cyclix_gen.assign(curStageInfo.TRX_BUF, hw_fracs(0), 0)
                 for (BUF_INDEX in 0 until curStageInfo.TRX_BUF_SIZE-1) {
@@ -1493,7 +1495,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
             // rdy signal: after processing
             if (curStage.busy_mode == PSTAGE_BUSY_MODE.FALL_THROUGH) {
-                cyclix_gen.assign(curStageInfo.pctrl_rdy, !curStageInfo.pctrl_stalled_glbl)
+                cyclix_gen.assign(curStageInfo.pctrl_rdy, !curStageInfo.TRX_BUF_COUNTER_FULL)
             }
 
             // working signal: succ or pstall

@@ -48,7 +48,7 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
                          val pctrl_flushreq : hw_var,
                          val pctrl_rdy : hw_var,
 
-                         val pctrl_active_glbl : hw_var,
+                         val pctrl_active : hw_var,
                          val pctrl_stalled_glbl : hw_var) {
 
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
@@ -90,19 +90,19 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
     }
 
     fun pkill_cmd_internal(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.begif(pctrl_active_glbl)
+        cyclix_gen.begif(pctrl_active)
         run {
-            cyclix_gen.assign(pctrl_active_glbl, 0)
+            cyclix_gen.assign(pctrl_active, 0)
         }; cyclix_gen.endif()
     }
 
     fun pstall_ifactive_cmd(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, pctrl_active_glbl)
-        cyclix_gen.assign(pctrl_active_glbl, 0)
+        cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, pctrl_active)
+        cyclix_gen.assign(pctrl_active, 0)
     }
 
     fun pflush_cmd_internal(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.bor_gen(pctrl_flushreq, pctrl_flushreq, pctrl_active_glbl)
+        cyclix_gen.bor_gen(pctrl_flushreq, pctrl_flushreq, pctrl_active)
     }
 }
 
