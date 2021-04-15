@@ -60,9 +60,9 @@ class RtlGenerator(var cyclix_module : Generic) {
                     expr : hw_exec,
                     context : import_expr_context) {
 
-        println("#### Cyclix: exporting expression: " + expr.opcode.default_string)
-        // for (param in expr.params) println("param: " + param.GetString())
-        // for (wrvar in expr.tgts) println("wrvar: " + wrvar.name)
+        MSG("#### Cyclix: exporting expression: " + expr.opcode.default_string)
+        // for (param in expr.params) MSG("param: " + param.GetString())
+        // for (wrvar in expr.tgts) MSG("wrvar: " + wrvar.name)
 
         if (expr.opcode == OP_FIFO_WR_UNBLK) {
 
@@ -120,18 +120,18 @@ class RtlGenerator(var cyclix_module : Generic) {
             var wdata_translated = TranslateParam(expr.params[0], var_dict)
             var fifo_rdy = TranslateVar(expr.tgts[0], var_dict)
 
-            println("DBG: START")
-            println("subproc: " + subproc + ", name: " + subproc.inst_name)
-            println("fifo_name: " + fifo_name)
-            println("size: " + submod_insts_fifos_in.size)
+            MSG("DBG: START")
+            MSG("subproc: " + subproc + ", name: " + subproc.inst_name)
+            MSG("fifo_name: " + fifo_name)
+            MSG("size: " + submod_insts_fifos_in.size)
             for (i in submod_insts_fifos_in) {
-                println("-- subproc: " + i.key)
+                MSG("-- subproc: " + i.key)
                 for (j in i.value) {
-                    println("---- fifo_name: " + j.key)
+                    MSG("---- fifo_name: " + j.key)
                 }
             }
-            println(submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_req.name)
-            println("DBG: END")
+            MSG(submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_req.name)
+            MSG("DBG: END")
 
             rtl_gen.begif(rtl_gen.lnot((rtl_gen as hw_astc_stdif).getPortByName("rst_i")))
             run {
@@ -180,14 +180,14 @@ class RtlGenerator(var cyclix_module : Generic) {
 
         } else rtl_gen.import_expr(false, expr, import_expr_context(var_dict), ::export_expr)
 
-        // println("#### Cyclix: exporting expression complete!")
+        // MSG("#### Cyclix: exporting expression complete!")
     }
 
     fun generate() : rtl.module {
 
-        println("#######################################")
-        println("#### Starting Cyclix-to-RTL export ####")
-        println("#######################################")
+        MSG("#######################################")
+        MSG("#### Starting Cyclix-to-RTL export ####")
+        MSG("#######################################")
 
         // TODO: pre-validation
 

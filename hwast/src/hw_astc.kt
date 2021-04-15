@@ -8,6 +8,9 @@
 
 package hwast
 
+import java.text.SimpleDateFormat
+import java.util.Date
+
 open class import_expr_context(var var_dict : MutableMap<hw_var, hw_var>)
 
 // AST constructor for behavioral HW specifications
@@ -24,24 +27,41 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     protected var FROZEN_FLAG = false
 
-    fun WARNING(err_string : String) {
-        println("ActiveCore (" + GenNamePrefix + ") WARNING: " + err_string)
-    }
-
-    fun CRITICAL(err_string : String) {
-        println("ActiveCore (" + GenNamePrefix + ") CRITICAL WARNING: " + err_string)
-    }
-
-    fun ERROR(err_string : String) {
-        throw Exception("ActiveCore (" + GenNamePrefix + ") ERROR: " + err_string)
-    }
-
     fun MSG(msg_string : String) {
-        println(GenNamePrefix + ": " + msg_string)
+        ProcessLogFileStream()
+        val str = GenNamePrefix + ": " + msg_string + "\n"
+        print(str)
+        LogFile.write(str)
+        LogFile.close()
     }
 
     fun MSG(DEBUG_FLAG : Boolean, msg_string : String) {
         if (DEBUG_FLAG) MSG(msg_string)
+    }
+
+    fun WARNING(err_string : String) {
+        ProcessLogFileStream()
+        val str = FRAMEWORK_NAME + " (" + GenNamePrefix + ") WARNING: " + err_string + "\n"
+        print(str)
+        LogFile.write(str)
+        LogFile.close()
+    }
+
+    fun CRITICAL(err_string : String) {
+        ProcessLogFileStream()
+        val str = FRAMEWORK_NAME + " (" + GenNamePrefix + ") CRITICAL WARNING: " + err_string + "\n"
+        print(str)
+        LogFile.write(str)
+        LogFile.close()
+    }
+
+    fun ERROR(err_string : String) {
+        ProcessLogFileStream()
+        val str = FRAMEWORK_NAME + " (" + GenNamePrefix + ") ERROR: " + err_string + "\n"
+        print(str)
+        LogFile.write(str)
+        LogFile.close()
+        throw Exception(str)
     }
 
     fun freeze() {
@@ -107,10 +127,10 @@ open class hw_astc() : ArrayList<hw_exec>() {
     fun AddExpr_op_gen_withgen(opcode: hw_opcode, target: hw_var, params: ArrayList<hw_param>) {
         var new_expr = hw_exec(opcode)
         new_expr.AddTgt(target)
-        //println("opcode: " + opcode.default_string)
-        //println("params: " + params.size)
+        //MSG("opcode: " + opcode.default_string)
+        //MSG("params: " + params.size)
         for (new_param in params) {
-            //println("param: " + new_param.GetString())
+            //MSG("param: " + new_param.GetString())
             new_expr.AddParam(new_param)
         }
         new_expr.AddGenVar(target)
@@ -236,7 +256,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun op_generate_genvar(opcode: hw_opcode, params: ArrayList<hw_param>): hw_var {
-        println("op_generate_genvar, opcode: " + opcode.default_string)
+        MSG("op_generate_genvar, opcode: " + opcode.default_string)
         if ((opcode == OP1_BITWISE_NOT)
                 || (opcode == OP1_LOGICAL_NOT)
                 || (opcode == OP1_COMPLEMENT)
@@ -422,12 +442,12 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun assign(tgt: hw_var, depow_fractions: hw_fracs, src: hw_param) {
         //if (src is hw_var)
-        //    println("ASSIGNMENT! tgt: " + tgt.name + " (struct: " + tgt.vartype.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
+        //    MSG("ASSIGNMENT! tgt: " + tgt.name + " (struct: " + tgt.vartype.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
 
         depow_fractions.FillSubStructs(tgt)
 
         var tgt_DePow_descr = tgt.GetDepowered(depow_fractions)
-        //println("tgt_DePow_descr: struct: " + tgt_DePow_descr.src_struct.name)
+        //MSG("tgt_DePow_descr: struct: " + tgt_DePow_descr.src_struct.name)
 
         var tgt_DePowered_Power = tgt_DePow_descr.dimensions.size
         if (tgt_DePowered_Power < 1) tgt_DePowered_Power = 1           // for 1-bit signals
@@ -453,11 +473,11 @@ open class hw_astc() : ArrayList<hw_exec>() {
                         // assignment of inequally structured variables
                         MSG("Structure of tgt: " + tgt.name + ", struct name: " + tgt_DePow_descr.src_struct.name)
                         for (structvar in tgt_DePow_descr.src_struct) {
-                            println("-- " + structvar.name)
+                            MSG("-- " + structvar.name)
                         }
                         MSG("Structure of src: " + tgt.name + ", struct name: " + src.vartype.src_struct.name)
                         for (structvar in src.vartype.src_struct) {
-                            println("-- " + structvar.name)
+                            MSG("-- " + structvar.name)
                         }
                         ERROR("assignment of inequally structured variables! tgt: " + tgt.name + " (struct: " + tgt_DePow_descr.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
                     }
@@ -746,7 +766,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         if (!structvar_found) {
             MSG("Struct elements for variable " + src.name + ":")
             for (structvar_entry in src.vartype.src_struct) {
-                println("-- " + structvar_entry.name)
+                MSG("-- " + structvar_entry.name)
             }
             ERROR("Structvar " + subStruct_name + " not found in var " + src.name)
         }

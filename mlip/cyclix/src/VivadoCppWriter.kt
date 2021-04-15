@@ -413,7 +413,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         wrFileInterface.write("\n")
         wrFileInterface.write("#include <ap_int.h>\n\n")
 
-        println("Exporting structs...")
+        MSG("Exporting structs...")
 
         structsIfToPrint.clear()
         for (port in cyclix_module.Ports) {
@@ -435,7 +435,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         }
         wrFileInterface.write("#endif\n")
         wrFileInterface.close()
-        println("done")
+        MSG("done")
 
         // writing module
         val wrFileModule = File(pathname + "/" + cyclix_module.name + ".cpp").writer()
@@ -443,13 +443,13 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         // writing header
         WriteGenSrcHeader(wrFileModule, "HLS sources")
 
-        println("Exporting modules and ports...")
+        MSG("Exporting modules and ports...")
         wrFileModule.write("#include <ap_int.h>\n")
         wrFileModule.write("#include <hls_stream.h>\n")
         wrFileModule.write("#include \"" + cyclix_module.name + ".hpp\"\n")
         wrFileModule.write("\n")
 
-        println("done")
+        MSG("done")
 
         structsInternalToPrint.clear()
         for (global in cyclix_module.globals) {
@@ -469,15 +469,15 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         tab_Counter++
 
         // globals
-        println("Exporting globals...")
+        MSG("Exporting globals...")
         for (global in cyclix_module.globals) {
             export_structvar("", "", global, ";\n", wrFileModule)
         }
         wrFileModule.write("\n")
-        println("done")
+        MSG("done")
 
         // proc
-        println("Exporting cyclix process...")
+        MSG("Exporting cyclix process...")
         wrFileModule.write("void " + cyclix_module.name + "(ap_uint<1> geninit")
 
         for (port in cyclix_module.Ports) {
@@ -551,7 +551,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
 
         tab_Counter = 0
         wrFileModule.write("\t}\n}\n")
-        println("done")
+        MSG("done")
 
         wrFileModule.close()
     }

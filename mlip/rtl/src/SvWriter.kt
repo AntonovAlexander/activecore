@@ -365,7 +365,7 @@ class SvWriter(var mod : module) {
     fun write(pathname : String) {
 
         // writing interface structures
-        println("Exporting structs...")
+        MSG("Exporting structs...")
 
         File(pathname).mkdirs()
         val wrFileInterface = File(pathname + "/" + mod.name + ".svh").writer()
@@ -395,7 +395,7 @@ class SvWriter(var mod : module) {
         }
         wrFileInterface.write("`endif // __" + mod.name +"_h_\n")
         wrFileInterface.close()
-        println("done")
+        MSG("done")
 
         // writing module
         val wrFileModule = File(pathname + "/" + mod.name + ".sv").writer()
@@ -404,13 +404,13 @@ class SvWriter(var mod : module) {
         WriteGenSrcHeader(wrFileModule, "RTL")
 
         // Submodules
-        println("Exporting submodules...")
+        MSG("Exporting submodules...")
         for (submodule in mod.Submodules) {
             submodule.value.src_module.export_to_sv(pathname + "/" + submodule.value.src_module.name)
         }
-        println("done")
+        MSG("done")
 
-        println("Exporting modules and ports...")
+        MSG("Exporting modules and ports...")
         var mods_included = ArrayList<String>()
         for (incl in mod.Include_filenames) {
             if (!mods_included.contains(incl)) {
@@ -447,7 +447,7 @@ class SvWriter(var mod : module) {
         wrFileModule.write("\n);\n")
         wrFileModule.write("\n")
 
-        println("done")
+        MSG("done")
 
         structsInternalToPrint.clear()
         for (comb in mod.Combs) {
@@ -468,16 +468,16 @@ class SvWriter(var mod : module) {
 
         tab_Counter++
 
-        println("Exporting combinationals...")
+        MSG("Exporting combinationals...")
         for (comb in mod.Combs) {
             export_structvar("", "logic ", ";\n", comb, wrFileModule)
         }
         wrFileModule.write("\n")
 
-        println("done")
+        MSG("done")
 
         // Mems
-        println("Exporting mems...")
+        MSG("Exporting mems...")
         for (mem in mod.Mems) {
 
             export_structvar("","logic ", ";\n", mem, wrFileModule)
@@ -619,7 +619,7 @@ class SvWriter(var mod : module) {
             wrFileModule.write("\n")
         }
         wrFileModule.write("\n")
-        println("done")
+        MSG("done")
 
         // Submodule instantiations
         for (submodule in mod.Submodules) {
@@ -633,7 +633,7 @@ class SvWriter(var mod : module) {
         }
 
         // Cprocs
-        println("Exporting cprocs...")
+        MSG("Exporting cprocs...")
         for (cproc in mod.Cprocs) {
             wrFileModule.write("always @*\n")
             tab_Counter = 1
@@ -649,7 +649,7 @@ class SvWriter(var mod : module) {
             tab_Counter = 0
             wrFileModule.write("\n")
         }
-        println("done")
+        MSG("done")
 
         wrFileModule.write("\n")
         wrFileModule.write("endmodule\n")

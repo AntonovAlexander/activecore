@@ -328,30 +328,30 @@ open class Generic(name_in : String) : hw_astc_stdif() {
 
     fun export_to_rtl() : rtl.module {
 
-        println("###########################################")
-        println("#### Starting Cyclix-to-RTL generation ####")
-        println("#### module: " + name)
-        println("###########################################")
+        MSG("###########################################")
+        MSG("#### Starting Cyclix-to-RTL generation ####")
+        MSG("#### module: " + name)
+        MSG("###########################################")
 
         validate()
 
         var rtl_generator = RtlGenerator(this)
         var rtl_gen = rtl_generator.generate()
 
-        println("############################################")
-        println("#### Cyclix-to-RTL generation complete! ####")
-        println("#### module: " + name)
-        println("############################################")
+        MSG("############################################")
+        MSG("#### Cyclix-to-RTL generation complete! ####")
+        MSG("#### module: " + name)
+        MSG("############################################")
 
         return rtl_gen
     }
 
     fun export_to_vivado_cpp(pathname : String) {
 
-        println("############################################")
-        println("#### Cyclix: starting vivado_cpp export ####")
-        println("#### module: " + name)
-        println("############################################")
+        MSG("############################################")
+        MSG("#### Cyclix: starting vivado_cpp export ####")
+        MSG("#### module: " + name)
+        MSG("############################################")
 
         validate()
         freeze()
@@ -359,10 +359,10 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         var writer = VivadoCppWriter(this)
         writer.write(pathname)
 
-        println("#############################################")
-        println("#### Cyclix: vivado_cpp export complete! ####")
-        println("#### module: " + name)
-        println("#############################################")
+        MSG("#############################################")
+        MSG("#### Cyclix: vivado_cpp export complete! ####")
+        MSG("#### module: " + name)
+        MSG("#############################################")
     }
 }
 

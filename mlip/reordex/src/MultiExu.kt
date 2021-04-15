@@ -53,9 +53,9 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         cyclix_gen as cyclix.Streaming
 
-        // println("#### Cyclix: exporting expression: " + expr.opcode.default_string)
-        // for (param in expr.params) println("param: " + param.GetString())
-        // for (wrvar in expr.wrvars) println("wrvar: " + wrvar.name)
+        // MSG("#### Cyclix: exporting expression: " + expr.opcode.default_string)
+        // for (param in expr.params) MSG("param: " + param.GetString())
+        // for (wrvar in expr.wrvars) MSG("wrvar: " + wrvar.name)
 
         var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, context.var_dict)
 
