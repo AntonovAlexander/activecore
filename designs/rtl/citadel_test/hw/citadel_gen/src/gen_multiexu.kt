@@ -9,6 +9,6 @@ fun main(args: Array<String>) {
     var multiexu_rtl = multiexu_cyclix.export_to_rtl(true)
 
     var dirname = "coregen/"
-    multiexu_rtl.export_to_sv(dirname + "sverilog")
+    multiexu_rtl.export_to_sv(dirname + "sverilog", true)
     multiexu_cyclix.export_to_vivado_cpp(dirname + "vivado_cpp", true)
 }

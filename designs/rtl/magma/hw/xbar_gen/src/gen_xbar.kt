@@ -22,5 +22,5 @@ fun main() {
         4,
         4,
         true)
-    xbar.export_to_sv("coregen")
+    xbar.export_to_sv("coregen", true)
 }

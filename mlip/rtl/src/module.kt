@@ -408,7 +408,7 @@ open class module(val name : String) : hw_astc_stdif() {
         freeze()
     }
 
-    fun export_to_sv(pathname : String) {
+    fun export_to_sv(pathname : String, DEBUG_FLAG : Boolean) {
 
         println("############################################")
         println("#### rtl: starting SystemVerilog export ####")
@@ -417,7 +417,7 @@ open class module(val name : String) : hw_astc_stdif() {
         validate()
 
         var writer = SvWriter(this)
-        writer.write(pathname)
+        writer.write(pathname, DEBUG_FLAG)
 
         println("#############################################")
         println("#### rtl: SystemVerilog export complete! ####")

@@ -8,7 +8,7 @@ fun main(args: Array<String>) {
         var cpu_rtl = cpu_cyclix.export_to_rtl(true)
 
         var dirname = "coregen/riscv_" + i +"stage" + "/"
-        cpu_rtl.export_to_sv(dirname + "sverilog")
+        cpu_rtl.export_to_sv(dirname + "sverilog", true)
         cpu_cyclix.export_to_vivado_cpp(dirname + "vivado_cpp", true)
     }
 }

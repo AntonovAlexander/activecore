@@ -362,7 +362,7 @@ class SvWriter(var mod : module) {
         }
     }
 
-    fun write(pathname : String) {
+    fun write(pathname : String, DEBUG_FLAG : Boolean) {
 
         // writing interface structures
         MSG("Exporting structs...")
@@ -406,7 +406,7 @@ class SvWriter(var mod : module) {
         // Submodules
         MSG("Exporting submodules...")
         for (submodule in mod.Submodules) {
-            submodule.value.src_module.export_to_sv(pathname + "/" + submodule.value.src_module.name)
+            submodule.value.src_module.export_to_sv(pathname + "/" + submodule.value.src_module.name, DEBUG_FLAG)
         }
         MSG("done")
 
