@@ -25,7 +25,7 @@ val OP_ACCUM        = hw_opcode("accum")
 val OP_ASSIGN_SUCC  = hw_opcode("assign_succ")
 val OP_RD_PREV      = hw_opcode("rd_prev")
 
-enum class PSTAGE_BUSY_MODE {
+enum class PSTAGE_FC_MODE {
     BUFFERED, FALL_THROUGH
 }
 
@@ -60,7 +60,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
     var Stages  = mutableMapOf<String, hw_stage>()
 
-    fun stage_handler(name : String, busy_mode : PSTAGE_BUSY_MODE, buf_size_cfg : PSTAGE_BUF_SIZE_CFG) : hw_stage {
+    fun stage_handler(name : String, busy_mode : PSTAGE_FC_MODE, buf_size_cfg : PSTAGE_BUF_SIZE_CFG) : hw_stage {
         if (FROZEN_FLAG) ERROR("Failed to add stage " + name + ": ASTC frozen")
         var new_stage = hw_stage(name, busy_mode, buf_size_cfg, this)
         if (Stages.put(new_stage.name, new_stage) != null) {
@@ -69,11 +69,11 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
         return new_stage
     }
 
-    fun stage_handler(name : String, busy_mode : PSTAGE_BUSY_MODE, BUF_SIZE : Int) : hw_stage {
+    fun stage_handler(name : String, busy_mode : PSTAGE_FC_MODE, BUF_SIZE : Int) : hw_stage {
         return stage_handler(name, busy_mode, PSTAGE_BUF_SIZE_CFG(BUF_SIZE))
     }
 
-    fun stage_handler(name : String, busy_mode : PSTAGE_BUSY_MODE) : hw_stage {
+    fun stage_handler(name : String, busy_mode : PSTAGE_FC_MODE) : hw_stage {
         return stage_handler(name, busy_mode, PSTAGE_BUF_SIZE_CFG())
     }
 
@@ -1247,7 +1247,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
             cyclix_gen.assign(curStageInfo.pctrl_occupied, curStageInfo.pctrl_active)
 
             // rdy signal: before processing
-            if (curStage.busy_mode == PSTAGE_BUSY_MODE.BUFFERED) {
+            if (curStage.fc_mode == PSTAGE_FC_MODE.BUFFERED) {
                 cyclix_gen.assign(curStageInfo.pctrl_rdy, !curStageInfo.TRX_BUF_COUNTER_FULL)
             }
 
@@ -1476,10 +1476,14 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                             }
 
                             cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER_NEMPTY, 1)
-                            cyclix_gen.begif(cyclix_gen.eq2(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_SIZE-1))
-                            run {
+                            if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_SIZE == 1) {
                                 cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER_FULL, 1)
-                            }; cyclix_gen.endif()
+                            } else {
+                                cyclix_gen.begif(cyclix_gen.eq2(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_SIZE-1))
+                                run {
+                                    cyclix_gen.assign(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER_FULL, 1)
+                                }; cyclix_gen.endif()
+                            }
                             cyclix_gen.add_gen(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].TRX_BUF_COUNTER, 1)
 
                         }; if (pipeline_fc_mode != PIPELINE_FC_MODE.CREDIT_BASED) cyclix_gen.endif()
@@ -1495,16 +1499,20 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 }
 
                 cyclix_gen.assign(curStageInfo.TRX_BUF_COUNTER_FULL, 0)
-                cyclix_gen.begif(cyclix_gen.eq2(curStageInfo.TRX_BUF_COUNTER, 1))
-                run {
+                if (curStageInfo.TRX_BUF_SIZE == 1) {
                     cyclix_gen.assign(curStageInfo.TRX_BUF_COUNTER_NEMPTY, 0)
-                }; cyclix_gen.endif()
+                } else {
+                    cyclix_gen.begif(cyclix_gen.eq2(curStageInfo.TRX_BUF_COUNTER, 1))
+                    run {
+                        cyclix_gen.assign(curStageInfo.TRX_BUF_COUNTER_NEMPTY, 0)
+                    }; cyclix_gen.endif()
+                }
                 cyclix_gen.sub_gen(curStageInfo.TRX_BUF_COUNTER, curStageInfo.TRX_BUF_COUNTER, 1)
 
             }; cyclix_gen.endif()
 
             // rdy signal: after processing
-            if (curStage.busy_mode == PSTAGE_BUSY_MODE.FALL_THROUGH) {
+            if (curStage.fc_mode == PSTAGE_FC_MODE.FALL_THROUGH) {
                 cyclix_gen.assign(curStageInfo.pctrl_rdy, !curStageInfo.TRX_BUF_COUNTER_FULL)
             }
 
