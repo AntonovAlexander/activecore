@@ -466,31 +466,17 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
             } else {
                 for (i in 0 until tgt.vartype.dimensions.last().GetWidth()) {
-
-                    depow_fractions.add(0, hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
-
-                    var new_dimrange = hw_dim_range_static(i - 1, 0)
-                    var gen_dim = hw_dim_static()
-                    gen_dim.add(new_dimrange)
-
-                    var new_srcs = ArrayList<hw_param>()
-                    new_srcs.add(src)
-                    new_srcs.add(hw_imm((i + tgt.vartype.dimensions[tgt_DePowered_Power - 1].lsb).toString()))
-
-                    var indexed_src = AddExpr_op(OP2_INDEXED, new_srcs)
-
-                    assign(tgt, depow_fractions, indexed_src)
-
-                    depow_fractions.removeAt(depow_fractions.lastIndex)
+                    var src_ref = src.GetFracRef(hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
+                    var tgt_ref = tgt.GetFracRef(hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
+                    assign(tgt_ref, depow_fractions, src_ref)
                 }
             }
         } else if (src is hw_imm) {
             if (tgt_DePowered_Power == 1) assign_gen(tgt, depow_fractions, src)
             else {
                 for (i in 0 until tgt.vartype.dimensions.get(tgt_DePowered_Power - 1).GetWidth()) {
-                    depow_fractions.add(0, hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
-                    assign(tgt, depow_fractions, src)
-                    depow_fractions.removeAt(0)
+                    var tgt_ref = tgt.GetFracRef(hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
+                    assign(tgt_ref, depow_fractions, src)
                 }
             }
         }
