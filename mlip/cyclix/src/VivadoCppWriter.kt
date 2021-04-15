@@ -556,13 +556,13 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         wrFileModule.close()
     }
 
-    fun write(pathname : String) {
+    fun write(pathname : String, DEBUG_FLAG : Boolean) {
 
         // writing interface structures
         // TODO: restrict to interfaces
         File(pathname).mkdirs()
         for (subproc in cyclix_module.Subprocs) {
-            subproc.value.src_module.export_to_vivado_cpp(pathname + "/" + subproc.value.src_module.name)
+            subproc.value.src_module.export_to_vivado_cpp(pathname + "/" + subproc.value.src_module.name, DEBUG_FLAG)
         }
         write_module(pathname)
     }

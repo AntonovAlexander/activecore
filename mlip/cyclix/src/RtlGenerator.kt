@@ -183,7 +183,7 @@ class RtlGenerator(var cyclix_module : Generic) {
         // MSG("#### Cyclix: exporting expression complete!")
     }
 
-    fun generate() : rtl.module {
+    fun generate(DEBUG_FLAG : Boolean) : rtl.module {
 
         MSG("#######################################")
         MSG("#### Starting Cyclix-to-RTL export ####")
@@ -237,7 +237,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             var fifo_internal_in_descrs = mutableMapOf<String, fifo_internal_out_descr>()
             var fifo_internal_out_descrs = mutableMapOf<String, fifo_internal_in_descr>()
 
-            var submod_rtl_gen = subproc.value.src_module.export_to_rtl()
+            var submod_rtl_gen = subproc.value.src_module.export_to_rtl(DEBUG_FLAG)
             var rtl_submodule_inst = rtl_gen.submodule(subproc.value.inst_name, submod_rtl_gen)
 
             rtl_submodule_inst.connect("clk_i", clk)

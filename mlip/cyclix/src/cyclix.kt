@@ -326,7 +326,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         freeze()
     }
 
-    fun export_to_rtl() : rtl.module {
+    fun export_to_rtl(DEBUG_FLAG : Boolean) : rtl.module {
 
         MSG("###########################################")
         MSG("#### Starting Cyclix-to-RTL generation ####")
@@ -336,7 +336,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         validate()
 
         var rtl_generator = RtlGenerator(this)
-        var rtl_gen = rtl_generator.generate()
+        var rtl_gen = rtl_generator.generate(DEBUG_FLAG)
 
         MSG("############################################")
         MSG("#### Cyclix-to-RTL generation complete! ####")
@@ -346,7 +346,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         return rtl_gen
     }
 
-    fun export_to_vivado_cpp(pathname : String) {
+    fun export_to_vivado_cpp(pathname : String, DEBUG_FLAG : Boolean) {
 
         MSG("############################################")
         MSG("#### Cyclix: starting vivado_cpp export ####")
@@ -357,7 +357,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         freeze()
 
         var writer = VivadoCppWriter(this)
-        writer.write(pathname)
+        writer.write(pathname, DEBUG_FLAG)
 
         MSG("#############################################")
         MSG("#### Cyclix: vivado_cpp export complete! ####")

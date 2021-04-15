@@ -627,10 +627,8 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
         var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, context.curStageInfo.var_dict)
 
-        if (DEBUG_FLAG) {
-            MSG(DEBUG_FLAG, "Reconstructing expression: " + expr.opcode.default_string)
-            for (param in expr.params) MSG(DEBUG_FLAG, "param: " + param.GetString())
-        }
+        MSG(DEBUG_FLAG, "Reconstructing expression: " + expr.opcode.default_string)
+        for (param in expr.params) MSG(DEBUG_FLAG, "param: " + param.GetString())
 
         if ((expr.opcode == OP1_ASSIGN)) {
 
