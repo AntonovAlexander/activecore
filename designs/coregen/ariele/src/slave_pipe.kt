@@ -6,7 +6,8 @@ import pipex.*
 class slave_pipe(name        : String,
                  num_masters    : Int,
                  req_vartype    : hw_type,
-                 resp_vartype   : hw_type) : pipex.Pipeline(name, PIPELINE_FC_MODE.STALLABLE) {
+                 resp_vartype   : hw_type,
+                 rob_size : Int) : pipex.Pipeline(name, PIPELINE_FC_MODE.STALLABLE) {
 
     var master_ifs      = ArrayList<hw_scopipe_if>()
     var master_handle   = scopipe_handle("master", req_vartype, resp_vartype)
@@ -31,7 +32,7 @@ class slave_pipe(name        : String,
 
         var ARB     = stage_handler("ARB", PSTAGE_FC_MODE.BUFFERED)
         var REQ     = stage_handler("REQ", PSTAGE_FC_MODE.BUFFERED)
-        var RESP    = stage_handler("RESP", PSTAGE_FC_MODE.BUFFERED)
+        var RESP    = stage_handler("RESP", PSTAGE_FC_MODE.BUFFERED, rob_size)
 
         ARB.begin()
         run {

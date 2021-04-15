@@ -15,7 +15,9 @@ class xbar(name         : String,
            be_width     : Int,
            req_vartype  : hw_type,
            resp_vartype : hw_type,
-           map          : addr_map) : rtl.module(name) {
+           map          : addr_map,
+           master_rob_size : Int,
+           slave_rob_size : Int) : rtl.module(name) {
 
     var master_pipe_insts   = ArrayList<hw_submodule>()
     var slave_pipe_insts    = ArrayList<hw_submodule>()
@@ -47,14 +49,14 @@ class xbar(name         : String,
 
         // generating master pipe module
         var master_name = "m_" + name
-        var pipex_master_pipe = master_pipe(master_name, hw_type(busreq_struct), map, resp_vartype)
+        var pipex_master_pipe = master_pipe(master_name, hw_type(busreq_struct), map, resp_vartype, master_rob_size)
         var cyclix_master_pipe = pipex_master_pipe.translate_to_cyclix(true)
         var rtl_master_pipe = cyclix_master_pipe.export_to_rtl()
         rtl_master_pipe.Include_filenames.add(name)
 
         // generating slave pipe module
         var slave_name = "s_" + name
-        var pipex_slave_pipe = slave_pipe(slave_name, num_masters, hw_type(busreq_struct), resp_vartype)
+        var pipex_slave_pipe = slave_pipe(slave_name, num_masters, hw_type(busreq_struct), resp_vartype, slave_rob_size)
         var cyclix_slave_pipe = pipex_slave_pipe.translate_to_cyclix(true)
         var rtl_slave_pipe = cyclix_slave_pipe.export_to_rtl()
         rtl_slave_pipe.Include_filenames.add(name)

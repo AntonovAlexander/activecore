@@ -18,6 +18,8 @@ fun main() {
         4,
         hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(31, 0)),
         hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(31, 0)),
-        map)
+        map,
+        4,
+        4)
     xbar.export_to_sv("coregen")
 }
