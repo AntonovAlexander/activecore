@@ -69,26 +69,26 @@ class hw_struct(var name: String) : ArrayList<hw_structvar>() {
     }
 
     fun addu(name: String, dimensions : hw_dim_static, defval : String) {
-        add(hw_structvar(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval))
+        add(hw_structvar(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defval))
     }
 
     fun addu(name: String, msb: Int, lsb: Int, defval : String) {
-        add(hw_structvar(name, VAR_TYPE.UNSIGNED, msb, lsb, defval))
+        add(hw_structvar(name, VAR_TYPE.BV_UNSIGNED, msb, lsb, defval))
     }
 
     fun addu(name: String, defval : String) {
-        add(hw_structvar(name, VAR_TYPE.UNSIGNED, defval))
+        add(hw_structvar(name, VAR_TYPE.BV_UNSIGNED, defval))
     }
 
     fun adds(name: String, dimensions : hw_dim_static, defval : String) {
-        add(hw_structvar(name, VAR_TYPE.SIGNED, dimensions, defval))
+        add(hw_structvar(name, VAR_TYPE.BV_SIGNED, dimensions, defval))
     }
 
     fun adds(name: String, msb: Int, lsb: Int, defval : String) {
-        add(hw_structvar(name, VAR_TYPE.SIGNED, msb, lsb, defval))
+        add(hw_structvar(name, VAR_TYPE.BV_SIGNED, msb, lsb, defval))
     }
 
     fun adds(name: String, defval : String) {
-        add(hw_structvar(name, VAR_TYPE.SIGNED, defval))
+        add(hw_structvar(name, VAR_TYPE.BV_SIGNED, defval))
     }
 }

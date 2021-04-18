@@ -91,7 +91,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             }
 
             var typename = "ap_int"
-            if (structvar.vartype.VarType == VAR_TYPE.UNSIGNED) typename = "ap_uint"
+            if (structvar.vartype.VarType == VAR_TYPE.BV_UNSIGNED) typename = "ap_uint"
 
             wrFile.write(preambule
                     + typename

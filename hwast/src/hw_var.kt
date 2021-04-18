@@ -52,7 +52,7 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
             : this(name, src_struct, 0, 0)
 
     constructor(name : String, msb : Int, lsb : Int, defval : String)
-            : this(name, VAR_TYPE.UNSIGNED, msb, lsb, hw_imm(defval))
+            : this(name, VAR_TYPE.BV_UNSIGNED, msb, lsb, hw_imm(defval))
 
     fun assign(depow_fracs: hw_fracs, src: hw_param) {
         default_astc.assign(this, depow_fracs, src)
@@ -231,7 +231,7 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     }
 }
 
-var DUMMY_VAR = hw_var("DUMMY_VAR", hw_type(VAR_TYPE.UNSIGNED, 0, 0), "0")
+var DUMMY_VAR = hw_var("DUMMY_VAR", hw_type(VAR_TYPE.BV_UNSIGNED, 0, 0), "0")
 
 class hw_var_frac(var src_var : hw_var, var depow_fractions: hw_fracs, vartype : hw_type) : hw_var(src_var.name, vartype, src_var.defimm) {
     init {

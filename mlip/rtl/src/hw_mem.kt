@@ -40,8 +40,8 @@ class hw_mem(name : String, vartype : hw_type, val sync_type : SYNC_TYPE)
     var rst_present = false
     var rst_type = RST_TYPE.SYNC
     var rst_lvl = SYNC_LVL.POS
-    var rst_signal = hw_var("TEMP", VAR_TYPE.UNSIGNED, "0")
-    var rst_src = hw_param(hw_type(VAR_TYPE.UNSIGNED, hw_dim_static(1)), "0")
+    var rst_signal = hw_var("TEMP", VAR_TYPE.BV_UNSIGNED, "0")
+    var rst_src = hw_param(hw_type(VAR_TYPE.BV_UNSIGNED, hw_dim_static(1)), "0")
 
     fun AddReset(rst_type_in : RST_TYPE, rst_lvl_in : SYNC_LVL, rst_signal_in : hw_var, rst_src_in : hw_param) {
 

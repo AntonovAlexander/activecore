@@ -69,73 +69,73 @@ open class module(val name : String) : hw_astc_stdif() {
     }
 
     fun ucomb(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, dimensions, defimm)
+        var ret_var = hw_var(name, VAR_TYPE.BV_UNSIGNED, dimensions, defimm)
         add_comb(ret_var)
         return ret_var
     }
 
     fun ucomb(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, dimensions, defval)
+        var ret_var = hw_var(name, VAR_TYPE.BV_UNSIGNED, dimensions, defval)
         add_comb(ret_var)
         return ret_var
     }
 
     fun ucomb(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, msb, lsb, defimm)
+        var ret_var = hw_var(name, VAR_TYPE.BV_UNSIGNED, msb, lsb, defimm)
         add_comb(ret_var)
         return ret_var
     }
 
     fun ucomb(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, msb, lsb, defval)
+        var ret_var = hw_var(name, VAR_TYPE.BV_UNSIGNED, msb, lsb, defval)
         add_comb(ret_var)
         return ret_var
     }
 
     fun ucomb(name : String, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, defimm)
+        var ret_var = hw_var(name, VAR_TYPE.BV_UNSIGNED, defimm)
         add_comb(ret_var)
         return ret_var
     }
 
     fun ucomb(name : String, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.UNSIGNED, defval)
+        var ret_var = hw_var(name, VAR_TYPE.BV_UNSIGNED, defval)
         add_comb(ret_var)
         return ret_var
     }
 
     fun scomb(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.SIGNED, dimensions, defimm)
+        var ret_var = hw_var(name, VAR_TYPE.BV_SIGNED, dimensions, defimm)
         add_comb(ret_var)
         return ret_var
     }
 
     fun scomb(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.SIGNED, dimensions, defval)
+        var ret_var = hw_var(name, VAR_TYPE.BV_SIGNED, dimensions, defval)
         add_comb(ret_var)
         return ret_var
     }
 
     fun scomb(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.SIGNED, msb, lsb, defimm)
+        var ret_var = hw_var(name, VAR_TYPE.BV_SIGNED, msb, lsb, defimm)
         add_comb(ret_var)
         return ret_var
     }
 
     fun scomb(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.SIGNED, msb, lsb, defval)
+        var ret_var = hw_var(name, VAR_TYPE.BV_SIGNED, msb, lsb, defval)
         add_comb(ret_var)
         return ret_var
     }
 
     fun scomb(name : String, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.SIGNED, defimm)
+        var ret_var = hw_var(name, VAR_TYPE.BV_SIGNED, defimm)
         add_comb(ret_var)
         return ret_var
     }
 
     fun scomb(name : String, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.SIGNED, defval)
+        var ret_var = hw_var(name, VAR_TYPE.BV_SIGNED, defval)
         add_comb(ret_var)
         return ret_var
     }
@@ -161,25 +161,25 @@ open class module(val name : String) : hw_astc_stdif() {
     }
 
     fun umem(name : String, dimensions : hw_dim_static, sync_type : SYNC_TYPE) : hw_mem {
-        var ret_var = hw_mem(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), sync_type)
+        var ret_var = hw_mem(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), sync_type)
         add_mem(ret_var)
         return ret_var
     }
 
     fun umem(name : String, msb: Int, lsb: Int, sync_type : SYNC_TYPE) : hw_mem {
-        var ret_var = hw_mem(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), sync_type)
+        var ret_var = hw_mem(name, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), sync_type)
         add_mem(ret_var)
         return ret_var
     }
 
     fun smem(name : String, dimensions : hw_dim_static, sync_type : SYNC_TYPE) : hw_mem {
-        var ret_var = hw_mem(name, hw_type(VAR_TYPE.SIGNED, dimensions), sync_type)
+        var ret_var = hw_mem(name, hw_type(VAR_TYPE.BV_SIGNED, dimensions), sync_type)
         add_mem(ret_var)
         return ret_var
     }
 
     fun smem(name : String, msb: Int, lsb: Int, sync_type : SYNC_TYPE) : hw_mem {
-        var ret_var = hw_mem(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), sync_type)
+        var ret_var = hw_mem(name, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), sync_type)
         add_mem(ret_var)
         return ret_var
     }
@@ -223,49 +223,49 @@ open class module(val name : String) : hw_astc_stdif() {
     }
 
     fun ubuffered(name : String, dimensions : hw_dim_static, defimm: hw_imm, clk : hw_var, rst : hw_var) : hw_buffered {
-        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defimm, clk, rst)
+        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defimm, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun ubuffered(name : String, dimensions : hw_dim_static, defval : String, clk : hw_var, rst : hw_var) : hw_buffered {
-        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval, clk, rst)
+        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defval, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun ubuffered(name : String, msb: Int, lsb: Int, defimm: hw_imm, clk : hw_var, rst : hw_var) : hw_buffered {
-        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defimm, clk, rst)
+        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defimm, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun ubuffered(name : String, msb: Int, lsb: Int, defval : String, clk : hw_var, rst : hw_var) : hw_buffered {
-        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval, clk, rst)
+        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defval, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun sbuffered(name : String, dimensions : hw_dim_static, defimm: hw_imm, clk : hw_var, rst : hw_var) : hw_buffered {
-        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.SIGNED, dimensions), defimm, clk, rst)
+        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defimm, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun sbuffered(name : String, dimensions : hw_dim_static, defval : String, clk : hw_var, rst : hw_var) : hw_buffered {
-        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.SIGNED, dimensions), defval, clk, rst)
+        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defval, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun sbuffered(name : String, msb: Int, lsb: Int, defimm: hw_imm, clk : hw_var, rst : hw_var) : hw_buffered {
-        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defimm, clk, rst)
+        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defimm, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun sbuffered(name : String, msb: Int, lsb: Int, defval : String, clk : hw_var, rst : hw_var) : hw_buffered {
-        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval, clk, rst)
+        var ret_var = hw_buffered(name, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defval, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
@@ -295,49 +295,49 @@ open class module(val name : String) : hw_astc_stdif() {
     }
 
     fun usticky(name : String, dimensions : hw_dim_static, defimm: hw_imm, clk : hw_var, rst : hw_var) : hw_sticky {
-        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defimm, clk, rst)
+        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defimm, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun usticky(name : String, dimensions : hw_dim_static, defval : String, clk : hw_var, rst : hw_var) : hw_sticky {
-        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.UNSIGNED, dimensions), defval, clk, rst)
+        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defval, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun usticky(name : String, msb: Int, lsb: Int, defimm: hw_imm, clk : hw_var, rst : hw_var) : hw_sticky {
-        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defimm, clk, rst)
+        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defimm, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun usticky(name : String, msb: Int, lsb: Int, defval : String, clk : hw_var, rst : hw_var) : hw_sticky {
-        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.UNSIGNED, msb, lsb), defval, clk, rst)
+        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defval, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun ssticky(name : String, dimensions : hw_dim_static, defimm: hw_imm, clk : hw_var, rst : hw_var) : hw_sticky {
-        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.SIGNED, dimensions), defimm, clk, rst)
+        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defimm, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun ssticky(name : String, dimensions : hw_dim_static, defval : String, clk : hw_var, rst : hw_var) : hw_sticky {
-        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.SIGNED, dimensions), defval, clk, rst)
+        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defval, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun ssticky(name : String, msb: Int, lsb: Int, defimm: hw_imm, clk : hw_var, rst : hw_var) : hw_sticky {
-        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defimm, clk, rst)
+        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defimm, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }
 
     fun ssticky(name : String, msb: Int, lsb: Int, defval : String, clk : hw_var, rst : hw_var) : hw_sticky {
-        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.SIGNED, msb, lsb), defval, clk, rst)
+        var ret_var = hw_sticky(name, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defval, clk, rst)
         add_syncbuf(ret_var)
         return ret_var
     }

@@ -9,7 +9,9 @@
 package hwast
 
 enum class VAR_TYPE {
-    SIGNED, UNSIGNED, STRUCTURED
+    BV_SIGNED,          // signed bit vector
+    BV_UNSIGNED,        // unsigned bit vector
+    STRUCTURED
 }
 
 // container for generic hardware types
