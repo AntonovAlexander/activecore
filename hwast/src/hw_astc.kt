@@ -848,6 +848,25 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op(OPS_CNCT, src)
     }
 
+    fun mat_mul(src0: hw_var, src1: hw_var) : hw_var {
+        if ((src0.vartype.dimensions.size != src1.vartype.dimensions.size) || (src0.vartype.dimensions.size != 3)) {
+            ERROR("Dimensions error of matrix multiplication")
+        }
+
+        var ret_dim = hw_dim_static()
+        ret_dim.add(31, 0)                  // TODO: calculate actual width
+        ret_dim.add(src0.vartype.dimensions[2])
+        ret_dim.add(src1.vartype.dimensions[1])
+
+        var ret_var = hw_var(GetGenName("matmul"), DATA_TYPE.BV_UNSIGNED, ret_dim, "0")
+        AddGenVar(ret_var)
+        AddWrVar(ret_var)
+
+        mat_mul_gen(ret_var, src0, src1)
+
+        return ret_var
+    }
+
     ///////////////////////////////////
 
     fun complement_gen(tgt : hw_var, src : hw_param) {
