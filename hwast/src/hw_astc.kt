@@ -1159,6 +1159,24 @@ open class hw_astc() : ArrayList<hw_exec>() {
         }
     }
 
+    fun mat_mul_gen(tgt: hw_var, src0: hw_var, src1: hw_var) {
+        if ((src0.vartype.dimensions.size != src1.vartype.dimensions.size) || (src0.vartype.dimensions.size != 3)) {
+            ERROR("Dimensions error of matrix multiplication")
+        }
+        var src0_row = begforall_asc(src0)
+        run {
+            var src0_col = begforall_asc(src0_row.iter_elem)
+            run {
+                var scr1_row = indexed(src1, src0_col.iter_num)
+                var scr1_col = indexed(scr1_row, src0_row.iter_num)
+                var fracs = hw_fracs()
+                fracs.add(src0_row.iter_elem)
+                fracs.add(scr1_col)
+                add_gen(tgt, tgt, mul(src0_col.iter_elem, scr1_col))
+            }; endloop()
+        }; endloop()
+    }
+
     fun signext(src : hw_param, tgt_width : Int): hw_var {
         if (src.vartype.dimensions.size > 1) ERROR("signext op dimensions error")
         val src_width = src.vartype.dimensions[0].GetWidth()
@@ -1313,7 +1331,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     data class for_loop_iteration(var iter_num : hw_var, var iter_elem: hw_var, var iter_num_next : hw_var)
 
-    fun begforrange(elements : hw_var, start: hw_param, end: hw_param) : for_loop_iteration {
+    fun begforrange(elements : hw_param, start: hw_param, end: hw_param) : for_loop_iteration {
 
         var new_expr = hw_exec(OP1_WHILE)
 
@@ -1350,7 +1368,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return for_loop_iteration(genvar_iter_num, genvar_iter_elem, genvar_iter_num_next)
     }
 
-    fun begforrange_asc(elements : hw_var, start: hw_param, end: hw_param) : for_loop_iteration {
+    fun begforrange_asc(elements : hw_param, start: hw_param, end: hw_param) : for_loop_iteration {
 
         var new_expr = hw_exec(OP1_WHILE)
 
@@ -1379,7 +1397,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return for_loop_iteration(genvar_iter_num, genvar_iter_elem, genvar_iter_num_next)
     }
 
-    fun begforrange_desc(elements : hw_var, start: hw_param, end: hw_param) : for_loop_iteration {
+    fun begforrange_desc(elements : hw_param, start: hw_param, end: hw_param) : for_loop_iteration {
 
         var new_expr = hw_exec(OP1_WHILE)
 
@@ -1408,15 +1426,15 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return for_loop_iteration(genvar_iter_num, genvar_iter_elem, genvar_iter_num_next)
     }
 
-    fun begforall_asc(elements : hw_var) : for_loop_iteration {
+    fun begforall_asc(elements : hw_param) : for_loop_iteration {
         return begforrange_asc(elements, hw_imm(elements.vartype.dimensions.last().lsb), hw_imm(elements.vartype.dimensions.last().msb))
     }
 
-    fun begforall_desc(elements : hw_var) : for_loop_iteration {
+    fun begforall_desc(elements : hw_param) : for_loop_iteration {
         return begforrange_desc(elements, hw_imm(elements.vartype.dimensions.last().msb), hw_imm(elements.vartype.dimensions.last().lsb))
     }
 
-    fun begforall(elements : hw_var, depth : Int) : for_loop_iteration {
+    fun begforall(elements : hw_param, depth : Int) : for_loop_iteration {
 
         if (depth > 1) {
             // TODO

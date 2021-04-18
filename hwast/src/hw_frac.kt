@@ -109,6 +109,30 @@ class hw_fracs() : ArrayList<hw_frac>() {
         }
     }
 
+    fun add(new_elem : hw_imm) {
+        add(hw_frac_C(new_elem))
+    }
+
+    fun add(new_elem : hw_var) {
+        add(hw_frac_V(new_elem))
+    }
+
+    fun add(new_elem0 : hw_imm, new_elem1 : hw_imm) {
+        add(hw_frac_CC(new_elem0, new_elem1))
+    }
+
+    fun add(new_elem0 : hw_imm, new_elem1 : hw_var) {
+        add(hw_frac_CV(new_elem0, new_elem1))
+    }
+
+    fun add(new_elem0 : hw_var, new_elem1 : hw_imm) {
+        add(hw_frac_VC(new_elem0, new_elem1))
+    }
+
+    fun add(new_elem0 : hw_var, new_elem1 : hw_var) {
+        add(hw_frac_VV(new_elem0, new_elem1))
+    }
+
     fun FillSubStructs(tgt: hw_var) {
         var tgt_struct_ptr = tgt.vartype.src_struct
         for (fraction in this) {
