@@ -64,7 +64,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
 
     fun export_structvar(preambule : String, prename : String, structvar : hw_structvar, postString : String, wrFile : java.io.OutputStreamWriter) {
         var dimstring = ""
-        if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
+        if (structvar.vartype.DataType == DATA_TYPE.STRUCTURED) {
             if (!structvar.vartype.dimensions.isEmpty()) {
                 for (dim in structvar.vartype.dimensions) {
                     dimstring += (" " + getDimString(dim))
@@ -91,7 +91,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             }
 
             var typename = "ap_int"
-            if (structvar.vartype.VarType == VAR_TYPE.BV_UNSIGNED) typename = "ap_uint"
+            if (structvar.vartype.DataType == DATA_TYPE.BV_UNSIGNED) typename = "ap_uint"
 
             wrFile.write(preambule
                     + typename
@@ -107,7 +107,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
 
     fun export_stream(preambule : String, structvar : hw_structvar, postString : String, wrFile : java.io.OutputStreamWriter) {
         // TODO: dimensions cleanup
-        if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
+        if (structvar.vartype.DataType == DATA_TYPE.STRUCTURED) {
             wrFile.write(preambule + "<" + structvar.vartype.src_struct.name + ">& " + structvar.name + postString)
         } else {
             wrFile.write(preambule + "<ap_uint<" + structvar.vartype.dimensions[0].GetWidth() + "> >& " + structvar.name + postString)
@@ -212,7 +212,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             || (expr.opcode == OP1_REDUCT_XNOR))
         {
             var var_descr = expr.wrvars[0].GetDepowered(expr.assign_tgt_fractured.depow_fractions)
-            if ((var_descr.VarType == VAR_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
+            if ((var_descr.DataType == DATA_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
                 if (opstring == "") {
                     wrFile.write(GetParamString(expr.wrvars[0]) +
                             dimstring +
@@ -360,7 +360,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
 
     var structsIfToPrint = mutableMapOf<String, hw_struct>()
     fun AddStructsIfToPrint(param: hw_param) {
-        if (param.vartype.VarType == VAR_TYPE.STRUCTURED) {
+        if (param.vartype.DataType == DATA_TYPE.STRUCTURED) {
             if (!structsIfToPrint.containsKey(param.vartype.src_struct.name)) {
                 for (structvar in param.vartype.src_struct) {
                     AddStructsIfToPrint(structvar)
@@ -371,7 +371,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
     }
     var structsInternalToPrint = mutableMapOf<String, hw_struct>()
     fun AddStructsInternalToPrint(param: hw_param) {
-        if (param.vartype.VarType == VAR_TYPE.STRUCTURED) {
+        if (param.vartype.DataType == DATA_TYPE.STRUCTURED) {
             if (!structsIfToPrint.containsKey(param.vartype.src_struct.name) && !structsInternalToPrint.containsKey(param.vartype.src_struct.name)) {
                 for (structvar in param.vartype.src_struct) {
                     AddStructsInternalToPrint(structvar)

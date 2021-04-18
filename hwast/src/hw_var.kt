@@ -24,22 +24,22 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     constructor(name : String, vartype : hw_type, defval : String)
             : this(name, vartype, hw_imm(defval))
 
-    constructor(name: String, VarType : VAR_TYPE, dimensions : hw_dim_static, defimm : hw_imm)
+    constructor(name: String, VarType : DATA_TYPE, dimensions : hw_dim_static, defimm : hw_imm)
             : this(name, hw_type(VarType, dimensions), defimm)
 
-    constructor(name: String, VarType : VAR_TYPE, dimensions : hw_dim_static, defval : String)
+    constructor(name: String, VarType : DATA_TYPE, dimensions : hw_dim_static, defval : String)
             : this(name, hw_type(VarType, dimensions), defval)
 
-    constructor(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int, defimm : hw_imm)
+    constructor(name: String, VarType: DATA_TYPE, msb: Int, lsb: Int, defimm : hw_imm)
             : this(name, hw_type(VarType, msb, lsb), defimm)
 
-    constructor(name: String, VarType: VAR_TYPE, msb: Int, lsb: Int, defval: String)
+    constructor(name: String, VarType: DATA_TYPE, msb: Int, lsb: Int, defval: String)
             : this(name, hw_type(VarType, msb, lsb), defval)
 
-    constructor(name: String, VarType: VAR_TYPE, defimm : hw_imm)
+    constructor(name: String, VarType: DATA_TYPE, defimm : hw_imm)
             : this(name, hw_type(VarType, defimm.imm_value), defimm)
 
-    constructor(name: String, VarType: VAR_TYPE, defval: String)
+    constructor(name: String, VarType: DATA_TYPE, defval: String)
             : this(name, hw_type(VarType, defval), defval)
 
     constructor(name: String, src_struct: hw_struct, dimensions : hw_dim_static)
@@ -52,7 +52,7 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
             : this(name, src_struct, 0, 0)
 
     constructor(name : String, msb : Int, lsb : Int, defval : String)
-            : this(name, VAR_TYPE.BV_UNSIGNED, msb, lsb, hw_imm(defval))
+            : this(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, hw_imm(defval))
 
     fun assign(depow_fracs: hw_fracs, src: hw_param) {
         default_astc.assign(this, depow_fracs, src)
@@ -170,12 +170,12 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
 
     fun GetDepowered(depow_fracs: hw_fracs): hw_type {
         var ret_dim = hw_dim_static()
-        var ret_vartype : VAR_TYPE
+        var ret_vartype : DATA_TYPE
         var ret_struct : hw_struct
 
         // copying dimensions of a variable
         for (i in 0 until vartype.dimensions.size) ret_dim.add(vartype.dimensions[i])
-        ret_vartype = vartype.VarType
+        ret_vartype = vartype.DataType
         ret_struct = vartype.src_struct
 
         // println("detaching dimensions")
@@ -187,7 +187,7 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
                 ret_dim.clear()
                 if (depow_fraction is hw_frac_SubStruct) {
                     // println("retrieving structure...")
-                    ret_vartype = depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.VarType
+                    ret_vartype = depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.DataType
                     ret_struct = depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.src_struct
                     for (dimension in depow_fraction.src_struct[depow_fraction.subStructIndex].vartype.dimensions) {
                         ret_dim.add(dimension)
@@ -231,7 +231,7 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     }
 }
 
-var DUMMY_VAR = hw_var("DUMMY_VAR", hw_type(VAR_TYPE.BV_UNSIGNED, 0, 0), "0")
+var DUMMY_VAR = hw_var("DUMMY_VAR", hw_type(DATA_TYPE.BV_UNSIGNED, 0, 0), "0")
 
 class hw_var_frac(var src_var : hw_var, var depow_fractions: hw_fracs, vartype : hw_type) : hw_var(src_var.name, vartype, src_var.defimm) {
     init {

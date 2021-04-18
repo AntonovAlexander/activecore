@@ -285,10 +285,10 @@ open class hw_astc() : ArrayList<hw_exec>() {
                 gen_dim.add(0, hw_dim_range_static(0, 0))
             }
 
-            var curVarType = VAR_TYPE.BV_UNSIGNED
-            if (params[0] is hw_var) curVarType = params[0].vartype.VarType
+            var curDataType = DATA_TYPE.BV_UNSIGNED
+            if (params[0] is hw_var) curDataType = params[0].vartype.DataType
 
-            return hw_var(GetGenName("var"), curVarType, gen_dim, "0")
+            return hw_var(GetGenName("var"), curDataType, gen_dim, "0")
         } else if ((opcode == OP2_ARITH_ADD)
                 || (opcode == OP2_ARITH_SUB)
                 || (opcode == OP2_ARITH_MUL)
@@ -321,7 +321,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             var gendim = op2_gen_dimensions(opcode, params[0].GetDimensions(), params[1].GetDimensions())
 
             // by default: unsigned
-            var curVarType = VAR_TYPE.BV_UNSIGNED
+            var curDataType = DATA_TYPE.BV_UNSIGNED
             var curStruct = DUMMY_STRUCT
 
             // if any operand for arith - signed
@@ -335,7 +335,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     || (opcode == OP2_ARITH_SRA)) {
                 for (param in params) {
                     if (param is hw_var) {
-                        if (param.vartype.VarType == VAR_TYPE.BV_SIGNED) curVarType = VAR_TYPE.BV_SIGNED
+                        if (param.vartype.DataType == DATA_TYPE.BV_SIGNED) curDataType = DATA_TYPE.BV_SIGNED
                     }
                 }
             }
@@ -343,14 +343,14 @@ open class hw_astc() : ArrayList<hw_exec>() {
             // if indexed of struct array - assert struct
             if (opcode == OP2_INDEXED) {
                 if (params[0] is hw_var) {
-                    if (params[0].vartype.VarType == VAR_TYPE.STRUCTURED) {
-                        curVarType = VAR_TYPE.STRUCTURED
+                    if (params[0].vartype.DataType == DATA_TYPE.STRUCTURED) {
+                        curDataType = DATA_TYPE.STRUCTURED
                         curStruct = params[0].vartype.src_struct
                     }
                 }
             }
 
-            return hw_var(GetGenName("var"), hw_type(curVarType, curStruct, gendim), "0")
+            return hw_var(GetGenName("var"), hw_type(curDataType, curStruct, gendim), "0")
         } else if (opcode == OP3_RANGED) {
             if (params.size != 3) ERROR("params incorrect for operation " + opcode.default_string + " - number of params: " + params.size + ", expected: 3")
             if ((params[0].GetDimensions().size > 1) || (params[1].GetDimensions().size > 1) || (params[2].GetDimensions().size > 1))
@@ -365,7 +365,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                 gendim = params[0].GetDimensions()
             }
 
-            return hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, gendim, "0")
+            return hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, gendim, "0")
         } else if (opcode == OPS_CNCT) {
             if (params.size == 0)
                 ERROR("params incorrect for operation " + opcode.default_string + " - number of params: " + params.size)
@@ -379,7 +379,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             var gendim = hw_dim_static()
             gendim.add(hw_dim_range_static(width - 1, 0))
 
-            return hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, gendim, "0")
+            return hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, gendim, "0")
         } else ERROR("Opcode unrecognized")
         return hw_var(GetGenName("var"), DUMMY_STRUCT, 0, 0)
     }
@@ -459,15 +459,15 @@ open class hw_astc() : ArrayList<hw_exec>() {
             if (tgt_DePowered_Power != src_Power) ERROR("dimensions do not match for target " + tgt.name + " (source tgt power: " + tgt.vartype.dimensions.size + ", depow size: " + depow_fractions.size + ", final tgt power: " + tgt_DePowered_Power + "), src: " + src.GetString() + " (src power: " + src_Power + ")")
             else if (tgt_DePowered_Power == 1) {
 
-                if (((src as hw_var).vartype.VarType == VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType != VAR_TYPE.STRUCTURED)) {
+                if (((src as hw_var).vartype.DataType == DATA_TYPE.STRUCTURED) && (tgt_DePow_descr.DataType != DATA_TYPE.STRUCTURED)) {
                     tgt.vartype.Print()
                     src.vartype.Print()
                     ERROR("assignment to non-structured variable (" + tgt.name + ") of structured variable (" + src.name + ")")
-                } else if ((src.vartype.VarType != VAR_TYPE.STRUCTURED) && (tgt_DePow_descr.VarType == VAR_TYPE.STRUCTURED)) {
+                } else if ((src.vartype.DataType != DATA_TYPE.STRUCTURED) && (tgt_DePow_descr.DataType == DATA_TYPE.STRUCTURED)) {
                     tgt.vartype.Print()
                     src.vartype.Print()
                     ERROR("assignment to structured variable (" + tgt.name + ") of non-structured variable (" + src.name + ")")
-                } else if (src.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                } else if (src.vartype.DataType == DATA_TYPE.STRUCTURED) {
                     // assignment of 1-bit structs
                     if (src.vartype.src_struct != tgt_DePow_descr.src_struct) {
                         // assignment of inequally structured variables
@@ -754,13 +754,13 @@ open class hw_astc() : ArrayList<hw_exec>() {
     fun get_subStruct_type(src: hw_var, subStruct_name: String): hw_type {
 
         if (!src.vartype.dimensions.isSingle()) ERROR("Attempting to take substruct of array")
-        if (src.vartype.VarType != VAR_TYPE.STRUCTURED) ERROR("Attempting to take substruct non-structured variable " + src.name + " (substruct: " + subStruct_name + ")")
+        if (src.vartype.DataType != DATA_TYPE.STRUCTURED) ERROR("Attempting to take substruct non-structured variable " + src.name + " (substruct: " + subStruct_name + ")")
 
         var structvar_found = false
         for (structvar in src.vartype.src_struct)
         {
             if (structvar.name == subStruct_name) {
-                return hw_type(structvar.vartype.VarType, structvar.vartype.src_struct, structvar.vartype.dimensions)
+                return hw_type(structvar.vartype.DataType, structvar.vartype.src_struct, structvar.vartype.dimensions)
             }
         }
         if (!structvar_found) {
@@ -770,7 +770,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             }
             ERROR("Structvar " + subStruct_name + " not found in var " + src.name)
         }
-        return hw_type(src.vartype.VarType, src.vartype.src_struct, src.vartype.dimensions)
+        return hw_type(src.vartype.DataType, src.vartype.src_struct, src.vartype.dimensions)
     }
 
     fun subStruct_gen(tgt: hw_var, src : hw_param, subStruct_name : String) {
@@ -1092,7 +1092,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         var new_expr = hw_exec(OP1_IF)
 
         if (cond is hw_var) {
-            val genvar = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+            val genvar = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
             new_expr.AddGenVar(genvar)
             assign_gen(genvar, cond)
             new_expr.AddParam(genvar)
@@ -1107,7 +1107,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun begelsif(cond : hw_param) {
 
-        val curif_cond = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        val curif_cond = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
 
         // summing previous conditions - some of previous occurred
         assign(curif_cond, hw_imm(1, "0"))
@@ -1133,7 +1133,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun begelse() {
 
-        val curif_cond = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        val curif_cond = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
 
         // summing previous conditions - some of previous occurred
         assign(curif_cond, hw_imm(1, "0"))
@@ -1224,17 +1224,17 @@ open class hw_astc() : ArrayList<hw_exec>() {
         var new_expr = hw_exec(OP1_WHILE)
 
         val iterations = elements.GetWidth()
-        val genvar_iter_num = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        val genvar_iter_num = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
         assign(genvar_iter_num, start)
         new_expr.AddGenVar(genvar_iter_num)
 
-        val genvar_iter_cont = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        val genvar_iter_cont = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         assign(genvar_iter_cont, 1)
         new_expr.AddGenVar(genvar_iter_cont)
         new_expr.AddParam(genvar_iter_cont)
         new_expr.while_trailer = WHILE_TRAILER.INCR_COUNTER
 
-        val genvar_iter_num_next = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        val genvar_iter_num_next = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
         new_expr.AddGenVar(genvar_iter_num_next)
 
         AddExpr(new_expr)
@@ -1261,17 +1261,17 @@ open class hw_astc() : ArrayList<hw_exec>() {
         var new_expr = hw_exec(OP1_WHILE)
 
         val iterations = elements.GetWidth()
-        val genvar_iter_num = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        val genvar_iter_num = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
         assign(genvar_iter_num, start)
         new_expr.AddGenVar(genvar_iter_num)
 
-        val genvar_iter_cont = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        val genvar_iter_cont = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         assign(genvar_iter_cont, 1)
         new_expr.AddGenVar(genvar_iter_cont)
         new_expr.AddParam(genvar_iter_cont)
         new_expr.while_trailer = WHILE_TRAILER.INCR_COUNTER
 
-        val genvar_iter_num_next = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        val genvar_iter_num_next = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
         new_expr.AddGenVar(genvar_iter_num_next)
 
         AddExpr(new_expr)
@@ -1290,17 +1290,17 @@ open class hw_astc() : ArrayList<hw_exec>() {
         var new_expr = hw_exec(OP1_WHILE)
 
         val iterations = elements.GetWidth()
-        val genvar_iter_num = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        val genvar_iter_num = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
         assign(genvar_iter_num, start)
         new_expr.AddGenVar(genvar_iter_num)
 
-        val genvar_iter_cont = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        val genvar_iter_cont = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         assign(genvar_iter_cont, 1)
         new_expr.AddGenVar(genvar_iter_cont)
         new_expr.AddParam(genvar_iter_cont)
         new_expr.while_trailer = WHILE_TRAILER.INCR_COUNTER
 
-        val genvar_iter_num_next = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
+        val genvar_iter_num_next = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, GetWidthToContain(iterations)-1, 0, "0")
         new_expr.AddGenVar(genvar_iter_num_next)
 
         AddExpr(new_expr)
@@ -1363,37 +1363,37 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun ugenvar(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.BV_UNSIGNED, dimensions, defval)
+        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, dimensions, defval)
         AddGenVar(ret_var)
         return ret_var
     }
 
     fun ugenvar(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.BV_UNSIGNED, msb, lsb, defval)
+        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defval)
         AddGenVar(ret_var)
         return ret_var
     }
 
     fun ugenvar(name : String, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.BV_UNSIGNED, defval)
+        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, defval)
         AddGenVar(ret_var)
         return ret_var
     }
 
     fun sgenvar(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.BV_SIGNED, dimensions, defval)
+        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, dimensions, defval)
         AddGenVar(ret_var)
         return ret_var
     }
 
     fun sgenvar(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.BV_SIGNED, msb, lsb, defval)
+        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, msb, lsb, defval)
         AddGenVar(ret_var)
         return ret_var
     }
 
     fun sgenvar(name : String, defval : String) : hw_var {
-        var ret_var = hw_var(name, VAR_TYPE.BV_SIGNED, defval)
+        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, defval)
         AddGenVar(ret_var)
         return ret_var
     }
@@ -1614,73 +1614,73 @@ open class hw_astc_stdif() : hw_astc() {
     }
 
     fun uport(name : String, port_dir : PORT_DIR, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defimm)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uport(name : String, port_dir : PORT_DIR, dimensions : hw_dim_static, defval : String) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defval)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uport(name : String, port_dir : PORT_DIR, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defimm)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uport(name : String, port_dir : PORT_DIR, msb: Int, lsb: Int, defval : String) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defval)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uport(name : String, port_dir : PORT_DIR, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uport(name : String, port_dir : PORT_DIR, defval : String) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_UNSIGNED, defval), defval)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_UNSIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sport(name : String, port_dir : PORT_DIR, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defimm)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun sport(name : String, port_dir : PORT_DIR, dimensions : hw_dim_static, defval : String) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defval)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sport(name : String, port_dir : PORT_DIR, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defimm)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun sport(name : String, port_dir : PORT_DIR, msb: Int, lsb: Int, defval : String) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defval)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sport(name : String, port_dir : PORT_DIR, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_SIGNED, defimm.imm_value), defimm)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_SIGNED, defimm.imm_value), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun sport(name : String, port_dir : PORT_DIR, defval : String) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(VAR_TYPE.BV_SIGNED, defval), defval)
+        var ret_var = hw_port(name, port_dir, hw_type(DATA_TYPE.BV_SIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
@@ -1710,73 +1710,73 @@ open class hw_astc_stdif() : hw_astc() {
     }
 
     fun uinput(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defimm)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinput(name : String, dimensions : hw_dim_static, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinput(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defimm)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinput(name : String, msb: Int, lsb: Int, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinput(name : String, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinput(name : String, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_UNSIGNED, defval), defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_UNSIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinput(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defimm)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinput(name : String, dimensions : hw_dim_static, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinput(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defimm)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinput(name : String, msb: Int, lsb: Int, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinput(name : String, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_SIGNED, defimm.imm_value), defimm)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_SIGNED, defimm.imm_value), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinput(name : String, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(VAR_TYPE.BV_SIGNED, defval), defval)
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(DATA_TYPE.BV_SIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
@@ -1806,73 +1806,73 @@ open class hw_astc_stdif() : hw_astc() {
     }
 
     fun uoutput(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defimm)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uoutput(name : String, dimensions : hw_dim_static, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uoutput(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defimm)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uoutput(name : String, msb: Int, lsb: Int, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uoutput(name : String, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uoutput(name : String, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_UNSIGNED, defval), defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_UNSIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun soutput(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defimm)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun soutput(name : String, dimensions : hw_dim_static, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun soutput(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defimm)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun soutput(name : String, msb: Int, lsb: Int, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun soutput(name : String, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_SIGNED, defimm.imm_value), defimm)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_SIGNED, defimm.imm_value), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun soutput(name : String, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(VAR_TYPE.BV_SIGNED, defval), defval)
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(DATA_TYPE.BV_SIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
@@ -1902,61 +1902,61 @@ open class hw_astc_stdif() : hw_astc() {
     }
 
     fun uinout(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defimm)
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinout(name : String, dimensions : hw_dim_static, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defval)
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinout(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defimm)
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinout(name : String, msb: Int, lsb: Int, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defval)
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinout(name : String, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(DATA_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun uinout(name : String, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.BV_UNSIGNED, defval), defval)
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(DATA_TYPE.BV_UNSIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinout(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defimm)
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defimm)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinout(name : String, dimensions : hw_dim_static, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defval)
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinout(name : String, msb: Int, lsb: Int, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defval)
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb), defval)
         add_port(ret_var)
         return ret_var
     }
 
     fun sinout(name : String, defval : String) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(VAR_TYPE.BV_SIGNED, defval), defval)
+        var ret_var = hw_port(name, PORT_DIR.INOUT, hw_type(DATA_TYPE.BV_SIGNED, defval), defval)
         add_port(ret_var)
         return ret_var
     }
@@ -1989,25 +1989,25 @@ open class hw_astc_stdif() : hw_astc() {
     }
 
     fun ufifo_in(name : String, dimensions : hw_dim_static) : hw_fifo_in {
-        var ret_var = hw_fifo_in(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions))
+        var ret_var = hw_fifo_in(name, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions))
         add_fifo_in(ret_var)
         return ret_var
     }
 
     fun ufifo_in(name : String, msb: Int, lsb: Int) : hw_fifo_in {
-        var ret_var = hw_fifo_in(name, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb))
+        var ret_var = hw_fifo_in(name, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb))
         add_fifo_in(ret_var)
         return ret_var
     }
 
     fun sfifo_in(name : String, dimensions : hw_dim_static) : hw_fifo_in {
-        var ret_var = hw_fifo_in(name, hw_type(VAR_TYPE.BV_SIGNED, dimensions))
+        var ret_var = hw_fifo_in(name, hw_type(DATA_TYPE.BV_SIGNED, dimensions))
         add_fifo_in(ret_var)
         return ret_var
     }
 
     fun sfifo_in(name : String, msb: Int, lsb: Int) : hw_fifo_in {
-        var ret_var = hw_fifo_in(name, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb))
+        var ret_var = hw_fifo_in(name, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb))
         add_fifo_in(ret_var)
         return ret_var
     }
@@ -2040,32 +2040,32 @@ open class hw_astc_stdif() : hw_astc() {
     }
 
     fun ufifo_out(name : String, dimensions : hw_dim_static) : hw_fifo_out {
-        var ret_var = hw_fifo_out(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions))
+        var ret_var = hw_fifo_out(name, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions))
         add_fifo_out(ret_var)
         return ret_var
     }
 
     fun ufifo_out(name : String, msb: Int, lsb: Int) : hw_fifo_out {
-        var ret_var = hw_fifo_out(name, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb))
+        var ret_var = hw_fifo_out(name, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb))
         add_fifo_out(ret_var)
         return ret_var
     }
 
     fun sfifo_out(name : String, dimensions : hw_dim_static) : hw_fifo_out {
-        var ret_var = hw_fifo_out(name, hw_type(VAR_TYPE.BV_SIGNED, dimensions))
+        var ret_var = hw_fifo_out(name, hw_type(DATA_TYPE.BV_SIGNED, dimensions))
         add_fifo_out(ret_var)
         return ret_var
     }
 
     fun sfifo_out(name : String, msb: Int, lsb: Int) : hw_fifo_out {
-        var ret_var = hw_fifo_out(name, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb))
+        var ret_var = hw_fifo_out(name, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb))
         add_fifo_out(ret_var)
         return ret_var
     }
 
     fun fifo_wr_unblk(fifo : hw_fifo_out, wdata : hw_param) : hw_var {
         var new_expr = hw_exec_fifo_wr_unblk(fifo)
-        var genvar = hw_var(GetGenName("fifo_rdy"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        var genvar = hw_var(GetGenName("fifo_rdy"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddParam(wdata)
         new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
@@ -2075,7 +2075,7 @@ open class hw_astc_stdif() : hw_astc() {
 
     fun fifo_rd_unblk(fifo : hw_fifo_in, rdata : hw_var) : hw_var {
         var new_expr = hw_exec_fifo_rd_unblk(fifo)
-        var genvar = hw_var(GetGenName("fifo_rdy"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        var genvar = hw_var(GetGenName("fifo_rdy"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         new_expr.AddTgt(rdata)

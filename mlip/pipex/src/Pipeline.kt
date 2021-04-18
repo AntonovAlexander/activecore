@@ -128,73 +128,73 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
     }
 
     fun ulocal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defimm)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defimm)
         add_local(ret_var)
         return ret_var
     }
 
     fun ulocal(name: String, dimensions: hw_dim_static, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defval)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defval)
         add_local(ret_var)
         return ret_var
     }
 
     fun ulocal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defimm)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defimm)
         add_local(ret_var)
         return ret_var
     }
 
     fun ulocal(name: String, msb: Int, lsb: Int, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defval)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defval)
         add_local(ret_var)
         return ret_var
     }
 
     fun ulocal(name: String, defimm: hw_imm): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
         add_local(ret_var)
         return ret_var
     }
 
     fun ulocal(name: String, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_UNSIGNED, defval), defval)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_UNSIGNED, defval), defval)
         add_local(ret_var)
         return ret_var
     }
 
     fun slocal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defimm)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defimm)
         add_local(ret_var)
         return ret_var
     }
 
     fun slocal(name: String, dimensions: hw_dim_static, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defval)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defval)
         add_local(ret_var)
         return ret_var
     }
 
     fun slocal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defimm)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb), defimm)
         add_local(ret_var)
         return ret_var
     }
 
     fun slocal(name: String, msb: Int, lsb: Int, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defval)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb), defval)
         add_local(ret_var)
         return ret_var
     }
 
     fun slocal(name: String, defimm: hw_imm): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_SIGNED, defimm.imm_value), defimm)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_SIGNED, defimm.imm_value), defimm)
         add_local(ret_var)
         return ret_var
     }
 
     fun slocal(name: String, defval: String): hw_local {
-        var ret_var = hw_local(name, hw_type(VAR_TYPE.BV_SIGNED, defval), defval)
+        var ret_var = hw_local(name, hw_type(DATA_TYPE.BV_SIGNED, defval), defval)
         add_local(ret_var)
         return ret_var
     }
@@ -236,73 +236,73 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
     }
 
     fun uglobal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defimm)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defimm)
         add_global(ret_var)
         return ret_var
     }
 
     fun uglobal(name: String, dimensions: hw_dim_static, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_UNSIGNED, dimensions), defval)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), defval)
         add_global(ret_var)
         return ret_var
     }
 
     fun uglobal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defimm)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defimm)
         add_global(ret_var)
         return ret_var
     }
 
     fun uglobal(name: String, msb: Int, lsb: Int, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_UNSIGNED, msb, lsb), defval)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_UNSIGNED, msb, lsb), defval)
         add_global(ret_var)
         return ret_var
     }
 
     fun uglobal(name: String, defimm: hw_imm): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_UNSIGNED, defimm.imm_value), defimm)
         add_global(ret_var)
         return ret_var
     }
 
     fun uglobal(name: String, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_UNSIGNED, defval), defval)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_UNSIGNED, defval), defval)
         add_global(ret_var)
         return ret_var
     }
 
     fun sglobal(name: String, dimensions: hw_dim_static, defimm: hw_imm): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defimm)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defimm)
         add_global(ret_var)
         return ret_var
     }
 
     fun sglobal(name: String, dimensions: hw_dim_static, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_SIGNED, dimensions), defval)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_SIGNED, dimensions), defval)
         add_global(ret_var)
         return ret_var
     }
 
     fun sglobal(name: String, msb: Int, lsb: Int, defimm: hw_imm): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defimm)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb), defimm)
         add_global(ret_var)
         return ret_var
     }
 
     fun sglobal(name: String, msb: Int, lsb: Int, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_SIGNED, msb, lsb), defval)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_SIGNED, msb, lsb), defval)
         add_global(ret_var)
         return ret_var
     }
 
     fun sglobal(name: String, defimm: hw_imm): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_SIGNED, defimm.imm_value), defimm)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_SIGNED, defimm.imm_value), defimm)
         add_global(ret_var)
         return ret_var
     }
 
     fun sglobal(name: String, defval: String): hw_global {
-        var ret_var = hw_global(name, hw_type(VAR_TYPE.BV_SIGNED, defval), defval)
+        var ret_var = hw_global(name, hw_type(DATA_TYPE.BV_SIGNED, defval), defval)
         add_global(ret_var)
         return ret_var
     }
@@ -411,7 +411,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
     fun isactive(remote_stage : hw_stage) : hw_var {
         var new_expr = hw_exec_stage_stat(remote_stage, OP_ISACTIVE)
-        var genvar = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        var genvar = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
@@ -420,7 +420,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
     fun isworking(remote_stage : hw_stage) : hw_var {
         var new_expr = hw_exec_stage_stat(remote_stage, OP_ISWORKING)
-        var genvar = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        var genvar = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
@@ -429,7 +429,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
     fun isstalled(remote_stage : hw_stage) : hw_var {
         var new_expr = hw_exec_stage_stat(remote_stage, OP_ISSTALLED)
-        var genvar = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        var genvar = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
@@ -438,7 +438,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
     fun issucc(remote_stage : hw_stage) : hw_var {
         var new_expr = hw_exec_stage_stat(remote_stage, OP_ISSUCC)
-        var genvar = hw_var(GetGenName("var"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        var genvar = hw_var(GetGenName("var"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
@@ -510,7 +510,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
     fun mcopipe_req(mcopipe_if : hw_mcopipe_if, mcopipe_handle : hw_mcopipe_handle, cmd : hw_param, wdata : hw_param) : hw_var {
         var new_expr = hw_exec_mcopipe_req(mcopipe_if, mcopipe_handle)
-        var genvar = hw_var(GetGenName("mcopipe_req_rdy"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        var genvar = hw_var(GetGenName("mcopipe_req_rdy"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddParam(cmd)
         new_expr.AddParam(wdata)
         new_expr.AddTgt(genvar)
@@ -521,7 +521,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
     fun mcopipe_resp(mcopipe_handle : hw_mcopipe_handle, rdata : hw_var) : hw_var {
         var new_expr = hw_exec_mcopipe_resp(mcopipe_handle)
-        var genvar = hw_var(GetGenName("mcopipe_resp_rdy"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        var genvar = hw_var(GetGenName("mcopipe_resp_rdy"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)
         new_expr.AddTgt(rdata)
@@ -531,7 +531,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
     fun scopipe_req(scopipe_if : hw_scopipe_if, scopipe_handle : hw_scopipe_handle, cmd : hw_var, rdata : hw_var) : hw_var {
         var new_expr = hw_exec_scopipe_req(scopipe_if, scopipe_handle)
-        var genvar = hw_var(GetGenName("scopipe_req_rdy"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        var genvar = hw_var(GetGenName("scopipe_req_rdy"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddTgt(cmd)
         new_expr.AddTgt(rdata)
         new_expr.AddTgt(genvar)
@@ -542,7 +542,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
 
     fun scopipe_resp(scopipe_handle : hw_scopipe_handle, wdata : hw_param) : hw_var {
         var new_expr = hw_exec_scopipe_resp(scopipe_handle)
-        var genvar = hw_var(GetGenName("scopipe_resp_rdy"), VAR_TYPE.BV_UNSIGNED, 0, 0, "0")
+        var genvar = hw_var(GetGenName("scopipe_resp_rdy"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddParam(wdata)
         new_expr.AddTgt(genvar)
         new_expr.AddGenVar(genvar)

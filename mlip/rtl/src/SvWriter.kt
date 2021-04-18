@@ -17,7 +17,7 @@ class SvWriter(var mod : module) {
 
     fun getStringAssignDefval(tgt: hw_var, src : String) : String
     {
-        if (tgt.vartype.VarType == VAR_TYPE.STRUCTURED) {
+        if (tgt.vartype.DataType == DATA_TYPE.STRUCTURED) {
             return "'{default:" + src + "}"
         } else {
             return src
@@ -73,7 +73,7 @@ class SvWriter(var mod : module) {
 
     fun export_structvar(preambule_uncond : String, preambule_cond : String, trailer : String, structvar : hw_structvar, wrFile : java.io.OutputStreamWriter) {
         var dimstring = ""
-        if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
+        if (structvar.vartype.DataType == DATA_TYPE.STRUCTURED) {
             if (!structvar.vartype.dimensions.isEmpty()) {
                 for (dim in structvar.vartype.dimensions) {
                     dimstring += (" " + getDimString(dim))
@@ -96,7 +96,7 @@ class SvWriter(var mod : module) {
                 dimstring += (" [" + structvar.vartype.dimensions[DIM_INDEX].msb + ":" + structvar.vartype.dimensions[DIM_INDEX].lsb + "]")
             }
             var sign_string = ""
-            if (structvar.vartype.VarType == VAR_TYPE.BV_UNSIGNED) sign_string = "unsigned "
+            if (structvar.vartype.DataType == DATA_TYPE.BV_UNSIGNED) sign_string = "unsigned "
             else sign_string = "signed "
             wrFile.write(preambule_uncond
                     + preambule_cond
@@ -182,7 +182,7 @@ class SvWriter(var mod : module) {
                 || (expr.opcode == OP1_REDUCT_XNOR))
         {
             var var_descr = expr.assign_tgt_fractured.depowered_fractions
-            if ((var_descr.VarType == VAR_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
+            if ((var_descr.DataType == DATA_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
                 if (opstring == "") {
                     wrFile.write(GetParamString(expr.tgts[0]) +
                             dimstring +
@@ -321,7 +321,7 @@ class SvWriter(var mod : module) {
 
     var structsIfToPrint = mutableMapOf<String, hw_struct>()
     fun AddStructsIfToPrint(param: hw_param) {
-        if (param.vartype.VarType == VAR_TYPE.STRUCTURED) {
+        if (param.vartype.DataType == DATA_TYPE.STRUCTURED) {
             if (!structsIfToPrint.containsKey(param.vartype.src_struct.name)) {
                 for (structvar in param.vartype.src_struct) {
                     AddStructsIfToPrint(structvar)
@@ -332,7 +332,7 @@ class SvWriter(var mod : module) {
     }
     var structsInternalToPrint = mutableMapOf<String, hw_struct>()
     fun AddStructsInternalToPrint(param: hw_param) {
-        if (param.vartype.VarType == VAR_TYPE.STRUCTURED) {
+        if (param.vartype.DataType == DATA_TYPE.STRUCTURED) {
             if (!structsIfToPrint.containsKey(param.vartype.src_struct.name) && !structsInternalToPrint.containsKey(param.vartype.src_struct.name)) {
                 for (structvar in param.vartype.src_struct) {
                     AddStructsInternalToPrint(structvar)
@@ -512,7 +512,7 @@ class SvWriter(var mod : module) {
 
                         wrFileModule.write("\tif ($reset_condition)\n")
                         wrFileModule.write("\t\tbegin\n")
-                        if (mem.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                        if (mem.vartype.DataType == DATA_TYPE.STRUCTURED) {
                             wrFileModule.write("\t\t"
                                     + mem.name
                                     + " <= '{default:"
@@ -592,7 +592,7 @@ class SvWriter(var mod : module) {
                         } else if (mem.vartype.dimensions.size > 2)
                             ERROR("Large dimensions for mems (data) are currently not supported!\n")
                         else {
-                            if (mem.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                            if (mem.vartype.DataType == DATA_TYPE.STRUCTURED) {
                                 wrFileModule.write("\t\t"
                                         + mem.name
                                         + " <= "

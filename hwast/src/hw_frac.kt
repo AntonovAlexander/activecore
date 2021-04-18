@@ -126,7 +126,7 @@ class hw_fracs() : ArrayList<hw_frac>() {
                             fraction.src_struct = tgt_struct_ptr
                             fraction.subStructIndex = SUBSTR_INDEX
 
-                            if (structvar.vartype.VarType == VAR_TYPE.STRUCTURED) {
+                            if (structvar.vartype.DataType == DATA_TYPE.STRUCTURED) {
                                 tgt_struct_ptr = structvar.vartype.src_struct
                             } else {
                                 tgt_struct_ptr = DUMMY_STRUCT
