@@ -518,8 +518,50 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op1(OP1_COMPLEMENT, src)
     }
 
-    fun add(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP2_ARITH_ADD, src0, src1)
+    // implements tree for bitwise logic operations
+    fun op_tree(opcode : hw_opcode, srcs : ArrayList<hw_param>) : hw_var {
+        if (srcs.size == 0) {
+            ERROR("Empty param list for bitwise operation!")
+            return DUMMY_VAR
+        } else if (srcs.size == 1) {
+            var ret_var = hw_var(GetGenName("btree"), srcs[0].vartype, "0")
+            assign_gen(ret_var, srcs[0])
+            return ret_var
+        } else if (srcs.size == 2) {
+            return AddExpr_op2(opcode, srcs[0], srcs[1])
+        } else {
+            var sum_inters = ArrayList<hw_param>()
+            for (src in srcs) {
+                val CUR_SRC_INDEX = srcs.indexOf(src)
+                val NEXT_SRC_INDEX = CUR_SRC_INDEX + 1
+                if (CUR_SRC_INDEX % 2 == 0) {
+                    if (srcs.lastIndex < NEXT_SRC_INDEX) {
+                        sum_inters.add(src)
+                    } else {
+                        var new_inter = op_tree(opcode, srcs[CUR_SRC_INDEX], srcs[CUR_SRC_INDEX+1])
+                        AddGenVar(new_inter)
+                        sum_inters.add(new_inter)
+                    }
+                }
+            }
+            return op_tree(opcode, sum_inters)
+        }
+    }
+
+    fun op_tree(opcode : hw_opcode, vararg srcs : hw_param) : hw_var {
+        var srcsList = ArrayList<hw_param>()
+        for (src in srcs) srcsList.add(src)
+        return op_tree(opcode, srcsList)
+    }
+
+    fun add(srcs : ArrayList<hw_param>): hw_var {
+        return op_tree(OP2_ARITH_ADD, srcs)
+    }
+
+    fun add(vararg srcs : hw_param): hw_var {
+        var srcList = ArrayList<hw_param>()
+        for (src in srcs) srcList.add(src)
+        return add(srcList)
     }
 
     fun add(src0: hw_param, src1: Int): hw_var {
@@ -534,8 +576,14 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op2(OP2_ARITH_SUB, src0, src1)
     }
 
-    fun mul(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP2_ARITH_MUL, src0, src1)
+    fun mul(srcs : ArrayList<hw_param>): hw_var {
+        return op_tree(OP2_ARITH_MUL, srcs)
+    }
+
+    fun mul(vararg srcs : hw_param): hw_var {
+        var srcList = ArrayList<hw_param>()
+        for (src in srcs) srcList.add(src)
+        return mul(srcList)
     }
 
     fun mul(src0: hw_param, src1: Int): hw_var {
@@ -670,46 +718,10 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op1(OP1_BITWISE_NOT, src)
     }
 
-    // implements tree for bitwise logic operations
-    fun bitwise_tree(opcode : hw_opcode, srcs : ArrayList<hw_param>) : hw_var {
-        if (srcs.size == 0) {
-            ERROR("Empty param list for bitwise operation!")
-            return DUMMY_VAR
-        } else if (srcs.size == 1) {
-            var ret_var = hw_var(GetGenName("btree"), srcs[0].vartype, "0")
-            assign_gen(ret_var, srcs[0])
-            return ret_var
-        } else if (srcs.size == 2) {
-            return AddExpr_op2(opcode, srcs[0], srcs[1])
-        } else {
-            var sum_inters = ArrayList<hw_param>()
-            for (src in srcs) {
-                val CUR_SRC_INDEX = srcs.indexOf(src)
-                val NEXT_SRC_INDEX = CUR_SRC_INDEX + 1
-                if (CUR_SRC_INDEX % 2 == 0) {
-                    if (srcs.lastIndex < NEXT_SRC_INDEX) {
-                        sum_inters.add(src)
-                    } else {
-                        var new_inter = bitwise_tree(opcode, srcs[CUR_SRC_INDEX], srcs[CUR_SRC_INDEX+1])
-                        AddGenVar(new_inter)
-                        sum_inters.add(new_inter)
-                    }
-                }
-            }
-            return bitwise_tree(opcode, sum_inters)
-        }
-    }
-
-    fun bitwise_tree(opcode : hw_opcode, vararg srcs : hw_param) : hw_var {
-        var srcsList = ArrayList<hw_param>()
-        for (src in srcs) srcsList.add(src)
-        return bitwise_tree(opcode, srcsList)
-    }
-
     fun band(vararg srcs : hw_param): hw_var {
         var srcsList = ArrayList<hw_param>()
         for (src in srcs) srcsList.add(src)
-        return bitwise_tree(OP2_BITWISE_AND, srcsList)
+        return op_tree(OP2_BITWISE_AND, srcsList)
     }
 
     fun band(src0: hw_param, src1: Int): hw_var {
@@ -719,7 +731,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     fun bor(vararg srcs : hw_param): hw_var {
         var srcsList = ArrayList<hw_param>()
         for (src in srcs) srcsList.add(src)
-        return bitwise_tree(OP2_BITWISE_OR, srcsList)
+        return op_tree(OP2_BITWISE_OR, srcsList)
     }
 
     fun bor(src0: hw_param, src1: Int): hw_var {
@@ -729,7 +741,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     fun bxor(vararg srcs : hw_param): hw_var {
         var srcsList = ArrayList<hw_param>()
         for (src in srcs) srcsList.add(src)
-        return bitwise_tree(OP2_BITWISE_XOR, srcsList)
+        return op_tree(OP2_BITWISE_XOR, srcsList)
     }
 
     fun bxor(src0: hw_param, src1: Int): hw_var {
@@ -739,7 +751,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     fun bxnor(vararg srcs : hw_param): hw_var {
         var srcsList = ArrayList<hw_param>()
         for (src in srcs) srcsList.add(src)
-        return bitwise_tree(OP2_BITWISE_XNOR, srcsList)
+        return op_tree(OP2_BITWISE_XNOR, srcsList)
     }
 
     fun bxnor(src0: hw_param, src1: Int): hw_var {
@@ -843,12 +855,12 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     // implements adder tree
-    fun add_gen(tgt : hw_var, srcs : ArrayList<hw_param>) {
+    fun op_tree_gen(opcode : hw_opcode, tgt : hw_var, srcs : ArrayList<hw_param>) {
         if (srcs.size == 0) return
         else if (srcs.size == 1) {
             assign_gen(tgt, srcs[0])
         } else if (srcs.size == 2) {
-            AddExpr_op2_gen(OP2_ARITH_ADD, tgt, srcs[0], srcs[1])
+            AddExpr_op2_gen(opcode, tgt, srcs[0], srcs[1])
         } else {
             var sum_inters = ArrayList<hw_param>()
             for (src in srcs) {
@@ -858,17 +870,21 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     if (srcs.lastIndex < NEXT_SRC_INDEX) {
                         sum_inters.add(src)
                     } else {
-                        var new_inter = AddExpr_op2(OP2_ARITH_ADD, srcs[CUR_SRC_INDEX], srcs[CUR_SRC_INDEX+1])
+                        var new_inter = AddExpr_op2(opcode, srcs[CUR_SRC_INDEX], srcs[CUR_SRC_INDEX+1])
                         AddGenVar(new_inter)
                         sum_inters.add(new_inter)
                     }
                 }
             }
-            add_gen(tgt, sum_inters)
+            op_tree_gen(opcode, tgt, sum_inters)
         }
     }
 
-    fun add_gen(tgt : hw_var, vararg srcs : hw_param){
+    fun add_gen(tgt : hw_var, srcs : ArrayList<hw_param>) {
+        op_tree_gen(OP2_ARITH_ADD, tgt, srcs)
+    }
+
+    fun add_gen(tgt : hw_var, vararg srcs : hw_param) {
         var srcsList = ArrayList<hw_param>()
         for (src in srcs) srcsList.add(src)
         add_gen(tgt, srcsList)
@@ -886,8 +902,14 @@ open class hw_astc() : ArrayList<hw_exec>() {
         AddExpr_op2_gen(OP2_ARITH_SUB, tgt, src0, src1)
     }
 
-    fun mul_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_ARITH_MUL, tgt, src0, src1)
+    fun mul_gen(tgt : hw_var, srcs : ArrayList<hw_param>) {
+        op_tree_gen(OP2_ARITH_MUL, tgt, srcs)
+    }
+
+    fun mul_gen(tgt : hw_var, vararg srcs : hw_param) {
+        var srcsList = ArrayList<hw_param>()
+        for (src in srcs) srcsList.add(src)
+        mul_gen(tgt, srcsList)
     }
 
     fun mul_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
