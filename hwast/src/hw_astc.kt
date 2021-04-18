@@ -41,7 +41,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun WARNING(err_string : String) {
         ProcessLogFileStream()
-        val str = FRAMEWORK_NAME + " (" + GenNamePrefix + ") WARNING: " + err_string + "\n"
+        val str = "WARNING (" + GenNamePrefix + "): " + err_string + "\n"
         print(str)
         LogFile.write(str)
         LogFile.close()
@@ -49,7 +49,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun CRITICAL(err_string : String) {
         ProcessLogFileStream()
-        val str = FRAMEWORK_NAME + " (" + GenNamePrefix + ") CRITICAL WARNING: " + err_string + "\n"
+        val str = "CRITICAL WARNING (" + GenNamePrefix + "): " + err_string + "\n"
         print(str)
         LogFile.write(str)
         LogFile.close()
@@ -57,7 +57,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun ERROR(err_string : String) {
         ProcessLogFileStream()
-        val str = FRAMEWORK_NAME + " (" + GenNamePrefix + ") ERROR: " + err_string + "\n"
+        val str = "ERROR (" + GenNamePrefix + "): " + err_string + "\n"
         print(str)
         LogFile.write(str)
         LogFile.close()

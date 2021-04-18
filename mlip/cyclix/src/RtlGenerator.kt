@@ -180,6 +180,7 @@ class RtlGenerator(var cyclix_module : Generic) {
 
     fun generate(DEBUG_FLAG : Boolean) : rtl.module {
 
+        NEWLINE()
         MSG("#######################################")
         MSG("#### Starting Cyclix-to-RTL export ####")
         MSG("#######################################")

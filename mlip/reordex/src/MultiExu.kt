@@ -64,7 +64,11 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
     fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
 
-        MSG("Translating to cyclix: beginning")
+        NEWLINE()
+        MSG("################################################")
+        MSG("#### Starting Reordex-to-Cyclix translation ####")
+        MSG("#### module: " + name)
+        MSG("################################################")
 
         var cyclix_gen = cyclix.Generic(name)
 
@@ -718,7 +722,12 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         }; cyclix_gen.endif()
 
         cyclix_gen.end()
-        MSG(DEBUG_FLAG, "Translating to cyclix: complete")
+
+        MSG("#################################################")
+        MSG("#### Reordex-to-Cyclix translation complete! ####")
+        MSG("#### module: " + name)
+        MSG("#################################################")
+
         return cyclix_gen
     }
 }

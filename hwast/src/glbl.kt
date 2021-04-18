@@ -33,6 +33,13 @@ fun ProcessLogFileStream() {
     }
 }
 
+fun NEWLINE() {
+    ProcessLogFileStream()
+    print("\n")
+    LogFile.write("\n")
+    LogFile.close()
+}
+
 fun MSG(msg_string : String) {
     ProcessLogFileStream()
     val str = FRAMEWORK_NAME + ": " + msg_string + "\n"

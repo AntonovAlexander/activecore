@@ -860,7 +860,12 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
     fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
 
-        MSG("Translating module "+ name + " to cyclix...")
+        NEWLINE()
+        MSG("##############################################")
+        MSG("#### Starting Pipex-to-Cyclix translation ####")
+        MSG("#### module: " + name)
+        MSG("##############################################")
+
         validate()
 
         var cyclix_gen = cyclix.Generic(name)
@@ -1555,7 +1560,11 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
         MSG("Generating logic: done")
 
-        MSG("Translating module " + name + " to cyclix: done")
+        MSG("###############################################")
+        MSG("#### Pipex-to-Cyclix translation complete! ####")
+        MSG("#### module: " + name)
+        MSG("###############################################")
+
         return cyclix_gen
     }
 }

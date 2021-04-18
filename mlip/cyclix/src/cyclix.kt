@@ -328,6 +328,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
 
     fun export_to_rtl(DEBUG_FLAG : Boolean) : rtl.module {
 
+        NEWLINE()
         MSG("###########################################")
         MSG("#### Starting Cyclix-to-RTL generation ####")
         MSG("#### module: " + name)
@@ -348,6 +349,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
 
     fun export_to_vivado_cpp(pathname : String, DEBUG_FLAG : Boolean) {
 
+        NEWLINE()
         MSG("############################################")
         MSG("#### Cyclix: starting vivado_cpp export ####")
         MSG("#### module: " + name)
