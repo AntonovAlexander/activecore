@@ -554,17 +554,20 @@ open class module(val name : String) : hw_astc_stdif() {
 
     fun export_to_sv(pathname : String, DEBUG_FLAG : Boolean) {
 
-        println("############################################")
-        println("#### rtl: starting SystemVerilog export ####")
-        println("############################################")
+        NEWLINE()
+        MSG("#################################")
+        MSG("#### Starting RTL generation ####")
+        MSG("#### module: " + name)
+        MSG("#################################")
 
         validate()
 
         var writer = SvWriter(this)
         writer.write(pathname, DEBUG_FLAG)
 
-        println("#############################################")
-        println("#### rtl: SystemVerilog export complete! ####")
-        println("#############################################")
+        MSG("##################################")
+        MSG("#### RTL generation complete! ####")
+        MSG("#### module: " + name)
+        MSG("##################################")
     }
 }
