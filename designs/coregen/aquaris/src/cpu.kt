@@ -962,7 +962,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
             alu_CF.assign(alu_result_wide[32])
             alu_SF.assign(alu_result_wide[31])
             alu_ZF.assign(bnot(ror(alu_result)))
-            alu_OF.assign(bor(band(!alu_op1[31], band(!alu_op2[31], alu_result[31])), band(alu_op1[31], band(alu_op2[31], !alu_result[31]))))
+            alu_OF.assign(bor(band(!alu_op1[31], !alu_op2[31], alu_result[31]), band(alu_op1[31], alu_op2[31], !alu_result[31])))
 
             begif(alu_unsigned)
             run {
