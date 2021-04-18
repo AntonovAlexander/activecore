@@ -716,24 +716,30 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op2(OP2_BITWISE_AND, src0, src1)
     }
 
-    fun bor(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP2_BITWISE_OR, src0, src1)
+    fun bor(vararg srcs : hw_param): hw_var {
+        var srcsList = ArrayList<hw_param>()
+        for (src in srcs) srcsList.add(src)
+        return bitwise_tree(OP2_BITWISE_OR, srcsList)
     }
 
     fun bor(src0: hw_param, src1: Int): hw_var {
         return AddExpr_op2(OP2_BITWISE_OR, src0, src1)
     }
 
-    fun bxor(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP2_BITWISE_XOR, src0, src1)
+    fun bxor(vararg srcs : hw_param): hw_var {
+        var srcsList = ArrayList<hw_param>()
+        for (src in srcs) srcsList.add(src)
+        return bitwise_tree(OP2_BITWISE_XOR, srcsList)
     }
 
     fun bxor(src0: hw_param, src1: Int): hw_var {
         return AddExpr_op2(OP2_BITWISE_XOR, src0, src1)
     }
 
-    fun bxnor(src0: hw_param, src1: hw_param): hw_var {
-        return AddExpr_op2(OP2_BITWISE_XNOR, src0, src1)
+    fun bxnor(vararg srcs : hw_param): hw_var {
+        var srcsList = ArrayList<hw_param>()
+        for (src in srcs) srcsList.add(src)
+        return bitwise_tree(OP2_BITWISE_XNOR, srcsList)
     }
 
     fun bxnor(src0: hw_param, src1: Int): hw_var {
