@@ -395,7 +395,7 @@ class SvWriter(var mod : module) {
         }
         wrFileInterface.write("`endif // __" + mod.name +"_h_\n")
         wrFileInterface.close()
-        MSG("done")
+        MSG("Exporting structs: done")
 
         // writing module
         val wrFileModule = File(pathname + "/" + mod.name + ".sv").writer()
@@ -408,7 +408,7 @@ class SvWriter(var mod : module) {
         for (submodule in mod.Submodules) {
             submodule.value.src_module.export_to_sv(pathname + "/" + submodule.value.src_module.name, DEBUG_FLAG)
         }
-        MSG("done")
+        MSG("Exporting submodules: done")
 
         MSG("Exporting modules and ports...")
         var mods_included = ArrayList<String>()
@@ -447,7 +447,7 @@ class SvWriter(var mod : module) {
         wrFileModule.write("\n);\n")
         wrFileModule.write("\n")
 
-        MSG("done")
+        MSG("Exporting modules and ports: done")
 
         structsInternalToPrint.clear()
         for (comb in mod.Combs) {
@@ -474,7 +474,7 @@ class SvWriter(var mod : module) {
         }
         wrFileModule.write("\n")
 
-        MSG("done")
+        MSG("Exporting combinationals: done")
 
         // Mems
         MSG("Exporting mems...")
@@ -619,7 +619,7 @@ class SvWriter(var mod : module) {
             wrFileModule.write("\n")
         }
         wrFileModule.write("\n")
-        MSG("done")
+        MSG("Exporting mems: done")
 
         // Submodule instantiations
         for (submodule in mod.Submodules) {
@@ -649,7 +649,7 @@ class SvWriter(var mod : module) {
             tab_Counter = 0
             wrFileModule.write("\n")
         }
-        MSG("done")
+        MSG("Exporting cprocs: done")
 
         wrFileModule.write("\n")
         wrFileModule.write("endmodule\n")

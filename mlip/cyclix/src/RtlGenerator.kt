@@ -60,7 +60,7 @@ class RtlGenerator(var cyclix_module : Generic) {
                     expr : hw_exec,
                     context : import_expr_context) {
 
-        MSG("#### Cyclix: exporting expression: " + expr.opcode.default_string)
+        MSG(DEBUG_FLAG, "#### Cyclix: exporting expression: " + expr.opcode.default_string)
         // for (param in expr.params) MSG("param: " + param.GetString())
         // for (wrvar in expr.tgts) MSG("wrvar: " + wrvar.name)
 
@@ -120,18 +120,13 @@ class RtlGenerator(var cyclix_module : Generic) {
             var wdata_translated = TranslateParam(expr.params[0], var_dict)
             var fifo_rdy = TranslateVar(expr.tgts[0], var_dict)
 
-            MSG("DBG: START")
-            MSG("subproc: " + subproc + ", name: " + subproc.inst_name)
-            MSG("fifo_name: " + fifo_name)
-            MSG("size: " + submod_insts_fifos_in.size)
             for (i in submod_insts_fifos_in) {
-                MSG("-- subproc: " + i.key)
+                MSG(DEBUG_FLAG, "-- subproc: " + i.key)
                 for (j in i.value) {
-                    MSG("---- fifo_name: " + j.key)
+                    MSG(DEBUG_FLAG, "---- fifo_name: " + j.key)
                 }
             }
-            MSG(submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_req.name)
-            MSG("DBG: END")
+            MSG(DEBUG_FLAG, submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_req.name)
 
             rtl_gen.begif(rtl_gen.lnot((rtl_gen as hw_astc_stdif).getPortByName("rst_i")))
             run {

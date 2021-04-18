@@ -860,11 +860,13 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
     fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
 
-        MSG("Translating to cyclix: beginning")
+        MSG("Translating module "+ name + " to cyclix...")
         validate()
 
         var cyclix_gen = cyclix.Generic(name)
         var TranslateInfo = __TranslateInfo(this)
+
+        MSG("Generating resources...")
 
         MSG(DEBUG_FLAG, "Processing globals")
         for (global in globals) {
@@ -1187,8 +1189,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 curStageInfo.var_dict.put(global_assoc.key, global_assoc.value.cyclix_global)
             }
         }
+        MSG("Generating resources: done")
 
-        MSG(DEBUG_FLAG, "Generating logic")
+        MSG("Generating logic...")
 
         MSG(DEBUG_FLAG, "mcopipe processing")
         for (mcopipe_if in TranslateInfo.__mcopipe_if_assocs) {
@@ -1549,7 +1552,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
 
         cyclix_gen.end()
-        MSG(DEBUG_FLAG, "Translating to cyclix: complete")
+
+        MSG("Generating logic: done")
+
+        MSG("Translating module " + name + " to cyclix: done")
         return cyclix_gen
     }
 }

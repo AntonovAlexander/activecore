@@ -256,7 +256,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun op_generate_genvar(opcode: hw_opcode, params: ArrayList<hw_param>): hw_var {
-        MSG("op_generate_genvar, opcode: " + opcode.default_string)
+        //MSG("op_generate_genvar, opcode: " + opcode.default_string)
         if ((opcode == OP1_BITWISE_NOT)
                 || (opcode == OP1_LOGICAL_NOT)
                 || (opcode == OP1_COMPLEMENT)
@@ -798,8 +798,36 @@ open class hw_astc() : ArrayList<hw_exec>() {
         AddExpr_op1_gen(OP1_COMPLEMENT, tgt, src)
     }
 
-    fun add_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_ARITH_ADD, tgt, src0, src1)
+    // implements adder tree
+    fun add_gen(tgt : hw_var, srcs : ArrayList<hw_param>) {
+        if (srcs.size == 0) return
+        else if (srcs.size == 1) {
+            assign_gen(tgt, srcs[0])
+        } else if (srcs.size == 2) {
+            AddExpr_op2_gen(OP2_ARITH_ADD, tgt, srcs[0], srcs[1])
+        } else {
+            var sum_inters = ArrayList<hw_param>()
+            for (src in srcs) {
+                val CUR_SRC_INDEX = srcs.indexOf(src)
+                val NEXT_SRC_INDEX = CUR_SRC_INDEX + 1
+                if (CUR_SRC_INDEX % 2 == 0) {
+                    if (srcs.lastIndex < NEXT_SRC_INDEX) {
+                        sum_inters.add(src)
+                    } else {
+                        var new_inter = AddExpr_op2(OP2_ARITH_ADD, srcs[CUR_SRC_INDEX], srcs[CUR_SRC_INDEX+1])
+                        AddGenVar(new_inter)
+                        sum_inters.add(new_inter)
+                    }
+                }
+            }
+            add_gen(tgt, sum_inters)
+        }
+    }
+
+    fun add_gen(tgt : hw_var, vararg srcs : hw_param){
+        var srcsList = ArrayList<hw_param>()
+        for (src in srcs) srcsList.add(src)
+        add_gen(tgt, srcsList)
     }
 
     fun add_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
