@@ -13,12 +13,15 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     var read_done: Boolean
     var write_done: Boolean
 
+    var reset_pref : Boolean
+
     var default_astc = hw_astc()
 
     init {
         read_done = false
         write_done = false
         token_printable = name
+        reset_pref = true
     }
 
     constructor(name : String, vartype : hw_type, defval : String)

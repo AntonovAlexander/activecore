@@ -206,8 +206,14 @@ class RtlGenerator(var cyclix_module : Generic) {
             var_dict.put(local, rtl_gen.comb(local.name, local.vartype, local.defimm))
 
         // Generating globals
-        for (global in cyclix_module.globals)
-            var_dict.put(global, rtl_gen.sticky(global.name, global.vartype, global.defimm, clk, rst))
+        for (global in cyclix_module.globals) {
+            var new_sticky = rtl_gen.sticky(global.name, global.vartype, global.defimm, clk)
+            new_sticky.reset_pref = global.reset_pref
+            if (global.reset_pref) {
+                new_sticky.AddReset(rst)
+            }
+            var_dict.put(global, new_sticky)
+        }
 
         // Generating fifo_outs
         for (fifo_out in cyclix_module.fifo_outs) {

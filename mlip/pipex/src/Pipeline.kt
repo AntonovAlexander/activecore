@@ -43,7 +43,10 @@ open class pipex_import_expr_context(var_dict : MutableMap<hw_var, hw_var>,
                                      var TranslateInfo: __TranslateInfo,
                                      var curStageInfo : __pstage_info) : import_expr_context(var_dict)
 
-open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) : hw_astc_stdif() {
+open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, val dpath_reset : Boolean) : hw_astc_stdif() {
+
+    constructor(name : String, pipeline_fc_mode : PIPELINE_FC_MODE)
+            : this(name, pipeline_fc_mode, true)
 
     override var GenNamePrefix   = "pipex"
 
@@ -1172,6 +1175,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE) 
                 stage_buf_struct.add("genscopipe_handle_" + cur_scopipe_handle.name, TranslateInfo.__scopipe_handle_assocs[cur_scopipe_handle]!!.struct_descr)
             }
             curStageInfo.TRX_BUF                = cyclix_gen.global(curStageInfo.name_prefix + "TRX_BUF", stage_buf_struct, curStageInfo.TRX_BUF_SIZE-1, 0)
+            curStageInfo.TRX_BUF.reset_pref     = dpath_reset
             curStageInfo.TRX_BUF_COUNTER        = cyclix_gen.uglobal(curStageInfo.name_prefix + "TRX_BUF_COUNTER", GetWidthToContain(curStageInfo.TRX_BUF_SIZE)-1, 0, "0")
             curStageInfo.TRX_BUF_COUNTER_NEMPTY = cyclix_gen.uglobal(curStageInfo.name_prefix + "TRX_BUF_COUNTER_NEMPTY", 0, 0, "0")
             curStageInfo.TRX_BUF_COUNTER_FULL   = cyclix_gen.uglobal(curStageInfo.name_prefix + "TRX_BUF_COUNTER_FULL", 0, 0, "0")
