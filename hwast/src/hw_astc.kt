@@ -858,9 +858,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         ret_dim.add(src0.vartype.dimensions[2])
         ret_dim.add(src1.vartype.dimensions[1])
 
-        var ret_var = hw_var(GetGenName("matmul"), DATA_TYPE.BV_UNSIGNED, ret_dim, "0")
-        AddGenVar(ret_var)
-        AddWrVar(ret_var)
+        var ret_var = ugenvar(GetGenName("matmul"), ret_dim, "0")
 
         mat_mul_gen(ret_var, src0, src1)
 
@@ -1191,7 +1189,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                 var fracs = hw_fracs()
                 fracs.add(src0_row.iter_elem)
                 fracs.add(scr1_col)
-                add_gen(tgt, tgt, mul(src0_col.iter_elem, scr1_col))
+                assign(tgt, fracs, mul(src0_col.iter_elem, scr1_col))
             }; endloop()
         }; endloop()
     }
@@ -1475,20 +1473,26 @@ open class hw_astc() : ArrayList<hw_exec>() {
         removeAt(lastIndex)
     }
 
+    fun genvar(name : String, vartype : hw_type, defimm : hw_imm) : hw_var {
+        var ret_var = hw_var(name, vartype, defimm)
+        AddGenVar(ret_var)
+        return ret_var
+    }
+
     fun genvar(name : String, vartype : hw_type, defval : String) : hw_var {
         var ret_var = hw_var(name, vartype, defval)
         AddGenVar(ret_var)
         return ret_var
     }
 
-    fun genvar(name : String, src_struct_in : hw_struct ,dimensions : hw_dim_static) : hw_var {
-        var ret_var = hw_var(name, src_struct_in, dimensions)
+    fun genvar(name : String, src_struct : hw_struct ,dimensions : hw_dim_static) : hw_var {
+        var ret_var = hw_var(name, src_struct, dimensions)
         AddGenVar(ret_var)
         return ret_var
     }
 
-    fun genvar(name : String, src_struct_in : hw_struct) : hw_var {
-        var ret_var = hw_var(name, src_struct_in)
+    fun genvar(name : String, src_struct : hw_struct) : hw_var {
+        var ret_var = hw_var(name, src_struct)
         AddGenVar(ret_var)
         return ret_var
     }
@@ -1732,14 +1736,14 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
-    fun port(name : String, port_dir : PORT_DIR, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(src_struct_in, dimensions), "0")
+    fun port(name : String, port_dir : PORT_DIR, src_struct : hw_struct, dimensions : hw_dim_static) : hw_port {
+        var ret_var = hw_port(name, port_dir, hw_type(src_struct, dimensions), "0")
         add_port(ret_var)
         return ret_var
     }
 
-    fun port(name : String, port_dir : PORT_DIR, src_struct_in : hw_struct) : hw_port {
-        var ret_var = hw_port(name, port_dir, hw_type(src_struct_in), "0")
+    fun port(name : String, port_dir : PORT_DIR, src_struct : hw_struct) : hw_port {
+        var ret_var = hw_port(name, port_dir, hw_type(src_struct), "0")
         add_port(ret_var)
         return ret_var
     }
@@ -1828,14 +1832,14 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
-    fun input(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(src_struct_in, dimensions), "0")
+    fun input(name : String, src_struct : hw_struct, dimensions : hw_dim_static) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(src_struct, dimensions), "0")
         add_port(ret_var)
         return ret_var
     }
 
-    fun input(name : String, src_struct_in : hw_struct) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(src_struct_in), "0")
+    fun input(name : String, src_struct : hw_struct) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.IN, hw_type(src_struct), "0")
         add_port(ret_var)
         return ret_var
     }
@@ -1924,14 +1928,14 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
-    fun output(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(src_struct_in, dimensions), "0")
+    fun output(name : String, src_struct : hw_struct, dimensions : hw_dim_static) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(src_struct, dimensions), "0")
         add_port(ret_var)
         return ret_var
     }
 
-    fun output(name : String, src_struct_in : hw_struct) : hw_port {
-        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(src_struct_in), "0")
+    fun output(name : String, src_struct : hw_struct) : hw_port {
+        var ret_var = hw_port(name, PORT_DIR.OUT, hw_type(src_struct), "0")
         add_port(ret_var)
         return ret_var
     }
@@ -2107,14 +2111,14 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
-    fun fifo_in(name : String, src_struct_in : hw_struct ,dimensions : hw_dim_static) : hw_fifo_in {
-        var ret_var = hw_fifo_in(name, hw_type(src_struct_in, dimensions))
+    fun fifo_in(name : String, src_struct : hw_struct ,dimensions : hw_dim_static) : hw_fifo_in {
+        var ret_var = hw_fifo_in(name, hw_type(src_struct, dimensions))
         add_fifo_in(ret_var)
         return ret_var
     }
 
-    fun fifo_in(name : String, src_struct_in : hw_struct) : hw_fifo_in {
-        var ret_var = hw_fifo_in(name, hw_type(src_struct_in))
+    fun fifo_in(name : String, src_struct : hw_struct) : hw_fifo_in {
+        var ret_var = hw_fifo_in(name, hw_type(src_struct))
         add_fifo_in(ret_var)
         return ret_var
     }
@@ -2158,14 +2162,14 @@ open class hw_astc_stdif() : hw_astc() {
         return ret_var
     }
 
-    fun fifo_out(name : String, src_struct_in : hw_struct ,dimensions : hw_dim_static) : hw_fifo_out {
-        var ret_var = hw_fifo_out(name, hw_type(src_struct_in, dimensions))
+    fun fifo_out(name : String, src_struct : hw_struct ,dimensions : hw_dim_static) : hw_fifo_out {
+        var ret_var = hw_fifo_out(name, hw_type(src_struct, dimensions))
         add_fifo_out(ret_var)
         return ret_var
     }
 
-    fun fifo_out(name : String, src_struct_in : hw_struct) : hw_fifo_out {
-        var ret_var = hw_fifo_out(name, hw_type(src_struct_in))
+    fun fifo_out(name : String, src_struct : hw_struct) : hw_fifo_out {
+        var ret_var = hw_fifo_out(name, hw_type(src_struct))
         add_fifo_out(ret_var)
         return ret_var
     }
