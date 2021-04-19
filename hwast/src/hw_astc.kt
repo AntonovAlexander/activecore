@@ -1180,23 +1180,23 @@ open class hw_astc() : ArrayList<hw_exec>() {
         if ((src0.vartype.dimensions.size != src1.vartype.dimensions.size) || (src0.vartype.dimensions.size != 3)) {
             ERROR("Dimensions error of matrix multiplication")
         }
-        for (tgt_row_num in 0 until src0.vartype.dimensions[2].GetWidth()) {
+        for (tgt_row_num in 0 until tgt.vartype.dimensions[2].GetWidth()) {
+            var tgt_row = tgt.GetFracRef(tgt_row_num)
 
-            var tgt_row = src0.GetFracRef(tgt_row_num)
-
-            for (tgt_col_num in 0 until src1.vartype.dimensions[1].GetWidth()) {
-
+            for (tgt_col_num in 0 until tgt.vartype.dimensions[1].GetWidth()) {
                 var tgt_elem = tgt_row.GetFracRef(tgt_col_num)
 
+                var factors = ArrayList<hw_param>()
                 for (factor in 0 until src0.vartype.dimensions[1].GetWidth()) {
                     var scr0_row = src0.GetFracRef(tgt_row_num)
                     var src0_elem = scr0_row.GetFracRef(factor)
 
                     var scr1_row = src1.GetFracRef(factor)
-                    var src1_elem = scr1_row.GetFracRef(tgt_row_num)
+                    var src1_elem = scr1_row.GetFracRef(tgt_col_num)
 
-                    add_gen(tgt_elem, tgt_elem, mul(src0_elem, src1_elem))
+                    factors.add(mul(src0_elem, src1_elem))
                 }
+                add_gen(tgt_elem, factors)
             }
         }
     }

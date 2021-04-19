@@ -75,14 +75,7 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
     var TRX_BUF_COUNTER_FULL    = DUMMY_VAR
 
     fun TranslateVar(src : hw_var) : hw_var {
-        if (!var_dict.containsKey(src)) {
-            MSG("Problem translating " + src.name + ". Available translations:")
-            for (entry in var_dict) {
-                MSG("key: " + entry.key.name + ", value: " + entry.value.name)
-            }
-            ERROR("Translation of variable " + src.name + " failed!\n")
-        }
-        return var_dict[src]!!
+        return TranslateVar(src, var_dict)
     }
 
     fun TranslateParam(src : hw_param) : hw_param {
