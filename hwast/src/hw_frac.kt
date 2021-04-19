@@ -109,6 +109,10 @@ class hw_fracs() : ArrayList<hw_frac>() {
         }
     }
 
+    fun add(new_elem : Int) {
+        add(hw_frac_C(new_elem))
+    }
+
     fun add(new_elem : hw_imm) {
         add(hw_frac_C(new_elem))
     }

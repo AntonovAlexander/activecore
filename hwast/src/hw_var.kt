@@ -232,6 +232,12 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
         for (frac in depow_frac) depow_fracs.add(frac)
         return GetFracRef(depow_fracs)
     }
+
+    open fun GetFracRef(index : Int) : hw_var_frac {
+        var depow_fracs = hw_fracs()
+        depow_fracs.add(index)
+        return GetFracRef(depow_fracs)
+    }
 }
 
 var DUMMY_VAR = hw_var("DUMMY_VAR", hw_type(DATA_TYPE.BV_UNSIGNED, 0, 0), "0")
