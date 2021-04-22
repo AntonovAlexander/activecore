@@ -1,5 +1,5 @@
 /*
- * hw_fifo.kt
+ * hw_fifo_if.kt
  *
  *  Created on: 05.06.2019
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>

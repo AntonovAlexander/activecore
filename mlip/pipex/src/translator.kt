@@ -61,6 +61,23 @@ class __pstage_info(cyclix_gen : cyclix.Generic,
     var scopipe_handle_resps = ArrayList<hw_scopipe_handle>()
     var scopipe_handles      = ArrayList<hw_scopipe_handle>()
 
+    var var_dict            = mutableMapOf<hw_var, hw_var>()
+
+    fun TranslateVar(src : hw_var) : hw_var {
+        return TranslateVar(src, var_dict)
+    }
+
+    fun TranslateParam(src : hw_param) : hw_param {
+        if (src is hw_imm) return src
+        else return TranslateVar(src as hw_var)
+    }
+
+    fun TranslateParams(srcs : ArrayList<hw_param>) : ArrayList<hw_param> {
+        var params = ArrayList<hw_param>()
+        for (src in srcs) params.add(TranslateParam(src))
+        return params
+    }
+
     fun pkill_cmd_internal(cyclix_gen : cyclix.Generic) {
         cyclix_gen.begif(pctrl_active)
         run {
