@@ -9,6 +9,7 @@
 package pipex
 
 import hwast.*
+import cyclix.*
 
 val COPIPE_TRX_ID_WIDTH = 4
 
@@ -40,7 +41,7 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
                          val name_prefix : String,
                          val TRX_BUF_SIZE : Int,
 
-                         val pctrl_active : hw_var,
+                         val stage_ref : hw_stage,
                          val pctrl_new : hw_var,
                          val pctrl_working : hw_var,
                          val pctrl_succ : hw_var,
@@ -90,19 +91,19 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
     }
 
     fun pkill_cmd_internal(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.begif(pctrl_active)
+        cyclix_gen.begif(stage_ref.pctrl_active)
         run {
-            cyclix_gen.assign(pctrl_active, 0)
+            cyclix_gen.assign(stage_ref.pctrl_active, 0)
         }; cyclix_gen.endif()
     }
 
     fun pstall_ifactive_cmd(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, pctrl_active)
-        cyclix_gen.assign(pctrl_active, 0)
+        cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, stage_ref.pctrl_active)
+        cyclix_gen.assign(stage_ref.pctrl_active, 0)
     }
 
     fun pflush_cmd_internal(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.bor_gen(pctrl_flushreq, pctrl_flushreq, pctrl_active)
+        cyclix_gen.bor_gen(pctrl_flushreq, pctrl_flushreq, stage_ref.pctrl_active)
     }
 }
 
@@ -120,9 +121,9 @@ class __TranslateInfo(var pipeline : Pipeline) {
     var __scopipe_handle_assocs = mutableMapOf<hw_scopipe_handle, __scopipe_handle_info>()
     var __scopipe_handle_reqdict = mutableMapOf<hw_scopipe_handle, ArrayList<hw_scopipe_if>>()
 
-    var __stage_assocs = mutableMapOf<hw_stage, __pstage_info>()
+    var __stage_assocs = mutableMapOf<hw_pipex_stage, __pstage_info>()
 
-    var StageList = ArrayList<hw_stage>()
+    var StageList = ArrayList<hw_pipex_stage>()
     var StageInfoList = ArrayList<__pstage_info>()
 
     var gencredit_counter = DUMMY_VAR
