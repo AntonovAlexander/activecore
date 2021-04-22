@@ -23,8 +23,7 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
     val pctrl_occupied      = cyclix_gen.ulocal((name_prefix + "genpctrl_occupied"), 0, 0, "0")
     var pctrl_rdy           = cyclix_gen.ulocal((name_prefix + "genpctrl_rdy"), 0, 0, "0")
 
-    var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
-    var pContext_srcglbls       = ArrayList<hw_var>()               // locals with required src bufs
+    var driven_locals       = mutableMapOf<hw_var, String>()
 
     var TRX_BUF                 = DUMMY_VAR
     var TRX_BUF_COUNTER         = DUMMY_VAR
@@ -66,8 +65,8 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
     }
 
     fun init_locals() {
-        for (src_glbl in pContext_srcglbls) {
-            cyclix_gen.assign(pContext_local_dict[src_glbl]!!, cyclix_gen.subStruct(TRX_BUF[0], src_glbl.name))
+        for (driven_local in driven_locals) {
+            cyclix_gen.assign(driven_local.key, cyclix_gen.subStruct(TRX_BUF[0], driven_local.value))
         }
     }
 

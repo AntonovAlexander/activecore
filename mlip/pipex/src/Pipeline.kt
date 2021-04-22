@@ -1178,6 +1178,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             for (global_assoc in TranslateInfo.__global_assocs) {
                 curStageInfo.var_dict.put(global_assoc.key, global_assoc.value.cyclix_global)
             }
+            for (srcglbl in curStageInfo.pContext_srcglbls) {
+                curStageInfo.driven_locals.put(curStageInfo.pContext_local_dict[srcglbl]!!, srcglbl.name)
+            }
         }
         MSG("Generating resources: done")
 

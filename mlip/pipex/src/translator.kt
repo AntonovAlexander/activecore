@@ -47,6 +47,8 @@ class __pstage_info(cyclix_gen : cyclix.Generic,
                     val pctrl_finish : hw_var,
                     val pctrl_flushreq : hw_var) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE, AUTO_FIRED) {
 
+    var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
+    var pContext_srcglbls       = ArrayList<hw_var>()               // locals with required src bufs
     var accum_tgts              = ArrayList<hw_var>()               // targets for accumulation
     var newaccums               = ArrayList<hw_var>()               // new targets for accumulation (without driver on previous stage)
 
