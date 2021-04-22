@@ -91,8 +91,15 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(pctrl_rdy, !TRX_BUF_COUNTER_FULL)
     }
 
-    fun push_trx_data() {
-
+    fun push_trx_data(tgt_buf_fracs : hw_fracs, pushed_var : hw_param) {
+        var fracs = hw_fracs(0)
+        if (TRX_BUF_SIZE != 1) {
+            fracs = hw_fracs(TRX_BUF_COUNTER)
+        }
+        for (tgt_buf_frac in tgt_buf_fracs) {
+            fracs.add(tgt_buf_frac)
+        }
+        cyclix_gen.assign(TRX_BUF, fracs, pushed_var)
     }
 
     fun pop_trx() {
