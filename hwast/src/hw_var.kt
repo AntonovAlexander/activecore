@@ -52,7 +52,7 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
             : this(name, hw_type(src_struct, msb, lsb), "0")
 
     constructor(name: String, src_struct: hw_struct)
-            : this(name, src_struct, 0, 0)
+            : this(name, hw_type(src_struct), "0")
 
     constructor(name : String, msb : Int, lsb : Int, defval : String)
             : this(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, hw_imm(defval))

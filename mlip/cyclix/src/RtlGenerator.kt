@@ -180,11 +180,6 @@ class RtlGenerator(var cyclix_module : Generic) {
 
     fun generate(DEBUG_FLAG : Boolean) : rtl.module {
 
-        NEWLINE()
-        MSG("#######################################")
-        MSG("#### Starting Cyclix-to-RTL export ####")
-        MSG("#######################################")
-
         // TODO: pre-validation
 
         var_dict.clear()
@@ -193,15 +188,20 @@ class RtlGenerator(var cyclix_module : Generic) {
 
         var rtl_gen = rtl.module(cyclix_module.name)
 
-        // Generating ports
+        MSG("Generating ports...")
         var clk = rtl_gen.uinput("clk_i", 0, 0, "0")
         var rst = rtl_gen.uinput("rst_i", 0, 0, "1")
+        MSG("Generating ports: done")
 
-        // Generating combinationals
-        for (local in cyclix_module.locals)
-            var_dict.put(local, rtl_gen.comb(local.name, local.vartype, local.defimm))
+        MSG("Generating combinationals...")
+        for (local in cyclix_module.locals) {
+            var new_comb = rtl_gen.comb(local.name, local.vartype, local.defimm)
+            var_dict.put(local, new_comb)
+        }
+        MSG("Generating combinationals: done")
 
         // Generating globals
+        MSG("Generating globals...")
         for (global in cyclix_module.globals) {
             var new_sticky = rtl_gen.sticky(global.name, global.vartype, global.defimm, clk)
             new_sticky.reset_pref = global.reset_pref
@@ -210,8 +210,10 @@ class RtlGenerator(var cyclix_module : Generic) {
             }
             var_dict.put(global, new_sticky)
         }
+        MSG("Generating globals: done")
 
-        // Generating fifo_outs
+        MSG("Generating fifo interfaces...")
+        // fifo_outs
         for (fifo_out in cyclix_module.fifo_outs) {
             fifo_out_dict.put(fifo_out, fifo_out_descr(
                 rtl_gen.uoutput((fifo_out.name + "_genfifo_req_o"), 0, 0, "0"),
@@ -220,8 +222,7 @@ class RtlGenerator(var cyclix_module : Generic) {
                 rtl_gen.ucomb((fifo_out.name + "_genfifo_reqbuf_req"), 0, 0, "0")
             ))
         }
-
-        // Generating fifo_ins
+        // fifo_ins
         for (fifo_in in cyclix_module.fifo_ins) {
             fifo_in_dict.put(fifo_in, fifo_in_descr(
                 rtl_gen.uinput((fifo_in.name + "_genfifo_req_i"), 0, 0, "0"),
@@ -232,8 +233,10 @@ class RtlGenerator(var cyclix_module : Generic) {
                 rtl_gen.comb((fifo_in.name + "_genfifo_buf_rdata"), fifo_in.vartype, fifo_in.defimm)
             ))
         }
+        MSG("Generating fifo interfaces: done")
 
         // Generating submodules
+        MSG("Generating fifo submodules...")
         for (subproc in cyclix_module.Subprocs) {
 
             var fifo_internal_in_descrs = mutableMapOf<String, fifo_internal_out_descr>()
@@ -293,6 +296,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             submod_insts_fifos_in.put(subproc.value, fifo_internal_in_descrs)
             submod_insts_fifos_out.put(subproc.value, fifo_internal_out_descrs)
         }
+        MSG("Generating fifo submodules: done")
 
         for (fifo_in in fifo_in_dict) {
             rtl_gen.cproc_begin()
@@ -301,6 +305,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             }; rtl_gen.cproc_end()
         }
 
+        MSG("Generating logic...")
         rtl_gen.cproc_begin()
         run {
 
@@ -358,6 +363,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             }
 
         }; rtl_gen.cproc_end()
+        MSG("Generating logic: done")
 
         rtl_gen.end()
 
