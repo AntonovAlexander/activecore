@@ -37,23 +37,16 @@ data class __scopipe_handle_info(val struct_descr : hw_struct)
 data class __assign_buf(val req : hw_var,
                         val buf : hw_var)
 
-data class __pstage_info(val TranslateInfo : __TranslateInfo,
-                         val name_prefix : String,
-                         val TRX_BUF_SIZE : Int,
+class __pstage_info(cyclix_gen : cyclix.Generic,
+                    name_prefix : String,
+                    TRX_BUF_SIZE : Int,
 
-                         val stage_ref : hw_stage,
-                         val pctrl_new : hw_var,
-                         val pctrl_working : hw_var,
-                         val pctrl_succ : hw_var,
-                         val pctrl_occupied : hw_var,
-                         val pctrl_finish : hw_var,
-                         val pctrl_flushreq : hw_var,
-                         val pctrl_rdy : hw_var,
+                    val TranslateInfo : __TranslateInfo,
 
-                         val pctrl_stalled_glbl : hw_var) {
+                    val pctrl_finish : hw_var,
+                    val pctrl_flushreq : hw_var,
+                    val pctrl_rdy : hw_var) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE) {
 
-    var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
-    var pContext_srcglbls       = ArrayList<hw_var>()               // locals with required src global bufs
     var accum_tgts              = ArrayList<hw_var>()               // targets for accumulation
     var newaccums               = ArrayList<hw_var>()               // new targets for accumulation (without driver on previous stage)
 
@@ -69,11 +62,6 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
     var scopipe_handle_reqs  = ArrayList<hw_scopipe_handle>()
     var scopipe_handle_resps = ArrayList<hw_scopipe_handle>()
     var scopipe_handles      = ArrayList<hw_scopipe_handle>()
-
-    var TRX_BUF                 = DUMMY_VAR
-    var TRX_BUF_COUNTER         = DUMMY_VAR
-    var TRX_BUF_COUNTER_NEMPTY  = DUMMY_VAR
-    var TRX_BUF_COUNTER_FULL    = DUMMY_VAR
 
     fun TranslateVar(src : hw_var) : hw_var {
         return TranslateVar(src, var_dict)
@@ -91,19 +79,19 @@ data class __pstage_info(val TranslateInfo : __TranslateInfo,
     }
 
     fun pkill_cmd_internal(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.begif(stage_ref.pctrl_active)
+        cyclix_gen.begif(pctrl_active)
         run {
-            cyclix_gen.assign(stage_ref.pctrl_active, 0)
+            cyclix_gen.assign(pctrl_active, 0)
         }; cyclix_gen.endif()
     }
 
     fun pstall_ifactive_cmd(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, stage_ref.pctrl_active)
-        cyclix_gen.assign(stage_ref.pctrl_active, 0)
+        cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, pctrl_active)
+        cyclix_gen.assign(pctrl_active, 0)
     }
 
     fun pflush_cmd_internal(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.bor_gen(pctrl_flushreq, pctrl_flushreq, stage_ref.pctrl_active)
+        cyclix_gen.bor_gen(pctrl_flushreq, pctrl_flushreq, pctrl_active)
     }
 }
 

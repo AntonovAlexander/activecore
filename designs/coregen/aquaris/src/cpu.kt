@@ -718,7 +718,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     // unblocking forwarding
-    fun forward_unblk (fw_stage : pipex.hw_stage) {
+    fun forward_unblk (fw_stage : pipex.hw_pipex_stage) {
 
         begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
         run {
@@ -749,7 +749,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     // blocking forwarding
-    fun forward_blk (fw_stage : pipex.hw_stage) {
+    fun forward_blk (fw_stage : pipex.hw_pipex_stage) {
 
         begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
         run {
@@ -788,7 +788,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     // interlocking
-    fun interlock (fw_stage : pipex.hw_stage) {
+    fun interlock (fw_stage : pipex.hw_pipex_stage) {
 
         begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
         run {
