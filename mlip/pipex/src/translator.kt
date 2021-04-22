@@ -40,12 +40,12 @@ data class __assign_buf(val req : hw_var,
 class __pstage_info(cyclix_gen : cyclix.Generic,
                     name_prefix : String,
                     TRX_BUF_SIZE : Int,
+                    AUTO_FIRED : Boolean,
 
                     val TranslateInfo : __TranslateInfo,
 
                     val pctrl_finish : hw_var,
-                    val pctrl_flushreq : hw_var,
-                    val pctrl_rdy : hw_var) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE) {
+                    val pctrl_flushreq : hw_var) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE, AUTO_FIRED) {
 
     var accum_tgts              = ArrayList<hw_var>()               // targets for accumulation
     var newaccums               = ArrayList<hw_var>()               // new targets for accumulation (without driver on previous stage)
