@@ -25,11 +25,33 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
 
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
     var pContext_srcglbls       = ArrayList<hw_var>()               // locals with required src bufs
+    var var_dict                = mutableMapOf<hw_var, hw_var>()
 
     var TRX_BUF                 = DUMMY_VAR
     var TRX_BUF_COUNTER         = DUMMY_VAR
-    var TRX_BUF_COUNTER_NEMPTY  = DUMMY_VAR
-    var TRX_BUF_COUNTER_FULL    = DUMMY_VAR
+    var TRX_BUF_COUNTER_NEMPTY  = cyclix_gen.uglobal(name_prefix + "TRX_BUF_COUNTER_NEMPTY", 0, 0, "0")
+    var TRX_BUF_COUNTER_FULL    = cyclix_gen.uglobal(name_prefix + "TRX_BUF_COUNTER_FULL", 0, 0, "0")
+
+    fun INIT_TRX_BUF(stage_buf_struct : hw_struct, reset_pref : Boolean) {
+        TRX_BUF                 = cyclix_gen.global(name_prefix + "TRX_BUF", stage_buf_struct, TRX_BUF_SIZE-1, 0)
+        TRX_BUF.reset_pref      = reset_pref
+        TRX_BUF_COUNTER         = cyclix_gen.uglobal(name_prefix + "TRX_BUF_COUNTER", GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0")
+    }
+
+    fun TranslateVar(src : hw_var) : hw_var {
+        return TranslateVar(src, var_dict)
+    }
+
+    fun TranslateParam(src : hw_param) : hw_param {
+        if (src is hw_imm) return src
+        else return TranslateVar(src as hw_var)
+    }
+
+    fun TranslateParams(srcs : ArrayList<hw_param>) : ArrayList<hw_param> {
+        var params = ArrayList<hw_param>()
+        for (src in srcs) params.add(TranslateParam(src))
+        return params
+    }
 
     fun init_pctrls() {
         // Asserting pctrl defaults (deployed even if signal is not used)
@@ -69,7 +91,11 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(pctrl_rdy, !TRX_BUF_COUNTER_FULL)
     }
 
-    fun pop() {
+    fun push_trx_data() {
+
+    }
+
+    fun pop_trx() {
         cyclix_gen.assign(pctrl_active, 0)
         cyclix_gen.assign(pctrl_stalled_glbl, 0)
         cyclix_gen.assign(TRX_BUF, hw_fracs(0), 0)

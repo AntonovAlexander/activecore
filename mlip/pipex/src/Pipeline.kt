@@ -1170,11 +1170,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             for (cur_scopipe_handle in curStageInfo.scopipe_handles) {
                 stage_buf_struct.add("genscopipe_handle_" + cur_scopipe_handle.name, TranslateInfo.__scopipe_handle_assocs[cur_scopipe_handle]!!.struct_descr)
             }
-            curStageInfo.TRX_BUF                = cyclix_gen.global(curStageInfo.name_prefix + "TRX_BUF", stage_buf_struct, curStageInfo.TRX_BUF_SIZE-1, 0)
-            curStageInfo.TRX_BUF.reset_pref     = dpath_reset
-            curStageInfo.TRX_BUF_COUNTER        = cyclix_gen.uglobal(curStageInfo.name_prefix + "TRX_BUF_COUNTER", GetWidthToContain(curStageInfo.TRX_BUF_SIZE)-1, 0, "0")
-            curStageInfo.TRX_BUF_COUNTER_NEMPTY = cyclix_gen.uglobal(curStageInfo.name_prefix + "TRX_BUF_COUNTER_NEMPTY", 0, 0, "0")
-            curStageInfo.TRX_BUF_COUNTER_FULL   = cyclix_gen.uglobal(curStageInfo.name_prefix + "TRX_BUF_COUNTER_FULL", 0, 0, "0")
+            curStageInfo.INIT_TRX_BUF(stage_buf_struct, dpath_reset)
 
             for (pContext_local_dict_entry in curStageInfo.pContext_local_dict) {
                 curStageInfo.var_dict.put(pContext_local_dict_entry.key, pContext_local_dict_entry.value)
@@ -1450,7 +1446,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                     }
                 }; cyclix_gen.endif()
 
-                curStageInfo.pop()
+                curStageInfo.pop_trx()
 
             }; cyclix_gen.endif()
 
