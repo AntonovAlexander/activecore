@@ -80,18 +80,6 @@ class __pstage_info(cyclix_gen : cyclix.Generic,
         return params
     }
 
-    fun pkill_cmd_internal(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.begif(pctrl_active)
-        run {
-            cyclix_gen.assign(pctrl_active, 0)
-        }; cyclix_gen.endif()
-    }
-
-    fun pstall_ifactive_cmd(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, pctrl_active)
-        cyclix_gen.assign(pctrl_active, 0)
-    }
-
     fun pflush_cmd_internal(cyclix_gen : cyclix.Generic) {
         cyclix_gen.bor_gen(pctrl_flushreq, pctrl_flushreq, pctrl_active)
     }

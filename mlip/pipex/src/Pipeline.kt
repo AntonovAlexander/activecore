@@ -653,7 +653,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                     ERROR("Attempting to kill transaction with credit-based mechanism at stage " + context.curStage.name)
                 }
             }
-            context.curStageInfo.pkill_cmd_internal(cyclix_gen)
+            context.curStageInfo.pkill_cmd_internal()
 
         } else if (expr.opcode == OP_PSTALL) {
             if (context.TranslateInfo.pipeline.pipeline_fc_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
@@ -662,7 +662,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                     ERROR("Attempting to stall transaction with credit-based mechanism at stage " + context.curStage.name)
                 }
             }
-            context.curStageInfo.pstall_ifactive_cmd(cyclix_gen)
+            context.curStageInfo.pstall_ifactive_cmd()
 
         } else if (expr.opcode == OP_PFLUSH) {
             if (context.TranslateInfo.pipeline.pipeline_fc_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
@@ -1160,17 +1160,16 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 }
             }
 
-            var stage_buf_struct = hw_struct(curStageInfo.name_prefix + "TRX_BUF_STRUCT")
             for (srcglbl in curStageInfo.pContext_srcglbls) {
-                stage_buf_struct.add(srcglbl.name, srcglbl.vartype, srcglbl.defimm)
+                curStageInfo.stage_buf_struct.add(srcglbl.name, srcglbl.vartype, srcglbl.defimm)
             }
             for (cur_mcopipe_handle in curStageInfo.mcopipe_handles) {
-                stage_buf_struct.add("genmcopipe_handle_" + cur_mcopipe_handle.name, TranslateInfo.__mcopipe_handle_assocs[cur_mcopipe_handle]!!.struct_descr)
+                curStageInfo.stage_buf_struct.add("genmcopipe_handle_" + cur_mcopipe_handle.name, TranslateInfo.__mcopipe_handle_assocs[cur_mcopipe_handle]!!.struct_descr)
             }
             for (cur_scopipe_handle in curStageInfo.scopipe_handles) {
-                stage_buf_struct.add("genscopipe_handle_" + cur_scopipe_handle.name, TranslateInfo.__scopipe_handle_assocs[cur_scopipe_handle]!!.struct_descr)
+                curStageInfo.stage_buf_struct.add("genscopipe_handle_" + cur_scopipe_handle.name, TranslateInfo.__scopipe_handle_assocs[cur_scopipe_handle]!!.struct_descr)
             }
-            curStageInfo.INIT_TRX_BUF(stage_buf_struct, dpath_reset)
+            curStageInfo.INIT_TRX_BUF(dpath_reset)
 
             for (pContext_local_dict_entry in curStageInfo.pContext_local_dict) {
                 curStageInfo.var_dict.put(pContext_local_dict_entry.key, pContext_local_dict_entry.value)
@@ -1309,7 +1308,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 MSG(DEBUG_FLAG, "#### Pipeline flush processing ####")
                 cyclix_gen.begif(curStageInfo.pctrl_flushreq)
                 run {
-                    if (CUR_STAGE_INDEX != 0) curStageInfo.pkill_cmd_internal(cyclix_gen)
+                    if (CUR_STAGE_INDEX != 0) curStageInfo.pkill_cmd_internal()
                 }; cyclix_gen.endif()
 
             }; cyclix_gen.endif()
@@ -1333,7 +1332,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 if (CUR_STAGE_INDEX == 0) {
                     cyclix_gen.begif(cyclix_gen.eq2(TranslateInfo.gencredit_counter, TranslateInfo.StageList.size-1))
                     run {
-                        curStageInfo.pstall_ifactive_cmd(cyclix_gen)
+                        curStageInfo.pstall_ifactive_cmd()
                     }; cyclix_gen.endif()
                 }
             } else {
@@ -1341,7 +1340,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                     cyclix_gen.begif(!TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_rdy)
                     run {
                         // prepeat from next pstage requested
-                        curStageInfo.pstall_ifactive_cmd(cyclix_gen)
+                        curStageInfo.pstall_ifactive_cmd()
                     }; cyclix_gen.endif()
                 }
             }

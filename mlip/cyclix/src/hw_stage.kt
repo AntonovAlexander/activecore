@@ -24,16 +24,22 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
     var pctrl_rdy           = cyclix_gen.ulocal((name_prefix + "genpctrl_rdy"), 0, 0, "0")
 
     var driven_locals       = mutableMapOf<hw_var, String>()
+    var stage_buf_struct    = hw_struct(name_prefix + "TRX_BUF_STRUCT")
 
     var TRX_BUF                 = DUMMY_VAR
-    var TRX_BUF_COUNTER         = DUMMY_VAR
+    var TRX_BUF_COUNTER         = cyclix_gen.uglobal(name_prefix + "TRX_BUF_COUNTER", GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0")
     var TRX_BUF_COUNTER_NEMPTY  = cyclix_gen.uglobal(name_prefix + "TRX_BUF_COUNTER_NEMPTY", 0, 0, "0")
     var TRX_BUF_COUNTER_FULL    = cyclix_gen.uglobal(name_prefix + "TRX_BUF_COUNTER_FULL", 0, 0, "0")
 
-    fun INIT_TRX_BUF(stage_buf_struct : hw_struct, reset_pref : Boolean) {
+    fun AddStageVar(new_var : hw_var) : hw_var {
+        stage_buf_struct.add(new_var.name, new_var.vartype, new_var.defimm)
+        driven_locals.put(new_var, new_var.name)
+        return new_var
+    }
+
+    fun INIT_TRX_BUF(reset_pref : Boolean) {
         TRX_BUF                 = cyclix_gen.global(name_prefix + "TRX_BUF", stage_buf_struct, TRX_BUF_SIZE-1, 0)
         TRX_BUF.reset_pref      = reset_pref
-        TRX_BUF_COUNTER         = cyclix_gen.uglobal(name_prefix + "TRX_BUF_COUNTER", GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0")
     }
 
     fun init_pctrls() {
@@ -120,5 +126,17 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
             }; cyclix_gen.endif()
         }
         cyclix_gen.sub_gen(TRX_BUF_COUNTER, TRX_BUF_COUNTER, 1)
+    }
+
+    fun pkill_cmd_internal() {
+        cyclix_gen.begif(pctrl_active)
+        run {
+            cyclix_gen.assign(pctrl_active, 0)
+        }; cyclix_gen.endif()
+    }
+
+    fun pstall_ifactive_cmd() {
+        cyclix_gen.bor_gen(pctrl_stalled_glbl, pctrl_stalled_glbl, pctrl_active)
+        cyclix_gen.assign(pctrl_active, 0)
     }
 }
