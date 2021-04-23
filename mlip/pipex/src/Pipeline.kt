@@ -662,7 +662,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                     ERROR("Attempting to stall transaction with credit-based mechanism at stage " + context.curStage.name)
                 }
             }
-            context.curStageInfo.pstall_ifactive_cmd()
+            context.curStageInfo.pstall_cmd_internal()
 
         } else if (expr.opcode == OP_PFLUSH) {
             if (context.TranslateInfo.pipeline.pipeline_fc_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
@@ -1161,15 +1161,14 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             }
 
             for (srcglbl in curStageInfo.pContext_srcglbls) {
-                curStageInfo.stage_buf_struct.add(srcglbl.name, srcglbl.vartype, srcglbl.defimm)
+                curStageInfo.AddBuf(hw_structvar(srcglbl.name, srcglbl.vartype, srcglbl.defimm))
             }
             for (cur_mcopipe_handle in curStageInfo.mcopipe_handles) {
-                curStageInfo.stage_buf_struct.add("genmcopipe_handle_" + cur_mcopipe_handle.name, TranslateInfo.__mcopipe_handle_assocs[cur_mcopipe_handle]!!.struct_descr)
+                curStageInfo.AddBuf(hw_structvar("genmcopipe_handle_" + cur_mcopipe_handle.name, TranslateInfo.__mcopipe_handle_assocs[cur_mcopipe_handle]!!.struct_descr))
             }
             for (cur_scopipe_handle in curStageInfo.scopipe_handles) {
-                curStageInfo.stage_buf_struct.add("genscopipe_handle_" + cur_scopipe_handle.name, TranslateInfo.__scopipe_handle_assocs[cur_scopipe_handle]!!.struct_descr)
+                curStageInfo.AddBuf(hw_structvar("genscopipe_handle_" + cur_scopipe_handle.name, TranslateInfo.__scopipe_handle_assocs[cur_scopipe_handle]!!.struct_descr))
             }
-            curStageInfo.INIT_TRX_BUF(dpath_reset)
 
             for (pContext_local_dict_entry in curStageInfo.pContext_local_dict) {
                 curStageInfo.var_dict.put(pContext_local_dict_entry.key, pContext_local_dict_entry.value)
@@ -1332,7 +1331,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 if (CUR_STAGE_INDEX == 0) {
                     cyclix_gen.begif(cyclix_gen.eq2(TranslateInfo.gencredit_counter, TranslateInfo.StageList.size-1))
                     run {
-                        curStageInfo.pstall_ifactive_cmd()
+                        curStageInfo.pstall_cmd_internal()
                     }; cyclix_gen.endif()
                 }
             } else {
@@ -1340,7 +1339,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                     cyclix_gen.begif(!TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pctrl_rdy)
                     run {
                         // prepeat from next pstage requested
-                        curStageInfo.pstall_ifactive_cmd()
+                        curStageInfo.pstall_cmd_internal()
                     }; cyclix_gen.endif()
                 }
             }
