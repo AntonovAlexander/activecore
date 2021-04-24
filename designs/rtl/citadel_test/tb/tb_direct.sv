@@ -235,6 +235,31 @@ task EXEC_MUL
 	end
 endtask
 
+task EXEC_DIV
+	(
+		input logic unsigned [4:0] fu_rd
+		, input logic unsigned [4:0] fu_rs0
+		, input logic unsigned [4:0] fu_rs1
+	);
+	begin
+	CMD_2RS(2, fu_rd, fu_rs0, fu_rs1);
+	log_data_expected[fu_rd] = log_data_expected[fu_rs0] / log_data_expected[fu_rs1];
+	end
+endtask
+
+task EXEC_FMA
+	(
+		input logic unsigned [4:0] fu_rd
+		, input logic unsigned [4:0] fu_rs0
+		, input logic unsigned [4:0] fu_rs1
+		, input logic unsigned [4:0] fu_rs2
+	);
+	begin
+	CMD_3RS(3, fu_rd, fu_rs0, fu_rs1, fu_rs2);
+	log_data_expected[fu_rd] = (log_data_expected[fu_rs0] * log_data_expected[fu_rs1] + log_data_expected[fu_rs2]);
+	end
+endtask
+
 function logic eq_shortreals (input shortreal src0, input shortreal src1);
     begin
     if (src0 > src1) return ((src0 - src1) > 0.0001);
@@ -291,6 +316,8 @@ initial
 	EXEC_ADD(5, 0, 1);
 	EXEC_ADD(6, 2, 5);
 	EXEC_MUL(10, 3, 6);
+	EXEC_DIV(11, 7, 5);
+	EXEC_FMA(16, 5, 6, 10);
 
     SCAN_REGS();
 

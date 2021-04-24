@@ -27,13 +27,13 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 * Demo MLIP cores based on hwast (/mlip):
 
-	* **rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
+	* **Rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
 
-	* **cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Xilinx HLS
+	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Xilinx HLS
 
-	* **pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
+	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
 
-	* **reordex** (**reorde**red e**x**ecution) - generator of coprocessors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to cyclix MLIP
+	* **Reordex** (**reorde**red e**x**ecution) - generator of coprocessors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to cyclix MLIP
 
 * Demo core generators based on MLIP cores (/designs/coregen):
 
@@ -60,6 +60,8 @@ Current version of project is implemented as a collection of Kotlin libraries th
 ### Publications
 
 * A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation, ITMO University, Saint-Petersburg, 28.12.2018. URL: http://fppo.ifmo.ru/dissertation/?number=63419
+
+* A. Antonov, “Inferring Custom Synthesizable Kernel for Generation of Coprocessors with Out-of-Order Execution,” in 2021 10th Mediterranean Conference on Embedded Computing (MECO), 2021 (accepted for publication)
 
 * A. Antonov, P. Kustarev, “Strategies of Computational Process Synthesis – a System-Level Model of HW/SW (Micro)Architectural Mechanisms,” in 2020 9th Mediterranean Conference on Embedded Computing (MECO), 2020. URL: https://ieeexplore.ieee.org/document/9134071 Preprint downloadable from: http://programme.meconet.me/documents/PAPERS/MECO_2020_paper_26.pdf
 
