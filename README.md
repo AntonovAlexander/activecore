@@ -3,21 +3,21 @@
 
 ### Project description
 
-ActiveCore is a framework (software library) that demonstrates original hardware designing concept based on **"Micro-Language IP"/"Microarchitecture-Level IP" (MLIP) cores**.
+ActiveCore is a framework that demonstrates original hardware designing concept based on **"Micro-Language IP"/"Microarchitecture-Level IP" (MLIP) cores**.
 
-MLIP core is a hardware generator that provides custom synthesizable execution kernel constructed in accordance to certain microarchitectural template. Each MLIP core offers specification of designs within custom computational model that reflects computational process organization inside a hardware microarchitecture. This model typically includes:
+MLIP core is a hardware generator that provides custom synthesizable execution kernel constructed in accordance to certain microarchitectural template. Each MLIP core offers specification of designs within custom computational model inferred from computational process organization inside hardware microarchitecture. This model typically includes:
 * special data types exhibiting behaviour of "microarchitectural" execution units;
 * pre-defined data structures and API for useful scheduling, communication and synchronization "services" of the microarchitecture;
 * procedural blocks selectively exposed for behavioral-style programming of custom application functions and mechanisms.
 
-MLIP core approach serves as intermediate solution for codification of custom microarchitectures between configurable IP cores with fixed functionality and general-purpose HW design tools:
+MLIP core approach serves as intermediate solution for codification of custom microarchitectures between fixed-function IP cores and general-purpose HW design tools:
 
 Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
 
 The ultimate goal of the project is to provide top-down methodology and reusable components for explicit allocation of intermediate ***“microarchitectural middleware”*** design level for complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) incorporates expert knowledge about cross-cutting internal mechanisms of custom microarchitectures, addressing:
 * rapid prototyping of various-purpose IP blocks with common microarchitectural mechanisms;
 * diversification of responsibility and competence of IP engineers: implementation of key microarchitectural mechanisms can be charged to the core of leading engineers, while developers of final products can focus solely on application-specific functionality;
-* facilitating IP design centers to package, reuse and deliver complex hardware templates with programmable microarchitectural mechanisms as basis for semi-custom IP cores.
+* facilitating IP design centers to package, reuse and deliver ***semi-custom IP cores*** instead of stitching microarchitectural mechanisms and custom logic in monolithic designs.
 
 ### Project structure
 

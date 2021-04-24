@@ -127,9 +127,9 @@ endtask
 task CMD_2RS
 	(
 		input logic unsigned [1:0] fu_id
+		, input logic unsigned [4:0] fu_rd
 		, input logic unsigned [4:0] fu_rs0
 		, input logic unsigned [4:0] fu_rs1
-		, input logic unsigned [4:0] fu_rd
 	);
 	begin
 	CMD_EXEC(fu_id, 1, fu_rs0, 1, fu_rs1, 0, 0, fu_rd);
@@ -139,10 +139,10 @@ endtask
 task CMD_3RS
 	(
 		input logic unsigned [1:0] fu_id
+		, input logic unsigned [4:0] fu_rd
 		, input logic unsigned [4:0] fu_rs0
 		, input logic unsigned [4:0] fu_rs1
 		, input logic unsigned [4:0] fu_rs2
-		, input logic unsigned [4:0] fu_rd
 	);
 	begin
 	CMD_EXEC(fu_id, 1, fu_rs0, 1, fu_rs1, 1, fu_rs2, fu_rd);
@@ -213,15 +213,34 @@ endtask
 
 task EXEC_ADD
 	(
-		input logic unsigned [4:0] fu_rs0
+		input logic unsigned [4:0] fu_rd
+		, input logic unsigned [4:0] fu_rs0
 		, input logic unsigned [4:0] fu_rs1
-		, input logic unsigned [4:0] fu_rd
 	);
 	begin
-	CMD_2RS(0, fu_rs0, fu_rs1, fu_rd);
+	CMD_2RS(0, fu_rd, fu_rs0, fu_rs1);
 	log_data_expected[fu_rd] = log_data_expected[fu_rs0] + log_data_expected[fu_rs1];
 	end
 endtask
+
+task EXEC_MUL
+	(
+		input logic unsigned [4:0] fu_rd
+		, input logic unsigned [4:0] fu_rs0
+		, input logic unsigned [4:0] fu_rs1
+	);
+	begin
+	CMD_2RS(1, fu_rd, fu_rs0, fu_rs1);
+	log_data_expected[fu_rd] = log_data_expected[fu_rs0] * log_data_expected[fu_rs1];
+	end
+endtask
+
+function logic eq_shortreals (input shortreal src0, input shortreal src1);
+    begin
+    if (src0 > src1) return ((src0 - src1) > 0.0001);
+    else return ((src1 - src0) > 0.0001);
+    end
+endfunction 
 
 logic test_passed = 1'b1;
 task SCAN_REGS ();
@@ -238,7 +257,7 @@ task SCAN_REGS ();
 	test_passed = 1'b1;
 	for (int i=0; i<32; i=i+1)
 	   begin
-	   if (log_data[i] != log_data_expected[i])
+	   if (eq_shortreals(log_data[i], log_data_expected[i]))
 	       begin
 	       test_passed = 1'b0;
 	       $display("error at address %2d: expected output: %f, actual outputs: %f", i, log_data_expected[i], log_data[i]);
@@ -262,15 +281,16 @@ initial
 	
 	// initialization
 	RF_LOAD(0, $shortrealtobits(2.4));
-	RF_LOAD(7, $shortrealtobits(7.0));
-	RF_LOAD(9, $shortrealtobits(9.0));
 	RF_LOAD(1, $shortrealtobits(1.0));
 	RF_LOAD(2, $shortrealtobits(2.0));
 	RF_LOAD(3, $shortrealtobits(3.0));
+	RF_LOAD(7, $shortrealtobits(7.0));
+	RF_LOAD(9, $shortrealtobits(9.0));
 	RF_LOAD(15, $shortrealtobits(15.0));
 	
-	EXEC_ADD(0, 1, 5);
-	EXEC_ADD(2, 5, 6);
+	EXEC_ADD(5, 0, 1);
+	EXEC_ADD(6, 2, 5);
+	EXEC_MUL(10, 3, 6);
 
     SCAN_REGS();
 
