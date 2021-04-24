@@ -186,7 +186,9 @@ citadel_gen citadel_inst
 	, .cmd_resp_genfifo_ack_i(cmd_resp_genfifo_ack)
 );
 
-real log_data [255:0];
+
+shortreal log_data [31:0];
+shortreal log_data_expected [31:0];
 integer log_data_counter = 0;
 always @(posedge CLK_100MHZ)
 	begin
@@ -198,9 +200,58 @@ always @(posedge CLK_100MHZ)
 		end
 	end
 
+task RF_LOAD
+	(
+		input logic unsigned [4:0] rf_addr
+		, input logic unsigned [31:0] rf_wdata
+	);
+	begin
+	CMD_RF_LOAD(rf_addr, rf_wdata);
+	log_data_expected[rf_addr] = $bitstoshortreal(rf_wdata);
+	end
+endtask
+
+task EXEC_ADD
+	(
+		input logic unsigned [4:0] fu_rs0
+		, input logic unsigned [4:0] fu_rs1
+		, input logic unsigned [4:0] fu_rd
+	);
+	begin
+	CMD_2RS(0, fu_rs0, fu_rs1, fu_rd);
+	log_data_expected[fu_rd] = log_data_expected[fu_rs0] + log_data_expected[fu_rs1];
+	end
+endtask
+
+logic test_passed = 1'b1;
+task SCAN_REGS ();
+    begin
+    // fetching results
+    for (int i=0; i<32; i=i+1)
+        begin
+        CMD_RF_STORE(i);
+        end
+     
+	WAIT(100);
+	
+	// checks
+	test_passed = 1'b1;
+	for (int i=0; i<32; i=i+1)
+	   begin
+	   if (log_data[i] != log_data_expected[i])
+	       begin
+	       test_passed = 1'b0;
+	       $display("error at address %2d: expected output: %f, actual outputs: %f", i, log_data_expected[i], log_data[i]);
+	       end
+	   end
+	if (test_passed) $display ("### TEST PASSED ###");
+	else $error("### TEST FAILED ###");
+	
+    end
+endtask;
+
 /////////////////////////
 // main test procesure //
-logic test_passed = 1'b1;
 initial
     begin
 
@@ -209,36 +260,19 @@ initial
 	RESET_ALL();
 	WAIT(10);
 	
-	// fetching results
-	CMD_RF_LOAD(0, $shortrealtobits(2.4));
-	CMD_RF_LOAD(7, $shortrealtobits(7.0));
-	CMD_RF_LOAD(9, $shortrealtobits(9.0));
-	CMD_RF_LOAD(1, $shortrealtobits(1.0));
-	CMD_RF_LOAD(2, $shortrealtobits(2.0));
-	CMD_RF_LOAD(3, $shortrealtobits(3.0));
-	CMD_RF_LOAD(15, $shortrealtobits(15.0));
+	// initialization
+	RF_LOAD(0, $shortrealtobits(2.4));
+	RF_LOAD(7, $shortrealtobits(7.0));
+	RF_LOAD(9, $shortrealtobits(9.0));
+	RF_LOAD(1, $shortrealtobits(1.0));
+	RF_LOAD(2, $shortrealtobits(2.0));
+	RF_LOAD(3, $shortrealtobits(3.0));
+	RF_LOAD(15, $shortrealtobits(15.0));
 	
-	CMD_2RS(0, 0, 1, 5);
-	CMD_2RS(0, 2, 5, 6);
+	EXEC_ADD(0, 1, 5);
+	EXEC_ADD(2, 5, 6);
 
-	CMD_RF_STORE(0);
-	CMD_RF_STORE(1);
-	CMD_RF_STORE(2);
-	CMD_RF_STORE(3);
-	CMD_RF_STORE(5);
-	CMD_RF_STORE(6);
-	CMD_RF_STORE(7);
-	CMD_RF_STORE(9);
-	CMD_RF_STORE(15);
-	
-	WAIT(100);
-	
-	// checks
-	if (log_data[4] != log_data[0] + log_data[1]) test_passed = 1'b0;
-	if (log_data[5] != log_data[2] + log_data[4]) test_passed = 1'b0;
-	
-	if (test_passed) $display ("### TEST PASSED ###");
-	else $error("### TEST FAILED ###");
+    SCAN_REGS();
 
 	$display ("### TEST PROCEDURE FINISHED ###");
 	$stop;
