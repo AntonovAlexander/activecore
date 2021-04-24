@@ -186,17 +186,21 @@ citadel_gen citadel_inst
 	, .cmd_resp_genfifo_ack_i(cmd_resp_genfifo_ack)
 );
 
+real log_data [255:0];
+integer log_data_counter = 0;
 always @(posedge CLK_100MHZ)
 	begin
 	if (cmd_resp_genfifo_req && cmd_resp_genfifo_ack)
 		begin
 		$display("DATA OUTPUT: hex: 0x%x, shortreal: %f", cmd_resp_genfifo_data, $bitstoshortreal(cmd_resp_genfifo_data));
+		log_data[log_data_counter] = $bitstoshortreal(cmd_resp_genfifo_data);
+		log_data_counter = log_data_counter + 1;
 		end
 	end
 
 /////////////////////////
 // main test procesure //
-
+logic test_passed = 1'b1;
 initial
     begin
 
@@ -228,6 +232,13 @@ initial
 	CMD_RF_STORE(15);
 	
 	WAIT(100);
+	
+	// checks
+	if (log_data[4] != log_data[0] + log_data[1]) test_passed = 1'b0;
+	if (log_data[5] != log_data[2] + log_data[4]) test_passed = 1'b0;
+	
+	if (test_passed) $display ("### TEST PASSED ###");
+	else $error("### TEST FAILED ###");
 
 	$display ("### TEST PROCEDURE FINISHED ###");
 	$stop;

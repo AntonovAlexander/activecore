@@ -16,7 +16,6 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
                     val AUTO_FIRED : Boolean) {
 
     val pctrl_active        = cyclix_gen.ulocal((name_prefix + "genpctrl_active"), 0, 0, "0")
-    val pctrl_stalled_glbl  = cyclix_gen.uglobal((name_prefix + "genpctrl_stalled_glbl"), 0, 0, "0")
     val pctrl_new           = cyclix_gen.ulocal((name_prefix + "genpctrl_new"), 0, 0, "0")
     val pctrl_working       = cyclix_gen.ulocal((name_prefix + "genpctrl_working"), 0, 0, "0")
     val pctrl_succ          = cyclix_gen.ulocal((name_prefix + "genpctrl_succ"), 0, 0, "0")
@@ -40,29 +39,18 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
         return new_var
     }
 
-    fun init_pctrls() {
+    open fun init_pctrls() {
         // Asserting pctrl defaults (deployed even if signal is not used)
         cyclix_gen.assign(pctrl_succ, 0)
         cyclix_gen.assign(pctrl_working, 0)
 
-        cyclix_gen.begif(pctrl_stalled_glbl)
-        run {
-            cyclix_gen.assign(pctrl_new, 0)
-
-            // reactivate stalled transaction
-            cyclix_gen.assign(pctrl_stalled_glbl, 0)
+        if (AUTO_FIRED) {
+            // new transaction
             cyclix_gen.assign(pctrl_active, 1)
-        }; cyclix_gen.endif()
-        cyclix_gen.begelse()
-        run {
-            if (AUTO_FIRED) {
-                // new transaction
-                cyclix_gen.assign(pctrl_active, 1)
-            } else {
-                cyclix_gen.assign(pctrl_active, TRX_BUF_COUNTER_NEMPTY)
-            }
-            cyclix_gen.assign(pctrl_new, pctrl_active)
-        }; cyclix_gen.endif()
+        } else {
+            cyclix_gen.assign(pctrl_active, TRX_BUF_COUNTER_NEMPTY)
+        }
+        cyclix_gen.assign(pctrl_new, pctrl_active)
 
         // Generating "occupied" pctrl
         cyclix_gen.assign(pctrl_occupied, pctrl_active)
@@ -72,6 +60,17 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
         for (driven_local in driven_locals) {
             cyclix_gen.assign(driven_local.key, cyclix_gen.subStruct(TRX_BUF[0], driven_local.value))
         }
+    }
+
+    fun accum(tgt : hw_var, fracs : hw_fracs, src : hw_param) {
+        cyclix_gen.assign(tgt, fracs, src)
+        cyclix_gen.begif(pctrl_active)
+        run {
+            var trx_buf_fracs = hw_fracs(0)
+            trx_buf_fracs.add(hw_frac_SubStruct(driven_locals[tgt]!!))
+            for (frac in fracs) trx_buf_fracs.add(frac)
+            cyclix_gen.assign(TRX_BUF, trx_buf_fracs, src)
+        }; cyclix_gen.endif()
     }
 
     fun set_rdy() {
@@ -89,9 +88,8 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(TRX_BUF, fracs, pushed_var)
     }
 
-    fun pop_trx() {
+    open fun pop_trx() {
         cyclix_gen.assign(pctrl_active, 0)
-        cyclix_gen.assign(pctrl_stalled_glbl, 0)
         cyclix_gen.assign(TRX_BUF, hw_fracs(0), 0)
         for (BUF_INDEX in 0 until TRX_BUF_SIZE-1) {
             cyclix_gen.assign(TRX_BUF, hw_fracs(BUF_INDEX), TRX_BUF[BUF_INDEX+1])
@@ -128,6 +126,53 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
 
     fun pkill_cmd_internal() {
         cyclix_gen.assign(pctrl_active, 0)
+    }
+}
+
+open class hw_stage_stallable(cyclix_gen : cyclix.Generic,
+                              name_prefix : String,
+                              TRX_BUF_SIZE : Int,
+                              AUTO_FIRED : Boolean) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE, AUTO_FIRED) {
+
+    val pctrl_stalled_glbl  = cyclix_gen.uglobal((name_prefix + "genpctrl_stalled_glbl"), 0, 0, "0")
+
+    override fun init_pctrls() {
+        // Asserting pctrl defaults (deployed even if signal is not used)
+        cyclix_gen.assign(pctrl_succ, 0)
+        cyclix_gen.assign(pctrl_working, 0)
+
+        cyclix_gen.begif(pctrl_stalled_glbl)
+        run {
+            cyclix_gen.assign(pctrl_new, 0)
+
+            // reactivate stalled transaction
+            cyclix_gen.assign(pctrl_stalled_glbl, 0)
+            cyclix_gen.assign(pctrl_active, 1)
+        }; cyclix_gen.endif()
+        cyclix_gen.begelse()
+        run {
+            if (AUTO_FIRED) {
+                // new transaction
+                cyclix_gen.assign(pctrl_active, 1)
+            } else {
+                cyclix_gen.assign(pctrl_active, TRX_BUF_COUNTER_NEMPTY)
+            }
+            cyclix_gen.assign(pctrl_new, pctrl_active)
+        }; cyclix_gen.endif()
+
+        // Generating "occupied" pctrl
+        cyclix_gen.assign(pctrl_occupied, pctrl_active)
+    }
+
+    override fun pop_trx() {
+        cyclix_gen.assign(pctrl_active, 0)
+        cyclix_gen.assign(pctrl_stalled_glbl, 0)
+        cyclix_gen.assign(TRX_BUF, hw_fracs(0), 0)
+        for (BUF_INDEX in 0 until TRX_BUF_SIZE-1) {
+            cyclix_gen.assign(TRX_BUF, hw_fracs(BUF_INDEX), TRX_BUF[BUF_INDEX+1])
+        }
+
+        dec_trx_counter()
     }
 
     fun pstall_cmd_internal() {

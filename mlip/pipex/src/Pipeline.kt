@@ -674,13 +674,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
 
         } else if (expr.opcode == OP_ACCUM) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
-            cyclix_gen.begif(context.curStageInfo.pctrl_active)
-            run {
-                var fracs = hw_fracs(0)
-                fracs.add(hw_frac_SubStruct(expr.tgts[0].name))
-                cyclix_gen.assign(context.curStageInfo.TRX_BUF, fracs, context.curStageInfo.TranslateParam(expr.params[0]))
-            }; cyclix_gen.endif()
+            context.curStageInfo.accum(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
 
         } else if (expr.opcode == OP_ASSIGN_SUCC) {
             cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[expr.tgts[0]]!!.req, 1)
