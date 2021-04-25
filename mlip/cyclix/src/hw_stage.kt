@@ -57,27 +57,26 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
     }
 
     fun init_locals() {
+        var TRX_BUF_0 = TRX_BUF.GetFracRef(0)
         for (driven_local in driven_locals) {
-            cyclix_gen.assign(driven_local.key, cyclix_gen.subStruct(TRX_BUF[0], driven_local.value))
+            var TRX_BUF_REF = TRX_BUF_0.GetFracRef(hw_frac_SubStruct(driven_local.value))
+            cyclix_gen.assign(driven_local.key, TRX_BUF_REF)
         }
-    }
-
-    fun accum(tgt : hw_var, fracs : hw_fracs, src : hw_param) {
-        cyclix_gen.assign(tgt, fracs, src)
-        cyclix_gen.begif(pctrl_active)
-        run {
-            var trx_buf_fracs = hw_fracs(0)
-            trx_buf_fracs.add(hw_frac_SubStruct(driven_locals[tgt]!!))
-            for (frac in fracs) trx_buf_fracs.add(frac)
-            cyclix_gen.assign(TRX_BUF, trx_buf_fracs, src)
-        }; cyclix_gen.endif()
     }
 
     fun set_rdy() {
         cyclix_gen.assign(pctrl_rdy, !TRX_BUF_COUNTER_FULL)
     }
 
-    fun push_trx_data(tgt_buf_fracs : hw_fracs, pushed_var : hw_param) {
+    fun push_trx(pushed_var : hw_param) {
+        var fracs = hw_fracs(0)
+        if (TRX_BUF_SIZE != 1) {
+            fracs = hw_fracs(TRX_BUF_COUNTER)
+        }
+        cyclix_gen.assign(TRX_BUF, fracs, pushed_var)
+    }
+
+    fun push_trx_frac(tgt_buf_fracs : hw_fracs, pushed_var : hw_param) {
         var fracs = hw_fracs(0)
         if (TRX_BUF_SIZE != 1) {
             fracs = hw_fracs(TRX_BUF_COUNTER)
@@ -126,6 +125,17 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
 
     fun pkill_cmd_internal() {
         cyclix_gen.assign(pctrl_active, 0)
+    }
+
+    fun accum(tgt : hw_var, fracs : hw_fracs, src : hw_param) {
+        cyclix_gen.assign(tgt, fracs, src)
+        cyclix_gen.begif(pctrl_active)
+        run {
+            var trx_buf_fracs = hw_fracs(0)
+            trx_buf_fracs.add(hw_frac_SubStruct(driven_locals[tgt]!!))
+            for (frac in fracs) trx_buf_fracs.add(frac)
+            cyclix_gen.assign(TRX_BUF, trx_buf_fracs, src)
+        }; cyclix_gen.endif()
     }
 }
 
