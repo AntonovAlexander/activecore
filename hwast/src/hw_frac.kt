@@ -137,6 +137,10 @@ class hw_fracs() : ArrayList<hw_frac>() {
         add(hw_frac_VV(new_elem0, new_elem1))
     }
 
+    fun add(new_elem : String) {
+        add(hw_frac_SubStruct(new_elem))
+    }
+
     fun FillSubStructs(tgt: hw_var) {
         var tgt_struct_ptr = tgt.vartype.src_struct
         for (fraction in this) {

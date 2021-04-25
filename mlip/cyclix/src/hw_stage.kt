@@ -68,35 +68,6 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(pctrl_rdy, !TRX_BUF_COUNTER_FULL)
     }
 
-    fun push_trx(pushed_var : hw_param) {
-        var fracs = hw_fracs(0)
-        if (TRX_BUF_SIZE != 1) {
-            fracs = hw_fracs(TRX_BUF_COUNTER)
-        }
-        cyclix_gen.assign(TRX_BUF, fracs, pushed_var)
-    }
-
-    fun push_trx_frac(tgt_buf_fracs : hw_fracs, pushed_var : hw_param) {
-        var fracs = hw_fracs(0)
-        if (TRX_BUF_SIZE != 1) {
-            fracs = hw_fracs(TRX_BUF_COUNTER)
-        }
-        for (tgt_buf_frac in tgt_buf_fracs) {
-            fracs.add(tgt_buf_frac)
-        }
-        cyclix_gen.assign(TRX_BUF, fracs, pushed_var)
-    }
-
-    open fun pop_trx() {
-        cyclix_gen.assign(pctrl_active, 0)
-        cyclix_gen.assign(TRX_BUF, hw_fracs(0), 0)
-        for (BUF_INDEX in 0 until TRX_BUF_SIZE-1) {
-            cyclix_gen.assign(TRX_BUF, hw_fracs(BUF_INDEX), TRX_BUF[BUF_INDEX+1])
-        }
-
-        dec_trx_counter()
-    }
-
     fun inc_trx_counter() {
         cyclix_gen.assign(TRX_BUF_COUNTER_NEMPTY, 1)
         if (TRX_BUF_SIZE == 1) {
@@ -121,6 +92,35 @@ open class hw_stage(val cyclix_gen : cyclix.Generic,
             }; cyclix_gen.endif()
         }
         cyclix_gen.sub_gen(TRX_BUF_COUNTER, TRX_BUF_COUNTER, 1)
+    }
+
+    fun push_trx(pushed_var : hw_param) {
+        var fracs = hw_fracs(0)
+        if (TRX_BUF_SIZE != 1) {
+            fracs = hw_fracs(TRX_BUF_COUNTER)
+        }
+        cyclix_gen.assign(TRX_BUF, fracs, pushed_var)
+        inc_trx_counter()
+    }
+
+    fun push_trx_frac(tgt_buf_fracs : hw_fracs, pushed_var : hw_param) {
+        var fracs = hw_fracs(0)
+        if (TRX_BUF_SIZE != 1) {
+            fracs = hw_fracs(TRX_BUF_COUNTER)
+        }
+        for (tgt_buf_frac in tgt_buf_fracs) {
+            fracs.add(tgt_buf_frac)
+        }
+        cyclix_gen.assign(TRX_BUF, fracs, pushed_var)
+    }
+
+    open fun pop_trx() {
+        cyclix_gen.assign(pctrl_active, 0)
+        cyclix_gen.assign(TRX_BUF, hw_fracs(0), 0)
+        for (BUF_INDEX in 0 until TRX_BUF_SIZE-1) {
+            cyclix_gen.assign(TRX_BUF, hw_fracs(BUF_INDEX), TRX_BUF[BUF_INDEX+1])
+        }
+        dec_trx_counter()
     }
 
     fun pkill_cmd_internal() {
