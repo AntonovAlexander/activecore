@@ -233,6 +233,12 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
         return GetFracRef(depow_fracs)
     }
 
+    open fun GetFracRef(index : hw_var) : hw_var_frac {
+        var depow_fracs = hw_fracs()
+        depow_fracs.add(index)
+        return GetFracRef(depow_fracs)
+    }
+
     open fun GetFracRef(index : Int) : hw_var_frac {
         var depow_fracs = hw_fracs()
         depow_fracs.add(index)
