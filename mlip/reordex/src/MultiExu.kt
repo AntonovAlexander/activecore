@@ -121,7 +121,6 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         var iq_struct = hw_struct("iq_struct")
         iq_struct.addu("enb",     0, 0, "0")
-        iq_struct.addu("rdy",     0, 0, "0")
         iq_struct.addu("fu_req",     0, 0, "0")
         iq_struct.addu("fu_pending",     0, 0, "0")
         iq_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size), 0, "0")              // for ExecUnits and wb_ext
@@ -135,6 +134,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         iq_struct.addu("rd_tag_prev",     MultiExu_cfg_rf.PRF_addr_width-1, 0, "0")                 // freeing
         iq_struct.addu("rd_tag_prev_clr",     0, 0, "0")
         iq_struct.addu("wb_ext",     0, 0, "0")
+        iq_struct.addu("rdy",     0, 0, "0")
 
         var TranslateInfo = __TranslateInfo()
 
@@ -355,10 +355,12 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             iq_id++
         }
 
-        var renamed_uop_buf = cyclix_gen.global("genrenamed_uop_buf", iq_struct)
+        var renamed_uop_buf = renamed_uop_stage(cyclix_gen, 1, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf)
+        renamed_uop_buf.init_pctrls()
+        renamed_uop_buf.set_rdy()
+        renamed_uop_buf.init_locals()
 
-        // broadcasting FU results to IQ and renamed buffer
-        MSG("Translating: broadcasting FU results to IQ")
+        MSG("Translating: broadcasting FU results to IQ and renamed buffer")
         var fu_id = 0
         for (exu_num in 0 until ExUnits_insts.size) {
             for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
@@ -430,35 +432,34 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     }
 
                     // broadcasting FU results to renamed buffer
-                    cyclix_gen.begif(cyclix_gen.subStruct(renamed_uop_buf, "enb"))
-                    run {
-                        // monitoring generated data
+                    // monitoring generated data
+                    for (renamed_uop_buf_idx in 0 until renamed_uop_buf.TRX_BUF_SIZE) {
+                        var renamed_uop_buf_entry = renamed_uop_buf.TRX_BUF.GetFracRef(renamed_uop_buf_idx)
                         for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
-                            cyclix_gen.begif(!cyclix_gen.subStruct(renamed_uop_buf, "rs" + RF_rs_idx + "_rdy"))
+
+                            var rs_rdy      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_rdy")
+                            var rs_tag      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_tag")
+                            var rs_rdata    = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_rdata")
+
+                            cyclix_gen.begif(!rs_rdy)
                             run {
-                                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(renamed_uop_buf, "rs" + RF_rs_idx + "_tag"), cyclix_gen.subStruct(exu_resp, "tag")))
+                                cyclix_gen.begif(cyclix_gen.eq2(rs_tag, cyclix_gen.subStruct(exu_resp, "tag")))
                                 run {
                                     // setting IQ entry ready
-                                    cyclix_gen.assign(
-                                        renamed_uop_buf,
-                                        hw_fracs(hw_frac_SubStruct("rs" + RF_rs_idx + "_rdata")),
-                                        cyclix_gen.subStruct(exu_resp, "wdata"))
-                                    cyclix_gen.assign(
-                                        renamed_uop_buf,
-                                        hw_fracs(hw_frac_SubStruct("rs" + RF_rs_idx + "_rdy")),
-                                        1)
+                                    cyclix_gen.assign(rs_rdata, cyclix_gen.subStruct(exu_resp, "wdata"))
+                                    cyclix_gen.assign(rs_rdy, 1)
                                 }; cyclix_gen.endif()
                             }; cyclix_gen.endif()
                         }
                         //// setting rdy for wb_ext if data generated ////
-                        cyclix_gen.begif(cyclix_gen.subStruct(renamed_uop_buf, "wb_ext"))
+                        var wb_ext  = renamed_uop_buf_entry.GetFracRef("wb_ext")
+                        var rdy     = renamed_uop_buf_entry.GetFracRef("rdy")
+                        var rs0_rdy = renamed_uop_buf_entry.GetFracRef("rs0_rdy")
+                        cyclix_gen.begif(wb_ext)
                         run {
-                            cyclix_gen.assign(
-                                renamed_uop_buf,
-                                hw_fracs(hw_frac_SubStruct("rdy")),
-                                cyclix_gen.subStruct(renamed_uop_buf, "rs0_rdy"))
+                            cyclix_gen.assign(rdy, rs0_rdy)
                         }; cyclix_gen.endif()
-                    }; cyclix_gen.endif()
+                    }
 
                 }; cyclix_gen.endif()
             }
@@ -466,12 +467,12 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         }
 
         // acquiring new operation to iq tail
-        cyclix_gen.begif(cyclix_gen.subStruct(renamed_uop_buf, "enb"))
+        cyclix_gen.begif(renamed_uop_buf.pctrl_active)
         run {
 
             for (IQ_inst in IQ_insts) {
 
-                cyclix_gen.begif(cyclix_gen.eq2(cyclix_gen.subStruct(renamed_uop_buf, "fu_id"), IQ_inst.iq_num))
+                cyclix_gen.begif(cyclix_gen.eq2(renamed_uop_buf.fu_id, IQ_inst.iq_num))
                 run {
 
                     cyclix_gen.begif(!IQ_inst.iq_full)
@@ -480,11 +481,9 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                         cyclix_gen.assign(IQ_inst.iq_wr, 1)
 
                         // putting new uop in IQ
-                        cyclix_gen.assign(
-                            IQ_inst.iq,
-                            hw_fracs(hw_frac_V(IQ_inst.iq_wr_ptr)),
-                            renamed_uop_buf
-                        )
+                        var src_trx = renamed_uop_buf.TRX_BUF.GetFracRef(0)
+                        var IQ_tail_ref = IQ_inst.iq.GetFracRef(IQ_inst.iq_wr_ptr)
+                        cyclix_gen.assign(IQ_tail_ref, src_trx)
 
                         // iq_wr_ptr update
                         cyclix_gen.begif(IQ_inst.iq_wr)
@@ -507,11 +506,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                         }; cyclix_gen.endif()
 
                         // clearing renamed uop buffer
-                        cyclix_gen.assign(
-                            renamed_uop_buf,
-                            hw_fracs(hw_frac_SubStruct("enb")),
-                            0
-                        )
+                        renamed_uop_buf.pop_trx()
 
                     }; cyclix_gen.endif()
 
@@ -521,7 +516,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         // renaming
         var new_renamed_uop = cyclix_gen.local("gennew_renamed_uop", iq_struct)
-        cyclix_gen.begif(!cyclix_gen.subStruct(renamed_uop_buf, "enb"))         // checking if renamed uop buffer is empty
+        cyclix_gen.begif(renamed_uop_buf.pctrl_rdy)                 // checking if renamed uop buffer is empty
         run {
             cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(cmd_req, cmd_req_data))
             run {
@@ -716,7 +711,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                 }; cyclix_gen.endif()
 
                 // placing new uop in rename_buf
-                cyclix_gen.assign(renamed_uop_buf, new_renamed_uop)
+                renamed_uop_buf.push_trx(new_renamed_uop)
 
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()

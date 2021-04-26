@@ -38,25 +38,27 @@ data class __RF_rs_req(val rs_rdy : hw_var,
 class renamed_uop_stage(cyclix_gen : cyclix.Generic,
                         TRX_BUF_SIZE : Int,
                         ExecUnits_size : Int,
+                        trx_struct : hw_struct,
                         MultiExu_cfg_rf : MultiExu_CFG_RF,
-                        Exu_cfg_rf : Exu_CFG_RF) : hw_stage(cyclix_gen, "genrenamed_uop_buf", TRX_BUF_SIZE, false) {
+                        Exu_cfg_rf : Exu_CFG_RF) : hw_stage(cyclix_gen, "genrenamed_uop_buf_", trx_struct, TRX_BUF_SIZE, false) {
 
-    val fu_req          = AddStageVar(cyclix_gen.ulocal("fu_req",     0, 0, "0"))
-    val fu_pending      = AddStageVar(cyclix_gen.ulocal("fu_pending",     0, 0, "0"))
-    val fu_id           = AddStageVar(cyclix_gen.ulocal("fu_id",     GetWidthToContain(ExecUnits_size), 0, "0"))
-    val fu_opcode       = AddStageVar(cyclix_gen.ulocal("fu_opcode",     0, 0, "0"))
+    val fu_req          = AddLocal("fu_req")
+    val fu_pending      = AddLocal("fu_pending")
+    val fu_id           = AddLocal("fu_id")
+    val fu_opcode       = AddLocal("fu_opcode")
     val rs_rsrv         = ArrayList<__RF_rs_req>()
-    val rd_tag          = AddStageVar(cyclix_gen.ulocal("rd_tag", MultiExu_cfg_rf.PRF_addr_width-1, 0, "0"))
-    val rd_tag_prev     = AddStageVar(cyclix_gen.ulocal("rd_tag_prev_clr", MultiExu_cfg_rf.PRF_addr_width-1, 0, "0"))
-    val rd_tag_prev_clr = AddStageVar(cyclix_gen.ulocal("rd_tag_prev_clr",0, 0, "0"))
-    val wb_ext          = AddStageVar(cyclix_gen.ulocal("wb_ext",     0, 0, "0"))
+    val rd_tag          = AddLocal("rd_tag")
+    val rd_tag_prev     = AddLocal("rd_tag_prev")
+    val rd_tag_prev_clr = AddLocal("rd_tag_prev_clr")
+    val wb_ext          = AddLocal("wb_ext")
+    val rdy             = AddLocal("rdy")
 
     init {
         for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
             rs_rsrv.add(__RF_rs_req(
-                AddStageVar(cyclix_gen.ulocal("rs" + RF_rs_idx + "_rdy",     0, 0, "0")),
-                AddStageVar(cyclix_gen.ulocal("rs" + RF_rs_idx + "_tag",     MultiExu_cfg_rf.PRF_addr_width-1, 0, "0")),
-                AddStageVar(cyclix_gen.ulocal("rs" + RF_rs_idx + "_rdata",     Exu_cfg_rf.RF_width-1, 0, "0"))
+                AddLocal("rs" + RF_rs_idx + "_rdy"),
+                AddLocal("rs" + RF_rs_idx + "_tag"),
+                AddLocal("rs" + RF_rs_idx + "_rdata")
             ))
         }
     }
