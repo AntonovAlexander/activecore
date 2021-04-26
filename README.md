@@ -31,35 +31,23 @@ Current version of project is implemented as a collection of Kotlin libraries th
 * **hwast** - generic AST constructor for behavioral HW specifications (/hwast)
 
 * Demo MLIP cores based on hwast (/mlip):
-
 	* **Rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
-
 	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Xilinx HLS
-
 	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
-
 	* **Reordex** (**reorde**red e**x**ecution) - generator of coprocessors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to cyclix MLIP
 
 * Demo core generators based on MLIP cores (/designs/coregen):
-
 	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on pipex MLIP core
-
 	* **ariele** - full xbar generator, based on pipex MLIP core
-
 	* **taylor_credit_pipeline** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on pipex MLIP core. Location: /designs/rtl/credit_test
-
 	* **citadel** - OoO FPU coprocessor, based on reordex MLIP core
 
 * Auxiliary reusable cores:
-
 	* **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Lab work manual included. Location: /designs/rtl/udm
-
 	* **sigma_tile** - basic CPU tile consisting of a single aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, interrupt controller, timer, Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equivalent to UDM bus protocol. Location: /designs/rtl/sigma_tile
 
 * Demo FPGA-based SoCs:
-
 	* **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Can be learned within a single lab work, lab work manual included. Location: /designs/rtl/sigma
-
 	* **Magma** - NUMA MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
 
 ### Publications

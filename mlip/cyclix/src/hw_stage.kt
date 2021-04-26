@@ -39,10 +39,9 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         return ret_var
     }
 
-    fun AddStageVar(new_var : hw_var) : hw_var {
-        TRX_BUF.vartype.src_struct.add(hw_structvar(new_var.name, new_var.vartype, new_var.defimm))
-        driven_locals.put(new_var, new_var.name)
-        return new_var
+    fun AddStageVar(new_structvar : hw_structvar) : hw_var {
+        AddBuf(new_structvar)
+        return AddLocal(new_structvar.name)
     }
 
     fun inc_trx_counter() {
