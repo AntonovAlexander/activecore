@@ -992,10 +992,11 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
         for (CUR_STAGE_INDEX in 0 until TranslateInfo.StageList.size) {
             val stage = TranslateInfo.StageList[CUR_STAGE_INDEX]
-            val name_prefix = "genpstage_" + stage.name + "_"
+            val name_prefix         = "genpstage_" + stage.name
+            val name_prefix_delim   = name_prefix + "_"
 
-            var pctrl_finish        = cyclix_gen.ulocal((name_prefix + "genpctrl_finish"), 0, 0, "0")
-            var pctrl_flushreq      = cyclix_gen.ulocal((name_prefix + "genpctrl_flushreq"), 0, 0, "0")
+            var pctrl_finish        = cyclix_gen.ulocal((name_prefix_delim + "genpctrl_finish"), 0, 0, "0")
+            var pctrl_flushreq      = cyclix_gen.ulocal((name_prefix_delim + "genpctrl_flushreq"), 0, 0, "0")
 
             var pstage_buf_size = 1
             if (CUR_STAGE_INDEX == 0) {
@@ -1133,7 +1134,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             for (local in pContext_locals) {
                 if (local is hw_local) {
                     var new_local = cyclix_gen.local(
-                        (curStageInfo.name_prefix + local.name),
+                        (curStageInfo.name_prefix + "_" + local.name),
                         local.vartype,
                         local.defimm
                     )

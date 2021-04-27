@@ -35,13 +35,15 @@ data class __RF_rs_req(val rs_rdy : hw_var,
                        val rs_tag : hw_var,
                        val rs_rdata : hw_var)
 
-class renamed_uop_stage(cyclix_gen : cyclix.Generic,
-                        TRX_BUF_SIZE : Int,
-                        ExecUnits_size : Int,
-                        trx_struct : hw_struct,
-                        MultiExu_cfg_rf : MultiExu_CFG_RF,
-                        Exu_cfg_rf : Exu_CFG_RF) : hw_stage(cyclix_gen, "genrenamed_uop_buf_", trx_struct, TRX_BUF_SIZE, false) {
+open class uop_buffer(cyclix_gen : cyclix.Generic,
+                 name_prefix : String,
+                 TRX_BUF_SIZE : Int,
+                 ExecUnits_size : Int,
+                 trx_struct : hw_struct,
+                 MultiExu_cfg_rf : MultiExu_CFG_RF,
+                 Exu_cfg_rf : Exu_CFG_RF) : hw_stage(cyclix_gen, name_prefix, trx_struct, TRX_BUF_SIZE, false) {
 
+    val enb             = AddLocal("enb")
     val fu_req          = AddLocal("fu_req")
     val fu_pending      = AddLocal("fu_pending")
     val fu_id           = AddLocal("fu_id")
@@ -62,4 +64,18 @@ class renamed_uop_stage(cyclix_gen : cyclix.Generic,
             ))
         }
     }
+}
+
+class iq_buffer(cyclix_gen : cyclix.Generic,
+                name_prefix : String,
+                TRX_BUF_SIZE : Int,
+                ExecUnits_size : Int,
+                trx_struct : hw_struct,
+                MultiExu_cfg_rf : MultiExu_CFG_RF,
+                Exu_cfg_rf : Exu_CFG_RF,
+                val iq_num: hw_imm,
+                val iq_exu: Boolean) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, ExecUnits_size, trx_struct, MultiExu_cfg_rf, Exu_cfg_rf) {
+
+    val rd = cyclix_gen.ulocal(name_prefix + "_rd", 0, 0, "0")
+    val wr = cyclix_gen.ulocal(name_prefix + "_wr", 0, 0, "0")
 }

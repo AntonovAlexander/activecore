@@ -17,15 +17,15 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
 
     var driven_locals       = mutableMapOf<hw_var, String>()
 
-    var TRX_BUF                 = cyclix_gen.global(name_prefix + "TRX_BUF", TRX_BUF_STRUCT, TRX_BUF_SIZE-1, 0)
+    var TRX_BUF                 = cyclix_gen.global(name_prefix + "_TRX_BUF", TRX_BUF_STRUCT, TRX_BUF_SIZE-1, 0)
     var TRX_BUF_head_ref        = TRX_BUF.GetFracRef(0)
-    var TRX_BUF_COUNTER         = cyclix_gen.uglobal(name_prefix + "TRX_BUF_COUNTER", GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0")
-    var TRX_BUF_COUNTER_NEMPTY  = cyclix_gen.uglobal(name_prefix + "TRX_BUF_COUNTER_NEMPTY", 0, 0, "0")
-    var TRX_BUF_COUNTER_FULL    = cyclix_gen.uglobal(name_prefix + "TRX_BUF_COUNTER_FULL", 0, 0, "0")
+    var TRX_BUF_COUNTER         = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER", GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0")
+    var TRX_BUF_COUNTER_NEMPTY  = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER_NEMPTY", 0, 0, "0")
+    var TRX_BUF_COUNTER_FULL    = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER_FULL", 0, 0, "0")
 
     constructor(cyclix_gen : cyclix.Generic,
                 name_prefix : String,
-                TRX_BUF_SIZE : Int) : this (cyclix_gen, name_prefix, hw_struct(name_prefix + "TRX_BUF_STRUCT"), TRX_BUF_SIZE)
+                TRX_BUF_SIZE : Int) : this (cyclix_gen, name_prefix, hw_struct(name_prefix + "_TRX_BUF_STRUCT"), TRX_BUF_SIZE)
 
 
     fun AddBuf(new_structvar : hw_structvar) {
@@ -34,7 +34,7 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
 
     fun AddLocal(fracname: String) : hw_var {
         var val_ref = TRX_BUF_head_ref.GetFracRef(fracname)
-        var ret_var = cyclix_gen.local(name_prefix + "genlocal_" + fracname, val_ref.vartype, "0")
+        var ret_var = cyclix_gen.local(name_prefix + "_genlocal_" + fracname, val_ref.vartype, "0")
         driven_locals.put(ret_var, fracname)
         return ret_var
     }
@@ -105,17 +105,17 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
                     TRX_BUF_SIZE : Int,
                     val AUTO_FIRED : Boolean) : hw_fifo(cyclix_gen, name_prefix, TRX_BUF_STRUCT, TRX_BUF_SIZE) {
 
-    val pctrl_active        = cyclix_gen.ulocal((name_prefix + "genpctrl_active"), 0, 0, "0")
-    val pctrl_new           = cyclix_gen.ulocal((name_prefix + "genpctrl_new"), 0, 0, "0")
-    val pctrl_working       = cyclix_gen.ulocal((name_prefix + "genpctrl_working"), 0, 0, "0")
-    val pctrl_succ          = cyclix_gen.ulocal((name_prefix + "genpctrl_succ"), 0, 0, "0")
-    val pctrl_occupied      = cyclix_gen.ulocal((name_prefix + "genpctrl_occupied"), 0, 0, "0")
-    var pctrl_rdy           = cyclix_gen.ulocal((name_prefix + "genpctrl_rdy"), 0, 0, "0")
+    val pctrl_active        = cyclix_gen.ulocal((name_prefix + "_genpctrl_active"), 0, 0, "0")
+    val pctrl_new           = cyclix_gen.ulocal((name_prefix + "_genpctrl_new"), 0, 0, "0")
+    val pctrl_working       = cyclix_gen.ulocal((name_prefix + "_genpctrl_working"), 0, 0, "0")
+    val pctrl_succ          = cyclix_gen.ulocal((name_prefix + "_genpctrl_succ"), 0, 0, "0")
+    val pctrl_occupied      = cyclix_gen.ulocal((name_prefix + "_genpctrl_occupied"), 0, 0, "0")
+    var pctrl_rdy           = cyclix_gen.ulocal((name_prefix + "_genpctrl_rdy"), 0, 0, "0")
 
     constructor(cyclix_gen : cyclix.Generic,
                 name_prefix : String,
                 TRX_BUF_SIZE : Int,
-                AUTO_FIRED : Boolean) : this (cyclix_gen, name_prefix, hw_struct(name_prefix + "TRX_BUF_STRUCT"), TRX_BUF_SIZE, AUTO_FIRED)
+                AUTO_FIRED : Boolean) : this (cyclix_gen, name_prefix, hw_struct(name_prefix + "_TRX_BUF_STRUCT"), TRX_BUF_SIZE, AUTO_FIRED)
 
     open fun init_pctrls() {
         // Asserting pctrl defaults (deployed even if signal is not used)
@@ -171,7 +171,7 @@ open class hw_stage_stallable(cyclix_gen : cyclix.Generic,
                               TRX_BUF_SIZE : Int,
                               AUTO_FIRED : Boolean) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE, AUTO_FIRED) {
 
-    val pctrl_stalled_glbl  = cyclix_gen.uglobal((name_prefix + "genpctrl_stalled_glbl"), 0, 0, "0")
+    val pctrl_stalled_glbl  = cyclix_gen.uglobal((name_prefix + "_genpctrl_stalled_glbl"), 0, 0, "0")
 
     override fun init_pctrls() {
         // Asserting pctrl defaults (deployed even if signal is not used)
