@@ -35,7 +35,7 @@ class SvWriter(var mod : module) {
             return ("[" + fraction.index.token_printable + "]")
 
         else if (fraction is hw_frac_V)
-            return ("[" + fraction.index.name + "]")
+            return ("[" + GetParamString(fraction.index) + "]")
 
         else if (fraction is hw_frac_CC)
             return ("[" + fraction.msb.token_printable + ":"
@@ -43,15 +43,15 @@ class SvWriter(var mod : module) {
 
         else if (fraction is hw_frac_CV)
             return ("[" + fraction.msb.token_printable + ":"
-                    + fraction.lsb.name + "]")
+                    + GetParamString(fraction.lsb) + "]")
 
         else if (fraction is hw_frac_VC)
-            return ("[" + fraction.msb.name + ":"
+            return ("[" + GetParamString(fraction.msb) + ":"
                     + fraction.lsb.token_printable + "]")
 
         else if (fraction is hw_frac_VV)
-            return ("[" + fraction.msb.name + ":"
-                    + fraction.lsb.name + "]")
+            return ("[" + GetParamString(fraction.msb) + ":"
+                    + GetParamString(fraction.lsb) + "]")
 
         else if (fraction is hw_frac_SubStruct)
             return ("." + fraction.substruct_name)

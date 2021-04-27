@@ -274,4 +274,12 @@ class hw_var_frac(var src_var : hw_var, var depow_fractions: hw_fracs, vartype :
         for (frac in depow_frac) depow_fracs.add(frac)
         return GetFracRef(depow_fracs)
     }
+
+    fun DisplayInfo() {
+        MSG("#### hw_var_frac info ####")
+        MSG("src name: " + src_var.name)
+        for (depow_frac in depow_fractions) {
+            MSG("-- frac: " + depow_frac.toString())
+        }
+    }
 }

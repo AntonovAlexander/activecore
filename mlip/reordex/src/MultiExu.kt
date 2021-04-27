@@ -146,7 +146,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         var ExUnit_idx = 0
         for (ExUnit in ExecUnits) {
-            IQ_insts.add(iq_buffer(cyclix_gen, "geniq_" + ExUnit.key, 1, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true))
+            IQ_insts.add(iq_buffer(cyclix_gen, "geniq_" + ExUnit.key, ExUnit.value.iq_length, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true))
             ExUnit_idx++
 
             // generating submodules
@@ -205,7 +205,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         }
 
         // adding IQ for stores
-        IQ_insts.add(iq_buffer(cyclix_gen, "genwb", 1, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false))
+        IQ_insts.add(iq_buffer(cyclix_gen, "genwb", out_iq_size, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false))
 
         var iq_id = 0
         for (IQ_inst in IQ_insts) {
@@ -306,7 +306,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             iq_id++
         }
 
-        var renamed_uop_buf = uop_buffer(cyclix_gen, "genrenamed_uop_buf_", 1, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf)
+        var renamed_uop_buf = uop_buffer(cyclix_gen, "genrenamed_uop_buf", 1, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf)
         renamed_uop_buf.init_pctrls()
         renamed_uop_buf.set_rdy()
         renamed_uop_buf.init_locals()
@@ -440,195 +440,116 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         // renaming
         var new_renamed_uop = cyclix_gen.local("gennew_renamed_uop", iq_struct)
+        var nru_enb             = new_renamed_uop.GetFracRef("enb")
+        var nru_rdy             = new_renamed_uop.GetFracRef("rdy")
+        var nru_fu_req          = new_renamed_uop.GetFracRef("fu_req")
+        var nru_fu_pending      = new_renamed_uop.GetFracRef("fu_pending")
+        var nru_fu_id           = new_renamed_uop.GetFracRef("fu_id")
+        var nru_fu_opcode       = new_renamed_uop.GetFracRef("fu_opcode")
+        var nru_wb_ext          = new_renamed_uop.GetFracRef("wb_ext")
+        var nru_rd_tag          = new_renamed_uop.GetFracRef("rd_tag")
+        var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
+        var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
+
         cyclix_gen.begif(renamed_uop_buf.pctrl_rdy)                 // checking if renamed uop buffer is empty
         run {
             cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(cmd_req, cmd_req_data))
             run {
 
                 // decoding input
-                cyclix_gen.assign(
-                    new_renamed_uop,
-                    hw_fracs(hw_frac_SubStruct("enb")),
-                    1)
+                cyclix_gen.assign(nru_enb, 1)
 
-                cyclix_gen.assign(
-                    new_renamed_uop,
-                    hw_fracs(hw_frac_SubStruct("fu_pending")),
-                    0)
-                cyclix_gen.assign(
-                    new_renamed_uop,
-                    hw_fracs(hw_frac_SubStruct("fu_id")),
-                    cyclix_gen.subStruct(cmd_req_data, "fu_id"))
-                cyclix_gen.assign(
-                    new_renamed_uop,
-                    hw_fracs(hw_frac_SubStruct("fu_opcode")),
-                    cyclix_gen.subStruct(cmd_req_data, "fu_opcode"))
+                cyclix_gen.assign(nru_fu_pending, 0)
+                cyclix_gen.assign(nru_fu_id,      cmd_req_data.GetFracRef("fu_id"))
+                cyclix_gen.assign(nru_fu_opcode,  cmd_req_data.GetFracRef("fu_opcode"))
 
                 // LOAD/STORE commutation
-                cyclix_gen.begif(!cyclix_gen.subStruct(cmd_req_data, "exec"))
+                cyclix_gen.begif(!cmd_req_data.GetFracRef("exec"))
                 run {
-                    cyclix_gen.assign(
-                        new_renamed_uop,
-                        hw_fracs(hw_frac_SubStruct("fu_id")),
-                        ExecUnits.size)
+                    cyclix_gen.assign(nru_fu_id, ExecUnits.size)
 
                     // LOAD
-                    cyclix_gen.begif(cyclix_gen.subStruct(cmd_req_data, "rf_we"))
+                    cyclix_gen.begif(cmd_req_data.GetFracRef("rf_we"))
                     run {
-                        cyclix_gen.assign(
-                            cmd_req_data,
-                            hw_fracs(hw_frac_SubStruct("fu_rd")),
-                            cyclix_gen.subStruct(cmd_req_data, "rf_addr"))
+                        cyclix_gen.assign(cmd_req_data.GetFracRef("fu_rd"), cmd_req_data.GetFracRef("rf_addr"))
                     }; cyclix_gen.endif()
 
                     // STORE
                     cyclix_gen.begelse()
                     run {
-                        cyclix_gen.assign(
-                            cmd_req_data,
-                            hw_fracs(hw_frac_SubStruct("fu_rs0")),
-                            cyclix_gen.subStruct(cmd_req_data, "rf_addr"))
+                        cyclix_gen.assign(cmd_req_data.GetFracRef("fu_rs0"), cmd_req_data.GetFracRef("rf_addr"))
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
 
                 var rss_tags = ArrayList<hw_var>()
                 for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
-                    rss_tags.add(cyclix_gen.indexed(ARF_map, cyclix_gen.subStruct(cmd_req_data, "fu_rs" + RF_rs_idx)))
+                    rss_tags.add(cyclix_gen.indexed(ARF_map, cmd_req_data.GetFracRef("fu_rs" + RF_rs_idx)))
                 }
-                var rd_tag = cyclix_gen.indexed(ARF_map, cyclix_gen.subStruct(cmd_req_data, "fu_rd"))
+                var rd_tag = cyclix_gen.indexed(ARF_map, cmd_req_data.GetFracRef("fu_rd"))
 
                 for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                    cyclix_gen.assign(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_tag"), rss_tags[RF_rs_idx])
                     cyclix_gen.assign(
-                        new_renamed_uop,
-                        hw_fracs(hw_frac_SubStruct("rs" + RF_rs_idx + "_tag")),
-                        rss_tags[RF_rs_idx])
-                    cyclix_gen.assign(
-                        new_renamed_uop,
-                        hw_fracs(hw_frac_SubStruct("rs" + RF_rs_idx + "_rdata")),
-                        cyclix_gen.indexed(PRF, cyclix_gen.subStruct(new_renamed_uop, "rs" + RF_rs_idx + "_tag")))
+                        new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdata"),
+                        cyclix_gen.indexed(PRF, new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_tag")))
                 }
 
                 var alloc_rd_tag = cyclix_gen.min0(PRF_mapped)
 
-                cyclix_gen.begif(cyclix_gen.subStruct(cmd_req_data, "exec"))
+                cyclix_gen.begif(cmd_req_data.GetFracRef("exec"))
                 run {
 
-                    cyclix_gen.assign(
-                        new_renamed_uop,
-                        hw_fracs(hw_frac_SubStruct("fu_req")),
-                        1)
+                    cyclix_gen.assign(nru_fu_req, 1)
 
                     for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
                         // fetching rdy flags from PRF_rdy and masking with rsX_req
                         cyclix_gen.assign(
-                            new_renamed_uop,
-                            hw_fracs(hw_frac_SubStruct("rs" + RF_rs_idx + "_rdy")),
+                            new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdy"),
                             cyclix_gen.bor(cyclix_gen.indexed(PRF_rdy, rss_tags[RF_rs_idx]), !cyclix_gen.subStruct(cmd_req_data, "fu_rs" + RF_rs_idx + "_req")) )
                     }
 
-                    cyclix_gen.assign(
-                        new_renamed_uop,
-                        hw_fracs(hw_frac_SubStruct("rd_tag")),
-                        alloc_rd_tag.position)                                      // TODO: check for availability flag
-                    cyclix_gen.assign(
-                        new_renamed_uop,
-                        hw_fracs(hw_frac_SubStruct("rd_tag_prev")),
-                        rd_tag)
-                    cyclix_gen.assign(
-                        new_renamed_uop,
-                        hw_fracs(hw_frac_SubStruct("rd_tag_prev_clr")),
-                        cyclix_gen.indexed(PRF_mapped, rd_tag))
-                    cyclix_gen.assign(
-                        ARF_map,
-                        hw_fracs(hw_frac_V(cyclix_gen.subStruct(cmd_req_data, "fu_rd"))),
-                        alloc_rd_tag.position)
-                    cyclix_gen.assign(
-                        PRF_mapped,
-                        hw_fracs(hw_frac_V(alloc_rd_tag.position)),
-                        1)
-                    cyclix_gen.assign(
-                        PRF_rdy,
-                        hw_fracs(hw_frac_V(alloc_rd_tag.position)),
-                        0)
+                    cyclix_gen.assign(nru_rd_tag, alloc_rd_tag.position)            // TODO: check for availability flag
+                    cyclix_gen.assign(nru_rd_tag_prev, rd_tag)
+                    cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(PRF_mapped, rd_tag))
 
-                    cyclix_gen.assign(
-                        new_renamed_uop,
-                        hw_fracs(hw_frac_SubStruct("rdy")),
-                        0)
+                    cyclix_gen.assign(ARF_map.GetFracRef(cmd_req_data.GetFracRef("fu_rd")), alloc_rd_tag.position)
+                    cyclix_gen.assign(PRF_mapped.GetFracRef(alloc_rd_tag.position), 1)
+                    cyclix_gen.assign(PRF_rdy.GetFracRef(alloc_rd_tag.position), 0)
 
-                    cyclix_gen.assign(
-                        new_renamed_uop,
-                        hw_fracs(hw_frac_SubStruct("wb_ext")),
-                        0)
+                    cyclix_gen.assign(nru_rdy, 0)
+                    cyclix_gen.assign(nru_wb_ext, 0)
                 }; cyclix_gen.endif()
 
                 cyclix_gen.begelse()
                 run {
 
                     // LOAD
-                    cyclix_gen.begif(cyclix_gen.subStruct(cmd_req_data, "rf_we"))
+                    cyclix_gen.begif(cmd_req_data.GetFracRef("rf_we"))
                     run {
 
-                        cyclix_gen.assign(
-                            new_renamed_uop,
-                            hw_fracs(hw_frac_SubStruct("rdy")),
-                            1)
+                        cyclix_gen.assign(nru_rdy, 1)
+                        cyclix_gen.assign(nru_rd_tag, alloc_rd_tag.position)        // TODO: check for availability flag
+                        cyclix_gen.assign(nru_rd_tag_prev, rd_tag)
+                        cyclix_gen.assign(nru_rd_tag_prev_clr, PRF_mapped.GetFracRef(rd_tag))
+                        cyclix_gen.assign(PRF_mapped.GetFracRef(alloc_rd_tag.position), 1)
 
-                        cyclix_gen.assign(
-                            new_renamed_uop,
-                            hw_fracs(hw_frac_SubStruct("rd_tag")),
-                            alloc_rd_tag.position)                                      // TODO: check for availability flag
-                        cyclix_gen.assign(
-                            new_renamed_uop,
-                            hw_fracs(hw_frac_SubStruct("rd_tag_prev")),
-                            rd_tag)
-                        cyclix_gen.assign(
-                            new_renamed_uop,
-                            hw_fracs(hw_frac_SubStruct("rd_tag_prev_clr")),
-                            cyclix_gen.indexed(PRF_mapped, rd_tag))
-                        cyclix_gen.assign(
-                            PRF_mapped,
-                            hw_fracs(hw_frac_V(alloc_rd_tag.position)),
-                            1)
-                        cyclix_gen.assign(
-                            ARF_map,
-                            hw_fracs(hw_frac_V(cyclix_gen.subStruct(cmd_req_data, "fu_rd"))),
-                            alloc_rd_tag.position)
-                        cyclix_gen.assign(
-                            PRF_rdy,
-                            hw_fracs(hw_frac_V(alloc_rd_tag.position)),
-                            1)
-                        cyclix_gen.assign(
-                            PRF,
-                            hw_fracs(hw_frac_V(alloc_rd_tag.position)),
-                            cyclix_gen.subStruct(cmd_req_data, "rf_wdata"))
+                        cyclix_gen.assign(ARF_map.GetFracRef(cmd_req_data.GetFracRef("fu_rd")), alloc_rd_tag.position)
+                        cyclix_gen.assign(PRF_rdy.GetFracRef(alloc_rd_tag.position), 1)
+                        cyclix_gen.assign(PRF.GetFracRef(alloc_rd_tag.position), cmd_req_data.GetFracRef("rf_wdata"))
 
                     }; cyclix_gen.endif()
 
                     // STORE
                     cyclix_gen.begelse()
                     run {
-                        cyclix_gen.assign(
-                            new_renamed_uop,
-                            hw_fracs(hw_frac_SubStruct("rs0_rdy")),
-                            cyclix_gen.indexed(PRF_rdy, rss_tags[0]))
+                        cyclix_gen.assign(new_renamed_uop.GetFracRef("rs0_rdy"), PRF_rdy.GetFracRef(rss_tags[0]))
 
                         for (RF_rs_idx in 1 until Exu_cfg_rf.RF_rs_num) {
-                            cyclix_gen.assign(
-                                new_renamed_uop,
-                                hw_fracs(hw_frac_SubStruct("rs" + RF_rs_idx + "_rdy")),
-                                1)
+                            cyclix_gen.assign(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdy"), 1)
                         }
 
-                        cyclix_gen.assign(
-                            new_renamed_uop,
-                            hw_fracs(hw_frac_SubStruct("rdy")),
-                            cyclix_gen.subStruct(new_renamed_uop, "rs0_rdy"))
-
-                        cyclix_gen.assign(
-                            new_renamed_uop,
-                            hw_fracs(hw_frac_SubStruct("wb_ext")),
-                            1)
+                        cyclix_gen.assign(nru_rdy, new_renamed_uop.GetFracRef("rs0_rdy"))
+                        cyclix_gen.assign(nru_wb_ext, 1)
 
                     }; cyclix_gen.endif()
 

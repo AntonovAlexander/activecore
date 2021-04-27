@@ -26,7 +26,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             return ("[" + fraction.index.GetString() + "]")
 
         else if (fraction is hw_frac_V)
-            return ("[" + fraction.index.name + "]")
+            return ("[" + GetParamString(fraction.index) + "]")
 
         else if (fraction is hw_frac_CC)
             return ("[" + fraction.msb.GetString() + ":"
@@ -34,15 +34,15 @@ class VivadoCppWriter(var cyclix_module : Generic) {
 
         else if (fraction is hw_frac_CV)
             return ("[" + fraction.msb.GetString() + ":"
-                    + fraction.lsb.name + "]")
+                    + GetParamString(fraction.lsb) + "]")
 
         else if (fraction is hw_frac_VC)
-            return ("[" + fraction.msb.name + ":"
+            return ("[" + GetParamString(fraction.msb) + ":"
                     + fraction.lsb.GetString() + "]")
 
         else if (fraction is hw_frac_VV)
-            return ("[" + fraction.msb.name + ":"
-                    + fraction.lsb.name + "]")
+            return ("[" + GetParamString(fraction.msb) + ":"
+                    + GetParamString(fraction.lsb) + "]")
 
         else if (fraction is hw_frac_SubStruct)
             return ("." + fraction.substruct_name)

@@ -91,10 +91,10 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
     }
 
     open fun pop_trx() {
-        cyclix_gen.assign(TRX_BUF, hw_fracs(0), 0)
         for (BUF_INDEX in 0 until TRX_BUF_SIZE-1) {
             cyclix_gen.assign(TRX_BUF, hw_fracs(BUF_INDEX), TRX_BUF[BUF_INDEX+1])
         }
+        cyclix_gen.assign(TRX_BUF, hw_fracs(TRX_BUF_SIZE-1), 0)
         dec_trx_counter()
     }
 }
