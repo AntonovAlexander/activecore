@@ -210,7 +210,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         var iq_id = 0
         for (IQ_inst in IQ_insts) {
 
-            IQ_inst.init_pctrls()
+            IQ_inst.preinit_ctrls()
             IQ_inst.set_rdy()
             IQ_inst.init_locals()
 
@@ -307,7 +307,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         }
 
         var renamed_uop_buf = uop_buffer(cyclix_gen, "genrenamed_uop_buf", 1, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf)
-        renamed_uop_buf.init_pctrls()
+        renamed_uop_buf.preinit_ctrls()
         renamed_uop_buf.set_rdy()
         renamed_uop_buf.init_locals()
 
@@ -416,14 +416,14 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         }
 
         // acquiring new operation to iq tail
-        cyclix_gen.begif(renamed_uop_buf.pctrl_active)
+        cyclix_gen.begif(renamed_uop_buf.ctrl_active)
         run {
 
             for (IQ_inst in IQ_insts) {
 
                 cyclix_gen.begif(cyclix_gen.eq2(renamed_uop_buf.fu_id, IQ_inst.iq_num))
                 run {
-                    cyclix_gen.begif(IQ_inst.pctrl_rdy)
+                    cyclix_gen.begif(IQ_inst.ctrl_rdy)
                     run {
 
                         // signaling iq_wr
@@ -451,7 +451,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
         var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
 
-        cyclix_gen.begif(renamed_uop_buf.pctrl_rdy)                 // checking if renamed uop buffer is empty
+        cyclix_gen.begif(renamed_uop_buf.ctrl_rdy)
         run {
             cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(cmd_req, cmd_req_data))
             run {

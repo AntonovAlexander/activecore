@@ -16,7 +16,7 @@ Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
 
 Compared to other hardware generation frameworks, ActiveCore is constructed according to the following prioritites:
 * Dynamic generation of all hardware-related content, including data types, structures, dimensions, expressions, etc;
-* Decoupling generation logic from complex programming styles (e.g. functional one). Here, conventional object-oriented approach is mostly used, however, you can use any in your generators;
+* Decoupling generation logic from certain programming styles (e.g. functional one). Here, conventional object-oriented approach is mostly used, however, you can use any in your generators;
 * Provision of generic AST constructor for behavioral HW specifications (see **hwast**) that is reused for specifications on various abstraction levels, and its content is freely accessible for analysis and manipulation.
 
 The ultimate goal of the project is to provide top-down methodology and reusable components for explicit allocation of intermediate ***“microarchitectural middleware”*** design level for complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) decouples selected internal management mechanisms from application-specific logic in hardware microarchitectures, addressing:
@@ -37,10 +37,10 @@ Current version of project is implemented as a collection of Kotlin libraries th
 	* **Reordex** (**reorde**red e**x**ecution) - generator of coprocessors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to cyclix MLIP
 
 * Demo core generators based on MLIP cores (/designs/coregen):
-	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on pipex MLIP core
-	* **ariele** - full xbar generator, based on pipex MLIP core
-	* **taylor_credit_pipeline** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on pipex MLIP core. Location: /designs/rtl/credit_test
-	* **citadel** - OoO FPU coprocessor, based on reordex MLIP core
+	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex MLIP core
+	* **ariele** - full xbar generator, based on Pipex MLIP core
+	* **taylor_credit_pipeline** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex MLIP core. Location: /designs/rtl/credit_test
+	* **citadel** - OoO FPU coprocessor, based on Reordex MLIP core
 
 * Auxiliary reusable cores:
 	* **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Lab work manual included. Location: /designs/rtl/udm

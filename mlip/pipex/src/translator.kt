@@ -41,10 +41,7 @@ class __pstage_info(cyclix_gen : cyclix.Generic,
                     name_prefix : String,
                     TRX_BUF_SIZE : Int,
                     AUTO_FIRED : Boolean,
-
                     val TranslateInfo : __TranslateInfo,
-
-                    val pctrl_finish : hw_var,
                     val pctrl_flushreq : hw_var) : hw_stage_stallable(cyclix_gen, name_prefix, TRX_BUF_SIZE, AUTO_FIRED) {
 
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
@@ -81,7 +78,7 @@ class __pstage_info(cyclix_gen : cyclix.Generic,
     }
 
     fun pflush_cmd_internal(cyclix_gen : cyclix.Generic) {
-        cyclix_gen.bor_gen(pctrl_flushreq, pctrl_flushreq, pctrl_active)
+        cyclix_gen.bor_gen(pctrl_flushreq, pctrl_flushreq, ctrl_active)
     }
 }
 
