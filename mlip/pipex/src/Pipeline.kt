@@ -11,20 +11,21 @@ package pipex
 import hwast.*
 import cyclix.*
 
-val OP_RD_REMOTE    = hw_opcode("rd_remote")
-val OP_ISACTIVE     = hw_opcode("isactive")
-val OP_ISWORKING    = hw_opcode("isworking")
-val OP_ISSTALLED    = hw_opcode("isstalled")
-val OP_ISSUCC       = hw_opcode("issucc")
-val OP_ISFINISHED   = hw_opcode("isfinished")
+val OP_RD_REMOTE        = hw_opcode("rd_remote")
+val OP_ISACTIVE         = hw_opcode("isactive")
+val OP_ISWORKING        = hw_opcode("isworking")
+val OP_ISSTALLED        = hw_opcode("isstalled")
+val OP_ISSUCC           = hw_opcode("issucc")
+val OP_ISFINISHED       = hw_opcode("isfinished")
 
-val OP_PSTALL       = hw_opcode("pstall")
-val OP_PKILL        = hw_opcode("pkill")
-val OP_PFLUSH       = hw_opcode("pflush")
+val OP_PSTALL           = hw_opcode("pstall")
+val OP_PKILL            = hw_opcode("pkill")
+val OP_PFLUSH           = hw_opcode("pflush")
 
-val OP_ACCUM        = hw_opcode("accum")
-val OP_ASSIGN_SUCC  = hw_opcode("assign_succ")
-val OP_RD_PREV      = hw_opcode("rd_prev")
+val OP_ACCUM            = hw_opcode("accum")
+val OP_ASSIGN_SUCC      = hw_opcode("assign_succ")
+val OP_ASSIGN_ALWAYS    = hw_opcode("assign_always")
+val OP_RD_PREV          = hw_opcode("rd_prev")
 
 enum class PSTAGE_FC_MODE {
     BUFFERED, FALL_THROUGH
@@ -461,6 +462,26 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         AddExpr(hw_exec(OP_PFLUSH))
     }
 
+    fun assign_always(depow_fractions: hw_fracs, tgt : hw_global, src: hw_param) {
+        var new_expr = hw_exec(OP_ASSIGN_ALWAYS)
+        new_expr.AddTgt(tgt)
+        new_expr.AddParam(src)
+        new_expr.assign_tgt_fractured = hw_fractured(tgt, depow_fractions)
+        AddExpr(new_expr)
+    }
+
+    fun assign_always(depow_fractions: hw_fracs, tgt : hw_global, src: Int) {
+        assign_always(depow_fractions, tgt, hw_imm(src))
+    }
+
+    fun assign_always(tgt : hw_global, src: hw_param) {
+        assign_always(hw_fracs(), tgt, src)
+    }
+
+    fun assign_always(tgt : hw_global, src: Int) {
+        assign_always(tgt, hw_imm(src))
+    }
+
     fun assign_succ(depow_fractions: hw_fracs, tgt : hw_pipex_var, src: hw_param) {
         var new_expr = hw_exec(OP_ASSIGN_SUCC)
         new_expr.AddTgt(tgt)
@@ -675,6 +696,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
         } else if (expr.opcode == OP_ACCUM) {
             context.curStageInfo.accum(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+
+        } else if (expr.opcode == OP_ASSIGN_ALWAYS) {
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
 
         } else if (expr.opcode == OP_ASSIGN_SUCC) {
             cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[expr.tgts[0]]!!.req, 1)
