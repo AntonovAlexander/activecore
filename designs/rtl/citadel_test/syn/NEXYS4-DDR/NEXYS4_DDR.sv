@@ -99,7 +99,7 @@ localparam CSR_CITADEL_FU_RD_ADDR       = 32'h10000028;
 localparam CSR_CITADEL_RDATA_ADDR       = 32'h10000040;
 
 logic cmd_req_genfifo_req;
-citadel_gen_cmd_req_struct cmd_req_genfifo_data;
+citadel_fpu_cmd_req_struct cmd_req_genfifo_data;
 logic cmd_req_genfifo_ack;
 
 logic cmd_resp_genfifo_req;
