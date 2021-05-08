@@ -126,59 +126,70 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", Exu_cfg_rf) {
     }
 }
 
-class EXU_ADD() : reordex.Exu("ADD", Exu_cfg_rf) {
+class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", Exu_cfg_rf) {
+
+    // ALU opcodes
+    val aluop_MUL		= 0
+    val aluop_DIV		= 1
 
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op2         = ulocal("alu_op2", 31, 0, "0")
+    var alu_op1_wide    = ulocal("alu_op1_wide", 32, 0, "0")
+    var alu_op2_wide    = ulocal("alu_op2_wide", 32, 0, "0")
+    var alu_opcode      = ulocal("alu_opcode", 3, 0, "0")
+    var alu_result_wide = ulocal("alu_result_wide", 32, 0, "0")
     var alu_result      = ulocal("alu_result", 31, 0, "0")
 
     init {
         alu_op1.assign(subStruct(req_data, "rs0_rdata"))
         alu_op2.assign(subStruct(req_data, "rs1_rdata"))
-        add_gen(alu_result, alu_op1, alu_op2)
-        resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), alu_result)
+        alu_opcode.assign(subStruct(req_data, "opcode"))
+
+        begcase(alu_opcode)
+        run {
+            begbranch(aluop_MUL)
+            run {
+                alu_result_wide.assign(alu_op1_wide * alu_op2_wide)
+            }; endbranch()
+
+            begbranch(aluop_DIV)
+            run {
+                alu_result_wide.assign(alu_op1_wide / alu_op2_wide)
+            }; endbranch()
+        }; endcase()
+
+        alu_result.assign(alu_result_wide[31, 0])
     }
 }
 
-class EXU_MUL() : reordex.Exu("MUL", Exu_cfg_rf) {
+class EXU_LSU() : reordex.Exu("LSU", Exu_cfg_rf) {
 
-    var alu_op1         = ulocal("alu_op1", 31, 0, "0")
-    var alu_op2         = ulocal("alu_op2", 31, 0, "0")
-    var alu_result      = ulocal("alu_result", 31, 0, "0")
+    // ALU opcodes
+    val op_LD		= 0
+    val op_ST		= 1
 
-    init {
-        alu_op1.assign(subStruct(req_data, "rs0_rdata"))
-        alu_op2.assign(subStruct(req_data, "rs1_rdata"))
-        mul_gen(alu_result, alu_op1, alu_op2)
-        resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), alu_result)
-    }
-}
-
-class EXU_XOR() : reordex.Exu("XOR", Exu_cfg_rf) {
-
-    var alu_op1         = ulocal("alu_op1", 31, 0, "0")
-    var alu_op2         = ulocal("alu_op2", 31, 0, "0")
-    var alu_result      = ulocal("alu_result", 31, 0, "0")
+    var mem_addr        = ulocal("mem_addr", 31, 0, "0")
+    var mem_wdata       = ulocal("mem_wdata", 31, 0, "0")
+    var mem_rdata       = ulocal("mem_rdata", 3, 0, "0")
+    var mem_opcode      = ulocal("mem_opcode", 3, 0, "0")
 
     init {
-        alu_op1.assign(subStruct(req_data, "rs0_rdata"))
-        alu_op2.assign(subStruct(req_data, "rs1_rdata"))
-        bxor_gen(alu_result, alu_op1, alu_op2)
-        resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), alu_result)
-    }
-}
+        mem_addr.assign(subStruct(req_data, "rs0_rdata"))
+        mem_wdata.assign(subStruct(req_data, "rs1_rdata"))
+        mem_opcode.assign(subStruct(req_data, "opcode"))
 
-class EXU_SHIFT() : reordex.Exu("SHIFT", Exu_cfg_rf) {
+        begcase(opcode)
+        run {
+            begbranch(op_LD)
+            run {
+                exec_load(mem_rdata, mem_addr)
+            }; endbranch()
 
-    var alu_op1         = ulocal("alu_op1", 31, 0, "0")
-    var alu_op2         = ulocal("alu_op2", 31, 0, "0")
-    var alu_result      = ulocal("alu_result", 31, 0, "0")
-
-    init {
-        alu_op1.assign(subStruct(req_data, "rs0_rdata"))
-        alu_op2.assign(subStruct(req_data, "rs1_rdata"))
-        sra_gen(alu_result, alu_op1, alu_op2)
-        resp_data.assign(hw_fracs(hw_frac_SubStruct("wdata")), alu_result)
+            begbranch(op_ST)
+            run {
+                exec_store(mem_addr, mem_wdata)
+            }; endbranch()
+        }; endcase()
     }
 }
 
@@ -221,6 +232,8 @@ class cpu(name : String) : reordex.MultiExu(name, Exu_cfg_rf, MultiExu_CFG_RF(32
 
     init {
         add_exu(EXU_ALU_INTEGER(), 4, 4)
+        add_exu(EXU_MUL_DIV(), 1, 2)
+        add_exu(EXU_LSU(), 2, 3)
 
         add_exu(EXU_FP_ADD_SUB(), 2, 4)
         add_exu(EXU_FP_MUL(), 1, 3)

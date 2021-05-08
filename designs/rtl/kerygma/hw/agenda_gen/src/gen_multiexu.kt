@@ -3,7 +3,7 @@ import agenda.*
 fun main(args: Array<String>) {
     println("Agenda: generating CPU")
 
-    var multiexu = agenda.cpu("agenda_gen")
+    var multiexu = agenda.cpu("agenda_cpu")
 
     var multiexu_cyclix = multiexu.translate_to_cyclix(true)
     var multiexu_rtl = multiexu_cyclix.export_to_rtl(true)

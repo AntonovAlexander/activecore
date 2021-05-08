@@ -278,3 +278,11 @@ open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF) : hw_astc_stdif()
         return ret_var
     }
 }
+
+fun exec_load(tgt: hw_var, addr: hw_param) {
+    // TODO
+}
+
+fun exec_store(addr: hw_param, wdata: hw_param) {
+    // TODO
+}
