@@ -9,6 +9,7 @@ MLIP core is a hardware generator that provides custom synthesizable execution k
 * special data types exhibiting behaviour of "microarchitectural" execution units;
 * pre-defined data structures and API for useful scheduling, communication and synchronization "services" of the microarchitecture;
 * procedural blocks selectively exposed for behavioral-style programming of custom application functions and mechanisms.
+Generation of designs can be (optionally) accompanied by microarchitecture-aware optimizations.
 
 MLIP core approach serves as intermediate solution for codification of custom microarchitectures between fixed-function IP cores and general-purpose HW design tools:
 

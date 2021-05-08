@@ -6,7 +6,7 @@
  *     License: See LICENSE file for details
  */
 
-package citadel
+package agenda
 
 import hwast.*
 import reordex.*
@@ -217,9 +217,11 @@ class EXU_FP_FMA() : reordex.Exu("FP_FMA", Exu_cfg_rf) {
     }
 }
 
-class fpu(name : String) : reordex.MultiExu(name, Exu_cfg_rf, MultiExu_CFG_RF(32, true, 64), 4) {
+class cpu(name : String) : reordex.MultiExu(name, Exu_cfg_rf, MultiExu_CFG_RF(32, true, 64), 4) {
 
     init {
+        add_exu(EXU_INTEGER(), 4, 4)
+
         add_exu(EXU_FP_ADD_SUB(), 2, 4)
         add_exu(EXU_FP_MUL(), 1, 3)
         add_exu(EXU_FP_DIV(), 1, 3)
