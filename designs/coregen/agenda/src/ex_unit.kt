@@ -1,7 +1,7 @@
 /*
  * ex_unit.kt
  *
- *  Created on: 20.12.2020
+ *  Created on: 01.04.2021
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
  *     License: See LICENSE file for details
  */
@@ -13,7 +13,7 @@ import reordex.*
 
 val Exu_cfg_rf = Exu_CFG_RF(32, 3)
 
-class EXU_INTEGER() : reordex.Exu("INTEGER", Exu_cfg_rf) {
+class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", Exu_cfg_rf) {
 
     // ALU opcodes
     val aluop_ADD		= 0
@@ -220,7 +220,7 @@ class EXU_FP_FMA() : reordex.Exu("FP_FMA", Exu_cfg_rf) {
 class cpu(name : String) : reordex.MultiExu(name, Exu_cfg_rf, MultiExu_CFG_RF(32, true, 64), 4) {
 
     init {
-        add_exu(EXU_INTEGER(), 4, 4)
+        add_exu(EXU_ALU_INTEGER(), 4, 4)
 
         add_exu(EXU_FP_ADD_SUB(), 2, 4)
         add_exu(EXU_FP_MUL(), 1, 3)

@@ -6,7 +6,7 @@
  *     License: See LICENSE file for details
  */
 
-`include "citadel_gen.svh"
+`include "citadel_fpu.svh"
 
 module NEXYS4_DDR
 #( parameter SIM = "NO" )
@@ -109,7 +109,7 @@ assign cmd_resp_genfifo_ack = 1'b1;
 
 logic [31:0] citadel_databuf;
 
-citadel_gen citadel_inst (
+citadel_fpu citadel_inst (
 	.clk_i(clk_gen)
 	, .rst_i(srst)
 	

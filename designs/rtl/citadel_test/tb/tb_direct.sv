@@ -9,7 +9,7 @@
 
 `timescale 1ns / 1ps
 
-`include "../hw/citadel_gen/coregen/sverilog/citadel_gen.svh"
+`include "../hw/citadel_gen/coregen/sverilog/citadel_fpu.svh"
 
 `define HALF_PERIOD			5						//external 100 MHZ
 
@@ -22,7 +22,7 @@ logic [15:0] LED;
 always #`HALF_PERIOD CLK_100MHZ = ~CLK_100MHZ;
 
 logic cmd_req_genfifo_req;
-citadel_gen_cmd_req_struct cmd_req_genfifo_data;
+citadel_fpu_cmd_req_struct cmd_req_genfifo_data;
 logic cmd_req_genfifo_ack;
 
 logic cmd_resp_genfifo_req;
@@ -172,7 +172,7 @@ logic [31:0] cycle_counter = 0;
 always @(posedge CLK_100MHZ) cycle_counter <= cycle_counter + 1;
 assign cmd_resp_genfifo_ack = cycle_counter[2] & cycle_counter[1] & cycle_counter[0];
 
-citadel_gen citadel_inst
+citadel_fpu citadel_inst
 (
 	.clk_i(CLK_100MHZ)
 	, .rst_i(RST)

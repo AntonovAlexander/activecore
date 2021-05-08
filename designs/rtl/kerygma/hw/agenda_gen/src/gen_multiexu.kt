@@ -1,7 +1,7 @@
 import agenda.*
 
 fun main(args: Array<String>) {
-    println("Citadel: generating experimental core")
+    println("Agenda: generating CPU")
 
     var multiexu = agenda.cpu("agenda_gen")
 
