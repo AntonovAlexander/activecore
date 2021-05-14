@@ -8,7 +8,8 @@ ActiveCore is a framework that demonstrates original hardware designing concept 
 MLIP core is a hardware generator that provides custom synthesizable execution kernel constructed in accordance to certain microarchitectural template. Each MLIP core offers specification of designs within custom computational model inferred from computational process organization inside hardware microarchitecture. This model typically includes:
 * special data types exhibiting behaviour of "microarchitectural" execution units;
 * pre-defined data structures and API for useful scheduling, communication and synchronization "services" of the microarchitecture;
-* procedural blocks selectively exposed for behavioral-style programming of custom application functions and mechanisms.
+* event model and handler procedures selectively exposed for behavioral-style programming of custom application functions and mechanisms.
+
 Generation of designs can be (optionally) accompanied by microarchitecture-aware optimizations.
 
 MLIP core approach serves as intermediate solution for codification of custom microarchitectures between fixed-function IP cores and general-purpose HW design tools:
@@ -57,7 +58,7 @@ Current version of project is implemented as a collection of Kotlin libraries th
 
 * A. Antonov, “Inferring Custom Synthesizable Kernel for Generation of Coprocessors with Out-of-Order Execution,” in 2021 10th Mediterranean Conference on Embedded Computing (MECO), 2021 (accepted for publication)
 
-* A. Antonov, P. Kustarev, “Strategies of Computational Process Synthesis – a System-Level Model of HW/SW (Micro)Architectural Mechanisms,” in 2020 9th Mediterranean Conference on Embedded Computing (MECO), 2020. URL: https://ieeexplore.ieee.org/document/9134071 Preprint downloadable from: http://programme.meconet.me/documents/PAPERS/MECO_2020_paper_26.pdf
+* A. Antonov, P. Kustarev, “Strategies of Computational Process Synthesis – a System-Level Model of HW/SW (Micro)Architectural Mechanisms,” in 2020 9th Mediterranean Conference on Embedded Computing (MECO), 2020. URL: https://ieeexplore.ieee.org/document/9134071
 
 * A. Antonov, P. Kustarev, S. Bikovsky, “MLIP Cores: Designing Hardware Generators with Programmable Microarchitectural Mechanisms,” in 2020 IEEE International Symposium on Circuits and Systems (ISCAS), 2020. URL: https://ieeexplore.ieee.org/document/9180593
 
