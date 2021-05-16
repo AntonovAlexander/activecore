@@ -21,7 +21,7 @@ module uart_tx
 	input [28:0] bitperiod_i,
 
 	output reg tx_done_tick_o,
-    output reg tx_o
+	output reg tx_o
 );
 
 reg [7:0] 	databuf;

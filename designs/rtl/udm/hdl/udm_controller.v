@@ -9,19 +9,19 @@
 
 module udm_controller
 #(
-    parameter BUS_TIMEOUT=(1024*1024*100)
+	parameter BUS_TIMEOUT=(1024*1024*100)
 )
 (
 	input clk_i, reset_i,
 
 	// uart rx
 	input rx_done_tick_i,
-    input [7:0] rx_din_bi,
+	input [7:0] rx_din_bi,
 
 	// uart tx
 	output reg [7:0] tx_dout_bo,
 	output reg tx_start_o,
-    input tx_done_tick_i,
+	input tx_done_tick_i,
 	
 	// bus
 	output reg rst_o,
@@ -30,10 +30,10 @@ module udm_controller
 	output reg bus_we_o,
 	output reg [31:0] bus_addr_bo,
 	output [3:0] bus_be_bo,
-    output reg [31:0] bus_wdata_bo,
+	output reg [31:0] bus_wdata_bo,
 
-    input bus_resp_i,
-    input [31:0] bus_rdata_bi
+	input bus_resp_i,
+	input [31:0] bus_rdata_bi
 );
 
 // control bytes

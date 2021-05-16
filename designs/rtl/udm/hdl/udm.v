@@ -13,16 +13,16 @@ module udm
     , parameter RTX_EXTERNAL_OVERRIDE = "NO"
 )
 (
-	input clk_i, rst_i,
+    input clk_i, rst_i,
 
-	input rx_i,
-	output tx_o,
+    input rx_i,
+    output tx_o,
 
-	output rst_o,
-	output bus_req_o,
-	input bus_ack_i,
-	output bus_we_o,
-	output [31:0] bus_addr_bo,
+    output rst_o,
+    output bus_req_o,
+    input bus_ack_i,
+    output bus_we_o,
+    output [31:0] bus_addr_bo,
     output [3:0] bus_be_bo,
     output [31:0] bus_wdata_bo,
 

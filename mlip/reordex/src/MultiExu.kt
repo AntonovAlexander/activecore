@@ -72,7 +72,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         var cyclix_gen = cyclix.Generic(name)
 
-        //// Generating control structures ////
+        MSG("generating control structures...")
         var prf_dim = hw_dim_static()
         prf_dim.add(Exu_cfg_rf.RF_width-1, 0)
         prf_dim.add(MultiExu_cfg_rf.PRF_depth-1, 0)
@@ -96,9 +96,10 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         }
 
         var ARF_map = cyclix_gen.uglobal("genARF_map", arf_map_dim, ARF_map_default)        // ARF-to-PRF mappings
-        ////
 
-        //// Generating interfaces ////
+        MSG("generating control structures: done")
+
+        MSG("generating interface structure...")
         // cmd (sequential instruction stream) //
         var cmd_req_struct = hw_struct(name + "_cmd_req_struct")
         cmd_req_struct.addu("exec",     0, 0, "0")
@@ -117,8 +118,11 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(Exu_cfg_rf.RF_width-1, 0)))
         var cmd_resp_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_resp_data"), hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(Exu_cfg_rf.RF_width-1, 0)), "0")
 
+        MSG("generating interface structure: done")
+
         // TODO: external memory interface
 
+        MSG("generating internal structure...")
         var iq_struct = hw_struct("iq_struct")
         iq_struct.addu("enb",     0, 0, "0")
         iq_struct.addu("fu_req",     0, 0, "0")
@@ -144,27 +148,38 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         var exu_req = cyclix_gen.local(cyclix_gen.GetGenName("exu_req"), Exu_cfg_rf.req_struct)
         var exu_resp = cyclix_gen.local(cyclix_gen.GetGenName("exu_resp"), Exu_cfg_rf.resp_struct)
 
+        MSG("generating internal structure: done")
+
         var ExUnit_idx = 0
+
         for (ExUnit in ExecUnits) {
+            MSG("generating execution unit: " + ExUnit.value.ExecUnit.name + "...")
+
             IQ_insts.add(iq_buffer(cyclix_gen, "geniq_" + ExUnit.key, ExUnit.value.iq_length, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true))
             ExUnit_idx++
 
-            // generating submodules
+            MSG("generating submodules...")
             var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, Exu_cfg_rf.req_struct, Exu_cfg_rf.resp_struct)
+            MSG("generating submodules: done")
 
             var var_dict = mutableMapOf<hw_var, hw_var>()
 
-            // Generating locals
+            MSG("generating locals...")
             for (local in ExUnit.value.ExecUnit.locals)
                 var_dict.put(local, exu_cyclix_gen.local(local.name, local.vartype, local.defimm))
+            MSG("generating locals: done")
 
-            // Generating globals
+            MSG("generating globals...")
             for (global in ExUnit.value.ExecUnit.globals)
                 var_dict.put(global, exu_cyclix_gen.global(global.name, global.vartype, global.defimm))
+            MSG("generating globals: done")
 
-            // Generating intermediates
+            MSG("generating intermediates...")
             for (genvar in ExUnit.value.ExecUnit[0].genvars)
                 var_dict.put(genvar, exu_cyclix_gen.local(genvar.name, genvar.vartype, genvar.defimm))
+            MSG("generating intermediates: done")
+
+            MSG("generating logic...")
 
             exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict), exu_cyclix_gen.stream_req_var)
 
@@ -187,7 +202,9 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
             exu_cyclix_gen.end()
 
-            // generating submodule instances
+            MSG("generating logic: done")
+
+            MSG("generating submodule instances...")
             var ExUnit_insts = ArrayList<cyclix.hw_subproc>()
             for (exu_num in 0 until ExUnit.value.exu_num) {
                 var exu_inst = cyclix_gen.subproc(exu_cyclix_gen.name + "_" + exu_num, exu_cyclix_gen)
@@ -202,10 +219,16 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             )
 
             TranslateInfo.exu_assocs.put(ExUnit.value.ExecUnit, exu_info)
+            MSG("generating submodule instances: done")
+
+            MSG("generating execution unit " + ExUnit.value.ExecUnit.name + ": done")
         }
 
-        // adding IQ for stores
+        MSG("generating store IQ...")
         IQ_insts.add(iq_buffer(cyclix_gen, "genwb", out_iq_size, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false))
+        MSG("generating store IQ: done")
+
+        MSG("generating logic...")
 
         var iq_id = 0
         for (IQ_inst in IQ_insts) {
@@ -214,7 +237,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             IQ_inst.set_rdy()
             IQ_inst.init_locals()
 
-            // committing IQ head
+            MSG("committing IQ head...")
             cyclix_gen.begif(cyclix_gen.band(IQ_inst.enb, IQ_inst.rdy))
             run {
 
@@ -246,11 +269,12 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     IQ_inst.pop_trx()
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
+            MSG("committing IQ head: done")
 
-            // issuing operations from IQ to FUs
+            MSG("issuing operations from IQ to FUs...")
             if (iq_id < ExecUnits.size) {
 
-                MSG("Translating: issuing operations from IQ to FUs")
+                MSG("issuing operations from IQ to FUs, iq_id: " + iq_id)
                 var iq_iter = cyclix_gen.begforall_asc(IQ_inst.TRX_BUF)
                 run {
 
@@ -305,13 +329,14 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
             iq_id++
         }
+        MSG("issuing operations from IQ to FUs: done")
 
         var renamed_uop_buf = uop_buffer(cyclix_gen, "genrenamed_uop_buf", 1, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf)
         renamed_uop_buf.preinit_ctrls()
         renamed_uop_buf.set_rdy()
         renamed_uop_buf.init_locals()
 
-        MSG("Translating: broadcasting FU results to IQ and renamed buffer")
+        MSG("broadcasting FU results to IQ and renamed buffer...")
         var fu_id = 0
         for (exu_num in 0 until ExUnits_insts.size) {
             for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
@@ -414,8 +439,9 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             }
             fu_id++
         }
+        MSG("broadcasting FU results to IQ and renamed buffer: done")
 
-        // acquiring new operation to iq tail
+        MSG("acquiring new operation to iq tail...")
         cyclix_gen.begif(renamed_uop_buf.ctrl_active)
         run {
 
@@ -437,8 +463,9 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                 }; cyclix_gen.endif()
             }
         }; cyclix_gen.endif()
+        MSG("acquiring new operation to iq tail: done")
 
-        // renaming
+        MSG("renaming...")
         var new_renamed_uop = cyclix_gen.local("gennew_renamed_uop", iq_struct)
         var nru_enb             = new_renamed_uop.GetFracRef("enb")
         var nru_rdy             = new_renamed_uop.GetFracRef("rdy")
@@ -561,7 +588,11 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
 
+        MSG("renaming: done")
+
         cyclix_gen.end()
+
+        MSG("generating logic: done")
 
         MSG("#################################################")
         MSG("#### Reordex-to-Cyclix translation complete! ####")
