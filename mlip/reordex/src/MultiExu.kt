@@ -141,7 +141,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         // TODO: external memory interface
 
-        MSG("generating internal structure...")
+        MSG("generating internal structures...")
         var iq_struct = hw_struct("iq_struct")
         iq_struct.addu("enb",     0, 0, "0")
         iq_struct.addu("fu_req",     0, 0, "0")
@@ -167,7 +167,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var exu_req = cyclix_gen.local(cyclix_gen.GetGenName("exu_req"), MultiExu_CFG.req_struct)
         var exu_resp = cyclix_gen.local(cyclix_gen.GetGenName("exu_resp"), MultiExu_CFG.resp_struct)
 
-        MSG("generating internal structure: done")
+        MSG("generating internal structures: done")
 
         var ExUnit_idx = 0
 
@@ -241,6 +241,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
             TranslateInfo.exu_assocs.put(ExUnit.value.ExecUnit, exu_info)
             MSG("generating submodule instances: done")
+
+            for (rs_num in 0 until ExUnit.value.ExecUnit.rs.size)
+                if (var_dict[ExUnit.value.ExecUnit.rs[rs_num]!!]!!.read_done)
+                    MSG("Exu waits for: " + ExUnit.value.ExecUnit.rs[rs_num]!!.name)
 
             MSG("generating execution unit " + ExUnit.value.ExecUnit.name + ": done")
         }
