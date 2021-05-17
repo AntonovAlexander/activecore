@@ -535,6 +535,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 cyclix_gen.assign(nru_fu_pending, 0)
                 cyclix_gen.assign(nru_fu_id,      cmd_req_data.GetFracRef("fu_id"))
 
+                for (imm_idx in 0 until MultiExu_CFG.imms.size) {
+                    cyclix_gen.assign(
+                        new_renamed_uop.GetFracRef(MultiExu_CFG.imms[imm_idx].name),
+                        cmd_req_data.GetFracRef("fu_imm_" + MultiExu_CFG.imms[imm_idx].name))
+                }
+
                 // LOAD/STORE commutation
                 cyclix_gen.begif(!cmd_req_data.GetFracRef("exec"))
                 run {
