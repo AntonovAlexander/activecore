@@ -21,6 +21,14 @@ open class Reordex_CFG(val RF_width : Int,
     var req_struct = hw_struct("req_struct")
     var resp_struct = hw_struct("resp_struct")
 
+    var imms = ArrayList<hw_var>()
+    fun AddImm(name : String, width : Int) : hw_var {
+        var new_var = hw_var(name, width-1, 0, "0")
+        req_struct.addu(name, width-1, 0, "0")
+        imms.add(new_var)
+        return new_var
+    }
+
     var rss = ArrayList<hw_var>()
     fun AddRs() : hw_var {
         var new_var = hw_var("rs" + rss.size, RF_width-1, 0, "0")
@@ -30,7 +38,6 @@ open class Reordex_CFG(val RF_width : Int,
     }
 
     init {
-        req_struct.addu("opcode",     31, 0, "0")
         req_struct.addu("rd_tag",     31, 0, "0")       // TODO: clean up
         resp_struct.addu("tag",     31, 0, "0")         // TODO: clean up
         resp_struct.addu("wdata",     RF_width-1, 0, "0")
@@ -186,8 +193,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             MSG("generating locals...")
             for (local in ExUnit.value.ExecUnit.locals)
                 var_dict.put(local, exu_cyclix_gen.local(local.name, local.vartype, local.defimm))
-            for (rs_num in 0 until ExUnit.value.ExecUnit.rs.size)
-                var_dict.put(MultiExu_CFG.rss[rs_num], var_dict[ExUnit.value.ExecUnit.rs[rs_num]!!]!!)
+            for (imm_num in 0 until ExUnit.value.ExecUnit.imms.size)
+                var_dict.put(MultiExu_CFG.imms[imm_num], var_dict[ExUnit.value.ExecUnit.imms[imm_num]!!]!!)
+            for (rs_num in 0 until ExUnit.value.ExecUnit.rss.size)
+                var_dict.put(MultiExu_CFG.rss[rs_num], var_dict[ExUnit.value.ExecUnit.rss[rs_num]!!]!!)
             MSG("generating locals: done")
 
             MSG("generating globals...")
@@ -204,9 +213,11 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
             exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict), exu_cyclix_gen.stream_req_var)
 
-            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.opcode, var_dict), exu_cyclix_gen.subStruct(TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict), "opcode"))
+            for (imm_num in 0 until MultiExu_CFG.imms.size) {
+                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.imms[imm_num], var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict)), MultiExu_CFG.imms[imm_num].name))
+            }
             for (rs_num in 0 until MultiExu_CFG.rss.size) {
-                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.rs[rs_num], var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict)), "rs" + rs_num + "_rdata"))
+                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.rss[rs_num], var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict)), "rs" + rs_num + "_rdata"))
             }
 
             for (expr in ExUnit.value.ExecUnit[0].expressions) {
@@ -242,9 +253,9 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             TranslateInfo.exu_assocs.put(ExUnit.value.ExecUnit, exu_info)
             MSG("generating submodule instances: done")
 
-            for (rs_num in 0 until ExUnit.value.ExecUnit.rs.size)
-                if (var_dict[ExUnit.value.ExecUnit.rs[rs_num]!!]!!.read_done)
-                    MSG("Exu waits for: " + ExUnit.value.ExecUnit.rs[rs_num]!!.name)
+            for (rs_num in 0 until ExUnit.value.ExecUnit.rss.size)
+                if (var_dict[ExUnit.value.ExecUnit.rss[rs_num]!!]!!.read_done)
+                    MSG("Exu waits for: " + ExUnit.value.ExecUnit.rss[rs_num]!!.name)
 
             MSG("generating execution unit " + ExUnit.value.ExecUnit.name + ": done")
         }

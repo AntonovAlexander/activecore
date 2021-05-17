@@ -13,6 +13,8 @@ import reordex.*
 
 class FPU_CFG() : Reordex_CFG(32, 32, true,64)
 {
+    var opcode = AddImm("opcode", 32)
+
     var rs0 = AddRs()
     var rs1 = AddRs()
     var rs2 = AddRs()
@@ -22,7 +24,7 @@ val FPU_CFG_inst = FPU_CFG()
 class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", FPU_CFG_inst) {
 
     init {
-        begif(eq2(opcode, 0))
+        begif(eq2(FPU_CFG_inst.opcode, 0))
         run {
             result.assign(add(FPU_CFG_inst.rs0, FPU_CFG_inst.rs1))
         }; endif()
