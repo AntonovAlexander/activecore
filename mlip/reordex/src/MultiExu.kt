@@ -186,6 +186,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             MSG("generating locals...")
             for (local in ExUnit.value.ExecUnit.locals)
                 var_dict.put(local, exu_cyclix_gen.local(local.name, local.vartype, local.defimm))
+            for (rs_num in 0 until ExUnit.value.ExecUnit.rs.size)
+                var_dict.put(MultiExu_CFG.rss[rs_num], var_dict[ExUnit.value.ExecUnit.rs[rs_num]!!]!!)
             MSG("generating locals: done")
 
             MSG("generating globals...")

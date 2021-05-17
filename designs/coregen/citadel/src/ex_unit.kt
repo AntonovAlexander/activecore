@@ -24,11 +24,11 @@ class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", FPU_CFG_inst) {
     init {
         begif(eq2(opcode, 0))
         run {
-            result.assign(rs[0] + rs[1])
+            result.assign(add(FPU_CFG_inst.rs0, FPU_CFG_inst.rs1))
         }; endif()
         begelse()
         run {
-            result.assign(rs[0] - rs[1])
+            result.assign(sub(FPU_CFG_inst.rs0, FPU_CFG_inst.rs1))
         }; endif()
     }
 }
@@ -36,21 +36,21 @@ class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", FPU_CFG_inst) {
 class EXU_FP_MUL() : reordex.Exu("FP_MUL", FPU_CFG_inst) {
 
     init {
-        result.assign(rs[0] * rs[1])
+        result.assign(mul(FPU_CFG_inst.rs0, FPU_CFG_inst.rs1))
     }
 }
 
 class EXU_FP_DIV() : reordex.Exu("FP_DIV", FPU_CFG_inst) {
 
     init {
-        result.assign(rs[0] / rs[1])
+        result.assign(div(FPU_CFG_inst.rs0, FPU_CFG_inst.rs1))
     }
 }
 
 class EXU_FP_FMA() : reordex.Exu("FP_FMA", FPU_CFG_inst) {
 
     init {
-        result.assign((rs[0] * rs[1]) + rs[2])
+        result.assign(add(mul(FPU_CFG_inst.rs0, FPU_CFG_inst.rs1), FPU_CFG_inst.rs2))
     }
 }
 

@@ -31,8 +31,8 @@ open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
         if (this.size != 0) ERROR("reordex ASTC inconsistent!")
         add(hw_exec(OP_EXU))
 
-        for (rs_num in 0 until Exu_CFG.rss.size) {
-            rs.add(ulocal("rs" + rs_num, Exu_CFG.RF_width-1, 0, "0"))
+        for (Exu_rs in Exu_CFG.rss) {
+            rs.add(local(Exu_rs.name, Exu_rs.vartype, Exu_rs.defimm))
         }
 
     }
