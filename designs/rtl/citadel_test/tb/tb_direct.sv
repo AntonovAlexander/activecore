@@ -102,6 +102,7 @@ endtask
 task CMD_EXEC
 	(
 		input logic unsigned [1:0] fu_id
+		, input logic unsigned [31:0] fu_imm_opcode
 		, input logic unsigned [0:0] fu_rs0_req
 		, input logic unsigned [4:0] fu_rs0
 		, input logic unsigned [0:0] fu_rs1_req
@@ -111,43 +112,46 @@ task CMD_EXEC
 		, input logic unsigned [4:0] fu_rd
 	);
 	begin
-	INIT_CMD(EXEC, RD, 0, 0, fu_id, 0, fu_rs0_req, fu_rs0, fu_rs1_req, fu_rs1, fu_rs2_req, fu_rs2, fu_rd);
+	INIT_CMD(EXEC, RD, 0, 0, fu_id, fu_imm_opcode, fu_rs0_req, fu_rs0, fu_rs1_req, fu_rs1, fu_rs2_req, fu_rs2, fu_rd);
 	end
 endtask
 
 task CMD_1RS
 	(
 		input logic unsigned [1:0] fu_id
+		, input logic unsigned [31:0] fu_imm_opcode
 		, input logic unsigned [4:0] fu_rs0
 		, input logic unsigned [4:0] fu_rd
 	);
 	begin
-	CMD_EXEC(fu_id, 1, fu_rs0, 0, 0, 0, 0, fu_rd);
+	CMD_EXEC(fu_id, fu_imm_opcode, 1, fu_rs0, 0, 0, 0, 0, fu_rd);
 	end
 endtask
 
 task CMD_2RS
 	(
 		input logic unsigned [1:0] fu_id
+		, input logic unsigned [31:0] fu_imm_opcode
 		, input logic unsigned [4:0] fu_rd
 		, input logic unsigned [4:0] fu_rs0
 		, input logic unsigned [4:0] fu_rs1
 	);
 	begin
-	CMD_EXEC(fu_id, 1, fu_rs0, 1, fu_rs1, 0, 0, fu_rd);
+	CMD_EXEC(fu_id, fu_imm_opcode, 1, fu_rs0, 1, fu_rs1, 0, 0, fu_rd);
 	end
 endtask
 
 task CMD_3RS
 	(
 		input logic unsigned [1:0] fu_id
+		, input logic unsigned [31:0] fu_imm_opcode
 		, input logic unsigned [4:0] fu_rd
 		, input logic unsigned [4:0] fu_rs0
 		, input logic unsigned [4:0] fu_rs1
 		, input logic unsigned [4:0] fu_rs2
 	);
 	begin
-	CMD_EXEC(fu_id, 1, fu_rs0, 1, fu_rs1, 1, fu_rs2, fu_rd);
+	CMD_EXEC(fu_id, fu_imm_opcode, 1, fu_rs0, 1, fu_rs1, 1, fu_rs2, fu_rd);
 	end
 endtask
 
@@ -220,8 +224,20 @@ task EXEC_ADD
 		, input logic unsigned [4:0] fu_rs1
 	);
 	begin
-	CMD_2RS(0, fu_rd, fu_rs0, fu_rs1);
+	CMD_2RS(0, 0, fu_rd, fu_rs0, fu_rs1);
 	log_data_expected[fu_rd] = log_data_expected[fu_rs0] + log_data_expected[fu_rs1];
+	end
+endtask
+
+task EXEC_SUB
+	(
+		input logic unsigned [4:0] fu_rd
+		, input logic unsigned [4:0] fu_rs0
+		, input logic unsigned [4:0] fu_rs1
+	);
+	begin
+	CMD_2RS(0, 1, fu_rd, fu_rs0, fu_rs1);
+	log_data_expected[fu_rd] = log_data_expected[fu_rs0] - log_data_expected[fu_rs1];
 	end
 endtask
 
@@ -232,7 +248,7 @@ task EXEC_MUL
 		, input logic unsigned [4:0] fu_rs1
 	);
 	begin
-	CMD_2RS(1, fu_rd, fu_rs0, fu_rs1);
+	CMD_2RS(1, 0, fu_rd, fu_rs0, fu_rs1);
 	log_data_expected[fu_rd] = log_data_expected[fu_rs0] * log_data_expected[fu_rs1];
 	end
 endtask
@@ -244,7 +260,7 @@ task EXEC_DIV
 		, input logic unsigned [4:0] fu_rs1
 	);
 	begin
-	CMD_2RS(2, fu_rd, fu_rs0, fu_rs1);
+	CMD_2RS(2, 0, fu_rd, fu_rs0, fu_rs1);
 	log_data_expected[fu_rd] = log_data_expected[fu_rs0] / log_data_expected[fu_rs1];
 	end
 endtask
@@ -257,7 +273,7 @@ task EXEC_FMA
 		, input logic unsigned [4:0] fu_rs2
 	);
 	begin
-	CMD_3RS(3, fu_rd, fu_rs0, fu_rs1, fu_rs2);
+	CMD_3RS(3, 0, fu_rd, fu_rs0, fu_rs1, fu_rs2);
 	log_data_expected[fu_rd] = (log_data_expected[fu_rs0] * log_data_expected[fu_rs1] + log_data_expected[fu_rs2]);
 	end
 endtask
@@ -319,6 +335,7 @@ initial
 	EXEC_ADD(6, 2, 5);
 	EXEC_MUL(10, 3, 6);
 	EXEC_DIV(11, 7, 5);
+	EXEC_SUB(12, 6, 3);
 	EXEC_FMA(16, 5, 6, 10);
 
     SCAN_REGS();
