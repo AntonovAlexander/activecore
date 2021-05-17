@@ -140,7 +140,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cmd_req_struct.addu("rf_wdata",    MultiExu_CFG.RF_width-1, 0, "0")
         cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size)-1, 0, "0")
         for (imm_idx in 0 until MultiExu_CFG.imms.size) {
-            cmd_req_struct.add(MultiExu_CFG.imms[imm_idx].name, MultiExu_CFG.imms[imm_idx].vartype, MultiExu_CFG.imms[imm_idx].defimm)
+            cmd_req_struct.add("fu_imm_" + MultiExu_CFG.imms[imm_idx].name, MultiExu_CFG.imms[imm_idx].vartype, MultiExu_CFG.imms[imm_idx].defimm)
         }
         for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
             cmd_req_struct.addu("fu_rs" + RF_rs_idx + "_req", 0, 0, "0")

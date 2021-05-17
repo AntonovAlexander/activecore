@@ -64,16 +64,17 @@ task INIT_CMD
 	(
 		input CMD
 		, input RF_CMD
-		, input logic unsigned [4:0] rf_addr
+		, input logic unsigned [4:0]  rf_addr
 		, input logic unsigned [31:0] rf_wdata
-		, input logic unsigned [1:0] fu_id
-		, input logic unsigned [0:0] fu_rs0_req
-		, input logic unsigned [4:0] fu_rs0
-		, input logic unsigned [0:0] fu_rs1_req
-		, input logic unsigned [4:0] fu_rs1
-		, input logic unsigned [0:0] fu_rs2_req
-		, input logic unsigned [4:0] fu_rs2
-		, input logic unsigned [4:0] fu_rd
+		, input logic unsigned [1:0]  fu_id
+		, input logic unsigned [31:0] fu_imm_opcode
+		, input logic unsigned [0:0]  fu_rs0_req
+		, input logic unsigned [4:0]  fu_rs0
+		, input logic unsigned [0:0]  fu_rs1_req
+		, input logic unsigned [4:0]  fu_rs1
+		, input logic unsigned [0:0]  fu_rs2_req
+		, input logic unsigned [4:0]  fu_rs2
+		, input logic unsigned [4:0]  fu_rd
 	);
 	begin
 	cmd_req_genfifo_req <= 1'b1;
@@ -82,6 +83,7 @@ task INIT_CMD
 	cmd_req_genfifo_data.rf_addr <= rf_addr;
 	cmd_req_genfifo_data.rf_wdata <= rf_wdata;
 	cmd_req_genfifo_data.fu_id <= fu_id;
+	cmd_req_genfifo_data.fu_imm_opcode <= fu_imm_opcode;
 	cmd_req_genfifo_data.fu_rs0_req <= fu_rs0_req;
 	cmd_req_genfifo_data.fu_rs0 <= fu_rs0;
 	cmd_req_genfifo_data.fu_rs1_req <= fu_rs1_req;
@@ -109,7 +111,7 @@ task CMD_EXEC
 		, input logic unsigned [4:0] fu_rd
 	);
 	begin
-	INIT_CMD(EXEC, RD, 0, 0, fu_id, fu_rs0_req, fu_rs0, fu_rs1_req, fu_rs1, fu_rs2_req, fu_rs2, fu_rd);
+	INIT_CMD(EXEC, RD, 0, 0, fu_id, 0, fu_rs0_req, fu_rs0, fu_rs1_req, fu_rs1, fu_rs2_req, fu_rs2, fu_rd);
 	end
 endtask
 
@@ -155,7 +157,7 @@ task CMD_RF_LOAD
 		, input logic unsigned [31:0] rf_wdata
 	);
 	begin
-	INIT_CMD(RF, WR, rf_addr, rf_wdata, 0, 0, 0, 0, 0, 0, 0, 0);
+	INIT_CMD(RF, WR, rf_addr, rf_wdata, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	end
 endtask
 
@@ -164,7 +166,7 @@ task CMD_RF_STORE
 		input logic unsigned [4:0] rf_addr
 	);
 	begin
-	INIT_CMD(RF, RD, rf_addr, 32'hdeadbeef, 0, 0, 0, 0, 0, 0, 0, 0);
+	INIT_CMD(RF, RD, rf_addr, 32'hdeadbeef, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	end
 endtask
 
