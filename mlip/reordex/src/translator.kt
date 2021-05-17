@@ -34,7 +34,7 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
     val fu_req          = AddLocal("fu_req")
     val fu_pending      = AddLocal("fu_pending")
     val fu_id           = AddLocal("fu_id")
-    val fu_opcode       = AddLocal("fu_opcode")
+    val imm_rsrv        = ArrayList<hw_var>()
     val rs_rsrv         = ArrayList<__RF_rs_req>()
     val rd_tag          = AddLocal("rd_tag")
     val rd_tag_prev     = AddLocal("rd_tag_prev")
@@ -43,6 +43,9 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
     val rdy             = AddLocal("rdy")
 
     init {
+        for (imm_idx in 0 until MultiExu_CFG.imms.size) {
+            imm_rsrv.add(AddLocal(MultiExu_CFG.imms[imm_idx].name))
+        }
         for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
             rs_rsrv.add(__RF_rs_req(
                 AddLocal("rs" + RF_rs_idx + "_rdy"),

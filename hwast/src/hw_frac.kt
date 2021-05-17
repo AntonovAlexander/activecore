@@ -169,7 +169,7 @@ class hw_fracs() : ArrayList<hw_frac>() {
                         SUBSTR_INDEX += 1
                     }
                     if (!substr_found){
-                        MSG("Available substucts in variable: " + tgt.name)
+                        MSG("Available substructs in variable: " + tgt.name)
                         for (structvar in tgt_struct_ptr) MSG("substruct: " + structvar.name)
                         ERROR("substruct " + (fraction as hw_frac_SubStruct).substruct_name + " not found!")
                     }

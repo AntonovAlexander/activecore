@@ -139,7 +139,9 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cmd_req_struct.addu("rf_addr",    MultiExu_CFG.ARF_addr_width-1, 0, "0")
         cmd_req_struct.addu("rf_wdata",    MultiExu_CFG.RF_width-1, 0, "0")
         cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size)-1, 0, "0")
-        cmd_req_struct.addu("fu_opcode",     0, 0, "0")
+        for (imm_idx in 0 until MultiExu_CFG.imms.size) {
+            cmd_req_struct.add(MultiExu_CFG.imms[imm_idx].name, MultiExu_CFG.imms[imm_idx].vartype, MultiExu_CFG.imms[imm_idx].defimm)
+        }
         for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
             cmd_req_struct.addu("fu_rs" + RF_rs_idx + "_req", 0, 0, "0")
             cmd_req_struct.addu("fu_rs" + RF_rs_idx, MultiExu_CFG.ARF_addr_width-1, 0, "0")
@@ -160,7 +162,9 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         iq_struct.addu("fu_req",     0, 0, "0")
         iq_struct.addu("fu_pending",     0, 0, "0")
         iq_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size), 0, "0")              // for ExecUnits and wb_ext
-        iq_struct.addu("fu_opcode",     0, 0, "0")
+        for (imm_idx in 0 until MultiExu_CFG.imms.size) {
+            iq_struct.add(MultiExu_CFG.imms[imm_idx].name, MultiExu_CFG.imms[imm_idx].vartype, MultiExu_CFG.imms[imm_idx].defimm)
+        }
         for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
             iq_struct.addu("rs" + RF_rs_idx + "_rdy",     0, 0, "0")
             iq_struct.addu("rs" + RF_rs_idx + "_tag",     MultiExu_CFG.PRF_addr_width-1, 0, "0")
@@ -323,7 +327,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     var iq_entry            = IQ_inst.TRX_BUF.GetFracRef(iq_iter.iter_num)
                     var iq_entry_enb        = iq_entry.GetFracRef("enb")
                     var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
-                    var iq_entry_fu_opcode  = iq_entry.GetFracRef("fu_opcode")
                     var iq_entry_rd_tag     = iq_entry.GetFracRef("rd_tag")
 
                     cyclix_gen.begif(iq_entry_enb)
@@ -345,8 +348,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                                     run {
 
                                         // filling exu_req with iq data
-                                        cyclix_gen.assign(exu_req.GetFracRef("opcode"), iq_entry_fu_opcode)
-
+                                        for (imm_idx in 0 until MultiExu_CFG.imms.size) {
+                                            var imm_name = MultiExu_CFG.imms[imm_idx].name
+                                            cyclix_gen.assign(exu_req.GetFracRef(imm_name), iq_entry.GetFracRef(imm_name))
+                                        }
                                         for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
                                             cyclix_gen.assign(exu_req.GetFracRef("rs" + RF_rs_idx + "_rdata"), iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdata"))
                                         }
@@ -514,7 +519,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var nru_fu_req          = new_renamed_uop.GetFracRef("fu_req")
         var nru_fu_pending      = new_renamed_uop.GetFracRef("fu_pending")
         var nru_fu_id           = new_renamed_uop.GetFracRef("fu_id")
-        var nru_fu_opcode       = new_renamed_uop.GetFracRef("fu_opcode")
         var nru_wb_ext          = new_renamed_uop.GetFracRef("wb_ext")
         var nru_rd_tag          = new_renamed_uop.GetFracRef("rd_tag")
         var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
@@ -530,7 +534,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
                 cyclix_gen.assign(nru_fu_pending, 0)
                 cyclix_gen.assign(nru_fu_id,      cmd_req_data.GetFracRef("fu_id"))
-                cyclix_gen.assign(nru_fu_opcode,  cmd_req_data.GetFracRef("fu_opcode"))
 
                 // LOAD/STORE commutation
                 cyclix_gen.begif(!cmd_req_data.GetFracRef("exec"))
