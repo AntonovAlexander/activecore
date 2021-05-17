@@ -13,7 +13,7 @@ import reordex.*
 
 class FPU_CFG() : Reordex_CFG(32, 32, true,64)
 {
-    var opcode = AddImm("opcode", 32)
+    var opcode = AddUImm("opcode", 32)
 
     var rs0 = AddRs()
     var rs1 = AddRs()

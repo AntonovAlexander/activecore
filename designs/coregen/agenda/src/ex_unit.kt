@@ -13,6 +13,8 @@ import reordex.*
 
 class CPU_CFG() : Reordex_CFG(32, 32, true,64)
 {
+    var opcode = AddUImm("opcode", 6)
+
     var rs0 = AddRs()
     var rs1 = AddRs()
     var rs2 = AddRs()
@@ -184,7 +186,7 @@ class EXU_LSU() : reordex.Exu("LSU", CPU_CFG_inst) {
         mem_wdata.assign(subStruct(req_data, "rs1_rdata"))
         mem_opcode.assign(subStruct(req_data, "opcode"))
 
-        begcase(opcode)
+        begcase(CPU_CFG_inst.opcode)
         run {
             begbranch(op_LD)
             run {
@@ -202,13 +204,13 @@ class EXU_LSU() : reordex.Exu("LSU", CPU_CFG_inst) {
 class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", CPU_CFG_inst) {
 
     init {
-        begif(eq2(opcode, 0))
+        begif(eq2(CPU_CFG_inst.opcode, 0))
         run {
-            result.assign(rs[0] + rs[1])
+            result.assign(rss[0] + rss[1])
         }; endif()
         begelse()
         run {
-            result.assign(rs[0] - rs[1])
+            result.assign(rss[0] - rss[1])
         }; endif()
     }
 }
@@ -216,21 +218,21 @@ class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", CPU_CFG_inst) {
 class EXU_FP_MUL() : reordex.Exu("FP_MUL", CPU_CFG_inst) {
 
     init {
-        result.assign(rs[0] * rs[1])
+        result.assign(rss[0] * rss[1])
     }
 }
 
 class EXU_FP_DIV() : reordex.Exu("FP_DIV", CPU_CFG_inst) {
 
     init {
-        result.assign(rs[0] / rs[1])
+        result.assign(rss[0] / rss[1])
     }
 }
 
 class EXU_FP_FMA() : reordex.Exu("FP_FMA", CPU_CFG_inst) {
 
     init {
-        result.assign((rs[0] * rs[1]) + rs[2])
+        result.assign((rss[0] * rss[1]) + rss[2])
     }
 }
 

@@ -22,11 +22,17 @@ open class Reordex_CFG(val RF_width : Int,
     var resp_struct = hw_struct("resp_struct")
 
     var imms = ArrayList<hw_var>()
-    fun AddImm(name : String, width : Int) : hw_var {
-        var new_var = hw_var(name, width-1, 0, "0")
-        req_struct.addu(name, width-1, 0, "0")
+    fun AddImm(name : String, new_type : hw_type) : hw_var {
+        var new_var = hw_var(name, new_type, "0")
+        req_struct.add(name, new_type, "0")
         imms.add(new_var)
         return new_var
+    }
+    fun AddUImm(name : String, new_width : Int) : hw_var {
+        return AddImm(name, hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(new_width)))
+    }
+    fun AddSImm(name : String, new_width : Int) : hw_var {
+        return AddImm(name, hw_type(DATA_TYPE.BV_SIGNED, hw_dim_static(new_width)))
     }
 
     var rss = ArrayList<hw_var>()
