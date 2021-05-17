@@ -28,8 +28,7 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
                  TRX_BUF_SIZE : Int,
                  ExecUnits_size : Int,
                  trx_struct : hw_struct,
-                 MultiExu_cfg_rf : MultiExu_CFG_RF,
-                 Exu_cfg_rf : Exu_CFG_RF) : hw_stage(cyclix_gen, name_prefix, trx_struct, TRX_BUF_SIZE, false) {
+                 MultiExu_CFG : Reordex_CFG) : hw_stage(cyclix_gen, name_prefix, trx_struct, TRX_BUF_SIZE, false) {
 
     val enb             = AddLocal("enb")
     val fu_req          = AddLocal("fu_req")
@@ -44,7 +43,7 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
     val rdy             = AddLocal("rdy")
 
     init {
-        for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
             rs_rsrv.add(__RF_rs_req(
                 AddLocal("rs" + RF_rs_idx + "_rdy"),
                 AddLocal("rs" + RF_rs_idx + "_tag"),
@@ -59,10 +58,9 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
                 TRX_BUF_SIZE : Int,
                 ExecUnits_size : Int,
                 trx_struct : hw_struct,
-                MultiExu_cfg_rf : MultiExu_CFG_RF,
-                Exu_cfg_rf : Exu_CFG_RF,
+                MultiExu_CFG : Reordex_CFG,
                 val iq_num: hw_imm,
-                val iq_exu: Boolean) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, ExecUnits_size, trx_struct, MultiExu_cfg_rf, Exu_cfg_rf) {
+                val iq_exu: Boolean) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, ExecUnits_size, trx_struct, MultiExu_CFG) {
 
     val rd = cyclix_gen.ulocal(name_prefix + "_rd", 0, 0, "0")
     val wr = cyclix_gen.ulocal(name_prefix + "_wr", 0, 0, "0")

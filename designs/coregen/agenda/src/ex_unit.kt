@@ -11,9 +11,15 @@ package agenda
 import hwast.*
 import reordex.*
 
-val Exu_cfg_rf = Exu_CFG_RF(32, 3)
+class CPU_CFG() : Reordex_CFG(32, 32, true,64)
+{
+    var rs0 = AddRs()
+    var rs1 = AddRs()
+    var rs2 = AddRs()
+}
+val CPU_CFG_inst = CPU_CFG()
 
-class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", Exu_cfg_rf) {
+class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
 
     // ALU opcodes
     val aluop_ADD		= 0
@@ -126,7 +132,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", Exu_cfg_rf) {
     }
 }
 
-class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", Exu_cfg_rf) {
+class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CPU_CFG_inst) {
 
     // ALU opcodes
     val aluop_MUL		= 0
@@ -162,7 +168,7 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", Exu_cfg_rf) {
     }
 }
 
-class EXU_LSU() : reordex.Exu("LSU", Exu_cfg_rf) {
+class EXU_LSU() : reordex.Exu("LSU", CPU_CFG_inst) {
 
     // ALU opcodes
     val op_LD		= 0
@@ -193,7 +199,7 @@ class EXU_LSU() : reordex.Exu("LSU", Exu_cfg_rf) {
     }
 }
 
-class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", Exu_cfg_rf) {
+class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", CPU_CFG_inst) {
 
     init {
         begif(eq2(opcode, 0))
@@ -207,28 +213,28 @@ class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", Exu_cfg_rf) {
     }
 }
 
-class EXU_FP_MUL() : reordex.Exu("FP_MUL", Exu_cfg_rf) {
+class EXU_FP_MUL() : reordex.Exu("FP_MUL", CPU_CFG_inst) {
 
     init {
         result.assign(rs[0] * rs[1])
     }
 }
 
-class EXU_FP_DIV() : reordex.Exu("FP_DIV", Exu_cfg_rf) {
+class EXU_FP_DIV() : reordex.Exu("FP_DIV", CPU_CFG_inst) {
 
     init {
         result.assign(rs[0] / rs[1])
     }
 }
 
-class EXU_FP_FMA() : reordex.Exu("FP_FMA", Exu_cfg_rf) {
+class EXU_FP_FMA() : reordex.Exu("FP_FMA", CPU_CFG_inst) {
 
     init {
         result.assign((rs[0] * rs[1]) + rs[2])
     }
 }
 
-class cpu(name : String) : reordex.MultiExu(name, Exu_cfg_rf, MultiExu_CFG_RF(32, true, 64), 4) {
+class cpu(name : String) : reordex.MultiExu(name, CPU_CFG_inst, 4) {
 
     init {
         add_exu(EXU_ALU_INTEGER(), 4, 4)

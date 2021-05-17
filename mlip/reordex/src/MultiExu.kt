@@ -10,19 +10,38 @@ package reordex
 
 import hwast.*
 
-data class MultiExu_CFG_RF(val ARF_depth : Int,
-                           val rename_RF: Boolean,
-                           val PRF_depth : Int) {
+open class Reordex_CFG(val RF_width : Int,
+                       val ARF_depth : Int,
+                       val rename_RF: Boolean,
+                       val PRF_depth : Int) {
 
     val ARF_addr_width = GetWidthToContain(ARF_depth)
     val PRF_addr_width = GetWidthToContain(PRF_depth)
+
+    var req_struct = hw_struct("req_struct")
+    var resp_struct = hw_struct("resp_struct")
+
+    var rss = ArrayList<hw_var>()
+    fun AddRs() : hw_var {
+        var new_var = hw_var("rs" + rss.size, RF_width-1, 0, "0")
+        req_struct.addu("rs" + rss.size + "_rdata", RF_width-1, 0, "0")
+        rss.add(new_var)
+        return new_var
+    }
+
+    init {
+        req_struct.addu("opcode",     31, 0, "0")
+        req_struct.addu("rd_tag",     31, 0, "0")       // TODO: clean up
+        resp_struct.addu("tag",     31, 0, "0")         // TODO: clean up
+        resp_struct.addu("wdata",     RF_width-1, 0, "0")
+    }
 }
 
 data class Exu_CFG(val ExecUnit : Exu,
                    val exu_num : Int,
                    val iq_length : Int)
 
-open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu_cfg_rf : MultiExu_CFG_RF, val out_iq_size : Int) {
+open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_iq_size : Int) {
 
     var ExecUnits  = mutableMapOf<String, Exu_CFG>()
 
@@ -74,21 +93,21 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
         MSG("generating control structures...")
         var prf_dim = hw_dim_static()
-        prf_dim.add(Exu_cfg_rf.RF_width-1, 0)
-        prf_dim.add(MultiExu_cfg_rf.PRF_depth-1, 0)
+        prf_dim.add(MultiExu_CFG.RF_width-1, 0)
+        prf_dim.add(MultiExu_CFG.PRF_depth-1, 0)
         var PRF = cyclix_gen.uglobal("genPRF", prf_dim, "0")
 
-        var PRF_mapped = cyclix_gen.uglobal("genPRF_mapped", MultiExu_cfg_rf.PRF_depth-1, 0, hw_imm_ones(MultiExu_cfg_rf.ARF_depth))
+        var PRF_mapped = cyclix_gen.uglobal("genPRF_mapped", MultiExu_CFG.PRF_depth-1, 0, hw_imm_ones(MultiExu_CFG.ARF_depth))
 
-        var PRF_rdy = cyclix_gen.uglobal("genPRF_rdy", MultiExu_cfg_rf.PRF_depth-1, 0, hw_imm_ones(MultiExu_cfg_rf.PRF_depth))
+        var PRF_rdy = cyclix_gen.uglobal("genPRF_rdy", MultiExu_CFG.PRF_depth-1, 0, hw_imm_ones(MultiExu_CFG.PRF_depth))
 
         var arf_map_dim = hw_dim_static()
-        arf_map_dim.add(MultiExu_cfg_rf.PRF_addr_width-1, 0)
-        arf_map_dim.add(MultiExu_cfg_rf.ARF_depth-1, 0)
+        arf_map_dim.add(MultiExu_CFG.PRF_addr_width-1, 0)
+        arf_map_dim.add(MultiExu_CFG.ARF_depth-1, 0)
 
         var ARF_map_default = hw_imm_arr(arf_map_dim)
-        for (RF_idx in 0 until MultiExu_cfg_rf.PRF_depth) {
-            if (RF_idx < MultiExu_cfg_rf.ARF_depth) {
+        for (RF_idx in 0 until MultiExu_CFG.PRF_depth) {
+            if (RF_idx < MultiExu_CFG.ARF_depth) {
                 ARF_map_default.AddSubImm(RF_idx.toString())
             } else {
                 ARF_map_default.AddSubImm("0")
@@ -104,19 +123,19 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         var cmd_req_struct = hw_struct(name + "_cmd_req_struct")
         cmd_req_struct.addu("exec",     0, 0, "0")
         cmd_req_struct.addu("rf_we",       0,  0, "0")
-        cmd_req_struct.addu("rf_addr",    MultiExu_cfg_rf.ARF_addr_width-1, 0, "0")
-        cmd_req_struct.addu("rf_wdata",    Exu_cfg_rf.RF_width-1, 0, "0")
+        cmd_req_struct.addu("rf_addr",    MultiExu_CFG.ARF_addr_width-1, 0, "0")
+        cmd_req_struct.addu("rf_wdata",    MultiExu_CFG.RF_width-1, 0, "0")
         cmd_req_struct.addu("fu_id",    GetWidthToContain(ExecUnits.size)-1, 0, "0")
         cmd_req_struct.addu("fu_opcode",     0, 0, "0")
-        for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
             cmd_req_struct.addu("fu_rs" + RF_rs_idx + "_req", 0, 0, "0")
-            cmd_req_struct.addu("fu_rs" + RF_rs_idx, MultiExu_cfg_rf.ARF_addr_width-1, 0, "0")
+            cmd_req_struct.addu("fu_rs" + RF_rs_idx, MultiExu_CFG.ARF_addr_width-1, 0, "0")
         }
-        cmd_req_struct.addu("fu_rd",    MultiExu_cfg_rf.ARF_addr_width-1, 0, "0")
+        cmd_req_struct.addu("fu_rd",    MultiExu_CFG.ARF_addr_width-1, 0, "0")
         var cmd_req = cyclix_gen.fifo_in("cmd_req",  hw_type(cmd_req_struct))
         var cmd_req_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_req_data"), cmd_req_struct)
-        var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(Exu_cfg_rf.RF_width-1, 0)))
-        var cmd_resp_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_resp_data"), hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(Exu_cfg_rf.RF_width-1, 0)), "0")
+        var cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(MultiExu_CFG.RF_width-1, 0)))
+        var cmd_resp_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_resp_data"), hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(MultiExu_CFG.RF_width-1, 0)), "0")
 
         MSG("generating interface structure: done")
 
@@ -129,13 +148,13 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         iq_struct.addu("fu_pending",     0, 0, "0")
         iq_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size), 0, "0")              // for ExecUnits and wb_ext
         iq_struct.addu("fu_opcode",     0, 0, "0")
-        for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
             iq_struct.addu("rs" + RF_rs_idx + "_rdy",     0, 0, "0")
-            iq_struct.addu("rs" + RF_rs_idx + "_tag",     MultiExu_cfg_rf.PRF_addr_width-1, 0, "0")
-            iq_struct.addu("rs" + RF_rs_idx + "_rdata",     Exu_cfg_rf.RF_width-1, 0, "0")
+            iq_struct.addu("rs" + RF_rs_idx + "_tag",     MultiExu_CFG.PRF_addr_width-1, 0, "0")
+            iq_struct.addu("rs" + RF_rs_idx + "_rdata",     MultiExu_CFG.RF_width-1, 0, "0")
         }
-        iq_struct.addu("rd_tag",     MultiExu_cfg_rf.PRF_addr_width-1, 0, "0")
-        iq_struct.addu("rd_tag_prev",     MultiExu_cfg_rf.PRF_addr_width-1, 0, "0")                 // freeing
+        iq_struct.addu("rd_tag",     MultiExu_CFG.PRF_addr_width-1, 0, "0")
+        iq_struct.addu("rd_tag_prev",     MultiExu_CFG.PRF_addr_width-1, 0, "0")                 // freeing
         iq_struct.addu("rd_tag_prev_clr",     0, 0, "0")
         iq_struct.addu("wb_ext",     0, 0, "0")
         iq_struct.addu("rdy",     0, 0, "0")
@@ -145,8 +164,8 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         var IQ_insts = ArrayList<iq_buffer>()
         var ExUnits_insts = ArrayList<ArrayList<cyclix.hw_subproc>>()
 
-        var exu_req = cyclix_gen.local(cyclix_gen.GetGenName("exu_req"), Exu_cfg_rf.req_struct)
-        var exu_resp = cyclix_gen.local(cyclix_gen.GetGenName("exu_resp"), Exu_cfg_rf.resp_struct)
+        var exu_req = cyclix_gen.local(cyclix_gen.GetGenName("exu_req"), MultiExu_CFG.req_struct)
+        var exu_resp = cyclix_gen.local(cyclix_gen.GetGenName("exu_resp"), MultiExu_CFG.resp_struct)
 
         MSG("generating internal structure: done")
 
@@ -155,11 +174,11 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         for (ExUnit in ExecUnits) {
             MSG("generating execution unit: " + ExUnit.value.ExecUnit.name + "...")
 
-            IQ_insts.add(iq_buffer(cyclix_gen, "geniq_" + ExUnit.key, ExUnit.value.iq_length, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true))
+            IQ_insts.add(iq_buffer(cyclix_gen, "geniq_" + ExUnit.key, ExUnit.value.iq_length, ExecUnits.size, iq_struct, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true))
             ExUnit_idx++
 
             MSG("generating submodules...")
-            var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, Exu_cfg_rf.req_struct, Exu_cfg_rf.resp_struct)
+            var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, MultiExu_CFG.req_struct, MultiExu_CFG.resp_struct)
             MSG("generating submodules: done")
 
             var var_dict = mutableMapOf<hw_var, hw_var>()
@@ -184,7 +203,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
             exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict), exu_cyclix_gen.stream_req_var)
 
             exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.opcode, var_dict), exu_cyclix_gen.subStruct(TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict), "opcode"))
-            for (rs_num in 0 until Exu_cfg_rf.RF_rs_num) {
+            for (rs_num in 0 until MultiExu_CFG.rss.size) {
                 exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.rs[rs_num], var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict)), "rs" + rs_num + "_rdata"))
             }
 
@@ -225,7 +244,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         }
 
         MSG("generating store IQ...")
-        IQ_insts.add(iq_buffer(cyclix_gen, "genwb", out_iq_size, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false))
+        IQ_insts.add(iq_buffer(cyclix_gen, "genwb", out_iq_size, ExecUnits.size, iq_struct, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false))
         MSG("generating store IQ: done")
 
         MSG("generating logic...")
@@ -288,7 +307,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     run {
                         var rss_rdy = cyclix_gen.ulocal(cyclix_gen.GetGenName("rss_rdy"), 0, 0, "0")
                         cyclix_gen.assign(rss_rdy, 1)
-                        for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
                             cyclix_gen.band_gen(rss_rdy, rss_rdy, iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy"))
                         }
                         cyclix_gen.begif(rss_rdy)
@@ -305,7 +324,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                                         // filling exu_req with iq data
                                         cyclix_gen.assign(exu_req.GetFracRef("opcode"), iq_entry_fu_opcode)
 
-                                        for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                                        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
                                             cyclix_gen.assign(exu_req.GetFracRef("rs" + RF_rs_idx + "_rdata"), iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdata"))
                                         }
 
@@ -331,7 +350,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
         }
         MSG("issuing operations from IQ to FUs: done")
 
-        var renamed_uop_buf = uop_buffer(cyclix_gen, "genrenamed_uop_buf", 1, ExecUnits.size, iq_struct, MultiExu_cfg_rf, Exu_cfg_rf)
+        var renamed_uop_buf = uop_buffer(cyclix_gen, "genrenamed_uop_buf", 1, ExecUnits.size, iq_struct, MultiExu_CFG)
         renamed_uop_buf.preinit_ctrls()
         renamed_uop_buf.set_rdy()
         renamed_uop_buf.init_locals()
@@ -369,7 +388,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                             cyclix_gen.begif(iq_entry_enb)
                             run {
 
-                                for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                                for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
 
                                     var iq_entry_rs_tag     = iq_entry.GetFracRef("rs" + RF_rs_idx + "_tag")
                                     var iq_entry_rs_rdy     = iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy")
@@ -411,7 +430,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     // monitoring generated data
                     for (renamed_uop_buf_idx in 0 until renamed_uop_buf.TRX_BUF_SIZE) {
                         var renamed_uop_buf_entry = renamed_uop_buf.TRX_BUF.GetFracRef(renamed_uop_buf_idx)
-                        for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
 
                             var rs_rdy      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_rdy")
                             var rs_tag      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_tag")
@@ -509,12 +528,12 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                 }; cyclix_gen.endif()
 
                 var rss_tags = ArrayList<hw_var>()
-                for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
                     rss_tags.add(cyclix_gen.indexed(ARF_map, cmd_req_data.GetFracRef("fu_rs" + RF_rs_idx)))
                 }
                 var rd_tag = cyclix_gen.indexed(ARF_map, cmd_req_data.GetFracRef("fu_rd"))
 
-                for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
                     cyclix_gen.assign(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_tag"), rss_tags[RF_rs_idx])
                     cyclix_gen.assign(
                         new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdata"),
@@ -528,7 +547,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
 
                     cyclix_gen.assign(nru_fu_req, 1)
 
-                    for (RF_rs_idx in 0 until Exu_cfg_rf.RF_rs_num) {
+                    for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
                         // fetching rdy flags from PRF_rdy and masking with rsX_req
                         cyclix_gen.assign(
                             new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdy"),
@@ -571,7 +590,7 @@ open class MultiExu(val name : String, val Exu_cfg_rf : Exu_CFG_RF, val MultiExu
                     run {
                         cyclix_gen.assign(new_renamed_uop.GetFracRef("rs0_rdy"), PRF_rdy.GetFracRef(rss_tags[0]))
 
-                        for (RF_rs_idx in 1 until Exu_cfg_rf.RF_rs_num) {
+                        for (RF_rs_idx in 1 until MultiExu_CFG.rss.size) {
                             cyclix_gen.assign(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdy"), 1)
                         }
 

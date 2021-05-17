@@ -12,45 +12,27 @@ import hwast.*
 
 val OP_EXU = hwast.hw_opcode("exec_unit")
 
-class Exu_CFG_RF(val RF_width : Int,
-                 val RF_rs_num : Int) {
-
-    var req_struct = hw_struct("req_struct")
-    var resp_struct = hw_struct("resp_struct")
-
-    init {
-        req_struct.addu("opcode",     31, 0, "0")
-        for (RF_rs_idx in 0 until RF_rs_num) {
-            req_struct.addu("rs" + RF_rs_idx + "_rdata", RF_width-1, 0, "0")
-        }
-        req_struct.addu("rd_tag",     31, 0, "0")       // TODO: clean up
-
-        resp_struct.addu("tag",     31, 0, "0")         // TODO: clean up
-        resp_struct.addu("wdata",     RF_width-1, 0, "0")
-    }
-}
-
-open class Exu(val name : String, val Exu_cfg_rf : Exu_CFG_RF) : hw_astc_stdif() {
+open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
 
     override var GenNamePrefix   = "reordex"
 
     var locals          = ArrayList<hw_var>()
     var globals         = ArrayList<hw_var>()
 
-    var req_data = local(GetGenName("req_data"), Exu_cfg_rf.req_struct)
-    var resp_data = local(GetGenName("resp_data"), Exu_cfg_rf.resp_struct)
+    var req_data = local(GetGenName("req_data"), Exu_CFG.req_struct)
+    var resp_data = local(GetGenName("resp_data"), Exu_CFG.resp_struct)
 
     var opcode      = ulocal("opcode", 31, 0, "0")
     var rs          = ArrayList<hw_var>()
-    var result      = ulocal("result", Exu_cfg_rf.RF_width-1, 0, "0")
+    var result      = ulocal("result", Exu_CFG.RF_width-1, 0, "0")
 
     init {
         if (FROZEN_FLAG) ERROR("Failed to begin stage " + name + ": ASTC frozen")
         if (this.size != 0) ERROR("reordex ASTC inconsistent!")
         add(hw_exec(OP_EXU))
 
-        for (rs_num in 0 until Exu_cfg_rf.RF_rs_num) {
-            rs.add(ulocal("rs" + rs_num, Exu_cfg_rf.RF_width-1, 0, "0"))
+        for (rs_num in 0 until Exu_CFG.rss.size) {
+            rs.add(ulocal("rs" + rs_num, Exu_CFG.RF_width-1, 0, "0"))
         }
 
     }
