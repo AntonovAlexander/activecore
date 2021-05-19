@@ -17,7 +17,7 @@ MLIP core approach serves as intermediate solution for codification of custom mi
 Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
 
 Compared to other hardware generation frameworks, ActiveCore is constructed according to the following prioritites:
-* Dynamic generation of all hardware-related content, including data types, structures, dimensions, expressions, etc;
+* Dynamic generation of all hardware-related content, including data instances, structures, dimensions, expressions, procedural blocks, etc;
 * Decoupling generation logic from certain programming styles (e.g. functional one). Here, conventional object-oriented approach is mostly used, however, you can use any in your generators;
 * Provision of generic AST constructor for behavioral HW specifications (see **hwast**) that is reused for specifications on various abstraction levels, and its content is freely accessible for analysis and manipulation.
 

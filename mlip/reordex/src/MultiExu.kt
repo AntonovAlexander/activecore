@@ -186,10 +186,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         MSG("generating internal structures: done")
 
+        var exu_descrs = mutableMapOf<Exu, __exu_descr>()
         var ExUnit_idx = 0
-
         for (ExUnit in ExecUnits) {
             MSG("generating execution unit: " + ExUnit.value.ExecUnit.name + "...")
+
+            var new_exu_descr = __exu_descr(mutableMapOf(), ArrayList())
 
             IQ_insts.add(iq_buffer(cyclix_gen, "geniq_" + ExUnit.key, ExUnit.value.iq_length, ExecUnits.size, iq_struct, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true))
             ExUnit_idx++
@@ -198,48 +200,46 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, MultiExu_CFG.req_struct, MultiExu_CFG.resp_struct)
             MSG("generating submodules: done")
 
-            var var_dict = mutableMapOf<hw_var, hw_var>()
-
             MSG("generating locals...")
             for (local in ExUnit.value.ExecUnit.locals)
-                var_dict.put(local, exu_cyclix_gen.local(local.name, local.vartype, local.defimm))
+                new_exu_descr.var_dict.put(local, exu_cyclix_gen.local(local.name, local.vartype, local.defimm))
             for (imm_num in 0 until ExUnit.value.ExecUnit.imms.size)
-                var_dict.put(MultiExu_CFG.imms[imm_num], var_dict[ExUnit.value.ExecUnit.imms[imm_num]!!]!!)
+                new_exu_descr.var_dict.put(MultiExu_CFG.imms[imm_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.imms[imm_num]!!]!!)
             for (rs_num in 0 until ExUnit.value.ExecUnit.rss.size)
-                var_dict.put(MultiExu_CFG.rss[rs_num], var_dict[ExUnit.value.ExecUnit.rss[rs_num]!!]!!)
+                new_exu_descr.var_dict.put(MultiExu_CFG.rss[rs_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.rss[rs_num]!!]!!)
             MSG("generating locals: done")
 
             MSG("generating globals...")
             for (global in ExUnit.value.ExecUnit.globals)
-                var_dict.put(global, exu_cyclix_gen.global(global.name, global.vartype, global.defimm))
+                new_exu_descr.var_dict.put(global, exu_cyclix_gen.global(global.name, global.vartype, global.defimm))
             MSG("generating globals: done")
 
             MSG("generating intermediates...")
             for (genvar in ExUnit.value.ExecUnit[0].genvars)
-                var_dict.put(genvar, exu_cyclix_gen.local(genvar.name, genvar.vartype, genvar.defimm))
+                new_exu_descr.var_dict.put(genvar, exu_cyclix_gen.local(genvar.name, genvar.vartype, genvar.defimm))
             MSG("generating intermediates: done")
 
             MSG("generating logic...")
 
-            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict), exu_cyclix_gen.stream_req_var)
+            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict), exu_cyclix_gen.stream_req_var)
 
             for (imm_num in 0 until MultiExu_CFG.imms.size) {
-                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.imms[imm_num], var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict)), MultiExu_CFG.imms[imm_num].name))
+                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.imms[imm_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), MultiExu_CFG.imms[imm_num].name))
             }
             for (rs_num in 0 until MultiExu_CFG.rss.size) {
-                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.rss[rs_num], var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, var_dict)), "rs" + rs_num + "_rdata"))
+                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.rss[rs_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), "rs" + rs_num + "_rdata"))
             }
 
             for (expr in ExUnit.value.ExecUnit[0].expressions) {
                 reconstruct_expression(false,
                     exu_cyclix_gen,
                     expr,
-                    import_expr_context(var_dict))
+                    import_expr_context(new_exu_descr.var_dict))
             }
 
-            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, var_dict), hw_fracs(hw_frac_SubStruct("wdata")), TranslateVar(ExUnit.value.ExecUnit.result, var_dict) )
+            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict), hw_fracs(hw_frac_SubStruct("wdata")), TranslateVar(ExUnit.value.ExecUnit.result, new_exu_descr.var_dict) )
 
-            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var, TranslateVar(ExUnit.value.ExecUnit.resp_data, var_dict))
+            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var, TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict))
             exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var, hw_fracs("tag"), exu_cyclix_gen.subStruct(exu_cyclix_gen.stream_req_var, "rd_tag"))
 
             exu_cyclix_gen.end()
@@ -264,8 +264,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             MSG("generating submodule instances: done")
 
             for (rs_num in 0 until ExUnit.value.ExecUnit.rss.size)
-                if (var_dict[ExUnit.value.ExecUnit.rss[rs_num]!!]!!.read_done)
+                if (new_exu_descr.var_dict[ExUnit.value.ExecUnit.rss[rs_num]!!]!!.read_done) {
                     MSG("Exu waits for: " + ExUnit.value.ExecUnit.rss[rs_num]!!.name)
+                    new_exu_descr.rs_use_flags.add(true)
+                } else {
+                    new_exu_descr.rs_use_flags.add(false)
+                }
 
             MSG("generating execution unit " + ExUnit.value.ExecUnit.name + ": done")
         }
