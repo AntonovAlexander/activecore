@@ -12,11 +12,17 @@ enum class IMM_BASE_TYPE {
     DEC, BIN, HEX
 }
 
+fun BoolToImmString(imm_value : Boolean) : String {
+    if (imm_value) return "1"
+    else return "0"
+}
+
 open class hw_imm (val dimensions : hw_dim_static, var base_type : IMM_BASE_TYPE, val imm_value : String) : hw_param(hw_type(DATA_TYPE.BV_UNSIGNED, dimensions), imm_value)
 {
     constructor(dimensions : hw_dim_static, imm_value : String) : this(dimensions, IMM_BASE_TYPE.DEC, imm_value)
-    constructor(imm_value : Int) : this(hw_dim_static(imm_value.toString()), imm_value.toString())
     constructor(imm_value : String) : this(hw_dim_static(imm_value), imm_value)
+    constructor(imm_value : Boolean) : this(hw_dim_static(1), BoolToImmString(imm_value))
+    constructor(imm_value : Int) : this(hw_dim_static(imm_value.toString()), imm_value.toString())
     constructor(msb: Int, lsb: Int, imm_value : String) : this(hw_dim_static(msb, lsb), imm_value)
     constructor(width: Int, base_type : IMM_BASE_TYPE, imm_value : String) : this(hw_dim_static(width), base_type, imm_value)
     constructor(width: Int, imm_value : String) : this(hw_dim_static(width), imm_value)

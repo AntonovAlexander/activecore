@@ -195,12 +195,7 @@ always @(posedge clk_gen)
                 testmem_udm_addr <= udm_addr[31:2];     // 4-byte aligned access only
                 testmem_udm_wdata <= udm_wdata;
                 end
-            if (udm_addr == CSR_CITADEL_CTRL_ADDR)      begin
-                                                        cmd_req_genfifo_req                 <= udm_wdata[0];
-                                                        cmd_req_genfifo_data.fu_rs0_req     <= udm_wdata[1];
-                                                        cmd_req_genfifo_data.fu_rs1_req     <= udm_wdata[2];
-                                                        cmd_req_genfifo_data.fu_rs2_req     <= udm_wdata[3];
-                                                        end
+            if (udm_addr == CSR_CITADEL_CTRL_ADDR)      cmd_req_genfifo_req                 <= udm_wdata[0];
             if (udm_addr == CSR_CITADEL_EXEC_ADDR)      cmd_req_genfifo_data.exec           <= udm_wdata;
             if (udm_addr == CSR_CITADEL_RF_WE_ADDR)     cmd_req_genfifo_data.rf_we          <= udm_wdata;
             if (udm_addr == CSR_CITADEL_RF_ADDR_ADDR)   cmd_req_genfifo_data.rf_addr        <= udm_wdata;

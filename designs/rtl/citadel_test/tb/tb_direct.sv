@@ -84,11 +84,8 @@ task INIT_CMD
 	cmd_req_genfifo_data.rf_wdata <= rf_wdata;
 	cmd_req_genfifo_data.fu_id <= fu_id;
 	cmd_req_genfifo_data.fu_imm_opcode <= fu_imm_opcode;
-	cmd_req_genfifo_data.fu_rs0_req <= fu_rs0_req;
 	cmd_req_genfifo_data.fu_rs0 <= fu_rs0;
-	cmd_req_genfifo_data.fu_rs1_req <= fu_rs1_req;
 	cmd_req_genfifo_data.fu_rs1 <= fu_rs1;
-	cmd_req_genfifo_data.fu_rs2_req <= fu_rs2_req;
 	cmd_req_genfifo_data.fu_rs2 <= fu_rs2;
 	cmd_req_genfifo_data.fu_rd <= fu_rd;
 	do begin

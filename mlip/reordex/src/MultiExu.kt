@@ -143,7 +143,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             cmd_req_struct.add("fu_imm_" + MultiExu_CFG.imms[imm_idx].name, MultiExu_CFG.imms[imm_idx].vartype, MultiExu_CFG.imms[imm_idx].defimm)
         }
         for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
-            cmd_req_struct.addu("fu_rs" + RF_rs_idx + "_req", 0, 0, "0")
             cmd_req_struct.addu("fu_rs" + RF_rs_idx, MultiExu_CFG.ARF_addr_width-1, 0, "0")
         }
         cmd_req_struct.addu("fu_rd",    MultiExu_CFG.ARF_addr_width-1, 0, "0")
@@ -186,7 +185,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         MSG("generating internal structures: done")
 
-        var exu_descrs = mutableMapOf<Exu, __exu_descr>()
+        var exu_descrs = ArrayList<__exu_descr>()
         var ExUnit_idx = 0
         for (ExUnit in ExecUnits) {
             MSG("generating execution unit: " + ExUnit.value.ExecUnit.name + "...")
@@ -270,6 +269,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 } else {
                     new_exu_descr.rs_use_flags.add(false)
                 }
+            exu_descrs.add(new_exu_descr)
 
             MSG("generating execution unit " + ExUnit.value.ExecUnit.name + ": done")
         }
@@ -527,6 +527,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var nru_rd_tag          = new_renamed_uop.GetFracRef("rd_tag")
         var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
         var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
+        var nru_rs_use_mask     = cyclix_gen.ulocal("genrs_use_mask", MultiExu_CFG.rss.size-1, 0, "0")
 
         cyclix_gen.begif(renamed_uop_buf.ctrl_rdy)
         run {
@@ -584,10 +585,19 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     cyclix_gen.assign(nru_fu_req, 1)
 
                     for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+
+                        var nru_rs_use = nru_rs_use_mask.GetFracRef(RF_rs_idx)
+                        for (exu_descr_idx in 0 until exu_descrs.size) {
+                            cyclix_gen.begif(cyclix_gen.eq2(nru_fu_id, exu_descr_idx))
+                            run {
+                                cyclix_gen.assign(nru_rs_use, hw_imm(exu_descrs[exu_descr_idx].rs_use_flags[RF_rs_idx]))
+                            }; cyclix_gen.endif()
+                        }
+
                         // fetching rdy flags from PRF_rdy and masking with rsX_req
                         cyclix_gen.assign(
                             new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdy"),
-                            cyclix_gen.bor(cyclix_gen.indexed(PRF_rdy, rss_tags[RF_rs_idx]), !cyclix_gen.subStruct(cmd_req_data, "fu_rs" + RF_rs_idx + "_req")) )
+                            cyclix_gen.bor(PRF_rdy.GetFracRef(rss_tags[RF_rs_idx]), !nru_rs_use))
                     }
 
                     cyclix_gen.assign(nru_rd_tag, alloc_rd_tag.position)            // TODO: check for availability flag
