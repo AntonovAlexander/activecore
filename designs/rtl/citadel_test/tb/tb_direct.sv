@@ -68,11 +68,8 @@ task INIT_CMD
 		, input logic unsigned [31:0] rf_wdata
 		, input logic unsigned [1:0]  fu_id
 		, input logic unsigned [31:0] fu_imm_opcode
-		, input logic unsigned [0:0]  fu_rs0_req
 		, input logic unsigned [4:0]  fu_rs0
-		, input logic unsigned [0:0]  fu_rs1_req
 		, input logic unsigned [4:0]  fu_rs1
-		, input logic unsigned [0:0]  fu_rs2_req
 		, input logic unsigned [4:0]  fu_rs2
 		, input logic unsigned [4:0]  fu_rd
 	);
@@ -100,16 +97,13 @@ task CMD_EXEC
 	(
 		input logic unsigned [1:0] fu_id
 		, input logic unsigned [31:0] fu_imm_opcode
-		, input logic unsigned [0:0] fu_rs0_req
 		, input logic unsigned [4:0] fu_rs0
-		, input logic unsigned [0:0] fu_rs1_req
 		, input logic unsigned [4:0] fu_rs1
-		, input logic unsigned [0:0] fu_rs2_req
 		, input logic unsigned [4:0] fu_rs2
 		, input logic unsigned [4:0] fu_rd
 	);
 	begin
-	INIT_CMD(EXEC, RD, 0, 0, fu_id, fu_imm_opcode, fu_rs0_req, fu_rs0, fu_rs1_req, fu_rs1, fu_rs2_req, fu_rs2, fu_rd);
+	INIT_CMD(EXEC, RD, 0, 0, fu_id, fu_imm_opcode, fu_rs0, fu_rs1, fu_rs2, fu_rd);
 	end
 endtask
 
@@ -121,7 +115,7 @@ task CMD_1RS
 		, input logic unsigned [4:0] fu_rd
 	);
 	begin
-	CMD_EXEC(fu_id, fu_imm_opcode, 1, fu_rs0, 0, 0, 0, 0, fu_rd);
+	CMD_EXEC(fu_id, fu_imm_opcode, fu_rs0, 0, 0, fu_rd);
 	end
 endtask
 
@@ -134,7 +128,7 @@ task CMD_2RS
 		, input logic unsigned [4:0] fu_rs1
 	);
 	begin
-	CMD_EXEC(fu_id, fu_imm_opcode, 1, fu_rs0, 1, fu_rs1, 0, 0, fu_rd);
+	CMD_EXEC(fu_id, fu_imm_opcode, fu_rs0, fu_rs1, 0, fu_rd);
 	end
 endtask
 
@@ -148,7 +142,7 @@ task CMD_3RS
 		, input logic unsigned [4:0] fu_rs2
 	);
 	begin
-	CMD_EXEC(fu_id, fu_imm_opcode, 1, fu_rs0, 1, fu_rs1, 1, fu_rs2, fu_rd);
+	CMD_EXEC(fu_id, fu_imm_opcode, fu_rs0, fu_rs1, fu_rs2, fu_rd);
 	end
 endtask
 
@@ -158,7 +152,7 @@ task CMD_RF_LOAD
 		, input logic unsigned [31:0] rf_wdata
 	);
 	begin
-	INIT_CMD(RF, WR, rf_addr, rf_wdata, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	INIT_CMD(RF, WR, rf_addr, rf_wdata, 0, 0, 0, 0, 0, 0);
 	end
 endtask
 
@@ -167,7 +161,7 @@ task CMD_RF_STORE
 		input logic unsigned [4:0] rf_addr
 	);
 	begin
-	INIT_CMD(RF, RD, rf_addr, 32'hdeadbeef, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	INIT_CMD(RF, RD, rf_addr, 32'hdeadbeef, 0, 0, 0, 0, 0, 0);
 	end
 endtask
 
