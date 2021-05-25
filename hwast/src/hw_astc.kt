@@ -1207,7 +1207,12 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
         var cnct_params = ArrayList<hw_param>()
         if (tgt_width > src_width) {
-            val sign_imm = indexed(src,  src.vartype.dimensions[0].msb)
+            var src_var = src
+            if (src is hw_var_frac) {           // hack against ranges sequence restriction in SV
+                src_var = genvar(GetGenName("gensignext"), src.vartype, src.defimm)
+                src_var.assign(src)
+            }
+            val sign_imm = indexed(src_var, src_var.vartype.dimensions[0].msb)
             for (i in 0 until (tgt_width - src_width)) {
                 cnct_params.add(sign_imm)
             }

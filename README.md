@@ -28,7 +28,7 @@ The ultimate goal of the project is to provide top-down methodology and reusable
 
 ### Project structure
 
-Current version of project is implemented as a collection of Kotlin libraries that can be individually built using IntelliJ IDEA:
+Current version of project is implemented as a collection of standalone Kotlin libraries that can be built using IntelliJ IDEA:
 
 * **hwast** - generic AST constructor for behavioral HW specifications (/hwast)
 

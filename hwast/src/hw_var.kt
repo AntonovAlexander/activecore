@@ -118,56 +118,62 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     }
 
     operator fun get(index: hw_param): hw_var {
-        return default_astc.AddExpr_op2(OP2_INDEXED, this, index)
+        return GetFracRef(index)
     }
 
     operator fun get(index: Int): hw_var {
-        return default_astc.AddExpr_op2(OP2_INDEXED, this, index)
+        return GetFracRef(index)
     }
 
     operator fun get(msb: hw_param, lsb: hw_param): hw_var {
-        return default_astc.AddExpr_op3(OP3_RANGED, this, msb, lsb)
+        return GetFracRef(msb, lsb)
+    }
+
+    operator fun get(msb: hw_param, lsb: Int): hw_var {
+        return GetFracRef(msb, lsb)
+    }
+
+    operator fun get(msb: Int, lsb: hw_param): hw_var {
+        return GetFracRef(msb, lsb)
     }
 
     operator fun get(msb: Int, lsb: Int): hw_var {
-        return default_astc.AddExpr_op3(OP3_RANGED, this, hw_imm(msb), hw_imm(lsb))
+        return GetFracRef(msb, lsb)
     }
 
     operator fun set(index: hw_param, src: hw_param) {
         var depow_fracs = hw_fracs()
-        if (index is hw_imm) depow_fracs.add(hw_frac_C(index))
-        else depow_fracs.add(hw_frac_V(index as hw_var))
+        depow_fracs.add(index)
         default_astc.assign(this, depow_fracs, src)
     }
 
     operator fun set(index: Int, src: hw_param) {
         var depow_fracs = hw_fracs()
-        depow_fracs.add(hw_frac_C(index))
+        depow_fracs.add(index)
         default_astc.assign(this, depow_fracs, src)
     }
 
     operator fun set(msb: hw_param, lsb: hw_param, src: hw_param) {
         var depow_fracs = hw_fracs()
+        depow_fracs.add(msb, lsb)
+        default_astc.assign(this, depow_fracs, src)
+    }
 
-        if (msb is hw_imm) {
-            if (lsb is hw_imm) {
-                depow_fracs.add(hw_frac_CC(msb , lsb))
-            } else {
-                depow_fracs.add(hw_frac_CV(msb, lsb as hw_var))
-            }
-        } else {
-            if (lsb is hw_imm) {
-                depow_fracs.add(hw_frac_VC(msb as hw_var, lsb))
-            } else {
-                depow_fracs.add(hw_frac_VV(msb as hw_var, lsb as hw_var))
-            }
-        }
+    operator fun set(msb: hw_param, lsb: Int, src: hw_param) {
+        var depow_fracs = hw_fracs()
+        depow_fracs.add(msb, lsb)
+        default_astc.assign(this, depow_fracs, src)
+    }
+
+    operator fun set(msb: Int, lsb: hw_param, src: hw_param) {
+        var depow_fracs = hw_fracs()
+        depow_fracs.add(msb, lsb)
         default_astc.assign(this, depow_fracs, src)
     }
 
     operator fun set(msb: Int, lsb: Int, src: hw_param) {
         var depow_fracs = hw_fracs()
-        depow_fracs.add(hw_frac_CC(msb, lsb))
+        depow_fracs.add(msb, lsb)
         default_astc.assign(this, depow_fracs, src)
     }
 
@@ -233,7 +239,7 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
         return GetFracRef(depow_fracs)
     }
 
-    open fun GetFracRef(index : hw_var) : hw_var_frac {
+    open fun GetFracRef(index : hw_param) : hw_var_frac {
         var depow_fracs = hw_fracs()
         depow_fracs.add(index)
         return GetFracRef(depow_fracs)
@@ -242,6 +248,30 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     open fun GetFracRef(index : Int) : hw_var_frac {
         var depow_fracs = hw_fracs()
         depow_fracs.add(index)
+        return GetFracRef(depow_fracs)
+    }
+
+    open fun GetFracRef(msb : hw_param, lsb : hw_param) : hw_var_frac {
+        var depow_fracs = hw_fracs()
+        depow_fracs.add(msb, lsb)
+        return GetFracRef(depow_fracs)
+    }
+
+    open fun GetFracRef(msb : hw_param, lsb : Int) : hw_var_frac {
+        var depow_fracs = hw_fracs()
+        depow_fracs.add(msb, hw_imm(lsb))
+        return GetFracRef(depow_fracs)
+    }
+
+    open fun GetFracRef(msb : Int, lsb : hw_param) : hw_var_frac {
+        var depow_fracs = hw_fracs()
+        depow_fracs.add(hw_imm(msb), lsb)
+        return GetFracRef(depow_fracs)
+    }
+
+    open fun GetFracRef(msb : Int, lsb : Int) : hw_var_frac {
+        var depow_fracs = hw_fracs()
+        depow_fracs.add(hw_imm(msb), hw_imm(lsb))
         return GetFracRef(depow_fracs)
     }
 

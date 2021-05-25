@@ -121,20 +121,36 @@ class hw_fracs() : ArrayList<hw_frac>() {
         add(hw_frac_V(new_elem))
     }
 
-    fun add(new_elem0 : hw_imm, new_elem1 : hw_imm) {
-        add(hw_frac_CC(new_elem0, new_elem1))
+    fun add(new_elem : hw_param) {
+        if (new_elem is hw_imm) add(hw_frac_C(new_elem))
+        else if (new_elem is hw_var) add(hw_frac_V(new_elem))
+        else ERROR("frac error")
     }
 
-    fun add(new_elem0 : hw_imm, new_elem1 : hw_var) {
-        add(hw_frac_CV(new_elem0, new_elem1))
+    fun add(msb : hw_param, lsb : hw_param) {
+        if (msb is hw_imm) {
+            if (lsb is hw_imm) add(hw_frac_CC(msb, lsb))
+            else if (lsb is hw_var) add(hw_frac_CV(msb, lsb))
+            else ERROR("frac error")
+        } else if (msb is hw_var) {
+            if (lsb is hw_imm) add(hw_frac_VC(msb, lsb))
+            else if (lsb is hw_var) add(hw_frac_VV(msb, lsb))
+            else ERROR("frac error")
+        } else {
+            ERROR("frac error")
+        }
     }
 
-    fun add(new_elem0 : hw_var, new_elem1 : hw_imm) {
-        add(hw_frac_VC(new_elem0, new_elem1))
+    fun add(msb : hw_param, lsb : Int) {
+        add(msb, hw_imm(lsb))
     }
 
-    fun add(new_elem0 : hw_var, new_elem1 : hw_var) {
-        add(hw_frac_VV(new_elem0, new_elem1))
+    fun add(msb : Int, lsb : hw_param) {
+        add(hw_imm(msb), lsb)
+    }
+
+    fun add(msb : Int, lsb : Int) {
+        add(hw_imm(msb), hw_imm(lsb))
     }
 
     fun add(new_elem : String) {
