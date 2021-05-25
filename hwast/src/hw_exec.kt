@@ -94,6 +94,19 @@ open class hw_exec(val opcode : hw_opcode) {
         var real_var = new_var
         if (new_var is hw_var_frac) real_var = new_var.src_var
         if (!wrvars.contains(real_var)) wrvars.add(real_var)
+
+        if (new_var is hw_var_frac) {
+            for (depow_frac in new_var.depow_fractions) {
+                if (depow_frac is hw_frac_V) AddRdVar(depow_frac.index)
+                if (depow_frac is hw_frac_CV) AddRdVar(depow_frac.lsb)
+                if (depow_frac is hw_frac_VC) AddRdVar(depow_frac.msb)
+                if (depow_frac is hw_frac_VV) {
+                    AddRdVar(depow_frac.lsb)
+                    AddRdVar(depow_frac.msb)
+                }
+            }
+        }
+
         real_var.write_done = true
     }
 
