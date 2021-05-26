@@ -142,39 +142,27 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     }
 
     operator fun set(index: hw_param, src: hw_param) {
-        var depow_fracs = hw_fracs()
-        depow_fracs.add(index)
-        default_astc.assign(this, depow_fracs, src)
+        default_astc.assign(GetFracRef(index), src)
     }
 
     operator fun set(index: Int, src: hw_param) {
-        var depow_fracs = hw_fracs()
-        depow_fracs.add(index)
-        default_astc.assign(this, depow_fracs, src)
+        default_astc.assign(GetFracRef(index), src)
     }
 
     operator fun set(msb: hw_param, lsb: hw_param, src: hw_param) {
-        var depow_fracs = hw_fracs()
-        depow_fracs.add(msb, lsb)
-        default_astc.assign(this, depow_fracs, src)
+        default_astc.assign(GetFracRef(msb, lsb), src)
     }
 
     operator fun set(msb: hw_param, lsb: Int, src: hw_param) {
-        var depow_fracs = hw_fracs()
-        depow_fracs.add(msb, lsb)
-        default_astc.assign(this, depow_fracs, src)
+        default_astc.assign(GetFracRef(msb, lsb), src)
     }
 
     operator fun set(msb: Int, lsb: hw_param, src: hw_param) {
-        var depow_fracs = hw_fracs()
-        depow_fracs.add(msb, lsb)
-        default_astc.assign(this, depow_fracs, src)
+        default_astc.assign(GetFracRef(msb, lsb), src)
     }
 
     operator fun set(msb: Int, lsb: Int, src: hw_param) {
-        var depow_fracs = hw_fracs()
-        depow_fracs.add(msb, lsb)
-        default_astc.assign(this, depow_fracs, src)
+        default_astc.assign(GetFracRef(msb, lsb), src)
     }
 
     fun GetDepowered(depow_fracs: hw_fracs): hw_type {
