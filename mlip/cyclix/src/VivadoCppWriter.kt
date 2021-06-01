@@ -136,8 +136,6 @@ class VivadoCppWriter(var cyclix_module : Generic) {
     {
         PrintTab(wrFile)
 
-        var dimstring = getDimString(expr.assign_tgt_fractured.depow_fractions)
-
         var opstring = ""
 
         if (expr.opcode == OP1_ASSIGN) 	        opstring = ""
@@ -211,18 +209,15 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             || (expr.opcode == OP1_REDUCT_XOR)
             || (expr.opcode == OP1_REDUCT_XNOR))
         {
-            var var_descr = expr.wrvars[0].GetDepowered(expr.assign_tgt_fractured.depow_fractions)
-            if ((var_descr.DataType == DATA_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
+            if ((expr.tgts[0].vartype.DataType == DATA_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
                 if (opstring == "") {
                     wrFile.write(GetParamString(expr.wrvars[0]) +
-                            dimstring +
                             " = '{default:" +
                             GetParamString(expr.params[0]) +
                             "};\n")
                 } else ERROR("assignment error")
             } else {
                 wrFile.write(GetParamString(expr.wrvars[0]) +
-                        dimstring +
                         " = " +
                         opstring +
                         GetParamString(expr.params[0]) +
@@ -253,7 +248,6 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             || (expr.opcode == OP2_BITWISE_XOR)
             || (expr.opcode == OP2_BITWISE_XNOR)) {
             wrFile.write(GetParamString(expr.wrvars[0]) +
-                    dimstring +
                     " = (" +
                     GetParamString(expr.params[0]) +
                     " " +

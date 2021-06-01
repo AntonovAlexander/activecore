@@ -211,9 +211,9 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     fun process_req_instrmem() {
-        instr_busreq.assign(hw_fracs("addr"), curinstr_addr)
-        instr_busreq.assign(hw_fracs("be"), 0xf)
-        instr_busreq.assign(hw_fracs("wdata"), 0)
+        assign(instr_busreq.GetFracRef("addr"), curinstr_addr)
+        assign(instr_busreq.GetFracRef("be"), 0xf)
+        assign(instr_busreq.GetFracRef("wdata"), 0)
 
         begif(!instr_req_done)
         run {
@@ -1129,9 +1129,9 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         run {
             begif(!data_req_done)
             run {
-                data_busreq.assign(hw_fracs("addr"), mem_addr)
-                data_busreq.assign(hw_fracs("be"), mem_be)
-                data_busreq.assign(hw_fracs("wdata"), mem_wdata)
+                assign(data_busreq.GetFracRef("addr"), mem_addr)
+                assign(data_busreq.GetFracRef("be"), mem_be)
+                assign(data_busreq.GetFracRef("wdata"), mem_wdata)
 
                 data_req_done.accum(data_mem.req(data_handle, mem_cmd, data_busreq))
             }; endif()
@@ -1195,7 +1195,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     fun process_wb() {
         begif(rd_req)
         run {
-            regfile.assign_succ(hw_fracs(rd_addr), rd_wdata)
+            assign_succ(regfile.GetFracRef(rd_addr), rd_wdata)
         }; endif()
     }
 

@@ -462,60 +462,33 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         AddExpr(hw_exec(OP_PFLUSH))
     }
 
-    fun assign_always(depow_fractions: hw_fracs, tgt : hw_global, src: hw_param) {
+    fun assign_always(tgt : hw_global, src: hw_param) {
         var new_expr = hw_exec(OP_ASSIGN_ALWAYS)
         new_expr.AddTgt(tgt)
         new_expr.AddParam(src)
-        new_expr.assign_tgt_fractured = hw_fractured(tgt, depow_fractions)
         AddExpr(new_expr)
-    }
-
-    fun assign_always(depow_fractions: hw_fracs, tgt : hw_global, src: Int) {
-        assign_always(depow_fractions, tgt, hw_imm(src))
-    }
-
-    fun assign_always(tgt : hw_global, src: hw_param) {
-        assign_always(hw_fracs(), tgt, src)
     }
 
     fun assign_always(tgt : hw_global, src: Int) {
         assign_always(tgt, hw_imm(src))
     }
 
-    fun assign_succ(depow_fractions: hw_fracs, tgt : hw_pipex_var, src: hw_param) {
+    fun assign_succ(tgt : hw_var, src: hw_param) {
         var new_expr = hw_exec(OP_ASSIGN_SUCC)
         new_expr.AddTgt(tgt)
         new_expr.AddParam(src)
-        new_expr.assign_tgt_fractured = hw_fractured(tgt, depow_fractions)
         AddExpr(new_expr)
     }
 
-    fun assign_succ(depow_fractions: hw_fracs, tgt : hw_pipex_var, src: Int) {
-        assign_succ(depow_fractions, tgt, hw_imm(src))
-    }
-
-    fun assign_succ(tgt : hw_pipex_var, src: hw_param) {
-        assign_succ(hw_fracs(), tgt, src)
-    }
-
-    fun assign_succ(tgt : hw_pipex_var, src: Int) {
+    fun assign_succ(tgt : hw_var, src: Int) {
         assign_succ(tgt, hw_imm(src))
     }
 
-    fun accum(depow_fractions: hw_fracs, tgt : hw_local, src: hw_param) {
+    fun accum(tgt : hw_local, src: hw_param) {
         var new_expr = hw_exec(OP_ACCUM)
         new_expr.AddTgt(tgt)
         new_expr.AddParam(src)
-        new_expr.assign_tgt_fractured = hw_fractured(tgt, depow_fractions)
         AddExpr(new_expr)
-    }
-
-    fun accum(depow_fractions: hw_fracs, tgt : hw_local, src: Int) {
-        accum(depow_fractions, tgt, hw_imm(src))
-    }
-
-    fun accum(tgt : hw_local, src: hw_param) {
-        accum(hw_fracs(), tgt, src)
     }
 
     fun accum(tgt : hw_local, src: Int) {
@@ -597,8 +570,15 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         } else if (expression.opcode == OP_ASSIGN_SUCC) {
             if (!pstage_info.assign_succ_assocs.containsKey(expression.tgts[0])) {
                 val req = cyclix_gen.ulocal(GetGenName("succreq"), 0, 0, "0")
-                val buf = cyclix_gen.local(GetGenName("succbuf"), expression.tgts[0].vartype, expression.tgts[0].defimm)
-                pstage_info.assign_succ_assocs.put((expression.tgts[0] as hw_pipex_var), __assign_buf(req, buf))
+
+                var buf = DUMMY_VAR
+                if (expression.tgts[0] is hw_pipex_var) buf = cyclix_gen.local(GetGenName("succbuf"), expression.tgts[0].vartype, expression.tgts[0].defimm)
+                else if (expression.tgts[0] is hw_var_frac) buf = cyclix_gen.local(GetGenName("succbuf"), ((expression.tgts[0] as hw_var_frac).src_var as hw_pipex_var).vartype, expression.tgts[0].defimm)
+                else ERROR("ProcessSyncOp")
+
+                if (expression.tgts[0] is hw_pipex_var) pstage_info.assign_succ_assocs.put((expression.tgts[0] as hw_pipex_var), __assign_buf(req, buf))
+                else if (expression.tgts[0] is hw_var_frac) pstage_info.assign_succ_assocs.put(((expression.tgts[0] as hw_var_frac).src_var as hw_pipex_var), __assign_buf(req, buf))
+                else ERROR("ProcessSyncOp")
             }
 
         } else if (expression.opcode == OP_RD_REMOTE) {
@@ -650,8 +630,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         cyclix_gen as cyclix.Generic
         context as pipex_import_expr_context
 
-        var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, context.curStageInfo.var_dict)
-
         MSG(DEBUG_FLAG, "Reconstructing expression: " + expr.opcode.default_string)
         for (param in expr.params)  MSG(DEBUG_FLAG, "\t\tparam: "   + param.GetString())
         for (tgt in expr.tgts)      MSG(DEBUG_FLAG, "\t\ttgt: "     + tgt.GetString())
@@ -663,10 +641,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             if (expr.tgts[0] is hw_global) {
                 cyclix_gen.begif(context.curStageInfo.ctrl_active)
                 run {
-                    cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+                    cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.curStageInfo.TranslateParam(expr.params[0]))
                 }; cyclix_gen.endif()
             } else {
-                cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+                cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.curStageInfo.TranslateParam(expr.params[0]))
             }
 
         } else if (expr.opcode == OP_PKILL) {
@@ -694,20 +672,25 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             context.curStageInfo.pflush_cmd_internal(cyclix_gen)
 
         } else if (expr.opcode == OP_RD_PREV) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
 
         } else if (expr.opcode == OP_ACCUM) {
-            context.curStageInfo.accum(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+            context.curStageInfo.accum(context.curStageInfo.TranslateVar(expr.tgts[0]), context.curStageInfo.TranslateParam(expr.params[0]))
 
         } else if (expr.opcode == OP_ASSIGN_ALWAYS) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.curStageInfo.TranslateParam(expr.params[0]))
 
         } else if (expr.opcode == OP_ASSIGN_SUCC) {
-            cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[expr.tgts[0]]!!.req, 1)
-            cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[expr.tgts[0]]!!.buf, fractions, context.curStageInfo.TranslateParam(expr.params[0]))
+            if (expr.tgts[0] is hw_pipex_var) {
+                cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[expr.tgts[0]]!!.req, 1)
+                cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[expr.tgts[0]]!!.buf, context.curStageInfo.TranslateParam(expr.params[0]))
+            } else if (expr.tgts[0] is hw_var_frac) {
+                cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[(expr.tgts[0] as hw_var_frac).src_var]!!.req, 1)
+                cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[(expr.tgts[0] as hw_var_frac).src_var]!!.buf.GetFracRef(TranslateFractions((expr.tgts[0] as hw_var_frac).depow_fractions, context.curStageInfo.var_dict)), context.curStageInfo.TranslateParam(expr.params[0]))
+            } else ERROR("ASSIGN_SUCC")
 
         } else if (expr.opcode == OP_RD_REMOTE) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), fractions, context.TranslateInfo.__stage_assocs[(expr as hw_exec_read_remote).stage]!!.TranslateVar(expr.remote_var))
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_read_remote).stage]!!.TranslateVar(expr.remote_var))
 
         } else if (expr.opcode == OP_ISACTIVE) {
             cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.ctrl_active)
@@ -775,8 +758,8 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                         mcopipe_if_assoc.req_fifo.vartype,
                         mcopipe_if_assoc.req_fifo.defimm)
 
-                    cyclix_gen.assign(req_struct, hw_fracs("we"), cmd_translated)
-                    cyclix_gen.assign(req_struct, hw_fracs("wdata"), wdata_translated)
+                    cyclix_gen.assign(req_struct.GetFracRef("we"), cmd_translated)
+                    cyclix_gen.assign(req_struct.GetFracRef("wdata"), wdata_translated)
 
                     cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(mcopipe_if_assoc.req_fifo, req_struct))
                     run {
@@ -1265,7 +1248,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                         for (newaccum in curStageInfo.newaccums) {
                             var fracs = hw_fracs(0)
                             fracs.add(hw_frac_SubStruct(newaccum.name))
-                            cyclix_gen.assign(curStageInfo.TRX_BUF, fracs, newaccum.defimm)
+                            cyclix_gen.assign(curStageInfo.TRX_BUF.GetFracRef(fracs), newaccum.defimm)
                         }
                     }; cyclix_gen.endif()
                 }

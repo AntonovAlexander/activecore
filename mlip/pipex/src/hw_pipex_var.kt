@@ -15,16 +15,6 @@ open class hw_pipex_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_
     constructor(name : String, vartype : hw_type, defval : String)
         : this(name, vartype, hw_imm(defval))
 
-    fun assign_succ(depow_fractions: hw_fracs, src: hw_param) {
-        if (default_astc is Pipeline) (default_astc as Pipeline).assign_succ(depow_fractions, this, src)
-        else ERROR("assign_succ cmd is out of place!")
-    }
-
-    fun assign_succ(depow_fractions: hw_fracs, src: Int) {
-        if (default_astc is Pipeline) (default_astc as Pipeline).assign_succ(depow_fractions, this, src)
-        else ERROR("assign_succ cmd is out of place!")
-    }
-
     fun assign_succ(src: hw_param) {
         if (default_astc is Pipeline) (default_astc as Pipeline).assign_succ(this, src)
         else ERROR("assign_succ cmd is out of place!")
@@ -47,16 +37,6 @@ class hw_local(name : String, vartype : hw_type, defimm : hw_imm)
 
     constructor(name : String, vartype : hw_type, defval : String)
         : this(name, vartype, hw_imm(defval))
-
-    fun accum(depow_fractions: hw_fracs, src: hw_param) {
-        if (default_astc is Pipeline) (default_astc as Pipeline).accum(depow_fractions, this, src)
-        else ERROR("accum cmd is out of place!")
-    }
-
-    fun accum(depow_fractions: hw_fracs, src: Int) {
-        if (default_astc is Pipeline) (default_astc as Pipeline).accum(depow_fractions, this, src)
-        else ERROR("accum cmd is out of place!")
-    }
 
     fun accum(src: hw_param) {
         if (default_astc is Pipeline) (default_astc as Pipeline).accum(this, src)

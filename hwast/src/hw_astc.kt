@@ -427,87 +427,68 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op(opcode, srcs)
     }
 
-    private fun assign_gen(tgt: hw_var, depow_fractions: hw_fracs, src: hw_param) {
-        depow_fractions.FillSubStructs(tgt)
+    private fun assign_gen(tgt: hw_var, src: hw_param) {
         var new_expr = hw_exec(OP1_ASSIGN)
         new_expr.AddParam(src)
         new_expr.AddTgt(tgt)
-        new_expr.assign_tgt_fractured = hw_fractured(tgt, depow_fractions)
         AddExpr(new_expr)
     }
 
-    private fun assign_gen(tgt: hw_var, src: hw_param) {
-        assign_gen(tgt, hw_fracs(), src)
-    }
-
-    fun assign(tgt: hw_var, depow_fractions: hw_fracs, src: hw_param) {
+    fun assign(tgt: hw_var, src: hw_param) {
         //if (src is hw_var)
         //    MSG("ASSIGNMENT! tgt: " + tgt.name + " (struct: " + tgt.vartype.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
 
-        depow_fractions.FillSubStructs(tgt)
-
-        var tgt_DePow_descr = tgt.GetDepowered(depow_fractions)
-        //MSG("tgt_DePow_descr: struct: " + tgt_DePow_descr.src_struct.name)
-
-        var tgt_DePowered_Power = tgt_DePow_descr.dimensions.size
-        if (tgt_DePowered_Power < 1) tgt_DePowered_Power = 1           // for 1-bit signals
+        var tgt_Power = tgt.GetDimensions().size
+        if (tgt_Power < 1) tgt_Power = 1                    // for 1-bit signals
 
         var src_Power = src.GetDimensions().size
         if (src_Power < 1) src_Power = 1                    // for 1-bit signals
 
         if (src is hw_var) {
-            if (tgt_DePowered_Power != src_Power) ERROR("dimensions do not match for target " + tgt.name + " (source tgt power: " + tgt.vartype.dimensions.size + ", depow size: " + depow_fractions.size + ", final tgt power: " + tgt_DePowered_Power + "), src: " + src.GetString() + " (src power: " + src_Power + ")")
-            else if (tgt_DePowered_Power == 1) {
+            if (tgt_Power != src_Power) ERROR("dimensions do not match for target " + tgt.name + " (tgt power: " + tgt_Power + "), src: " + src.GetString() + " (src power: " + src_Power + ")")
+            else if (tgt_Power == 1) {
 
-                if (((src as hw_var).vartype.DataType == DATA_TYPE.STRUCTURED) && (tgt_DePow_descr.DataType != DATA_TYPE.STRUCTURED)) {
+                if (((src as hw_var).vartype.DataType == DATA_TYPE.STRUCTURED) && (tgt.vartype.DataType != DATA_TYPE.STRUCTURED)) {
                     tgt.vartype.Print()
                     src.vartype.Print()
                     ERROR("assignment to non-structured variable (" + tgt.name + ") of structured variable (" + src.name + ")")
-                } else if ((src.vartype.DataType != DATA_TYPE.STRUCTURED) && (tgt_DePow_descr.DataType == DATA_TYPE.STRUCTURED)) {
+                } else if ((src.vartype.DataType != DATA_TYPE.STRUCTURED) && (tgt.vartype.DataType == DATA_TYPE.STRUCTURED)) {
                     tgt.vartype.Print()
                     src.vartype.Print()
                     ERROR("assignment to structured variable (" + tgt.name + ") of non-structured variable (" + src.name + ")")
                 } else if (src.vartype.DataType == DATA_TYPE.STRUCTURED) {
                     // assignment of 1-bit structs
-                    if (src.vartype.src_struct != tgt_DePow_descr.src_struct) {
+                    if (src.vartype.src_struct != tgt.vartype.src_struct) {
                         // assignment of inequally structured variables
-                        MSG("Structure of tgt: " + tgt.name + ", struct name: " + tgt_DePow_descr.src_struct.name)
-                        for (structvar in tgt_DePow_descr.src_struct) {
+                        MSG("Structure of tgt: " + tgt.name + ", struct name: " + tgt.vartype.src_struct.name)
+                        for (structvar in tgt.vartype.src_struct) {
                             MSG("-- " + structvar.name)
                         }
                         MSG("Structure of src: " + tgt.name + ", struct name: " + src.vartype.src_struct.name)
                         for (structvar in src.vartype.src_struct) {
                             MSG("-- " + structvar.name)
                         }
-                        ERROR("assignment of inequally structured variables! tgt: " + tgt.name + " (struct: " + tgt_DePow_descr.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
+                        ERROR("assignment of inequally structured variables! tgt: " + tgt.name + " (struct: " + tgt.vartype.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
                     }
                 }
-                assign_gen(tgt, depow_fractions, src)
+                assign_gen(tgt, src)
 
             } else {
                 for (i in 0 until tgt.vartype.dimensions.last().GetWidth()) {
                     var src_ref = src.GetFracRef(hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
                     var tgt_ref = tgt.GetFracRef(hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
-                    assign(tgt_ref, depow_fractions, src_ref)
+                    assign(tgt_ref, src_ref)
                 }
             }
         } else if (src is hw_imm) {
-            if (tgt_DePowered_Power == 1) assign_gen(tgt, depow_fractions, src)
+            if (tgt_Power == 1) assign_gen(tgt, src)
             else {
-                for (i in 0 until tgt.vartype.dimensions.get(tgt_DePowered_Power - 1).GetWidth()) {
+                for (i in 0 until tgt.vartype.dimensions.get(tgt_Power - 1).GetWidth()) {
                     var tgt_ref = tgt.GetFracRef(hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
-                    assign(tgt_ref, depow_fractions, src)
+                    assign(tgt_ref, src)
                 }
             }
         }
-    }
-
-    fun assign(tgt: hw_var, depow_fractions: hw_fracs, src: Int) {
-        assign(tgt, depow_fractions, hw_imm(src))
-    }
-
-    fun assign(tgt: hw_var, src: hw_param) {
-        assign(tgt, hw_fracs(), src)
     }
 
     fun assign(tgt: hw_var, src: Int) {
@@ -1605,10 +1586,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun import_expr(DEBUG_FLAG : Boolean, expr : hw_exec, context : import_expr_context, process_subexpr : (DEBUG_FLAG : Boolean, astc_gen : hw_astc, expr : hw_exec, context : import_expr_context) -> Unit) {
 
-        var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, context.var_dict)
-
         if ((expr.opcode == OP1_ASSIGN)) {
-            assign(TranslateVar(expr.tgts[0], context.var_dict), fractions, TranslateParam(expr.params[0], context.var_dict))
+            assign(TranslateVar(expr.tgts[0], context.var_dict), TranslateParam(expr.params[0], context.var_dict))
 
         } else if ((expr.opcode == OP2_ARITH_ADD)
                 || (expr.opcode == OP2_ARITH_SUB)

@@ -168,10 +168,10 @@ class xbar(name         : String,
                 var wdata_fraction = hw_fracs("wdata")
                 wdata_fraction.add(hw_frac_SubStruct("wdata"))
 
-                master_ifs[num_master].req.wdata_struct.assign(we_fraction, master_ifs[num_master].req.we)
-                master_ifs[num_master].req.wdata_struct.assign(addr_fraction, master_ifs[num_master].req.addr)
-                master_ifs[num_master].req.wdata_struct.assign(be_fraction, master_ifs[num_master].req.be)
-                master_ifs[num_master].req.wdata_struct.assign(wdata_fraction, master_ifs[num_master].req.wdata)
+                assign(master_ifs[num_master].req.wdata_struct.GetFracRef(we_fraction),     master_ifs[num_master].req.we)
+                assign(master_ifs[num_master].req.wdata_struct.GetFracRef(addr_fraction),   master_ifs[num_master].req.addr)
+                assign(master_ifs[num_master].req.wdata_struct.GetFracRef(be_fraction),     master_ifs[num_master].req.be)
+                assign(master_ifs[num_master].req.wdata_struct.GetFracRef(wdata_fraction),  master_ifs[num_master].req.wdata)
             }; cproc_end()
         }
 

@@ -75,7 +75,7 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         if (TRX_BUF_SIZE != 1) {
             fracs = hw_fracs(TRX_BUF_COUNTER)
         }
-        cyclix_gen.assign(TRX_BUF, fracs, pushed_var)
+        cyclix_gen.assign(TRX_BUF.GetFracRef(fracs), pushed_var)
         inc_trx_counter()
     }
 
@@ -87,14 +87,14 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         for (tgt_buf_frac in tgt_buf_fracs) {
             fracs.add(tgt_buf_frac)
         }
-        cyclix_gen.assign(TRX_BUF, fracs, pushed_var)
+        cyclix_gen.assign(TRX_BUF.GetFracRef(fracs), pushed_var)
     }
 
     open fun pop_trx() {
         for (BUF_INDEX in 0 until TRX_BUF_SIZE-1) {
-            cyclix_gen.assign(TRX_BUF, hw_fracs(BUF_INDEX), TRX_BUF[BUF_INDEX+1])
+            cyclix_gen.assign(TRX_BUF.GetFracRef(BUF_INDEX), TRX_BUF[BUF_INDEX+1])
         }
-        cyclix_gen.assign(TRX_BUF, hw_fracs(TRX_BUF_SIZE-1), 0)
+        cyclix_gen.assign(TRX_BUF.GetFracRef(hw_fracs(TRX_BUF_SIZE-1)), 0)
         dec_trx_counter()
     }
 }
@@ -152,14 +152,13 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(ctrl_active, 0)
     }
 
-    fun accum(tgt : hw_var, fracs : hw_fracs, src : hw_param) {
-        cyclix_gen.assign(tgt, fracs, src)
+    fun accum(tgt : hw_var, src : hw_param) {
+        cyclix_gen.assign(tgt, src)
         cyclix_gen.begif(ctrl_active)
         run {
             var trx_buf_fracs = hw_fracs(0)
             trx_buf_fracs.add(hw_frac_SubStruct(driven_locals[tgt]!!))
-            for (frac in fracs) trx_buf_fracs.add(frac)
-            cyclix_gen.assign(TRX_BUF, trx_buf_fracs, src)
+            cyclix_gen.assign(TRX_BUF.GetFracRef(trx_buf_fracs), src)
         }; cyclix_gen.endif()
     }
 }
@@ -204,9 +203,9 @@ open class hw_stage_stallable(cyclix_gen : cyclix.Generic,
     override fun pop_trx() {
         cyclix_gen.assign(ctrl_active, 0)
         cyclix_gen.assign(ctrl_stalled_glbl, 0)
-        cyclix_gen.assign(TRX_BUF, hw_fracs(0), 0)
+        cyclix_gen.assign(TRX_BUF.GetFracRef(0), 0)
         for (BUF_INDEX in 0 until TRX_BUF_SIZE-1) {
-            cyclix_gen.assign(TRX_BUF, hw_fracs(BUF_INDEX), TRX_BUF[BUF_INDEX+1])
+            cyclix_gen.assign(TRX_BUF.GetFracRef(BUF_INDEX), TRX_BUF[BUF_INDEX+1])
         }
 
         dec_trx_counter()

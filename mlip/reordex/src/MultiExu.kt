@@ -89,8 +89,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         // for (param in expr.params) MSG("param: " + param.GetString())
         // for (wrvar in expr.wrvars) MSG("wrvar: " + wrvar.name)
 
-        var fractions = ReconstructFractions(expr.assign_tgt_fractured.depow_fractions, context.var_dict)
-
         cyclix_gen.import_expr(DEBUG_FLAG, expr, context, ::reconstruct_expression)
     }
 
@@ -236,10 +234,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     import_expr_context(new_exu_descr.var_dict))
             }
 
-            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict), hw_fracs(hw_frac_SubStruct("wdata")), TranslateVar(ExUnit.value.ExecUnit.result, new_exu_descr.var_dict) )
+            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict).GetFracRef("wdata"), TranslateVar(ExUnit.value.ExecUnit.result, new_exu_descr.var_dict) )
 
             exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var, TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict))
-            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var, hw_fracs("tag"), exu_cyclix_gen.subStruct(exu_cyclix_gen.stream_req_var, "rd_tag"))
+            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("tag"), exu_cyclix_gen.subStruct(exu_cyclix_gen.stream_req_var, "rd_tag"))
 
             exu_cyclix_gen.end()
 
@@ -296,8 +294,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     run {
                         // PRF written, and previous tag can be remapped
                         cyclix_gen.assign(
-                            PRF_mapped,
-                            hw_fracs(hw_frac_V(IQ_inst.rd_tag_prev)),
+                            PRF_mapped.GetFracRef(IQ_inst.rd_tag_prev),
                             0)
                     }; cyclix_gen.endif()
                     cyclix_gen.assign(IQ_inst.rd, 1)
@@ -396,12 +393,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
                     // updating PRF state
                     cyclix_gen.assign(
-                        PRF_rdy,
-                        hw_fracs(hw_frac_V(cyclix_gen.subStruct(exu_resp, "tag"))),
+                        PRF_rdy.GetFracRef(cyclix_gen.subStruct(exu_resp, "tag")),
                         1)
                     cyclix_gen.assign(
-                        PRF,
-                        hw_fracs(hw_frac_V(cyclix_gen.subStruct(exu_resp, "tag"))),
+                        PRF.GetFracRef(cyclix_gen.subStruct(exu_resp, "tag")),
                         cyclix_gen.subStruct(exu_resp, "wdata"))
 
                     // broadcasting FU results to IQ

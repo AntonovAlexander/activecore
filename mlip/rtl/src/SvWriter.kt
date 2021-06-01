@@ -120,8 +120,6 @@ class SvWriter(var mod : module) {
     {
         PrintTab(wrFile)
 
-        var dimstring = getDimString(expr.assign_tgt_fractured.depow_fractions)
-
         var opstring = ""
         if (expr.opcode == OP1_ASSIGN) 	            opstring = ""
         else if (expr.opcode == OP1_COMPLEMENT) 	    opstring = "-"
@@ -181,18 +179,15 @@ class SvWriter(var mod : module) {
                 || (expr.opcode == OP1_REDUCT_XOR)
                 || (expr.opcode == OP1_REDUCT_XNOR))
         {
-            var var_descr = expr.assign_tgt_fractured.depowered_fractions
-            if ((var_descr.DataType == DATA_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
+            if ((expr.tgts[0].vartype.DataType == DATA_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
                 if (opstring == "") {
                     wrFile.write(GetParamString(expr.tgts[0]) +
-                            dimstring +
                             " = '{default:" +
                             GetParamString(expr.params[0]) +
                             "};\n")
                 } else ERROR("assignment error")
             } else {
                 wrFile.write(GetParamString(expr.tgts[0]) +
-                        dimstring +
                         " = " +
                         opstring +
                         GetParamString(expr.params[0]) +
@@ -223,7 +218,6 @@ class SvWriter(var mod : module) {
                 || (expr.opcode == OP2_BITWISE_XOR)
                 || (expr.opcode == OP2_BITWISE_XNOR)) {
             wrFile.write(GetParamString(expr.tgts[0]) +
-                    dimstring +
                     " = (" +
                     GetParamString(expr.params[0]) +
                     " " +
