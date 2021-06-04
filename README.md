@@ -8,7 +8,7 @@ ActiveCore is a framework that demonstrates original hardware designing concept 
 MLIP core is a hardware generator that provides custom synthesizable execution kernel constructed in accordance to certain microarchitectural template. Each MLIP core offers hardware description within custom computational model inferred from computational process organization inside hardware microarchitecture, applies microarchitecture-aware optimizations, and generates design specifications in standard RTL/HLS form.
 
 MLIP core's computational model typically includes:
-* special data types exhibiting behaviour of "microarchitectural" execution units;
+* special data types exhibiting behavior of "microarchitectural" execution units;
 * pre-defined data structures and API for useful scheduling, communication and synchronization "services" of the microarchitecture;
 * event model and handler procedures selectively exposed for behavioral-style programming of custom application functions and mechanisms.
 
@@ -37,6 +37,8 @@ Current version of project is implemented as a collection of standalone Kotlin l
 	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Xilinx HLS
 	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
 	* **Reordex** (**reorde**red e**x**ecution) - generator of coprocessors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to cyclix MLIP
+
+![pic_test](mlip/__img/MLIPs_overview.png)
 
 * Demo core generators based on MLIP cores (/designs/coregen):
 	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex MLIP core
