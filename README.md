@@ -3,22 +3,22 @@
 
 ### Project description
 
-ActiveCore is a framework that demonstrates original hardware designing concept based on **"Micro-Language IP"/"Microarchitecture-Level IP" (MLIP) cores**.
+ActiveCore is a framework that demonstrates original hardware designing concept based on **"Microarchitectural Kernel IP" (MKIP) cores** (previously LIP/MLIP cores).
 
-MLIP core is a hardware generator that provides custom synthesizable execution kernel constructed in accordance to certain microarchitectural template. Each MLIP core offers hardware description within custom computational model inferred from computational process organization inside hardware microarchitecture, applies microarchitecture-aware optimizations, and generates design specifications in standard RTL/HLS form.
+MKIP core is a hardware generator that provides custom synthesizable execution kernel constructed in accordance to certain microarchitectural template. Each MKIP core offers hardware description within custom computational model inferred from computational process organization inside hardware microarchitecture, applies microarchitecture-aware optimizations, and generates design specifications in standard RTL/HLS form.
 
-MLIP core's computational model typically includes:
+MKIP core's computational model typically includes:
 * special data types exhibiting behavior of "microarchitectural" execution units;
 * pre-defined data structures and API for useful scheduling, communication and synchronization "services" of the microarchitecture;
 * event model and handler procedures selectively exposed for behavioral-style programming of custom application functions and mechanisms.
 
-MLIP core approach serves as intermediate solution for codification of custom microarchitectures between fixed-function IP cores and general-purpose HW design tools:
+MKIP core approach serves as intermediate solution for codification of custom microarchitectures between fixed-function IP cores and general-purpose HW design tools:
 
-Fixed-function IP core <------ MLIP core ------> General-purpose HW design tool
+Fixed-function IP core <------ MKIP core ------> General-purpose HW design tool
 
 Compared to other hardware generation frameworks, ActiveCore is constructed according to the following prioritites:
 * Dynamic generation of all hardware-related content, including data instances, structures, dimensions, expressions, procedural blocks, etc;
-* Decoupling generation logic from certain programming styles (e.g. functional one). Here, conventional object-oriented approach is mostly used, however, you can use any in your generators;
+* Decoupling generation logic from certain programming styles (e.g. functional one). ActiveCore relies on basic object-oriented capabilities, however, you can use any paradigm in your generators;
 * Provision of generic AST constructor for behavioral HW specifications (see **hwast**) that is reused for specifications on various abstraction levels, and its content is freely accessible for analysis and manipulation.
 
 The ultimate goal of the project is to provide top-down methodology and reusable components for explicit allocation of intermediate ***“microarchitectural middleware”*** design level for complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) decouples selected internal management mechanisms from application-specific logic in hardware microarchitectures, addressing:
@@ -32,19 +32,19 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 * **hwast** - generic AST constructor of behavioral HW specifications (/hwast)
 
-* Demo MLIP cores based on hwast (/mlip):
+* Demo MKIP cores based on hwast (/mlip):
 	* **Rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
-	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for rtl MLIP or to C++ sources for Xilinx HLS
-	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to cyclix MLIP
-	* **Reordex** (**reorde**red e**x**ecution) - generator of coprocessors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to cyclix MLIP
+	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for rtl MKIP or to C++ sources for Xilinx HLS
+	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to Cyclix MKIP
+	* **Reordex** (**reorde**red e**x**ecution) - generator of coprocessors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to Cyclix MKIP
 
 ![pic_test](mlip/__img/MLIPs_overview.png)
 
-* Demo core generators based on MLIP cores (/designs/coregen):
-	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex MLIP core
-	* **ariele** - full xbar generator, based on Pipex MLIP core
-	* **taylor_credit_pipeline** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex MLIP core. Location: /designs/rtl/credit_test
-	* **citadel** - OoO FPU coprocessor, based on Reordex MLIP core
+* Demo core generators based on MKIP cores (/designs/coregen):
+	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex MKIP core
+	* **ariele** - full xbar generator, based on Pipex MKIP core
+	* **taylor_credit_pipeline** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex MKIP core. Location: /designs/rtl/credit_test
+	* **citadel** - OoO FPU coprocessor, based on Reordex MKIP core
 
 * Auxiliary reusable cores:
 	* **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Lab work manual included. Location: /designs/rtl/udm
@@ -65,9 +65,5 @@ Current version of project is implemented as a collection of standalone Kotlin l
 * A. Antonov, P. Kustarev, S. Bikovsky, “MLIP Cores: Designing Hardware Generators with Programmable Microarchitectural Mechanisms,” in 2020 IEEE International Symposium on Circuits and Systems (ISCAS), 2020. URL: https://ieeexplore.ieee.org/document/9180593
 
 * A. Antonov, P. Kustarev, S. Bikovsky, "Improving Microarchitecture Design and Hardware Generation using Micro-Language IP Cores", in Proc. IEEE Nordic Circuits and Systems Conference (NORCAS) / NORCHIP and International Symposium of System-on-Chip (SoC) - 2017, pp. 1-6. URL: https://ieeexplore.ieee.org/document/8124952
-
-* A. Antonov, P. Kustarev, S. Bykovskii, "Methods of Computational Process Scheduling for Synthesis of Hardware Microarchitecture", in Proc. 19th International Multidisciplinary Scientific GeoConference, SGEM 2019 - 2019, Vol. 19, No. 2.1, pp. 445-452
-
-* A. Antonov, P. Kustarev, "DSL-based approach to hardware pipelines design", in Proc. 17th International Multidisciplinary Scientific GeoConference, SGEM 2017 - 2017, Vol. 17, No. 21, pp. 287-294
 
 * A. Аntonov, "Design of Computer Microarchitecture Basing on Problem-Oriented Languages", Journal of Instrument Engineering, 2017, Vol. 60, No. 10, pp. 980—985. URL: http://pribor.ifmo.ru/en/article/17220/proektirovanie_mikroarhitektury_vychisliteley_na_baze_problemno-orientirovannyh_yazykov.htm
