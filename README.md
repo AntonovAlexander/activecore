@@ -3,18 +3,18 @@
 
 ### Project description
 
-ActiveCore is a framework that demonstrates original hardware designing concept based on **"Microarchitectural Kernel IP" (MKIP) cores** (previously LIP/MLIP cores).
+ActiveCore is a framework that demonstrates original hardware designing concept based on **"Kernel IP" (KIP) cores**.
 
-MKIP core is a hardware generator that provides custom synthesizable execution kernel constructed in accordance to certain microarchitectural template. Each MKIP core offers hardware description within custom computational model inferred from computational process organization inside hardware microarchitecture, applies microarchitecture-aware optimizations, and generates design specifications in standard RTL/HLS form.
+KIP core is a hardware generator that provides custom synthesizable execution kernel constructed in accordance to certain microarchitectural template. Each KIP core offers hardware description within custom computational model inferred from computational process organization inside hardware microarchitecture, applies microarchitecture-aware optimizations, and generates design specifications in standard RTL/HLS form.
 
-MKIP core's computational model typically includes:
+KIP core's computational model typically includes:
 * special data types exhibiting behavior of "microarchitectural" execution units;
 * pre-defined data structures and API for useful scheduling, communication and synchronization "services" of the microarchitecture;
 * event model and handler procedures selectively exposed for behavioral-style programming of custom application functions and mechanisms.
 
-MKIP core approach serves as intermediate solution for codification of custom microarchitectures between fixed-function IP cores and general-purpose HW design tools:
+KIP core approach serves as intermediate solution for codification of custom microarchitectures between fixed-function IP cores and general-purpose HW design tools:
 
-Fixed-function IP core <------ MKIP core ------> General-purpose HW design tool
+Fixed-function IP core <------ KIP core ------> General-purpose HW design tool
 
 Compared to other hardware generation frameworks, ActiveCore is constructed according to the following prioritites:
 * Dynamic generation of all hardware-related content, including data instances, structures, dimensions, expressions, procedural blocks, etc;
@@ -32,19 +32,19 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 * **hwast** - generic AST constructor of behavioral HW specifications (/hwast)
 
-* Demo MKIP cores based on hwast (/mlip):
+* Demo KIP cores based on hwast (/mlip):
 	* **Rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
-	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for rtl MKIP or to C++ sources for Xilinx HLS
-	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to Cyclix MKIP
-	* **Reordex** (**reorde**red e**x**ecution) - generator of coprocessors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to Cyclix MKIP
+	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for Rtl KIP or to C++ sources for Xilinx HLS
+	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to Cyclix KIP
+	* **Reordex** (**reorde**red e**x**ecution) - generator of coprocessors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to Cyclix KIP
 
 ![pic_test](mlip/__img/MLIPs_overview.png)
 
-* Demo core generators based on MKIP cores (/designs/coregen):
-	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex MKIP core
-	* **ariele** - full xbar generator, based on Pipex MKIP core
-	* **taylor_credit_pipeline** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex MKIP core. Location: /designs/rtl/credit_test
-	* **citadel** - OoO FPU coprocessor, based on Reordex MKIP core
+* Demo core generators based on KIP cores (/designs/coregen):
+	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex KIP core
+	* **ariele** - full xbar generator, based on Pipex KIP core
+	* **taylor_credit_pipeline** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex KIP core. Location: /designs/rtl/credit_test
+	* **citadel** - OoO FPU coprocessor, based on Reordex KIP core
 
 * Auxiliary reusable cores:
 	* **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Lab work manual included. Location: /designs/rtl/udm

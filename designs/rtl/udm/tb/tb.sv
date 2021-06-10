@@ -74,7 +74,7 @@ endtask
 udm_driver udm;
 
 /////////////////////////
-// main test procesure //
+// main test procedure //
 localparam CSR_LED_ADDR         = 32'h00000000;
 localparam CSR_SW_ADDR          = 32'h00000004;
 localparam TESTMEM_ADDR         = 32'h80000000;
@@ -94,14 +94,29 @@ initial
 	udm.check();
 	udm.hreset();
 	
-	udm.wr32(CSR_LED_ADDR, 32'h33cc);
-	udm.rd32(CSR_SW_ADDR);
+	// test data initialization
+	udm.wr32(32'h10000000, 32'h112233cc);
+	udm.wr32(32'h10000004, 32'h55aa55aa);
+	udm.wr32(32'h10000008, 32'h01010202);
+	udm.wr32(32'h1000000C, 32'h44556677);
+	udm.wr32(32'h10000010, 32'h00000003);
+	udm.wr32(32'h10000014, 32'h00000004);
+	udm.wr32(32'h10000018, 32'h00000005);
+	udm.wr32(32'h1000001C, 32'h00000006);
+	udm.wr32(32'h10000020, 32'h00000007);
+	udm.wr32(32'h10000024, 32'hdeadbeef);
+	udm.wr32(32'h10000028, 32'hfefe8800);
+	udm.wr32(32'h1000002C, 32'h23344556);
+	udm.wr32(32'h10000030, 32'h05050505);
+	udm.wr32(32'h10000034, 32'h07070707);
+	udm.wr32(32'h10000038, 32'h99999999);
+	udm.wr32(32'h1000003C, 32'hbadc0ffe);
 	
-	wrdata = new [ARRSIZE];
-	for (int i=0; i<ARRSIZE; i=i+1) wrdata[i] = i;
-	udm.wrarr32(TESTMEM_ADDR, wrdata);
+	WAIT(100);
 	
-	udm.rdarr32(TESTMEM_ADDR, ARRSIZE);
+	// fetching results
+	udm.rd32(32'h20000000);
+	udm.rd32(32'h20000004);
 	
 	WAIT(1000);
 
