@@ -32,7 +32,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 * **hwast** - generic AST constructor of behavioral HW specifications (/hwast)
 
-* Demo KIP cores based on hwast (/mlip):
+* Demo KIP cores based on hwast (/kip):
 	* **Rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
 	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for Rtl KIP or to C++ sources for Xilinx HLS
 	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to Cyclix KIP
