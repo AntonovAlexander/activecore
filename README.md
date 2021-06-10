@@ -38,7 +38,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and pipelined I/O synchronization features. Translates to Cyclix KIP
 	* **Reordex** (**reorde**red e**x**ecution) - generator of coprocessors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to Cyclix KIP
 
-![pic_test](mlip/__img/MLIPs_overview.png)
+![pic_test](kip/__img/KIPs_overview.png)
 
 * Demo core generators based on KIP cores (/designs/coregen):
 	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex KIP core
