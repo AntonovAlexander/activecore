@@ -160,11 +160,12 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     var mem_rshift      = ulocal("mem_rshift", 0, 0, "0")
     var load_signext    = ulocal("load_signext", 0, 0, "0")
 
-    var mret_req         = ulocal("mret_req", 0, 0, "0")
+    var mret_req        = ulocal("mret_req", 0, 0, "0")
 
     var pc              = uglobal("pc", 31, 0, START_ADDR.toString())
     var rf_dim = hw_dim_static()
     var regfile         = uglobal("regfile", rf_dim, "0")
+    var jump_req_done   = ulocal("jump_req_done", 0, 0, "0")
     var jump_req_cmd    = uglobal("jump_req_cmd", 0, 0, "0")
     var jump_vector_cmd = uglobal("jump_vector_cmd", 31, 0, "0")
 
@@ -197,20 +198,24 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     //// RISC-V pipeline macro-operations ////
 
     fun process_pc() {
-        curinstr_addr.assign(pc)
-
         begif(jump_req_cmd)
         run {
-            curinstr_addr.assign(jump_vector_cmd)
+            pc.assign(jump_vector_cmd)
+            jump_req_cmd.assign(0)
         }; endif()
-        jump_req_cmd.assign_succ(0)
 
+        curinstr_addr.assign(pc)
         nextinstr_addr.assign(curinstr_addr + 4)
 
         pc.assign_succ(nextinstr_addr)
     }
 
     fun process_req_instrmem() {
+        begif(jump_req_cmd)
+        run {
+            instr_req_done.accum(0)
+        }; endif()
+
         assign(instr_busreq.GetFracRef("addr"), curinstr_addr)
         assign(instr_busreq.GetFracRef("be"), 0xf)
         assign(instr_busreq.GetFracRef("wdata"), 0)
@@ -229,6 +234,13 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         begif(!instr_handle.resp(instr_code))
         run {
             pstall()
+        }; endif()
+    }
+
+    fun kill_if_jump() {
+        begif(jump_req_cmd)
+        run {
+            pkill()
         }; endif()
     }
 
@@ -1114,11 +1126,11 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
     // branch control
     fun process_branch() {
-        jump_req_cmd.assign_succ(jump_req)
-        jump_vector_cmd.assign_succ(jump_vector)
-        begif(jump_req)
+        begif(!jump_req_done)
         run {
-            pflush()
+            jump_req_cmd.assign(jump_req)
+            jump_vector_cmd.assign(jump_vector)
+            jump_req_done.accum(1)
         }; endif()
     }
 
@@ -1289,6 +1301,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             EXEC.begin()
             run {
+                kill_if_jump()
                 process_resp_instrmem()
 
                 process_decode()
@@ -1332,6 +1345,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             IDECODE.begin()
             run {
+                kill_if_jump()
                 process_resp_instrmem()
                 process_decode()
                 process_regfetch()
@@ -1343,6 +1357,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             EXEC.begin()
             run {
+                kill_if_jump()
                 process_irq()
                 process_alu()
                 process_curinstraddr_imm()
@@ -1381,6 +1396,8 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             IDECODE.begin()
             run {
+                kill_if_jump()
+
                 process_resp_instrmem()
                 process_decode()
                 process_regfetch()
@@ -1395,6 +1412,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             EXEC.begin()
             run {
+                kill_if_jump()
                 process_irq()
                 process_alu()
                 process_curinstraddr_imm()
@@ -1434,12 +1452,15 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             IFETCH.begin()
             run {
+                kill_if_jump()
                 process_req_instrmem()
 
             }; endstage()
 
             IDECODE.begin()
             run {
+                kill_if_jump()
+
                 process_resp_instrmem()
                 process_decode()
                 process_regfetch()
@@ -1454,6 +1475,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             EXEC.begin()
             run {
+                kill_if_jump()
                 process_irq()
                 process_alu()
 
