@@ -1193,9 +1193,9 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     fun process_wb() {
-        begif(rd_req)
+        begif(land(rd_req, rd_rdy))
         run {
-            assign_succ(regfile.GetFracRef(rd_addr), rd_wdata)
+            assign(regfile.GetFracRef(rd_addr), rd_wdata)
         }; endif()
     }
 
