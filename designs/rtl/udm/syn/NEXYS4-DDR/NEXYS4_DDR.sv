@@ -1,5 +1,5 @@
 /*
- * NEXYS4_DDR.v
+ * NEXYS4_DDR.sv
  *
  *  Created on: 01.01.2020
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
@@ -139,6 +139,8 @@ always @(posedge clk_gen)
     csr_resp <= 1'b0;
     testmem_resp_dly <= 1'b0;
     testmem_resp <= testmem_resp_dly;
+    
+    if (srst) LED <= 16'hffff;
     
     if (udm_req && udm_ack)
         begin
