@@ -26,11 +26,11 @@ reg irq_btn;
 	
 sigma
 #(
-	.CPU("riscv_1stage")
+	//.CPU("riscv_1stage")
 	//.CPU("riscv_2stage")
 	//.CPU("riscv_3stage")
 	//.CPU("riscv_4stage")
-	//.CPU("riscv_5stage")
+	.CPU("riscv_5stage")
 	//.CPU("riscv_6stage")
 
 	, .UDM_RTX_EXTERNAL_OVERRIDE("YES")
@@ -113,10 +113,11 @@ begin
 	irq_btn = 1'b0;
 	WAIT(50);
 	udm.check();
-	udm.hreset();
+	//udm.hreset();
+	WAIT(100);
 	
-	udm.wr32(CSR_LED_ADDR, 32'hdeadbeef);
-	udm.rd32(CSR_SW_ADDR);
+	//udm.wr32(CSR_LED_ADDR, 32'hdeadbeef);
+	//udm.rd32(CSR_SW_ADDR);
 	
 	WAIT(50000);
 

@@ -93,6 +93,7 @@ initial
 	WAIT(100);
 	udm.check();
 	udm.hreset();
+	WAIT(100);
 	
 	// test data initialization
 	udm.wr32(32'h10000000, 32'h112233cc);
