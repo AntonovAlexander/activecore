@@ -1,5 +1,5 @@
 /*
- * NEXYS4_DDR.v
+ * NEXYS4_DDR.sv
  *
  *  Created on: 01.01.2020
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>

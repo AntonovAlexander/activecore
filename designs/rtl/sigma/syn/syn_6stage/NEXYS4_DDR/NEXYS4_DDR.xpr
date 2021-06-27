@@ -3,10 +3,10 @@
 <!--                                                         -->
 <!-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="40" Path="D:/PROJECTS/PERSONAL/activecore/activecore/designs/rtl/sigma/syn/syn_4stage/NEXYS4-DDR/NEXYS4_DDR.xpr">
+<Project Version="7" Minor="40" Path="D:/PROJECTS/PERSONAL/activecore/activecore/designs/rtl/sigma/syn/syn_6stage/NEXYS4_DDR/NEXYS4_DDR.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
-    <Option Name="Id" Val="783e97e2ccdd4ee09b45ca8a87a6dff8"/>
+    <Option Name="Id" Val="fe19d8d068964be4be75912343edf473"/>
     <Option Name="Part" Val="xc7a100tcsg324-3"/>
     <Option Name="CompiledLibDir" Val="$PCACHEDIR/compile_simlib"/>
     <Option Name="CompiledLibDirXSim" Val=""/>
@@ -31,20 +31,20 @@
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="16"/>
-    <Option Name="WTXSimLaunchSim" Val="8"/>
+    <Option Name="WTXSimLaunchSim" Val="1"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="5"/>
-    <Option Name="WTModelSimExportSim" Val="5"/>
-    <Option Name="WTQuestaExportSim" Val="5"/>
-    <Option Name="WTIesExportSim" Val="5"/>
-    <Option Name="WTVcsExportSim" Val="5"/>
-    <Option Name="WTRivieraExportSim" Val="5"/>
-    <Option Name="WTActivehdlExportSim" Val="5"/>
+    <Option Name="WTXSimExportSim" Val="7"/>
+    <Option Name="WTModelSimExportSim" Val="7"/>
+    <Option Name="WTQuestaExportSim" Val="7"/>
+    <Option Name="WTIesExportSim" Val="7"/>
+    <Option Name="WTVcsExportSim" Val="7"/>
+    <Option Name="WTRivieraExportSim" Val="7"/>
+    <Option Name="WTActivehdlExportSim" Val="7"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -83,28 +83,28 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../udm/hdl/uart_rx.v">
+      <File Path="$PPRDIR/../../../../udm/hw/uart_rx.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../udm/hdl/uart_tx.v">
+      <File Path="$PPRDIR/../../../../udm/hw/uart_tx.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../udm/hdl/udm.v">
+      <File Path="$PPRDIR/../../../../udm/hw/udm.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../udm/hdl/udm_controller.v">
+      <File Path="$PPRDIR/../../../../udm/hw/udm_controller.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -152,13 +152,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_6stage/sverilog/riscv_6stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.sv">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_6stage/sverilog/riscv_6stage.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -191,12 +191,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_6stage/sverilog/riscv_6stage.svh">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_2stage/sverilog/riscv_2stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -204,6 +198,12 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_3stage/sverilog/riscv_3stage.svh">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -290,7 +290,7 @@
       <File Path="$PSRCDIR/sources_1/ip/sys_clk.xcix">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/sys_clk.xcix"/>
-          <Attr Name="ImportTime" Val="1608206907"/>
+          <Attr Name="ImportTime" Val="1608205330"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -299,7 +299,7 @@
       <File Path="$PSRCDIR/sources_1/ip/sys_clk/sys_clk.xci">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/sys_clk/sys_clk.xci"/>
-          <Attr Name="ImportTime" Val="1608206864"/>
+          <Attr Name="ImportTime" Val="1608205284"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>

@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="44" Path="D:/git_projects/activecore/designs/rtl/magma/syn/NEXYS4-DDR/NEXYS4_DDR.xpr">
+<Project Version="7" Minor="44" Path="D:/PROJECTS/PERSONAL/activecore/activecore/designs/rtl/magma/syn/NEXYS4-DDR/NEXYS4_DDR.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="dbe4f722851248e3976cc912f1a3ff99"/>
@@ -67,13 +67,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../sigma_tile/hw/irq_adapter.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../../../ram/ram_dual.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -95,28 +88,28 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../udm/hdl/uart_rx.v">
+      <File Path="$PPRDIR/../../../udm/hw/uart_rx.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../udm/hdl/uart_tx.v">
+      <File Path="$PPRDIR/../../../udm/hw/uart_tx.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../udm/hdl/udm.v">
+      <File Path="$PPRDIR/../../../udm/hw/udm.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../udm/hdl/udm_controller.v">
+      <File Path="$PPRDIR/../../../udm/hw/udm_controller.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -143,12 +136,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../hw/xbar_gen/coregen/ariele_xbar.svh">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../../hw/xbar_gen/coregen/m_ariele_xbar/m_ariele_xbar.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -156,6 +143,12 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../hw/xbar_gen/coregen/s_ariele_xbar/s_ariele_xbar.svh">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../hw/xbar_gen/coregen/ariele_xbar.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -169,6 +162,13 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../../sigma_tile/hw/cpu_stub.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../sigma_tile/hw/irq_adapter.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
