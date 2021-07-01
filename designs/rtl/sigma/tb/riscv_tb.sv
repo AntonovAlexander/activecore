@@ -1,5 +1,5 @@
 /*
- * riscv_tb.v
+ * riscv_tb.sv
  *
  *  Created on: 24.09.2017
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>

@@ -41,10 +41,11 @@ Current version of project is implemented as a collection of standalone Kotlin l
 ![pic_test](kip/__img/KIPs_overview.png)
 
 * Demo core generators based on KIP cores (/designs/coregen):
-	* **aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex KIP core
-	* **ariele** - full xbar generator, based on Pipex KIP core
+	* **Aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex KIP core
+	* **Ariele** - full xbar generator, based on Pipex KIP core
 	* **taylor_credit_pipeline** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex KIP core. Location: /designs/rtl/credit_test
-	* **citadel** - OoO FPU coprocessor, based on Reordex KIP core
+	* **Citadel** - OoO FPU coprocessor, based on Reordex KIP core
+	* **Agenda** - OoO RISC-V CPU, based on Reordex KIP core *(in development)*
 
 * Auxiliary reusable cores:
 	* **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Lab work manual included. Location: /designs/rtl/udm
