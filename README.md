@@ -12,9 +12,9 @@ KIP core's computational model typically includes:
 * pre-defined data structures and API for useful scheduling, communication and synchronization "services" of the microarchitecture;
 * event model and handler procedures selectively exposed for behavioral-style programming of custom application functions and mechanisms.
 
-KIP core approach serves as intermediate solution for codification of custom microarchitectures between fixed-function IP cores and general-purpose HW design tools:
+KIP core approach serves as intermediate solution for codification of custom microarchitectures between fixed-function IP cores and general-purpose HW synthesis tools:
 
-Fixed-function IP core <------ KIP core ------> General-purpose HW design tool
+Fixed-function IP core <------ KIP core ------> General-purpose HW synthesis tool
 
 Compared to other hardware generation frameworks, ActiveCore is constructed according to the following prioritites:
 * Dynamic generation of all hardware-related content, including data instances, structures, dimensions, expressions, procedural blocks, etc;
@@ -25,6 +25,8 @@ The ultimate goal of the project is to provide top-down methodology and reusable
 * rapid prototyping of various-purpose IP blocks with common microarchitectural mechanisms;
 * diversification of responsibility and competence of IP engineers: implementation of engines offering key microarchitectural mechanisms can be charged to the core of leading expert engineers, while developers of final designs can focus solely on application-specific functionality;
 * facilitating IP design centers to package, reuse and deliver templates for ***semi-custom IP cores*** instead of stitching management mechanisms and application-specific logic in monolithic designs.
+
+![pic_test](kip/__img/KIP_model.png)
 
 ### Project structure
 
@@ -59,7 +61,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 * A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation, ITMO University, Saint-Petersburg, 28.12.2018. URL: http://fppo.ifmo.ru/dissertation/?number=63419
 
-* A. Antonov, “Inferring Custom Synthesizable Kernel for Generation of Coprocessors with Out-of-Order Execution,” in 2021 10th Mediterranean Conference on Embedded Computing (MECO), 2021 (accepted for publication). Preprint available at: http://embeddedcomputing.meconet.me/wp-content/uploads/2021/05/86.pdf
+* A. Antonov, “Inferring Custom Synthesizable Kernel for Generation of Coprocessors with Out-of-Order Execution,” in 2021 10th Mediterranean Conference on Embedded Computing (MECO), 2021. URL: https://ieeexplore.ieee.org/document/9460265 Preprint available at: http://embeddedcomputing.meconet.me/wp-content/uploads/2021/05/86.pdf
 
 * A. Antonov, P. Kustarev, “Strategies of Computational Process Synthesis – a System-Level Model of HW/SW (Micro)Architectural Mechanisms,” in 2020 9th Mediterranean Conference on Embedded Computing (MECO), 2020. URL: https://ieeexplore.ieee.org/document/9134071
 
