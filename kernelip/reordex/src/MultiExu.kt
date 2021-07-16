@@ -186,7 +186,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var cdb_struct  = hw_struct("cdb_struct")
         cdb_struct.addu("enb", 0, 0, "0")
         cdb_struct.add("wdata", MultiExu_CFG.resp_struct)
-        var exu_cdb     = cyclix_gen.local(cyclix_gen.GetGenName("exu_cdb"), cdb_struct, hw_dim_static(fu_num-1, 0))
+        var exu_cdb     = cyclix_gen.local("genexu_cdb", cdb_struct, hw_dim_static(fu_num-1, 0))
 
         MSG("generating internal structures: done")
 
@@ -393,18 +393,23 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         MSG("broadcasting FU results to IQ and renamed buffer...")
         var fu_id = 0
+        var exu_cdb_num = 0
         for (exu_num in 0 until ExUnits_insts.size) {
             for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
-                cyclix_gen.begif(cyclix_gen.fifo_internal_rd_unblk(ExUnits_insts[exu_num][exu_inst_num], cyclix.STREAM_RESP_BUS_NAME, exu_resp))
+                var exu_cdb_inst = exu_cdb.GetFracRef(exu_cdb_num)
+                var exu_cdb_inst_enb = exu_cdb_inst.GetFracRef("enb")
+                var exu_cdb_inst_wdata = exu_cdb_inst.GetFracRef("wdata")
+                cyclix_gen.assign(exu_cdb_inst_enb, cyclix_gen.fifo_internal_rd_unblk(ExUnits_insts[exu_num][exu_inst_num], cyclix.STREAM_RESP_BUS_NAME, exu_cdb_inst_wdata))
+                cyclix_gen.begif(exu_cdb_inst_enb)
                 run {
 
                     // updating PRF state
                     cyclix_gen.assign(
-                        PRF_rdy.GetFracRef(cyclix_gen.subStruct(exu_resp, "tag")),
+                        PRF_rdy.GetFracRef(cyclix_gen.subStruct(exu_cdb_inst_wdata, "tag")),
                         1)
                     cyclix_gen.assign(
-                        PRF.GetFracRef(cyclix_gen.subStruct(exu_resp, "tag")),
-                        cyclix_gen.subStruct(exu_resp, "wdata"))
+                        PRF.GetFracRef(cyclix_gen.subStruct(exu_cdb_inst_wdata, "tag")),
+                        cyclix_gen.subStruct(exu_cdb_inst_wdata, "wdata"))
 
                     // broadcasting FU results to IQ
                     for (IQ_inst in IQ_insts) {
@@ -430,10 +435,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
                                     cyclix_gen.begif(!iq_entry_rs_rdy)
                                     run {
-                                        cyclix_gen.begif(cyclix_gen.eq2(iq_entry_rs_tag, cyclix_gen.subStruct(exu_resp, "tag")))
+                                        cyclix_gen.begif(cyclix_gen.eq2(iq_entry_rs_tag, cyclix_gen.subStruct(exu_cdb_inst_wdata, "tag")))
                                         run {
                                             // setting IQ entry ready
-                                            cyclix_gen.assign(iq_entry_rs_rdata, cyclix_gen.subStruct(exu_resp, "wdata"))
+                                            cyclix_gen.assign(iq_entry_rs_rdata, cyclix_gen.subStruct(exu_cdb_inst_wdata, "wdata"))
                                             cyclix_gen.assign(iq_entry_rs_rdy, 1)
                                         }; cyclix_gen.endif()
                                     }; cyclix_gen.endif()
@@ -448,7 +453,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                                 // fu_req //
                                 cyclix_gen.begif(iq_entry_fu_pending)
                                 run {
-                                    cyclix_gen.begif(cyclix_gen.eq2(iq_entry_rd_tag, cyclix_gen.subStruct(exu_resp, "tag")))
+                                    cyclix_gen.begif(cyclix_gen.eq2(iq_entry_rd_tag, cyclix_gen.subStruct(exu_cdb_inst_wdata, "tag")))
                                     run {
                                         cyclix_gen.assign(iq_entry_rdy, 1)
                                     }; cyclix_gen.endif()
@@ -472,10 +477,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
                             cyclix_gen.begif(!rs_rdy)
                             run {
-                                cyclix_gen.begif(cyclix_gen.eq2(rs_tag, cyclix_gen.subStruct(exu_resp, "tag")))
+                                cyclix_gen.begif(cyclix_gen.eq2(rs_tag, cyclix_gen.subStruct(exu_cdb_inst_wdata, "tag")))
                                 run {
                                     // setting IQ entry ready
-                                    cyclix_gen.assign(rs_rdata, cyclix_gen.subStruct(exu_resp, "wdata"))
+                                    cyclix_gen.assign(rs_rdata, cyclix_gen.subStruct(exu_cdb_inst_wdata, "wdata"))
                                     cyclix_gen.assign(rs_rdy, 1)
                                 }; cyclix_gen.endif()
                             }; cyclix_gen.endif()
@@ -489,6 +494,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     }
 
                 }; cyclix_gen.endif()
+                exu_cdb_num++
             }
             fu_id++
         }
