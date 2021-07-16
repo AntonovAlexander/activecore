@@ -21,6 +21,7 @@ class __TranslateInfo() {
 
 data class __RF_rs_req(val rs_rdy : hw_var,
                        val rs_tag : hw_var,
+                       val rs_src : hw_var,
                        val rs_rdata : hw_var)
 
 open class uop_buffer(cyclix_gen : cyclix.Generic,
@@ -50,6 +51,7 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
             rs_rsrv.add(__RF_rs_req(
                 AddLocal("rs" + RF_rs_idx + "_rdy"),
                 AddLocal("rs" + RF_rs_idx + "_tag"),
+                AddLocal("rs" + RF_rs_idx + "_src"),
                 AddLocal("rs" + RF_rs_idx + "_rdata")
             ))
         }
