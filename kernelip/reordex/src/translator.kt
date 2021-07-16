@@ -62,11 +62,11 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
                 ExecUnits_size : Int,
                 trx_struct : hw_struct,
                 MultiExu_CFG : Reordex_CFG,
-                val iq_num: hw_imm,
+                val fu_id_num: hw_imm,
                 val iq_exu: Boolean) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, ExecUnits_size, trx_struct, MultiExu_CFG) {
 
     val rd = cyclix_gen.ulocal(name_prefix + "_rd", 0, 0, "0")
     val wr = cyclix_gen.ulocal(name_prefix + "_wr", 0, 0, "0")
 }
 
-class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>)
+class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>)
