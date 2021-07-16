@@ -7,9 +7,9 @@
       <root url="jar://$KOTLIN_BUNDLED$/lib/kotlin-stdlib-jdk7.jar!/" />
       <root url="jar://$KOTLIN_BUNDLED$/lib/kotlin-stdlib-jdk8.jar!/" />
       <root url="file://$PROJECT_DIR$/../../../hwast/out/production/hwast" />
-      <root url="file://$PROJECT_DIR$/../../../kip/rtl/out/production/rtl" />
-      <root url="file://$PROJECT_DIR$/../../../kip/cyclix/out/production/cyclix" />
-      <root url="file://$PROJECT_DIR$/../../../kip/reordex/out/production/reordex" />
+      <root url="file://$PROJECT_DIR$/../../../kernelip/rtl/out/production/rtl" />
+      <root url="file://$PROJECT_DIR$/../../../kernelip/cyclix/out/production/cyclix" />
+      <root url="file://$PROJECT_DIR$/../../../kernelip/reordex/out/production/reordex" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

@@ -17,4 +17,4 @@ print("")
 sigma = sigma(udm)
 sigma.run_app_tests()
 
-udm.disconnect()
+#udm.disconnect()

@@ -178,8 +178,15 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var IQ_insts = ArrayList<iq_buffer>()
         var ExUnits_insts = ArrayList<ArrayList<cyclix.hw_subproc>>()
 
-        var exu_req = cyclix_gen.local(cyclix_gen.GetGenName("exu_req"), MultiExu_CFG.req_struct)
-        var exu_resp = cyclix_gen.local(cyclix_gen.GetGenName("exu_resp"), MultiExu_CFG.resp_struct)
+        var exu_req     = cyclix_gen.local(cyclix_gen.GetGenName("exu_req"), MultiExu_CFG.req_struct)
+        var exu_resp    = cyclix_gen.local(cyclix_gen.GetGenName("exu_resp"), MultiExu_CFG.resp_struct)
+
+        var fu_num = 0
+        for (ExUnit in ExecUnits) fu_num += ExUnit.value.exu_num
+        var cdb_struct  = hw_struct("cdb_struct")
+        cdb_struct.addu("enb", 0, 0, "0")
+        cdb_struct.add("wdata", MultiExu_CFG.resp_struct)
+        var exu_cdb     = cyclix_gen.local(cyclix_gen.GetGenName("exu_cdb"), cdb_struct, hw_dim_static(fu_num-1, 0))
 
         MSG("generating internal structures: done")
 
