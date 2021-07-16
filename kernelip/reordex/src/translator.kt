@@ -69,4 +69,4 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
     val wr = cyclix_gen.ulocal(name_prefix + "_wr", 0, 0, "0")
 }
 
-class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>)
+class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>, var base_CDB_index : Int)

@@ -15,13 +15,13 @@
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
       <ZoomEndTime time="4245001fs"></ZoomEndTime>
-      <Cursor1Time time="1835000fs"></Cursor1Time>
+      <Cursor1Time time="1315000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="473"></NameColumnWidth>
       <ValueColumnWidth column_width="214"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="14" />
+   <WVObjectSize size="15" />
    <wvobject fp_name="/tb_direct/CLK_100MHZ" type="logic">
       <obj_property name="ElementShortName">CLK_100MHZ</obj_property>
       <obj_property name="ObjectShortName">CLK_100MHZ</obj_property>
@@ -77,6 +77,10 @@
    <wvobject fp_name="/tb_direct/citadel_inst/genPRF_rdy" type="array">
       <obj_property name="ElementShortName">genPRF_rdy[63:0]</obj_property>
       <obj_property name="ObjectShortName">genPRF_rdy[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_direct/citadel_inst/genPRF_src" type="array">
+      <obj_property name="ElementShortName">genPRF_src[63:0][2:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF_src[63:0][2:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_direct/citadel_inst/genPRF" type="array">
       <obj_property name="ElementShortName">genPRF[63:0][31:0]</obj_property>

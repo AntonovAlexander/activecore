@@ -103,6 +103,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var cyclix_gen = cyclix.Generic(name)
 
         MSG("generating control structures...")
+
+        var cdb_num = 0
+        for (ExUnit in ExecUnits) cdb_num += ExUnit.value.exu_num
+
         var prf_dim = hw_dim_static()
         prf_dim.add(MultiExu_CFG.RF_width-1, 0)
         prf_dim.add(MultiExu_CFG.PRF_depth-1, 0)
@@ -126,6 +130,11 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         }
 
         var ARF_map = cyclix_gen.uglobal("genARF_map", arf_map_dim, ARF_map_default)        // ARF-to-PRF mappings
+
+        var prf_src_dim = hw_dim_static()
+        prf_src_dim.add(GetWidthToContain(cdb_num)-1, 0)
+        prf_src_dim.add(MultiExu_CFG.PRF_depth-1, 0)
+        var PRF_src = cyclix_gen.uglobal("genPRF_src", prf_src_dim, "0") // uncomputed PRF sources
 
         MSG("generating control structures: done")
 
@@ -165,6 +174,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
             iq_struct.addu("rs" + RF_rs_idx + "_rdy",     0, 0, "0")
             iq_struct.addu("rs" + RF_rs_idx + "_tag",     MultiExu_CFG.PRF_addr_width-1, 0, "0")
+            iq_struct.addu("rs" + RF_rs_idx + "_src",     GetWidthToContain(cdb_num)-1, 0, "0")
             iq_struct.addu("rs" + RF_rs_idx + "_rdata",     MultiExu_CFG.RF_width-1, 0, "0")
         }
         iq_struct.addu("rd_tag",     MultiExu_CFG.PRF_addr_width-1, 0, "0")
@@ -172,6 +182,11 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         iq_struct.addu("rd_tag_prev_clr",     0, 0, "0")
         iq_struct.addu("wb_ext",     0, 0, "0")
         iq_struct.addu("rdy",     0, 0, "0")
+
+        var cdb_struct  = hw_struct("cdb_struct")
+        cdb_struct.addu("enb", 0, 0, "0")
+        cdb_struct.add("wdata", MultiExu_CFG.resp_struct)
+        var exu_cdb     = cyclix_gen.local("genexu_cdb", cdb_struct, hw_dim_static(cdb_num-1, 0))
 
         var TranslateInfo = __TranslateInfo()
 
@@ -181,28 +196,21 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var exu_req     = cyclix_gen.local(cyclix_gen.GetGenName("exu_req"), MultiExu_CFG.req_struct)
         var exu_resp    = cyclix_gen.local(cyclix_gen.GetGenName("exu_resp"), MultiExu_CFG.resp_struct)
 
-        var fu_num = 0
-        for (ExUnit in ExecUnits) fu_num += ExUnit.value.exu_num
-        var cdb_struct  = hw_struct("cdb_struct")
-        cdb_struct.addu("enb", 0, 0, "0")
-        cdb_struct.add("wdata", MultiExu_CFG.resp_struct)
-        var exu_cdb     = cyclix_gen.local("genexu_cdb", cdb_struct, hw_dim_static(fu_num-1, 0))
-
         MSG("generating internal structures: done")
 
         var exu_descrs = mutableMapOf<String, __exu_descr>()
         var ExUnit_idx = 0
+        var fu_num = 0
         for (ExUnit in ExecUnits) {
             MSG("generating execution unit: " + ExUnit.value.ExecUnit.name + "...")
 
-            var new_exu_descr = __exu_descr(mutableMapOf(), ArrayList(), ArrayList())
+            var new_exu_descr = __exu_descr(mutableMapOf(), ArrayList(), ArrayList(), fu_num)
 
             for (ExUnit_num in 0 until ExUnit.value.exu_num) {
                 var iq_buf = iq_buffer(cyclix_gen, "geniq_" + ExUnit.key + "_" + ExUnit_num, ExUnit.value.iq_length, ExecUnits.size, iq_struct, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true)
                 new_exu_descr.IQ_insts.add(iq_buf)
                 IQ_insts.add(iq_buf)
             }
-            ExUnit_idx++
 
             MSG("generating submodules...")
             var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, MultiExu_CFG.req_struct, MultiExu_CFG.resp_struct)
@@ -279,6 +287,9 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     new_exu_descr.rs_use_flags.add(false)
                 }
             exu_descrs.put(ExUnit.key, new_exu_descr)
+
+            ExUnit_idx++
+            fu_num += ExUnit.value.exu_num
 
             MSG("generating execution unit " + ExUnit.value.ExecUnit.name + ": done")
         }
@@ -544,6 +555,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                             // signaling iq_wr
                             cyclix_gen.assign(IQ_inst.wr, 1)
                             IQ_inst.push_trx(renamed_uop_buf.TRX_BUF_head_ref)
+                            cyclix_gen.assign(PRF_src.GetFracRef(renamed_uop_buf.rd_tag), exu_descrs[ExUnit.key]!!.base_CDB_index)
 
                             // clearing renamed uop buffer
                             cyclix_gen.assign(renamed_uop_buf_pop, 1)
