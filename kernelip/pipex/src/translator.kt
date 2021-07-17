@@ -40,9 +40,10 @@ data class __assign_buf(val req : hw_var,
 class __pstage_info(cyclix_gen : cyclix.Generic,
                     name_prefix : String,
                     TRX_BUF_SIZE : Int,
+                    fc_mode : STAGE_FC_MODE,
                     AUTO_FIRED : Boolean,
                     val TranslateInfo : __TranslateInfo,
-                    val pctrl_flushreq : hw_var) : hw_stage_stallable(cyclix_gen, name_prefix, TRX_BUF_SIZE, AUTO_FIRED) {
+                    val pctrl_flushreq : hw_var) : hw_stage_stallable(cyclix_gen, name_prefix, TRX_BUF_SIZE, fc_mode, AUTO_FIRED) {
 
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
     var pContext_srcglbls       = ArrayList<hw_var>()               // locals with required src bufs

@@ -1,6 +1,7 @@
 package ariele
 
 import hwast.*
+import cyclix.STAGE_FC_MODE
 import pipex.*
 
 class slave_pipe(name        : String,
@@ -30,9 +31,9 @@ class slave_pipe(name        : String,
             master_ifs.add(scopipe_if("master" + mnum, req_vartype, resp_vartype))
         }
 
-        var ARB     = stage_handler("ARB", PSTAGE_FC_MODE.BUFFERED)
-        var REQ     = stage_handler("REQ", PSTAGE_FC_MODE.BUFFERED)
-        var RESP    = stage_handler("RESP", PSTAGE_FC_MODE.BUFFERED, rob_size)
+        var ARB     = stage_handler("ARB", STAGE_FC_MODE.BUFFERED)
+        var REQ     = stage_handler("REQ", STAGE_FC_MODE.BUFFERED)
+        var RESP    = stage_handler("RESP", STAGE_FC_MODE.BUFFERED, rob_size)
 
         ARB.begin()
         run {

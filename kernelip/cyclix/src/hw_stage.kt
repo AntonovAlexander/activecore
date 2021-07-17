@@ -99,10 +99,15 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
     }
 }
 
+enum class STAGE_FC_MODE {
+    BUFFERED, FALL_THROUGH
+}
+
 open class hw_stage(cyclix_gen : cyclix.Generic,
                     name_prefix : String,
                     TRX_BUF_STRUCT : hw_struct,
                     TRX_BUF_SIZE : Int,
+                    val fc_mode : STAGE_FC_MODE,
                     val AUTO_FIRED : Boolean) : hw_fifo(cyclix_gen, name_prefix, TRX_BUF_STRUCT, TRX_BUF_SIZE) {
 
     val ctrl_active        = cyclix_gen.ulocal((name_prefix + "_genctrl_active"), 0, 0, "0")
@@ -114,7 +119,8 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
     constructor(cyclix_gen : cyclix.Generic,
                 name_prefix : String,
                 TRX_BUF_SIZE : Int,
-                AUTO_FIRED : Boolean) : this (cyclix_gen, name_prefix, hw_struct(name_prefix + "_TRX_BUF_STRUCT"), TRX_BUF_SIZE, AUTO_FIRED)
+                fc_mode : STAGE_FC_MODE,
+                AUTO_FIRED : Boolean) : this (cyclix_gen, name_prefix, hw_struct(name_prefix + "_TRX_BUF_STRUCT"), TRX_BUF_SIZE, fc_mode, AUTO_FIRED)
 
     open fun preinit_ctrls() {
         // Asserting ctrl defaults (deployed even if signal is not used)
@@ -130,6 +136,8 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
 
         // Generating "occupied" pctrl
         cyclix_gen.assign(ctrl_occupied, ctrl_active)
+
+        if (fc_mode == STAGE_FC_MODE.BUFFERED) cyclix_gen.assign(ctrl_rdy, !TRX_BUF_COUNTER_FULL)
     }
 
     fun init_locals() {
@@ -139,13 +147,13 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
         }
     }
 
-    fun set_rdy() {
-        cyclix_gen.assign(ctrl_rdy, !TRX_BUF_COUNTER_FULL)
-    }
-
     override fun pop_trx() {
         cyclix_gen.assign(ctrl_active, 0)
         super.pop_trx()
+    }
+
+    fun finalize_ctrls() {
+        if (fc_mode == STAGE_FC_MODE.FALL_THROUGH) cyclix_gen.assign(ctrl_rdy, !TRX_BUF_COUNTER_FULL)
     }
 
     fun kill_cmd_internal() {
@@ -163,10 +171,11 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
     }
 }
 
-open class hw_stage_stallable(cyclix_gen : cyclix.Generic,
-                              name_prefix : String,
-                              TRX_BUF_SIZE : Int,
-                              AUTO_FIRED : Boolean) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE, AUTO_FIRED) {
+open class hw_stage_stallable(cyclix_gen    : cyclix.Generic,
+                              name_prefix   : String,
+                              TRX_BUF_SIZE  : Int,
+                              fc_mode       : STAGE_FC_MODE,
+                              AUTO_FIRED    : Boolean) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE, fc_mode, AUTO_FIRED) {
 
     val ctrl_stalled_glbl  = cyclix_gen.uglobal((name_prefix + "_genctrl_stalled_glbl"), 0, 0, "0")
     val ctrl_new           = cyclix_gen.ulocal((name_prefix + "_genctrl_new"), 0, 0, "0")
@@ -198,17 +207,13 @@ open class hw_stage_stallable(cyclix_gen : cyclix.Generic,
 
         cyclix_gen.assign(ctrl_occupied, ctrl_active)
         cyclix_gen.assign(ctrl_finish, 0)
+
+        if (fc_mode == STAGE_FC_MODE.BUFFERED) cyclix_gen.assign(ctrl_rdy, !TRX_BUF_COUNTER_FULL)
     }
 
     override fun pop_trx() {
-        cyclix_gen.assign(ctrl_active, 0)
         cyclix_gen.assign(ctrl_stalled_glbl, 0)
-        cyclix_gen.assign(TRX_BUF.GetFracRef(0), 0)
-        for (BUF_INDEX in 0 until TRX_BUF_SIZE-1) {
-            cyclix_gen.assign(TRX_BUF.GetFracRef(BUF_INDEX), TRX_BUF[BUF_INDEX+1])
-        }
-
-        dec_trx_counter()
+        super.pop_trx()
     }
 
     fun stall_cmd_internal() {

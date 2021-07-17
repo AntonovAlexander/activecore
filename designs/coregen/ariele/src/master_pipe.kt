@@ -1,6 +1,7 @@
 package ariele
 
 import hwast.*
+import cyclix.STAGE_FC_MODE
 import pipex.*
 
 class master_pipe(name          : String,
@@ -33,10 +34,10 @@ class master_pipe(name          : String,
             slave_enb.add(ulocal("slave_enb" + map.indexOf(slave), 0, 0, "0"))
         }
 
-        var DEC    = stage_handler("DEC", PSTAGE_FC_MODE.BUFFERED)
-        var REQ    = stage_handler("REQ", PSTAGE_FC_MODE.BUFFERED)
-        var SEQ    = stage_handler("SEQ", PSTAGE_FC_MODE.BUFFERED)
-        var RESP   = stage_handler("RESP", PSTAGE_FC_MODE.BUFFERED, rob_size)
+        var DEC    = stage_handler("DEC", STAGE_FC_MODE.BUFFERED)
+        var REQ    = stage_handler("REQ", STAGE_FC_MODE.BUFFERED)
+        var SEQ    = stage_handler("SEQ", STAGE_FC_MODE.BUFFERED)
+        var RESP   = stage_handler("RESP", STAGE_FC_MODE.BUFFERED, rob_size)
 
         DEC.begin()
         run {

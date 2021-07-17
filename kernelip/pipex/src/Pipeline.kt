@@ -27,10 +27,6 @@ val OP_ASSIGN_SUCC      = hw_opcode("assign_succ")
 val OP_ASSIGN_ALWAYS    = hw_opcode("assign_always")
 val OP_RD_PREV          = hw_opcode("rd_prev")
 
-enum class PSTAGE_FC_MODE {
-    BUFFERED, FALL_THROUGH
-}
-
 enum class PIPELINE_FC_MODE {
     STALLABLE, CREDIT_BASED
 }
@@ -65,21 +61,21 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
     var Stages  = mutableMapOf<String, hw_pipex_stage>()
 
-    fun stage_handler(name : String, busy_mode : PSTAGE_FC_MODE, buf_size_cfg : PSTAGE_BUF_SIZE_CFG) : hw_pipex_stage {
+    fun stage_handler(name : String, fc_mode : STAGE_FC_MODE, buf_size_cfg : PSTAGE_BUF_SIZE_CFG) : hw_pipex_stage {
         if (FROZEN_FLAG) ERROR("Failed to add stage " + name + ": ASTC frozen")
-        var new_stage = hw_pipex_stage(name, busy_mode, buf_size_cfg, this)
+        var new_stage = hw_pipex_stage(name, fc_mode, buf_size_cfg, this)
         if (Stages.put(new_stage.name, new_stage) != null) {
             ERROR("Stage addition problem!")
         }
         return new_stage
     }
 
-    fun stage_handler(name : String, busy_mode : PSTAGE_FC_MODE, BUF_SIZE : Int) : hw_pipex_stage {
-        return stage_handler(name, busy_mode, PSTAGE_BUF_SIZE_CFG(BUF_SIZE))
+    fun stage_handler(name : String, fc_mode : STAGE_FC_MODE, BUF_SIZE : Int) : hw_pipex_stage {
+        return stage_handler(name, fc_mode, PSTAGE_BUF_SIZE_CFG(BUF_SIZE))
     }
 
-    fun stage_handler(name : String, busy_mode : PSTAGE_FC_MODE) : hw_pipex_stage {
-        return stage_handler(name, busy_mode, PSTAGE_BUF_SIZE_CFG())
+    fun stage_handler(name : String, fc_mode : STAGE_FC_MODE) : hw_pipex_stage {
+        return stage_handler(name, fc_mode, PSTAGE_BUF_SIZE_CFG())
     }
 
     fun begstage(stage : hw_pipex_stage) {
@@ -1031,6 +1027,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             var pstage_info = __pstage_info(cyclix_gen,
                 name_prefix,
                 pstage_buf_size,
+                stage.fc_mode,
                 (CUR_STAGE_INDEX == 0),
                 TranslateInfo,
                 pctrl_flushreq)
@@ -1214,11 +1211,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             curStageInfo.preinit_ctrls()
 
             cyclix_gen.assign(curStageInfo.pctrl_flushreq, 0)
-
-            // rdy signal: before processing
-            if (curStage.fc_mode == PSTAGE_FC_MODE.BUFFERED) {
-                curStageInfo.set_rdy()
-            }
 
             // Forming mcopipe_handles_last list
             MSG(DEBUG_FLAG ,"Detecting last mcopipe handles")
@@ -1425,10 +1417,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
             }; cyclix_gen.endif()
 
-            // rdy signal: after processing
-            if (curStage.fc_mode == PSTAGE_FC_MODE.FALL_THROUGH) {
-                curStageInfo.set_rdy()
-            }
+            curStageInfo.finalize_ctrls()
 
             // working signal: succ or pstall
             cyclix_gen.bor_gen(curStageInfo.ctrl_working, curStageInfo.ctrl_succ, curStageInfo.ctrl_stalled_glbl)

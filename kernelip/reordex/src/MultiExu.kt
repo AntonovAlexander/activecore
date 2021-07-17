@@ -303,7 +303,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         cyclix_gen.MSG_COMMENT("IQ processing: store IQ...")
         store_iq.preinit_ctrls()
-        store_iq.set_rdy()
         store_iq.init_locals()
         cyclix_gen.begif(store_iq.ctrl_active)
         run {
@@ -327,7 +326,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
                 var IQ_inst = exu_descrs[ExUnit.key]!!.IQ_insts[ExUnit_num]
                 IQ_inst.preinit_ctrls()
-                IQ_inst.set_rdy()
                 IQ_inst.init_locals()
 
                 cyclix_gen.MSG_COMMENT("committing IQ head...")
@@ -410,7 +408,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var renamed_uop_buf_pop     = cyclix_gen.ulocal("genrenamed_uop_buf_pop", 0, 0, "0")
 
         renamed_uop_buf.preinit_ctrls()
-        renamed_uop_buf.set_rdy()
         renamed_uop_buf.init_locals()
 
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer...")
@@ -586,7 +583,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         run {
             renamed_uop_buf.pop_trx()
         }; cyclix_gen.endif()
-        renamed_uop_buf.set_rdy()               //  TODO: cleanup
+        renamed_uop_buf.finalize_ctrls()               //  TODO: cleanup
 
         var new_renamed_uop     = cyclix_gen.local("gennew_renamed_uop", iq_struct)
         var nru_enb             = new_renamed_uop.GetFracRef("enb")

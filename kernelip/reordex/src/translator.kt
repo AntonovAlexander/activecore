@@ -9,7 +9,7 @@
 package reordex
 
 import hwast.*
-import cyclix.hw_stage
+import cyclix.*
 
 data class __exu_info(val module : cyclix.Streaming,
                       val req_bus : hw_var,
@@ -29,7 +29,7 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
                  TRX_BUF_SIZE : Int,
                  ExecUnits_size : Int,
                  trx_struct : hw_struct,
-                 MultiExu_CFG : Reordex_CFG) : hw_stage(cyclix_gen, name_prefix, trx_struct, TRX_BUF_SIZE, false) {
+                 MultiExu_CFG : Reordex_CFG) : hw_stage(cyclix_gen, name_prefix, trx_struct, TRX_BUF_SIZE, STAGE_FC_MODE.BUFFERED, false) {
 
     val enb             = AddLocal("enb")
     val fu_req          = AddLocal("fu_req")
