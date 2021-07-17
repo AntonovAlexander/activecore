@@ -138,7 +138,9 @@ class VivadoCppWriter(var cyclix_module : Generic) {
 
         var opstring = ""
 
-        if (expr.opcode == OP1_ASSIGN) 	        opstring = ""
+        if (expr.opcode == OP_COMMENT) 	        opstring = "// "
+
+        else if (expr.opcode == OP1_ASSIGN) 	    opstring = ""
         else if (expr.opcode == OP1_COMPLEMENT) 	opstring = "-"
 
         else if (expr.opcode == OP2_ARITH_ADD) 	opstring = "+"
@@ -198,16 +200,19 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         else ERROR("operation " + expr.opcode.default_string + " not recognized")
 
 
-        if ((expr.opcode == OP1_ASSIGN)
-            || (expr.opcode == OP1_COMPLEMENT)
-            || (expr.opcode == OP1_LOGICAL_NOT)
-            || (expr.opcode == OP1_BITWISE_NOT)
-            || (expr.opcode == OP1_REDUCT_AND)
-            || (expr.opcode == OP1_REDUCT_NAND)
-            || (expr.opcode == OP1_REDUCT_OR)
-            || (expr.opcode == OP1_REDUCT_NOR)
-            || (expr.opcode == OP1_REDUCT_XOR)
-            || (expr.opcode == OP1_REDUCT_XNOR))
+        if (expr.opcode == OP_COMMENT) {
+            wrFile.write(opstring + expr.comment + "\n")
+
+        } else if ((expr.opcode == OP1_ASSIGN)
+                || (expr.opcode == OP1_COMPLEMENT)
+                || (expr.opcode == OP1_LOGICAL_NOT)
+                || (expr.opcode == OP1_BITWISE_NOT)
+                || (expr.opcode == OP1_REDUCT_AND)
+                || (expr.opcode == OP1_REDUCT_NAND)
+                || (expr.opcode == OP1_REDUCT_OR)
+                || (expr.opcode == OP1_REDUCT_NOR)
+                || (expr.opcode == OP1_REDUCT_XOR)
+                || (expr.opcode == OP1_REDUCT_XNOR))
         {
             if ((expr.tgts[0].vartype.DataType == DATA_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
                 if (opstring == "") {

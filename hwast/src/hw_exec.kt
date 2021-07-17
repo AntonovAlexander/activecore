@@ -10,6 +10,8 @@ package hwast
 
 class hw_opcode (val default_string : String)
 
+val OP_COMMENT          = hw_opcode("//")
+
 val OP1_ASSIGN          = hw_opcode("=")
 
 val OP2_ARITH_ADD       = hw_opcode("+")
@@ -78,6 +80,8 @@ open class hw_exec(val opcode : hw_opcode) {
     var subStructvar_name       = "UNDEF"
     var iftargets   = ArrayList<hw_var>()
     var priority_conditions  = ArrayList<hw_param>()
+
+    var comment = ""
 
     var cursor = 0
 

@@ -491,6 +491,17 @@ open class hw_astc() : ArrayList<hw_exec>() {
         }
     }
 
+    fun COMMENT(new_comment : String) {
+        var new_expr = hw_exec(OP_COMMENT)
+        new_expr.comment = new_comment
+        AddExpr(new_expr)
+    }
+
+    fun MSG_COMMENT(new_comment : String) {
+        MSG(new_comment)
+        COMMENT(new_comment)
+    }
+
     fun assign(tgt: hw_var, src: Int) {
         assign(tgt, hw_imm(src))
     }
@@ -1586,7 +1597,10 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun import_expr(DEBUG_FLAG : Boolean, expr : hw_exec, context : import_expr_context, process_subexpr : (DEBUG_FLAG : Boolean, astc_gen : hw_astc, expr : hw_exec, context : import_expr_context) -> Unit) {
 
-        if ((expr.opcode == OP1_ASSIGN)) {
+        if ((expr.opcode == OP_COMMENT)) {
+            COMMENT(expr.comment)
+
+        } else if ((expr.opcode == OP1_ASSIGN)) {
             assign(TranslateVar(expr.tgts[0], context.var_dict), TranslateParam(expr.params[0], context.var_dict))
 
         } else if ((expr.opcode == OP2_ARITH_ADD)

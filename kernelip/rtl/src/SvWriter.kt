@@ -121,7 +121,10 @@ class SvWriter(var mod : module) {
         PrintTab(wrFile)
 
         var opstring = ""
-        if (expr.opcode == OP1_ASSIGN) 	            opstring = ""
+
+        if (expr.opcode == OP_COMMENT) 	            opstring = "// "
+
+        else if (expr.opcode == OP1_ASSIGN) 	        opstring = ""
         else if (expr.opcode == OP1_COMPLEMENT) 	    opstring = "-"
 
         else if (expr.opcode == OP2_ARITH_ADD) 	    opstring = "+"
@@ -168,7 +171,10 @@ class SvWriter(var mod : module) {
 
         else ERROR("operation " + expr.opcode.default_string + " not recognized")
 
-        if ((expr.opcode == OP1_ASSIGN)
+        if (expr.opcode == OP_COMMENT) {
+            wrFile.write(opstring + expr.comment + "\n")
+
+        } else if ((expr.opcode == OP1_ASSIGN)
                 || (expr.opcode == OP1_COMPLEMENT)
                 || (expr.opcode == OP1_LOGICAL_NOT)
                 || (expr.opcode == OP1_BITWISE_NOT)
