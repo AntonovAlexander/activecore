@@ -163,6 +163,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         // TODO: external memory interface
 
         MSG("generating internal structures...")
+
         var iq_struct = hw_struct("iq_struct")
         iq_struct.addu("enb",     0, 0, "0")
         iq_struct.addu("fu_req",     0, 0, "0")
@@ -187,6 +188,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cdb_struct.addu("enb", 0, 0, "0")
         cdb_struct.add("data", MultiExu_CFG.resp_struct)
         var exu_cdb     = cyclix_gen.local("genexu_cdb", cdb_struct, hw_dim_static(cdb_num-1, 0))
+
+        var rob = rob_buffer(cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
 
         var TranslateInfo = __TranslateInfo()
 
@@ -403,7 +406,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             fu_id++
         }
 
-        var renamed_uop_buf         = uop_buffer(cyclix_gen, "genrenamed_uop_buf", 1, ExecUnits.size, iq_struct, MultiExu_CFG)
+        var renamed_uop_buf         = uop_buffer(cyclix_gen, "genrenamed_uop_buf", 1, iq_struct, MultiExu_CFG)
         var renamed_uop_buf_push    = cyclix_gen.ulocal("genrenamed_uop_buf_push", 0, 0, "0")
         var renamed_uop_buf_pop     = cyclix_gen.ulocal("genrenamed_uop_buf_pop", 0, 0, "0")
 
