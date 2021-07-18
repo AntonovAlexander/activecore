@@ -44,8 +44,12 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         return AddLocal(new_structvar.name)
     }
 
+    fun GetPushTrx(name: String) : hw_var {
+        return cyclix_gen.local(name, TRX_BUF.vartype.src_struct)
+    }
+
     fun GetPushTrx() : hw_var {
-        return cyclix_gen.local(name_prefix + "_genpush_trx", TRX_BUF.vartype.src_struct)
+        return GetPushTrx(name_prefix + "_" + cyclix_gen.GetGenName("push_trx"))
     }
 
     fun inc_trx_counter() {

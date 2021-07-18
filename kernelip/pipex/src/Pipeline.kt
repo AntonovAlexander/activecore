@@ -1374,7 +1374,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                         run {
                             cyclix_gen.COMMENT("propagating transaction context")
 
-                            var push_trx = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].GetPushTrx()
+                            var push_trx = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].GetPushTrx(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].name_prefix + "_push_trx")
 
                             // locals
                             cyclix_gen.assign_subStructs(push_trx, curStageInfo.local_trx)
