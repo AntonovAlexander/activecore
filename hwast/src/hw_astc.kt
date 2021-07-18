@@ -506,6 +506,18 @@ open class hw_astc() : ArrayList<hw_exec>() {
         assign(tgt, hw_imm(src))
     }
 
+    fun assign_subStructs(tgt: hw_var, src: hw_var) {
+        if ((tgt.vartype.DataType != DATA_TYPE.STRUCTURED) || (src.vartype.DataType != DATA_TYPE.STRUCTURED))
+            ERROR("Attempting to assign_subStructs non structured variables")
+
+        for (tgt_substruct in tgt.vartype.src_struct) {
+            for (src_substruct in src.vartype.src_struct) {
+                if (tgt_substruct.name == src_substruct.name)
+                    assign(tgt.GetFracRef(tgt_substruct.name), src.GetFracRef(src_substruct.name))
+            }
+        }
+    }
+
     fun complement(src: hw_param): hw_var {
         return AddExpr_op1(OP1_COMPLEMENT, src)
     }

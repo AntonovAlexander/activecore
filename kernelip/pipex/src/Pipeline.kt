@@ -1181,7 +1181,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
         MSG("Generating logic...")
 
-        MSG(DEBUG_FLAG, "mcopipe processing")
+        cyclix_gen.COMMENT("mcopipe processing")
         for (mcopipe_if in TranslateInfo.__mcopipe_if_assocs) {
             cyclix_gen.assign(mcopipe_if.value.wr_done, 0)
             cyclix_gen.assign(mcopipe_if.value.rd_done, 0)
@@ -1191,23 +1191,20 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             cyclix_gen.add_gen(mcopipe_if.value.rd_ptr_next, mcopipe_if.value.rd_ptr, 1)
         }
 
-        MSG(DEBUG_FLAG, "rdbuf logic")
+        cyclix_gen.COMMENT("rdbuf logic")
         for (global in TranslateInfo.__global_assocs) {
             cyclix_gen.assign(global.value.cyclix_global_buf, global.value.cyclix_global)
         }
 
-        MSG(DEBUG_FLAG, "logic of stages")
+        cyclix_gen.COMMENT("logic of stages")
         for (CUR_STAGE_INDEX in TranslateInfo.StageList.lastIndex downTo 0) {
 
             var curStage        = TranslateInfo.StageList[CUR_STAGE_INDEX]
             var curStageInfo    = TranslateInfo.StageInfoList[CUR_STAGE_INDEX]
 
-            MSG(DEBUG_FLAG, "[[ Stage processing: " + curStage.name + " ]]")
+            cyclix_gen.COMMENT("#### Stage processing: " + curStage.name + " ####")
 
-            // Generating root pctrls
-            MSG(DEBUG_FLAG, "#### Initializing pctrls ####")
             curStageInfo.preinit_ctrls()
-
             cyclix_gen.assign(curStageInfo.pctrl_flushreq, 0)
 
             // Forming mcopipe_handles_last list
@@ -1231,7 +1228,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             cyclix_gen.begif(curStageInfo.ctrl_occupied)
             run {
 
-                MSG(DEBUG_FLAG, "#### Initializing new newaccums descriptors ####")
+                cyclix_gen.COMMENT("Initializing new newaccums descriptors ####")
                 if (curStageInfo.newaccums.size != 0) {
                     cyclix_gen.begif(curStageInfo.ctrl_new)
                     run {
@@ -1243,10 +1240,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                     }; cyclix_gen.endif()
                 }
 
-                MSG(DEBUG_FLAG, "Fetching locals from src_glbls")
+                cyclix_gen.COMMENT("Fetching locals from src_glbls")
                 curStageInfo.init_locals()
 
-                MSG(DEBUG_FLAG, "#### Acquiring mcopipe rdata ####")
+                cyclix_gen.COMMENT("Acquiring mcopipe rdata")
                 for (BUF_INDEX in 0 until curStageInfo.TRX_BUF_SIZE) {
                     for (mcopipe_handle in curStageInfo.mcopipe_handles) {
 
@@ -1295,7 +1292,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 }
 
                 // do not start payload if flush requested
-                MSG(DEBUG_FLAG, "#### Pipeline flush processing ####")
+                cyclix_gen.COMMENT("Pipeline flush processing")
                 cyclix_gen.begif(curStageInfo.pctrl_flushreq)
                 run {
                     if (CUR_STAGE_INDEX != 0) curStageInfo.kill_cmd_internal()
@@ -1303,12 +1300,12 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
             }; cyclix_gen.endif()
 
-            MSG(DEBUG_FLAG, "#### Saving succ targets ####")        // for indexed assignments
+            cyclix_gen.COMMENT("Saving succ targets")        // for indexed assignments
             for (assign_succ_assoc in curStageInfo.assign_succ_assocs) {
                 cyclix_gen.assign(assign_succ_assoc.value.buf, curStageInfo.TranslateVar(assign_succ_assoc.key))
             }
 
-            MSG(DEBUG_FLAG, "#### Generating payload expressions ####")
+            cyclix_gen.COMMENT("Generating payload")
             for (expr in curStage.expressions) {
                 reconstruct_expression(DEBUG_FLAG,
                     cyclix_gen,
@@ -1317,7 +1314,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 )
             }
 
-            MSG(DEBUG_FLAG, "#### Processing of next pstage busyness ####")
+            cyclix_gen.COMMENT("Processing of next pstage busyness")
             if (TranslateInfo.pipeline.pipeline_fc_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
                 if (CUR_STAGE_INDEX == 0) {
                     cyclix_gen.begif(cyclix_gen.eq2(TranslateInfo.gencredit_counter, TranslateInfo.StageList.size-1))
@@ -1335,11 +1332,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 }
             }
 
-            // pctrl_finish and pctrl_succ formation
-            MSG(DEBUG_FLAG, "#### pctrl_finish and pctrl_succ formation ####")
+            cyclix_gen.COMMENT("pctrl_finish and pctrl_succ formation")
             curStageInfo.postinit_ctrls()
 
-            // credit counter processing
+            cyclix_gen.COMMENT("credit counter processing")
             if (pipeline_fc_mode == PIPELINE_FC_MODE.CREDIT_BASED) {
                 if (CUR_STAGE_INDEX == 0) {
                     cyclix_gen.begif(curStageInfo.ctrl_succ)
@@ -1354,8 +1350,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 }
             }
 
-            // asserting succ signals
-            MSG(DEBUG_FLAG, "#### Asserting succ signals ####")
+            cyclix_gen.COMMENT("asserting succ signals")
             if (curStageInfo.assign_succ_assocs.size > 0) {
                 cyclix_gen.begif(curStageInfo.ctrl_succ)
                 run {
@@ -1368,28 +1363,19 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 }; cyclix_gen.endif()
             }
 
-            // processing context in case transaction is ready to propagate
+            cyclix_gen.COMMENT("processing context in case transaction is ready to propagate")
             cyclix_gen.begif(curStageInfo.ctrl_finish)
             run {
-                // programming next stage in case transaction is able to propagate
+                cyclix_gen.COMMENT("programming next stage in case transaction is able to propagate")
                 cyclix_gen.begif(curStageInfo.ctrl_succ)
                 run {
                     if (CUR_STAGE_INDEX < TranslateInfo.StageList.lastIndex) {
                         if (pipeline_fc_mode != PIPELINE_FC_MODE.CREDIT_BASED) cyclix_gen.begif(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].ctrl_rdy)
                         run {
-                            // propagating transaction context
-                            for (local in TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_local_dict) {
-                                if (curStageInfo.pContext_local_dict.containsKey(local.key)) {
-                                    // having data to propagate
-                                    if (local.key is hw_local) {
-                                        if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].pContext_srcglbls.contains(local.key)) {
-                                            TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].push_trx_frac(hw_fracs(local.key.name), curStageInfo.TranslateVar(local.key))
-                                        }
-                                    }
-                                }
-                            }
+                            cyclix_gen.COMMENT("propagating transaction context")
+                            TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].push_trx_subStructs(curStageInfo.local_trx)
 
-                            // propagating mcopipe_handles
+                            cyclix_gen.COMMENT("propagating mcopipe_handles")
                             for (mcopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].mcopipe_handles) {
                                 if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].mcopipe_handles.contains(mcopipe_handle)) {
                                     var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
@@ -1397,7 +1383,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                                 }
                             }
 
-                            // propagating scopipe_handles
+                            cyclix_gen.COMMENT("propagating scopipe_handles")
                             for (scopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].scopipe_handles) {
                                 if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].scopipe_handles.contains(scopipe_handle)) {
                                     var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))

@@ -90,6 +90,14 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(TRX_BUF.GetFracRef(fracs), pushed_var)
     }
 
+    fun push_trx_subStructs(pushed_trx : hw_var) {
+        var fracs = hw_fracs(0)
+        if (TRX_BUF_SIZE != 1) {
+            fracs = hw_fracs(TRX_BUF_COUNTER)
+        }
+        cyclix_gen.assign_subStructs(TRX_BUF.GetFracRef(fracs), pushed_trx)
+    }
+
     open fun pop_trx() {
         for (BUF_INDEX in 0 until TRX_BUF_SIZE-1) {
             cyclix_gen.assign(TRX_BUF.GetFracRef(BUF_INDEX), TRX_BUF[BUF_INDEX+1])
