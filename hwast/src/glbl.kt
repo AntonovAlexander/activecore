@@ -114,9 +114,15 @@ fun WriteGenSrcHeader(wrFile : OutputStreamWriter, SrcType : String) {
 }
 
 fun DisplayTranslationError(var_in : hw_var, var_dict: MutableMap<hw_var, hw_var>) {
-    MSG("Possible var translations for variable " + var_in.name + ":")
+    var type_string = "var"
+    if (var_in is hw_var_frac) type_string = "frac, src var: " + var_in.src_var.name + ", fracs: " + var_in.GetFracString()
+    MSG("Possible var translations for variable " + var_in.name + " (type: " + type_string + "):")
     for (var_entry in var_dict) {
-        println("-- " + var_entry.key.name)
+        var key_type_string = "var"
+        if (var_entry.key is hw_var_frac) key_type_string = "frac"
+        var value_type_string = "var"
+        if (var_entry.value is hw_var_frac) value_type_string = "frac"
+        MSG("-- key: " + var_entry.key.name + " (" + key_type_string + "), value: " + var_entry.value.name + " (" + value_type_string + ")")
     }
     ERROR("Translation error for var " + var_in.name + "!")
 }
@@ -139,7 +145,7 @@ fun TranslateFractions(depow_fractions_in: hw_fracs, var_dict: MutableMap<hw_var
 fun TranslateVar(var_in : hw_var, var_dict: MutableMap<hw_var, hw_var>) : hw_var {
     if (var_in is hw_var_frac) {
         var src_var = var_dict[var_in.src_var]
-        if (src_var != null) return hw_var_frac(src_var, TranslateFractions(var_in.depow_fractions, var_dict), var_in.vartype)
+        if (src_var != null) return src_var.GetFracRef(TranslateFractions(var_in.depow_fractions, var_dict))
         else DisplayTranslationError(var_in, var_dict)
     } else {
         var ret_var = var_dict[var_in]

@@ -1135,14 +1135,12 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             var pContext_notnew = CrossArrayLists(UniteArrayLists(cur_rd_pvarlist, next_rd_pvarlist), prev_wr_pvarlist)
 
             // processing pContext list
+            var local_trx_struct = hw_struct(curStageInfo.name_prefix + "_local_trx_struct")
+            curStageInfo.local_trx = cyclix_gen.local(curStageInfo.name_prefix + "_local_trx", local_trx_struct)
             for (local in pContext_locals) {
                 if (local is hw_local) {
-                    var new_local = cyclix_gen.local(
-                        (curStageInfo.name_prefix + "_" + local.name),
-                        local.vartype,
-                        local.defimm
-                    )
-                    curStageInfo.pContext_local_dict.put(local, new_local)
+                    local_trx_struct.add(local.name, local.vartype, local.defimm)
+                    curStageInfo.pContext_local_dict.put(local, curStageInfo.local_trx.GetFracRef(local.name))
                 }
             }
 

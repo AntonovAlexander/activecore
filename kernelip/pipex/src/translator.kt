@@ -45,6 +45,7 @@ class __pstage_info(cyclix_gen : cyclix.Generic,
                     val TranslateInfo : __TranslateInfo,
                     val pctrl_flushreq : hw_var) : hw_stage_stallable(cyclix_gen, name_prefix, TRX_BUF_SIZE, fc_mode, AUTO_FIRED) {
 
+    var local_trx               = DUMMY_VAR
     var pContext_local_dict     = mutableMapOf<hw_var, hw_var>()    // local variables
     var pContext_srcglbls       = ArrayList<hw_var>()               // locals with required src bufs
     var accum_tgts              = ArrayList<hw_var>()               // targets for accumulation

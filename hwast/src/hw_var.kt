@@ -267,6 +267,7 @@ var DUMMY_VAR = hw_var("DUMMY_VAR", hw_type(DATA_TYPE.BV_UNSIGNED, 0, 0), "0")
 class hw_var_frac(var src_var : hw_var, var depow_fractions: hw_fracs, vartype : hw_type) : hw_var(src_var.name, vartype, src_var.defimm) {
     init {
         hw_fractured(src_var, depow_fractions)
+        if (src_var is hw_var_frac) ERROR("Trying to get frac based on frac!")
     }
 
     override fun GetFracRef(depow_fracs: hw_fracs) : hw_var_frac {
@@ -283,6 +284,14 @@ class hw_var_frac(var src_var : hw_var, var depow_fractions: hw_fracs, vartype :
         var depow_fracs = hw_fracs()
         for (frac in depow_frac) depow_fracs.add(frac)
         return GetFracRef(depow_fracs)
+    }
+
+    fun GetFracString() : String {
+        var ret_var = ""
+        for (depow_frac in depow_fractions) {
+            ret_var += "." + depow_frac.toString()
+        }
+        return ret_var
     }
 
     fun DisplayInfo() {
