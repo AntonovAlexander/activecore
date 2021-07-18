@@ -44,6 +44,10 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         return AddLocal(new_structvar.name)
     }
 
+    fun GetPushTrx() : hw_var {
+        return cyclix_gen.local(name_prefix + "_genpush_trx", TRX_BUF.vartype.src_struct)
+    }
+
     fun inc_trx_counter() {
         cyclix_gen.assign(TRX_BUF_COUNTER_NEMPTY, 1)
         if (TRX_BUF_SIZE == 1) {
@@ -77,25 +81,6 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         }
         cyclix_gen.assign(TRX_BUF.GetFracRef(fracs), pushed_var)
         inc_trx_counter()
-    }
-
-    fun push_trx_frac(tgt_buf_fracs : hw_fracs, pushed_var : hw_param) {
-        var fracs = hw_fracs(0)
-        if (TRX_BUF_SIZE != 1) {
-            fracs = hw_fracs(TRX_BUF_COUNTER)
-        }
-        for (tgt_buf_frac in tgt_buf_fracs) {
-            fracs.add(tgt_buf_frac)
-        }
-        cyclix_gen.assign(TRX_BUF.GetFracRef(fracs), pushed_var)
-    }
-
-    fun push_trx_subStructs(pushed_trx : hw_var) {
-        var fracs = hw_fracs(0)
-        if (TRX_BUF_SIZE != 1) {
-            fracs = hw_fracs(TRX_BUF_COUNTER)
-        }
-        cyclix_gen.assign_subStructs(TRX_BUF.GetFracRef(fracs), pushed_trx)
     }
 
     open fun pop_trx() {

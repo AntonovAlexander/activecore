@@ -65,6 +65,10 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
         default_astc.assign(this, src)
     }
 
+    fun assign_subStructs(src: hw_var) {
+        default_astc.assign(this, src)
+    }
+
     operator fun not(): hw_var {
         return default_astc.AddExpr_op1(OP1_BITWISE_NOT, this)
     }

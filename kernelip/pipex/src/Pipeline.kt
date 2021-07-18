@@ -1373,25 +1373,27 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                         if (pipeline_fc_mode != PIPELINE_FC_MODE.CREDIT_BASED) cyclix_gen.begif(TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].ctrl_rdy)
                         run {
                             cyclix_gen.COMMENT("propagating transaction context")
-                            TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].push_trx_subStructs(curStageInfo.local_trx)
 
-                            cyclix_gen.COMMENT("propagating mcopipe_handles")
-                            for (mcopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].mcopipe_handles) {
+                            var push_trx = TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].GetPushTrx()
+
+                            // locals
+                            cyclix_gen.assign_subStructs(push_trx, curStageInfo.local_trx)
+
+                            // mcopipe_handles
+                            for (mcopipe_handle in curStageInfo.mcopipe_handles) {
                                 if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].mcopipe_handles.contains(mcopipe_handle)) {
-                                    var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genmcopipe_handle_" + mcopipe_handle.name))
-                                    TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].push_trx_frac(hw_fracs("genmcopipe_handle_" + mcopipe_handle.name), curhandleref)
+                                    cyclix_gen.assign_subStructs(push_trx.GetFracRef("genmcopipe_handle_" + mcopipe_handle.name), curStageInfo.TRX_BUF.GetFracRef(0).GetFracRef("genmcopipe_handle_" + mcopipe_handle.name))
                                 }
                             }
 
-                            cyclix_gen.COMMENT("propagating scopipe_handles")
-                            for (scopipe_handle in TranslateInfo.StageInfoList[CUR_STAGE_INDEX].scopipe_handles) {
+                            // scopipe_handles
+                            for (scopipe_handle in curStageInfo.scopipe_handles) {
                                 if (TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].scopipe_handles.contains(scopipe_handle)) {
-                                    var curhandleref = TranslateInfo.StageInfoList[CUR_STAGE_INDEX].TRX_BUF.GetFracRef(hw_frac_C(0), hw_frac_SubStruct("genscopipe_handle_" + scopipe_handle.name))
-                                    TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].push_trx_frac(hw_fracs("genscopipe_handle_" + scopipe_handle.name), curhandleref)
+                                    cyclix_gen.assign_subStructs(push_trx.GetFracRef("genscopipe_handle_" + scopipe_handle.name), curStageInfo.TRX_BUF.GetFracRef(0).GetFracRef("genscopipe_handle_" + scopipe_handle.name))
                                 }
                             }
 
-                            TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].inc_trx_counter()
+                            TranslateInfo.StageInfoList[CUR_STAGE_INDEX+1].push_trx(push_trx)
 
                         }; if (pipeline_fc_mode != PIPELINE_FC_MODE.CREDIT_BASED) cyclix_gen.endif()
                     }
