@@ -207,10 +207,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         for (ExUnit in ExecUnits) {
             MSG("generating execution unit: " + ExUnit.value.ExecUnit.name + "...")
 
-            var new_exu_descr = __exu_descr(mutableMapOf(), ArrayList(), ArrayList(), fu_num)
+            var new_exu_descr = __exu_descr(mutableMapOf(), ArrayList(), ArrayList())
 
             for (ExUnit_num in 0 until ExUnit.value.exu_num) {
-                var iq_buf = iq_buffer(cyclix_gen, "geniq_" + ExUnit.key + "_" + ExUnit_num, ExUnit.value.iq_length, ExecUnits.size, iq_struct, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true)
+                var iq_buf = iq_buffer(cyclix_gen, "geniq_" + ExUnit.key + "_" + ExUnit_num, ExUnit.value.iq_length, ExecUnits.size, iq_struct, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true, fu_num)
                 new_exu_descr.IQ_insts.add(iq_buf)
                 IQ_insts.add(iq_buf)
             }
@@ -298,11 +298,32 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         }
 
         MSG("generating store IQ...")
-        var store_iq = iq_buffer(cyclix_gen, "genwb", out_iq_size, ExecUnits.size, iq_struct, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false)
+        var store_iq = iq_buffer(cyclix_gen, "genwb", out_iq_size, ExecUnits.size, iq_struct, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num)
         IQ_insts.add(store_iq)
         MSG("generating store IQ: done")
 
         MSG("generating logic...")
+
+        cyclix_gen.MSG_COMMENT("ROB processing...")
+        rob.preinit_ctrls()
+        rob.init_locals()
+        cyclix_gen.begif(rob.ctrl_active)
+        run {
+            cyclix_gen.begif(rob.rd_tag_prev_clr)
+            run {
+                // PRF written, and previous tag can be remapped
+                cyclix_gen.assign(
+                    PRF_mapped.GetFracRef(rob.rd_tag_prev),
+                    0)
+            }; cyclix_gen.endif()
+            cyclix_gen.assign(rob.rd, 1)
+        }; cyclix_gen.endif()
+        // popping
+        cyclix_gen.begif(rob.rd)
+        run {
+            rob.pop_trx()
+        }; cyclix_gen.endif()
+        cyclix_gen.MSG_COMMENT("ROB processing: done")
 
         cyclix_gen.MSG_COMMENT("IQ processing: store IQ...")
         store_iq.preinit_ctrls()
@@ -334,14 +355,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 cyclix_gen.MSG_COMMENT("committing IQ head...")
                 cyclix_gen.begif(cyclix_gen.band(IQ_inst.enb, IQ_inst.rdy))
                 run {
-
-                    cyclix_gen.begif(IQ_inst.rd_tag_prev_clr)
-                    run {
-                        // PRF written, and previous tag can be remapped
-                        cyclix_gen.assign(
-                            PRF_mapped.GetFracRef(IQ_inst.rd_tag_prev),
-                            0)
-                    }; cyclix_gen.endif()
                     cyclix_gen.assign(IQ_inst.rd, 1)
 
                     // popping
@@ -406,9 +419,9 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             fu_id++
         }
 
-        var renamed_uop_buf         = uop_buffer(cyclix_gen, "genrenamed_uop_buf", 1, iq_struct, MultiExu_CFG)
-        var renamed_uop_buf_push    = cyclix_gen.ulocal("genrenamed_uop_buf_push", 0, 0, "0")
-        var renamed_uop_buf_pop     = cyclix_gen.ulocal("genrenamed_uop_buf_pop", 0, 0, "0")
+        var renamed_uop_buf     = uop_buffer(cyclix_gen, "genrenamed_uop_buf", 1, iq_struct, MultiExu_CFG)
+        renamed_uop_buf.push    = cyclix_gen.ulocal("genrenamed_uop_buf_push", 0, 0, "0")
+        renamed_uop_buf.pop     = cyclix_gen.ulocal("genrenamed_uop_buf_pop", 0, 0, "0")
 
         renamed_uop_buf.preinit_ctrls()
         renamed_uop_buf.init_locals()
@@ -528,6 +541,13 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer: done")
 
         cyclix_gen.MSG_COMMENT("sending new operations to IQs...")
+
+        var push_trx = rob.GetPushTrx()
+        cyclix_gen.assign(push_trx.GetFracRef("enb"), 1)
+        cyclix_gen.assign(push_trx.GetFracRef("rd_tag_prev"), renamed_uop_buf.rd_tag_prev)
+        cyclix_gen.assign(push_trx.GetFracRef("rd_tag_prev_clr"), renamed_uop_buf.rd_tag_prev_clr)
+        cyclix_gen.assign(push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
+
         cyclix_gen.begif(renamed_uop_buf.ctrl_active)
         run {
 
@@ -546,8 +566,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     cyclix_gen.assign(store_iq.wr, 1)
                     store_iq.push_trx(renamed_uop_buf.TRX_BUF_head_ref)
 
+                    cyclix_gen.assign(push_trx.GetFracRef("cdb_id"), store_iq.CDB_index)
+
                     // clearing renamed uop buffer
-                    cyclix_gen.assign(renamed_uop_buf_pop, 1)
+                    cyclix_gen.assign(renamed_uop_buf.pop, 1)
 
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
@@ -566,10 +588,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                             // signaling iq_wr
                             cyclix_gen.assign(IQ_inst.wr, 1)
                             IQ_inst.push_trx(renamed_uop_buf.TRX_BUF_head_ref)
-                            cyclix_gen.assign(PRF_src.GetFracRef(renamed_uop_buf.rd_tag), exu_descrs[ExUnit.key]!!.base_CDB_index)
+                            cyclix_gen.assign(PRF_src.GetFracRef(renamed_uop_buf.rd_tag), IQ_inst.CDB_index)
+
+                            cyclix_gen.assign(push_trx.GetFracRef("cdb_id"), IQ_inst.CDB_index)
 
                             // clearing renamed uop buffer
-                            cyclix_gen.assign(renamed_uop_buf_pop, 1)
+                            cyclix_gen.assign(renamed_uop_buf.pop, 1)
 
                         }; cyclix_gen.endif()
                     }; cyclix_gen.endif()
@@ -582,8 +606,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cyclix_gen.MSG_COMMENT("acquiring new operation to IQs: done")
 
         cyclix_gen.MSG_COMMENT("renaming...")
-        cyclix_gen.begif(renamed_uop_buf_pop)
+        cyclix_gen.begif(renamed_uop_buf.pop)
         run {
+            cyclix_gen.assign(rob.wr, 1)
+            rob.push_trx(push_trx)
             renamed_uop_buf.pop_trx()
         }; cyclix_gen.endif()
         renamed_uop_buf.finalize_ctrls()               //  TODO: cleanup
@@ -684,7 +710,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     cyclix_gen.assign(nru_rdy, 0)
                     cyclix_gen.assign(nru_wb_ext, 0)
 
-                    cyclix_gen.assign(renamed_uop_buf_push, 1)
+                    cyclix_gen.assign(renamed_uop_buf.push, 1)
                 }; cyclix_gen.endif()
 
                 cyclix_gen.begelse()
@@ -718,14 +744,14 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                         cyclix_gen.assign(nru_rdy, new_renamed_uop.GetFracRef("rs0_rdy"))
                         cyclix_gen.assign(nru_wb_ext, 1)
 
-                        cyclix_gen.assign(renamed_uop_buf_push, 1)
+                        cyclix_gen.assign(renamed_uop_buf.push, 1)
 
                     }; cyclix_gen.endif()
 
                 }; cyclix_gen.endif()
 
                 // placing new uop in rename_buf
-                cyclix_gen.begif(renamed_uop_buf_push)
+                cyclix_gen.begif(renamed_uop_buf.push)
                 run {
                     renamed_uop_buf.push_trx(new_renamed_uop)
                 }; cyclix_gen.endif()

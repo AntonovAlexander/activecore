@@ -55,6 +55,9 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
             ))
         }
     }
+
+    var push = DUMMY_VAR
+    var pop = DUMMY_VAR
 }
 
 class iq_buffer(cyclix_gen : cyclix.Generic,
@@ -64,7 +67,8 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
                 trx_struct : hw_struct,
                 MultiExu_CFG : Reordex_CFG,
                 val fu_id_num: hw_imm,
-                val iq_exu: Boolean) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, trx_struct, MultiExu_CFG) {
+                val iq_exu: Boolean,
+                var CDB_index : Int) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, trx_struct, MultiExu_CFG) {
 
     val rd = cyclix_gen.ulocal(name_prefix + "_rd", 0, 0, "0")
     val wr = cyclix_gen.ulocal(name_prefix + "_wr", 0, 0, "0")
@@ -84,6 +88,8 @@ class rob_buffer(cyclix_gen : cyclix.Generic,
     var rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
     var cdb_id          = AddStageVar(hw_structvar("cdb_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(cdb_num)-1, 0, "0"))
     var trx_id          = AddStageVar(hw_structvar("trx_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0"))
+
+    var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0")
 }
 
-class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>, var base_CDB_index : Int)
+class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>)
