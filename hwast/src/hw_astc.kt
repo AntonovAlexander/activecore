@@ -507,6 +507,9 @@ open class hw_astc() : ArrayList<hw_exec>() {
     }
 
     fun assign_subStructs(tgt: hw_var, src: hw_var) {
+
+        if (tgt.vartype.DataType != DATA_TYPE.STRUCTURED) MSG_COMMENT("tgt: " + tgt.name + ": not structured!")
+        if (src.vartype.DataType != DATA_TYPE.STRUCTURED) MSG_COMMENT("src: " + src.name + ": not structured!")
         if ((tgt.vartype.DataType != DATA_TYPE.STRUCTURED) || (src.vartype.DataType != DATA_TYPE.STRUCTURED))
             ERROR("Attempting to assign_subStructs non structured variables")
 

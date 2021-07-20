@@ -164,26 +164,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         MSG("generating internal structures...")
 
-        var iq_struct = hw_struct("iq_struct")
-        iq_struct.addu("enb",     0, 0, "0")
-        iq_struct.addu("fu_req",     0, 0, "0")
-        iq_struct.addu("fu_pending",     0, 0, "0")
-        iq_struct.addu("fu_id",     GetWidthToContain(ExecUnits.size), 0, "0")              // for ExecUnits and wb_ext
-        for (imm_idx in 0 until MultiExu_CFG.imms.size) {
-            iq_struct.add(MultiExu_CFG.imms[imm_idx].name, MultiExu_CFG.imms[imm_idx].vartype, MultiExu_CFG.imms[imm_idx].defimm)
-        }
-        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
-            iq_struct.addu("rs" + RF_rs_idx + "_rdy",     0, 0, "0")
-            iq_struct.addu("rs" + RF_rs_idx + "_tag",     MultiExu_CFG.PRF_addr_width-1, 0, "0")
-            iq_struct.addu("rs" + RF_rs_idx + "_src",     GetWidthToContain(cdb_num)-1, 0, "0")
-            iq_struct.addu("rs" + RF_rs_idx + "_rdata",     MultiExu_CFG.RF_width-1, 0, "0")
-        }
-        iq_struct.addu("rd_tag",     MultiExu_CFG.PRF_addr_width-1, 0, "0")
-        iq_struct.addu("rd_tag_prev",     MultiExu_CFG.PRF_addr_width-1, 0, "0")                 // freeing
-        iq_struct.addu("rd_tag_prev_clr",     0, 0, "0")
-        iq_struct.addu("wb_ext",     0, 0, "0")
-        iq_struct.addu("rdy",     0, 0, "0")
-
         var cdb_struct  = hw_struct("cdb_struct")
         cdb_struct.addu("enb", 0, 0, "0")
         cdb_struct.add("data", MultiExu_CFG.resp_struct)
@@ -210,7 +190,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             var new_exu_descr = __exu_descr(mutableMapOf(), ArrayList(), ArrayList())
 
             for (ExUnit_num in 0 until ExUnit.value.exu_num) {
-                var iq_buf = iq_buffer(cyclix_gen, "geniq_" + ExUnit.key + "_" + ExUnit_num, ExUnit.value.iq_length, ExecUnits.size, iq_struct, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true, fu_num)
+                var iq_buf = iq_buffer(cyclix_gen, "geniq_" + ExUnit.key + "_" + ExUnit_num, ExUnit.value.iq_length, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true, fu_num, cdb_num)
                 new_exu_descr.IQ_insts.add(iq_buf)
                 IQ_insts.add(iq_buf)
             }
@@ -298,7 +278,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         }
 
         MSG("generating store IQ...")
-        var store_iq = iq_buffer(cyclix_gen, "genwb", out_iq_size, ExecUnits.size, iq_struct, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num)
+        var store_iq = iq_buffer(cyclix_gen, "genwb", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, cdb_num)
         IQ_insts.add(store_iq)
         MSG("generating store IQ: done")
 
@@ -316,10 +296,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     PRF_mapped.GetFracRef(rob.rd_tag_prev),
                     0)
             }; cyclix_gen.endif()
-            cyclix_gen.assign(rob.rd, 1)
+            cyclix_gen.assign(rob.pop, 1)
         }; cyclix_gen.endif()
         // popping
-        cyclix_gen.begif(rob.rd)
+        cyclix_gen.begif(rob.pop)
         run {
             rob.pop_trx()
         }; cyclix_gen.endif()
@@ -332,11 +312,11 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         run {
             cyclix_gen.begif(store_iq.rs_rsrv[0].rs_rdy)
             run {
-                cyclix_gen.assign(store_iq.rd, cyclix_gen.fifo_wr_unblk(cmd_resp, store_iq.rs_rsrv[0].rs_rdata))
+                cyclix_gen.assign(store_iq.pop, cyclix_gen.fifo_wr_unblk(cmd_resp, store_iq.rs_rsrv[0].rs_rdata))
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
         // popping
-        cyclix_gen.begif(store_iq.rd)
+        cyclix_gen.begif(store_iq.pop)
         run {
             store_iq.pop_trx()
         }; cyclix_gen.endif()
@@ -355,10 +335,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 cyclix_gen.MSG_COMMENT("committing IQ head...")
                 cyclix_gen.begif(cyclix_gen.band(IQ_inst.enb, IQ_inst.rdy))
                 run {
-                    cyclix_gen.assign(IQ_inst.rd, 1)
+                    cyclix_gen.assign(IQ_inst.pop, 1)
 
                     // popping
-                    cyclix_gen.begif(IQ_inst.rd)
+                    cyclix_gen.begif(IQ_inst.pop)
                     run {
                         IQ_inst.pop_trx()
                     }; cyclix_gen.endif()
@@ -419,9 +399,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             fu_id++
         }
 
-        var renamed_uop_buf     = uop_buffer(cyclix_gen, "genrenamed_uop_buf", 1, iq_struct, MultiExu_CFG)
-        renamed_uop_buf.push    = cyclix_gen.ulocal("genrenamed_uop_buf_push", 0, 0, "0")
-        renamed_uop_buf.pop     = cyclix_gen.ulocal("genrenamed_uop_buf_pop", 0, 0, "0")
+        var renamed_uop_buf     = rename_buffer(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, cdb_num)
 
         renamed_uop_buf.preinit_ctrls()
         renamed_uop_buf.init_locals()
@@ -563,8 +541,11 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 run {
 
                     // signaling iq_wr
-                    cyclix_gen.assign(store_iq.wr, 1)
-                    store_iq.push_trx(renamed_uop_buf.TRX_BUF_head_ref)
+                    cyclix_gen.assign(store_iq.push, 1)
+
+                    var store_push_trx = store_iq.GetPushTrx()
+                    cyclix_gen.assign_subStructs(store_push_trx, renamed_uop_buf.TRX_BUF_head_ref)
+                    store_iq.push_trx(store_push_trx)
 
                     cyclix_gen.assign(push_trx.GetFracRef("cdb_id"), store_iq.CDB_index)
 
@@ -586,8 +567,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                         run {
 
                             // signaling iq_wr
-                            cyclix_gen.assign(IQ_inst.wr, 1)
-                            IQ_inst.push_trx(renamed_uop_buf.TRX_BUF_head_ref)
+                            cyclix_gen.assign(IQ_inst.push, 1)
+
+                            var iq_push_trx = IQ_inst.GetPushTrx()
+                            cyclix_gen.assign_subStructs(iq_push_trx, renamed_uop_buf.TRX_BUF_head_ref)
+                            IQ_inst.push_trx(iq_push_trx)
+
                             cyclix_gen.assign(PRF_src.GetFracRef(renamed_uop_buf.rd_tag), IQ_inst.CDB_index)
 
                             cyclix_gen.assign(push_trx.GetFracRef("cdb_id"), IQ_inst.CDB_index)
@@ -608,17 +593,16 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cyclix_gen.MSG_COMMENT("renaming...")
         cyclix_gen.begif(renamed_uop_buf.pop)
         run {
-            cyclix_gen.assign(rob.wr, 1)
+            cyclix_gen.assign(rob.push, 1)
             rob.push_trx(push_trx)
             renamed_uop_buf.pop_trx()
         }; cyclix_gen.endif()
         renamed_uop_buf.finalize_ctrls()               //  TODO: cleanup
 
-        var new_renamed_uop     = cyclix_gen.local("gennew_renamed_uop", iq_struct)
+        var new_renamed_uop     = renamed_uop_buf.GetPushTrx()
         var nru_enb             = new_renamed_uop.GetFracRef("enb")
         var nru_rdy             = new_renamed_uop.GetFracRef("rdy")
         var nru_fu_req          = new_renamed_uop.GetFracRef("fu_req")
-        var nru_fu_pending      = new_renamed_uop.GetFracRef("fu_pending")
         var nru_fu_id           = new_renamed_uop.GetFracRef("fu_id")
         var nru_wb_ext          = new_renamed_uop.GetFracRef("wb_ext")
         var nru_rd_tag          = new_renamed_uop.GetFracRef("rd_tag")
@@ -634,7 +618,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 // decoding input
                 cyclix_gen.assign(nru_enb, 1)
 
-                cyclix_gen.assign(nru_fu_pending, 0)
                 cyclix_gen.assign(nru_fu_id,      cmd_req_data.GetFracRef("fu_id"))
 
                 for (imm_idx in 0 until MultiExu_CFG.imms.size) {

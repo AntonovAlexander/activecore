@@ -12,36 +12,27 @@ import hwast.*
 
 open class hw_fifo(val cyclix_gen : cyclix.Generic,
                    val name_prefix : String,
-                   TRX_BUF_STRUCT : hw_struct,
                    val TRX_BUF_SIZE : Int) {
 
-    var driven_locals       = mutableMapOf<hw_var, String>()
-
-    var TRX_BUF                 = cyclix_gen.global(name_prefix + "_TRX_BUF", TRX_BUF_STRUCT, TRX_BUF_SIZE-1, 0)
+    var TRX_BUF                 = cyclix_gen.global(name_prefix + "_TRX_BUF", hw_struct(name_prefix + "_TRX_BUF_STRUCT"), TRX_BUF_SIZE-1, 0)
     var TRX_BUF_head_ref        = TRX_BUF.GetFracRef(0)
     var TRX_BUF_COUNTER         = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER", GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0")
     var TRX_BUF_COUNTER_NEMPTY  = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER_NEMPTY", 0, 0, "0")
     var TRX_BUF_COUNTER_FULL    = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER_FULL", 0, 0, "0")
-
-    constructor(cyclix_gen : cyclix.Generic,
-                name_prefix : String,
-                TRX_BUF_SIZE : Int) : this (cyclix_gen, name_prefix, hw_struct(name_prefix + "_TRX_BUF_STRUCT"), TRX_BUF_SIZE)
-
+    var TRX_LOCAL               = cyclix_gen.local(name_prefix + "_TRX_LOCAL", hw_struct(name_prefix + "_TRX_LOCAL_STRUCT"))
 
     fun AddBuf(new_structvar : hw_structvar) {
         TRX_BUF.vartype.src_struct.add(new_structvar)
     }
 
-    fun AddLocal(fracname: String) : hw_var {
-        var val_ref = TRX_BUF_head_ref.GetFracRef(fracname)
-        var ret_var = cyclix_gen.local(name_prefix + "_genlocal_" + fracname, val_ref.vartype, "0")
-        driven_locals.put(ret_var, fracname)
-        return ret_var
+    fun AddLocal(new_structvar : hw_structvar) : hw_var {
+        TRX_LOCAL.vartype.src_struct.add(new_structvar)
+        return TRX_LOCAL.GetFracRef(new_structvar.name)
     }
 
     fun AddStageVar(new_structvar : hw_structvar) : hw_var {
         AddBuf(new_structvar)
-        return AddLocal(new_structvar.name)
+        return AddLocal(new_structvar)
     }
 
     fun GetPushTrx(name: String) : hw_var {
@@ -102,22 +93,15 @@ enum class STAGE_FC_MODE {
 
 open class hw_stage(cyclix_gen : cyclix.Generic,
                     name_prefix : String,
-                    TRX_BUF_STRUCT : hw_struct,
                     TRX_BUF_SIZE : Int,
                     val fc_mode : STAGE_FC_MODE,
-                    val AUTO_FIRED : Boolean) : hw_fifo(cyclix_gen, name_prefix, TRX_BUF_STRUCT, TRX_BUF_SIZE) {
+                    val AUTO_FIRED : Boolean) : hw_fifo(cyclix_gen, name_prefix, TRX_BUF_SIZE) {
 
     val ctrl_active        = cyclix_gen.ulocal((name_prefix + "_genctrl_active"), 0, 0, "0")
     val ctrl_working       = cyclix_gen.ulocal((name_prefix + "_genctrl_working"), 0, 0, "0")
     val ctrl_succ          = cyclix_gen.ulocal((name_prefix + "_genctrl_succ"), 0, 0, "0")
     val ctrl_occupied      = cyclix_gen.ulocal((name_prefix + "_genctrl_occupied"), 0, 0, "0")
     var ctrl_rdy           = cyclix_gen.ulocal((name_prefix + "_genctrl_rdy"), 0, 0, "0")
-
-    constructor(cyclix_gen : cyclix.Generic,
-                name_prefix : String,
-                TRX_BUF_SIZE : Int,
-                fc_mode : STAGE_FC_MODE,
-                AUTO_FIRED : Boolean) : this (cyclix_gen, name_prefix, hw_struct(name_prefix + "_TRX_BUF_STRUCT"), TRX_BUF_SIZE, fc_mode, AUTO_FIRED)
 
     open fun preinit_ctrls() {
         // Asserting ctrl defaults (deployed even if signal is not used)
@@ -138,9 +122,16 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
     }
 
     fun init_locals() {
-        for (driven_local in driven_locals) {
-            var TRX_BUF_REF = TRX_BUF_head_ref.GetFracRef(hw_frac_SubStruct(driven_local.value))
-            cyclix_gen.assign(driven_local.key, TRX_BUF_REF)
+        for (local in TRX_LOCAL.vartype.src_struct) {
+            var drv_found = false
+            for (buf_structvar in TRX_BUF.vartype.src_struct) {
+                if (local.name == buf_structvar.name) {
+                    cyclix_gen.assign(TRX_LOCAL.GetFracRef(local.name), TRX_BUF_head_ref.GetFracRef(local.name))
+                    drv_found = true
+                    break
+                }
+            }
+            if (!drv_found) cyclix_gen.assign(TRX_LOCAL.GetFracRef(local.name), local.defimm)
         }
     }
 
@@ -161,9 +152,7 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(tgt, src)
         cyclix_gen.begif(ctrl_active)
         run {
-            var trx_buf_fracs = hw_fracs(0)
-            trx_buf_fracs.add(hw_frac_SubStruct(driven_locals[tgt]!!))
-            cyclix_gen.assign(TRX_BUF.GetFracRef(trx_buf_fracs), src)
+            cyclix_gen.assign(TRX_BUF_head_ref.GetFracRef(((tgt as hw_var_frac).depow_fractions[0] as hw_frac_SubStruct).substruct_name), src)  //TODO: cleanup
         }; cyclix_gen.endif()
     }
 }
