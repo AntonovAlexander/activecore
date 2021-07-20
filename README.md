@@ -1,5 +1,5 @@
 # ActiveCore
-*Making complex RTL designing rapid, fun and full of insights*
+*Making complex RTL designing rapid, fun, with full control and plenty of insights*
 
 ### Project description
 
@@ -55,7 +55,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 * Demo FPGA-based SoCs:
 	* **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Can be learned within a single lab work, lab work manual included: https://github.com/AntonovAlexander/activecore/blob/master/designs/rtl/sigma/doc/sigma_lab_manual.pdf. Location: /designs/rtl/sigma
-	* **Magma** - NUMA MPSoC consisting of multiple sigma_tile modules connected by ariele xbar. Location: /designs/rtl/magma
+	* **Magma** - NUMA MPSoC consisting of multiple sigma_tile modules connected by Ariele xbar. Location: /designs/rtl/magma
 
 ### Publications
 
