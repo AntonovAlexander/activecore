@@ -1425,7 +1425,9 @@ open class hw_astc() : ArrayList<hw_exec>() {
         AddExpr(new_expr)
         add(new_expr)
 
-        val genvar_iter_elem = (elements as hw_var).GetFracRef(genvar_iter_num)     // TODO: clean
+        var genvar_iter_elem = DUMMY_VAR
+        if (elements is hw_var) genvar_iter_elem = elements.GetFracRef(genvar_iter_num)
+        else genvar_iter_elem = indexed(elements, genvar_iter_num)
 
         assign(genvar_iter_cont, less(genvar_iter_num, end))
         add_gen(genvar_iter_num_next, genvar_iter_num, 1)
