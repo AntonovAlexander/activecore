@@ -13,7 +13,8 @@ import hwast.*
 open class Reordex_CFG(val RF_width : Int,
                        val ARF_depth : Int,
                        val rename_RF: Boolean,
-                       val PRF_depth : Int) {
+                       val PRF_depth : Int,
+                       val trx_inflight_num : Int) {
 
     val ARF_addr_width = GetWidthToContain(ARF_depth)
     val PRF_addr_width = GetWidthToContain(PRF_depth)
@@ -44,7 +45,9 @@ open class Reordex_CFG(val RF_width : Int,
     }
 
     init {
+        req_struct.addu("trx_id",     31, 0, "0")       // TODO: clean up
         req_struct.addu("rd_tag",     31, 0, "0")       // TODO: clean up
+        resp_struct.addu("trx_id",     31, 0, "0")      // TODO: clean up
         resp_struct.addu("tag",     31, 0, "0")         // TODO: clean up
         resp_struct.addu("wdata",     RF_width-1, 0, "0")
     }
@@ -239,7 +242,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict).GetFracRef("wdata"), TranslateVar(ExUnit.value.ExecUnit.result, new_exu_descr.var_dict) )
 
             exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var, TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict))
-            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("tag"), exu_cyclix_gen.subStruct(exu_cyclix_gen.stream_req_var, "rd_tag"))
+            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("tag"), exu_cyclix_gen.stream_req_var.GetFracRef("rd_tag"))
+            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("trx_id"), exu_cyclix_gen.stream_req_var.GetFracRef("trx_id"))
 
             exu_cyclix_gen.end()
 

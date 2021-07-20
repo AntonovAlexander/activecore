@@ -11,7 +11,7 @@ package citadel
 import hwast.*
 import reordex.*
 
-class FPU_CFG() : Reordex_CFG(32, 32, true,64)
+class FPU_CFG() : Reordex_CFG(32, 32, true,64, 64)
 {
     var opcode = AddUImm("opcode", 32)
 

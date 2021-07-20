@@ -25,8 +25,8 @@ fp_fma fp_fma_inst (
     , .ap_done(stream_resp_bus_genfifo_req_o)
     , .ap_idle()
     , .ap_ready(stream_req_bus_genfifo_ack_o)
-    , .datain({stream_req_bus_genfifo_rdata_bi.rd_tag, stream_req_bus_genfifo_rdata_bi.rs2_rdata, stream_req_bus_genfifo_rdata_bi.rs1_rdata, stream_req_bus_genfifo_rdata_bi.rs0_rdata, stream_req_bus_genfifo_rdata_bi.opcode})
-    , .ap_return({stream_resp_bus_genfifo_wdata_bo.wdata, stream_resp_bus_genfifo_wdata_bo.tag})
+    , .datain({stream_req_bus_genfifo_rdata_bi.rd_tag, stream_req_bus_genfifo_rdata_bi.rs2_rdata, stream_req_bus_genfifo_rdata_bi.rs1_rdata, stream_req_bus_genfifo_rdata_bi.rs0_rdata, stream_req_bus_genfifo_rdata_bi.opcode, stream_req_bus_genfifo_rdata_bi.trx_id})
+    , .ap_return({stream_resp_bus_genfifo_wdata_bo.wdata, stream_resp_bus_genfifo_wdata_bo.tag, stream_resp_bus_genfifo_wdata_bo.trx_id})
 );
 
 

@@ -8,6 +8,7 @@
 
 typedef struct s_datain
 {
+    unsigned int trx_id;
     unsigned int opcode;
     float rs0;
     float rs1;
@@ -17,8 +18,9 @@ typedef struct s_datain
 
 typedef struct s_dataout
 {
-    unsigned int rd_tag;
-    float rd_wdata;
+    unsigned int trx_id;
+    unsigned int tag;
+    float wdata;
 } t_dataout;
 
 #endif // __FP_EXU_H
