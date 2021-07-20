@@ -53,10 +53,10 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
         }
         for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
             rs_rsrv.add(__RF_rs_req(
-                AddStageVar(hw_structvar("rs" + RF_rs_idx + "_rdy", DATA_TYPE.BV_UNSIGNED,     0, 0, "0")),
-                AddStageVar(hw_structvar("rs" + RF_rs_idx + "_tag", DATA_TYPE.BV_UNSIGNED,     MultiExu_CFG.PRF_addr_width-1, 0, "0")),
-                AddStageVar(hw_structvar("rs" + RF_rs_idx + "_src", DATA_TYPE.BV_UNSIGNED,     GetWidthToContain(cdb_num)-1, 0, "0")),
-                AddStageVar(hw_structvar("rs" + RF_rs_idx + "_rdata", DATA_TYPE.BV_UNSIGNED,     MultiExu_CFG.RF_width-1, 0, "0"))
+                AddStageVar(hw_structvar("rs" + RF_rs_idx + "_rdy",     DATA_TYPE.BV_UNSIGNED,     0, 0, "0")),
+                AddStageVar(hw_structvar("rs" + RF_rs_idx + "_tag",     DATA_TYPE.BV_UNSIGNED,     MultiExu_CFG.PRF_addr_width-1, 0, "0")),
+                AddStageVar(hw_structvar("rs" + RF_rs_idx + "_src",     DATA_TYPE.BV_UNSIGNED,     GetWidthToContain(cdb_num)-1, 0, "0")),
+                AddStageVar(hw_structvar("rs" + RF_rs_idx + "_rdata",   DATA_TYPE.BV_UNSIGNED,     MultiExu_CFG.RF_width-1, 0, "0"))
             ))
         }
     }
@@ -69,11 +69,11 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
                          ExecUnits_size : Int,
                          cdb_num : Int) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, cdb_num) {
 
-    var fu_id           = AddStageVar(hw_structvar("fu_id", DATA_TYPE.BV_UNSIGNED, GetWidthToContain(ExecUnits_size), 0, "0"))
-    val rd_tag          = AddStageVar(hw_structvar("rd_tag", DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
-    val rd_tag_prev     = AddStageVar(hw_structvar("rd_tag_prev", DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
-    val rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr", DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
-    val wb_ext          = AddStageVar(hw_structvar("wb_ext", DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
+    var fu_id           = AddStageVar(hw_structvar("fu_id",             DATA_TYPE.BV_UNSIGNED, GetWidthToContain(ExecUnits_size), 0, "0"))
+    val rd_tag          = AddStageVar(hw_structvar("rd_tag",            DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
+    val rd_tag_prev     = AddStageVar(hw_structvar("rd_tag_prev",       DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
+    val rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
+    val wb_ext          = AddStageVar(hw_structvar("wb_ext",            DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 }
 
 class iq_buffer(cyclix_gen : cyclix.Generic,
@@ -88,8 +88,8 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
     var trx_id      = AddStageVar(hw_structvar("trx_id",     DATA_TYPE.BV_UNSIGNED, GetWidthToContain(MultiExu_CFG.trx_inflight_num)-1, 0, "0"))
     var fu_pending  = AddStageVar(hw_structvar("fu_pending", DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
     val rs_srcs     = ArrayList<hw_var>()
-    val rd_tag      = AddStageVar(hw_structvar("rd_tag", DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
-    val wb_ext      = AddStageVar(hw_structvar("wb_ext", DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
+    val rd_tag      = AddStageVar(hw_structvar("rd_tag",    DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
+    val wb_ext      = AddStageVar(hw_structvar("wb_ext",    DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 }
 
 class rob_buffer(cyclix_gen : cyclix.Generic,
@@ -102,6 +102,7 @@ class rob_buffer(cyclix_gen : cyclix.Generic,
     var rd_tag_prev     = AddStageVar(hw_structvar("rd_tag_prev",       DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
     var rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
     var cdb_id          = AddStageVar(hw_structvar("cdb_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(cdb_num)-1, 0, "0"))
+    val rdy             = AddStageVar(hw_structvar("rdy",               DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
     var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0")
 }

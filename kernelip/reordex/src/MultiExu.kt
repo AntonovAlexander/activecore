@@ -288,26 +288,51 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         MSG("generating logic...")
 
-        cyclix_gen.MSG_COMMENT("ROB processing...")
+        cyclix_gen.MSG_COMMENT("Acquiring EXU CDB...")
+        var exu_cdb_num = 0
+        for (exu_num in 0 until ExUnits_insts.size) {
+            for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
+                var exu_cdb_inst        = exu_cdb.GetFracRef(exu_cdb_num)
+                var exu_cdb_inst_enb    = exu_cdb_inst.GetFracRef("enb")
+                var exu_cdb_inst_data   = exu_cdb_inst.GetFracRef("data")
+
+                cyclix_gen.assign(exu_cdb_inst_enb, cyclix_gen.fifo_internal_rd_unblk(ExUnits_insts[exu_num][exu_inst_num], cyclix.STREAM_RESP_BUS_NAME, exu_cdb_inst_data))
+
+                exu_cdb_num++
+            }
+        }
+        cyclix_gen.MSG_COMMENT("Acquiring EXU CDB: done")
+
+        cyclix_gen.MSG_COMMENT("ROB committing...")
         rob.preinit_ctrls()
         rob.init_locals()
         cyclix_gen.begif(rob.ctrl_active)
         run {
-            cyclix_gen.begif(rob.rd_tag_prev_clr)
+            cyclix_gen.begif(rob.rdy)
             run {
-                // PRF written, and previous tag can be remapped
-                cyclix_gen.assign(
-                    PRF_mapped.GetFracRef(rob.rd_tag_prev),
-                    0)
+                cyclix_gen.begif(rob.rd_tag_prev_clr)
+                run {
+                    // PRF written, and previous tag can be remapped
+                    cyclix_gen.assign(
+                        PRF_mapped.GetFracRef(rob.rd_tag_prev),
+                        0)
+                }; cyclix_gen.endif()
+                cyclix_gen.assign(rob.pop, 1)
             }; cyclix_gen.endif()
-            cyclix_gen.assign(rob.pop, 1)
         }; cyclix_gen.endif()
         // popping
         cyclix_gen.begif(rob.pop)
         run {
             rob.pop_trx()
         }; cyclix_gen.endif()
-        cyclix_gen.MSG_COMMENT("ROB processing: done")
+        var rob_iter = cyclix_gen.begforall_asc(rob.TRX_BUF)
+        run {
+            cyclix_gen.begif(cyclix_gen.eq2(rob_iter.iter_elem.GetFracRef("trx_id"), exu_cdb.GetFracRef(rob_iter.iter_elem.GetFracRef("cdb_id")).GetFracRef("data").GetFracRef("trx_id")))
+            run {
+                cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rdy"), 1)
+            }; cyclix_gen.endif()
+        }; cyclix_gen.endloop()
+        cyclix_gen.MSG_COMMENT("ROB committing: done")
 
         cyclix_gen.MSG_COMMENT("IQ processing: store IQ...")
         store_iq.preinit_ctrls()
@@ -402,7 +427,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer...")
         fu_id = 0
-        var exu_cdb_num = 0
+        exu_cdb_num = 0
         for (exu_num in 0 until ExUnits_insts.size) {
             for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
 
@@ -412,7 +437,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
                 var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
 
-                cyclix_gen.assign(exu_cdb_inst_enb, cyclix_gen.fifo_internal_rd_unblk(ExUnits_insts[exu_num][exu_inst_num], cyclix.STREAM_RESP_BUS_NAME, exu_cdb_inst_data))
                 cyclix_gen.begif(exu_cdb_inst_enb)
                 run {
 
@@ -578,6 +602,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                             // clearing renamed uop buffer
                             cyclix_gen.assign(renamed_uop_buf.pop, 1)
 
+                            cyclix_gen.assign(rob.push, 1)
+
                         }; cyclix_gen.endif()
                     }; cyclix_gen.endif()
 
@@ -591,10 +617,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cyclix_gen.MSG_COMMENT("renaming...")
         cyclix_gen.begif(renamed_uop_buf.pop)
         run {
-            cyclix_gen.assign(rob.push, 1)
-            cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
-            cyclix_gen.assign(rob.TRX_ID_COUNTER, cyclix_gen.add(rob.TRX_ID_COUNTER, 1))
-            rob.push_trx(rob_push_trx)
+            cyclix_gen.begif(rob.push)
+            run {
+                cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
+                cyclix_gen.assign(rob.TRX_ID_COUNTER, cyclix_gen.add(rob.TRX_ID_COUNTER, 1))
+                rob.push_trx(rob_push_trx)
+            }; cyclix_gen.endif()
             renamed_uop_buf.pop_trx()
         }; cyclix_gen.endif()
         renamed_uop_buf.finalize_ctrls()               //  TODO: cleanup
