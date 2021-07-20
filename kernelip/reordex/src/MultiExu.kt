@@ -376,15 +376,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                                 run {
 
                                     // filling exu_req with iq data
-                                    for (imm_idx in 0 until MultiExu_CFG.imms.size) {
-                                        var imm_name = MultiExu_CFG.imms[imm_idx].name
-                                        cyclix_gen.assign(exu_req.GetFracRef(imm_name), iq_entry.GetFracRef(imm_name))
-                                    }
-                                    for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
-                                        cyclix_gen.assign(exu_req.GetFracRef("rs" + RF_rs_idx + "_rdata"), iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdata"))
-                                    }
-
-                                    cyclix_gen.assign(exu_req.GetFracRef("rd_tag"), iq_entry_rd_tag)
+                                    cyclix_gen.assign_subStructs(exu_req, iq_entry)
 
                                     cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(ExUnits_insts[fu_id][ExUnit_num], cyclix.STREAM_REQ_BUS_NAME, exu_req))
                                     run {
