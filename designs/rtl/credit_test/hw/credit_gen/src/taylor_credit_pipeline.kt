@@ -1,4 +1,5 @@
 import hwast.*
+import cyclix.*
 import pipex.*
 
 class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELINE_FC_MODE.CREDIT_BASED) {
@@ -21,12 +22,12 @@ class taylor_credit_pipeline() : pipex.Pipeline("taylor_credit_pipeline", PIPELI
     var ext_datain    = ufifo_in("ext_datain", 15, 0)
     var ext_dataout   = ufifo_out("ext_dataout", 15, 0)
 
-    var ST_ACQ_POW2         = stage_handler("ST_ACQ_POW2", PSTAGE_FC_MODE.FALL_THROUGH)
-    var ST_POW3             = stage_handler("ST_POW3", PSTAGE_FC_MODE.FALL_THROUGH)
-    var ST_TERM1_POW5       = stage_handler("ST_TERM1_POW5", PSTAGE_FC_MODE.FALL_THROUGH)
-    var ST_TERM2            = stage_handler("ST_TERM2", PSTAGE_FC_MODE.FALL_THROUGH)
-    var ST_GENRESULT        = stage_handler("ST_GENRESULT", PSTAGE_FC_MODE.FALL_THROUGH)
-    var ST_SENDRESULT       = stage_handler("ST_SENDRESULT", PSTAGE_FC_MODE.FALL_THROUGH)
+    var ST_ACQ_POW2         = stage_handler("ST_ACQ_POW2", STAGE_FC_MODE.FALL_THROUGH)
+    var ST_POW3             = stage_handler("ST_POW3", STAGE_FC_MODE.FALL_THROUGH)
+    var ST_TERM1_POW5       = stage_handler("ST_TERM1_POW5", STAGE_FC_MODE.FALL_THROUGH)
+    var ST_TERM2            = stage_handler("ST_TERM2", STAGE_FC_MODE.FALL_THROUGH)
+    var ST_GENRESULT        = stage_handler("ST_GENRESULT", STAGE_FC_MODE.FALL_THROUGH)
+    var ST_SENDRESULT       = stage_handler("ST_SENDRESULT", STAGE_FC_MODE.FALL_THROUGH)
 
     init {
 
