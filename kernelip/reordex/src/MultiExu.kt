@@ -520,11 +520,11 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         cyclix_gen.MSG_COMMENT("sending new operations to IQs...")
 
-        var push_trx = rob.GetPushTrx()
-        cyclix_gen.assign(push_trx.GetFracRef("enb"), 1)
-        cyclix_gen.assign(push_trx.GetFracRef("rd_tag_prev"), renamed_uop_buf.rd_tag_prev)
-        cyclix_gen.assign(push_trx.GetFracRef("rd_tag_prev_clr"), renamed_uop_buf.rd_tag_prev_clr)
-        cyclix_gen.assign(push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
+        var rob_push_trx = rob.GetPushTrx()
+        cyclix_gen.assign(rob_push_trx.GetFracRef("enb"), 1)
+        cyclix_gen.assign(rob_push_trx.GetFracRef("rd_tag_prev"), renamed_uop_buf.rd_tag_prev)
+        cyclix_gen.assign(rob_push_trx.GetFracRef("rd_tag_prev_clr"), renamed_uop_buf.rd_tag_prev_clr)
+        cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
 
         cyclix_gen.begif(renamed_uop_buf.ctrl_active)
         run {
@@ -545,9 +545,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
                     var store_push_trx = store_iq.GetPushTrx()
                     cyclix_gen.assign_subStructs(store_push_trx, renamed_uop_buf.TRX_BUF_head_ref)
+                    cyclix_gen.assign(store_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
                     store_iq.push_trx(store_push_trx)
 
-                    cyclix_gen.assign(push_trx.GetFracRef("cdb_id"), store_iq.CDB_index)
+                    cyclix_gen.assign(rob_push_trx.GetFracRef("cdb_id"), store_iq.CDB_index)
 
                     // clearing renamed uop buffer
                     cyclix_gen.assign(renamed_uop_buf.pop, 1)
@@ -571,11 +572,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
                             var iq_push_trx = IQ_inst.GetPushTrx()
                             cyclix_gen.assign_subStructs(iq_push_trx, renamed_uop_buf.TRX_BUF_head_ref)
+                            cyclix_gen.assign(iq_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
                             IQ_inst.push_trx(iq_push_trx)
 
                             cyclix_gen.assign(PRF_src.GetFracRef(renamed_uop_buf.rd_tag), IQ_inst.CDB_index)
 
-                            cyclix_gen.assign(push_trx.GetFracRef("cdb_id"), IQ_inst.CDB_index)
+                            cyclix_gen.assign(rob_push_trx.GetFracRef("cdb_id"), IQ_inst.CDB_index)
 
                             // clearing renamed uop buffer
                             cyclix_gen.assign(renamed_uop_buf.pop, 1)
@@ -594,7 +596,9 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cyclix_gen.begif(renamed_uop_buf.pop)
         run {
             cyclix_gen.assign(rob.push, 1)
-            rob.push_trx(push_trx)
+            cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
+            cyclix_gen.assign(rob.TRX_ID_COUNTER, cyclix_gen.add(rob.TRX_ID_COUNTER, 1))
+            rob.push_trx(rob_push_trx)
             renamed_uop_buf.pop_trx()
         }; cyclix_gen.endif()
         renamed_uop_buf.finalize_ctrls()               //  TODO: cleanup
