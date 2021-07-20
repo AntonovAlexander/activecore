@@ -32,7 +32,7 @@ The ultimate goal of the project is to provide top-down methodology and reusable
 
 Current version of project is implemented as a collection of standalone Kotlin libraries that can be built using IntelliJ IDEA:
 
-* **hwast** - generic AST constructor of behavioral HW specifications (/hwast)
+* **hwast** - generic AST constructor of behavioral-style HW specifications (/hwast)
 
 * Demo KIP cores based on hwast (/kernelip):
 	* **Rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
