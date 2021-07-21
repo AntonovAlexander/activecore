@@ -26,4 +26,18 @@ open class hw_param (var vartype : hw_type, var token_printable : String) {
         if (vartype.dimensions.size == 0) return 1;
         else return vartype.dimensions.last().GetWidth()
     }
+
+    fun GetUnpackWidth() : Int {
+        var ret_width = 0
+        if (vartype.DataType == DATA_TYPE.STRUCTURED) {
+            for (structvar in vartype.src_struct) {
+                ret_width += structvar.GetUnpackWidth()
+            }
+        }
+        if (ret_width == 0) ret_width = 1
+        for (dim in vartype.dimensions) {
+            ret_width *= dim.GetWidth()
+        }
+        return ret_width
+    }
 }

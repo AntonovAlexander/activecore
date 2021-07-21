@@ -409,8 +409,8 @@ open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct:
         var stream_resp_bus_genfifo_ack_i       = wrapper_rtl_gen.uinput("stream_resp_bus_genfifo_ack_i", 0, 0, "0")
         var stream_resp_bus_genfifo_wdata_bo    = wrapper_rtl_gen.output("stream_resp_bus_genfifo_wdata_bo", stream_resp_bus.vartype.src_struct)
 
-        var datain_drv  = wrapper_rtl_gen.ucomb("datain_drv", 1023, 0, "0")         // TODO: cleanup
-        var dataout_drv = wrapper_rtl_gen.ucomb("dataout_drv", 1023, 0, "0")        // TODO: cleanup
+        var datain_drv  = wrapper_rtl_gen.ucomb("datain_drv", stream_req_bus_genfifo_rdata_bi.GetUnpackWidth()-1, 0, "0")
+        var dataout_drv = wrapper_rtl_gen.ucomb("dataout_drv", stream_resp_bus_genfifo_wdata_bo.GetUnpackWidth()-1, 0, "0")
 
         wrapper_rtl_gen.cproc_begin()
         run {
