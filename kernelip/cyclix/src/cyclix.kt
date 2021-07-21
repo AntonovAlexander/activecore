@@ -378,4 +378,80 @@ open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct:
 
     var stream_resp_bus = fifo_out(STREAM_RESP_BUS_NAME, hw_type(fifo_out_struct))
     var stream_resp_var = local(GetGenName("stream_resp_var"), fifo_out_struct)
+
+    fun export_rtl_wrapper(pathname : String, DEBUG_FLAG : Boolean) {
+        NEWLINE()
+        MSG("#############################################")
+        MSG("#### Cyclix: starting RTL wrapper export ####")
+        MSG("#### module: " + name)
+        MSG("#############################################")
+
+        var rtl_gen = rtl.module(name + "_hls_wrapper")
+
+        MSG("Generating ports...")
+
+        var clk = rtl_gen.uinput("clk_i", 0, 0, "0")
+        var rst = rtl_gen.uinput("rst_i", 0, 0, "1")
+
+        var stream_req_bus_genfifo_req_i        = rtl_gen.uinput("stream_req_bus_genfifo_req_i", 0, 0, "0")
+        var stream_req_bus_genfifo_ack_o        = rtl_gen.uoutput("stream_req_bus_genfifo_ack_o", 0, 0, "0")
+        var stream_req_bus_genfifo_rdata_bi     = rtl_gen.input("stream_req_bus_genfifo_rdata_bi", stream_req_bus.vartype.src_struct)
+        var stream_resp_bus_genfifo_req_o       = rtl_gen.uoutput("stream_resp_bus_genfifo_req_o", 0, 0, "0")
+        var stream_resp_bus_genfifo_ack_i       = rtl_gen.uinput("stream_resp_bus_genfifo_ack_i", 0, 0, "0")
+        var stream_resp_bus_genfifo_wdata_bo    = rtl_gen.output("stream_resp_bus_genfifo_wdata_bo", stream_resp_bus.vartype.src_struct)
+
+        var datain_drv  = rtl_gen.ucomb("datain_drv", 1023, 0, "0")         // TODO: cleanup
+        var dataout_drv = rtl_gen.ucomb("dataout_drv", 1023, 0, "0")        // TODO: cleanup
+
+        rtl_gen.cproc_begin()
+        run {
+            var datain_drvs = ArrayList<hw_param>()
+            for (structvar in stream_req_bus_genfifo_rdata_bi.vartype.src_struct.asReversed()) {
+                datain_drvs.add(stream_req_bus_genfifo_rdata_bi.GetFracRef(structvar.name))
+            }
+            rtl_gen.cnct_gen(datain_drv, datain_drvs)
+        }; rtl_gen.cproc_end()
+
+        rtl_gen.cproc_begin()
+        run {
+            var idx = 0
+            for (structvar in stream_resp_bus_genfifo_wdata_bo.vartype.src_struct) {
+                rtl_gen.assign(stream_resp_bus_genfifo_wdata_bo.GetFracRef(structvar.name), dataout_drv.GetFracRef(idx + structvar.GetWidth() - 1, idx))
+                idx += structvar.GetWidth()
+            }
+        }; rtl_gen.cproc_end()
+
+        MSG("Generating ports: done")
+
+        MSG("Generating submodule instance...")
+
+        var wrapped_module = rtl.module(name)
+        var ap_clk      = wrapped_module.uinput("ap_clk", 0, 0, "0")
+        var ap_rst      = wrapped_module.uinput("ap_rst", 0, 0, "0")
+        var ap_start    = wrapped_module.uinput("ap_start", 0, 0, "0")
+        var ap_done     = wrapped_module.uoutput("ap_done", 0, 0, "0")
+        var ap_idle     = wrapped_module.uoutput("ap_idle", 0, 0, "0")
+        var ap_ready    = wrapped_module.uoutput("ap_ready", 0, 0, "0")
+        var datain      = wrapped_module.uinput("datain", 0, 0, "0")
+        var ap_return   = wrapped_module.uoutput("ap_return", 0, 0, "0")
+
+        var wrapped_module_inst = rtl_gen.submodule(name + "_inst", wrapped_module)
+        wrapped_module_inst.connect(ap_clk, clk)
+        wrapped_module_inst.connect(ap_rst, rst)
+
+        wrapped_module_inst.connect(ap_start,   stream_req_bus_genfifo_req_i)
+        wrapped_module_inst.connect(ap_done,    stream_resp_bus_genfifo_req_o)
+        wrapped_module_inst.connect(ap_ready,   stream_req_bus_genfifo_ack_o)
+        wrapped_module_inst.connect(datain,     datain_drv)
+        wrapped_module_inst.connect(ap_return,  dataout_drv)
+
+        MSG("Generating submodule instance: done")
+
+        rtl_gen.export_to_sv(pathname, DEBUG_FLAG)
+
+        MSG("##############################################")
+        MSG("#### Cyclix: RTL wrapper export complete! ####")
+        MSG("#### module: " + name)
+        MSG("##############################################")
+    }
 }
