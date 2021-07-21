@@ -1,11 +1,11 @@
-<project xmlns="com.autoesl.autopilot.project" name="fp_add_sub" top="fp_add_sub">
+<project xmlns="com.autoesl.autopilot.project" top="genexu_FP_ADD_SUB" name="genexu_FP_ADD_SUB">
     <includePaths/>
     <libraryPaths/>
     <Simulation>
         <SimFlow name="csim"/>
     </Simulation>
     <files xmlns="">
-        <file name="fp_add_sub.c" sc="0" tb="false" cflags="" csimflags="" blackbox="false"/>
+        <file name="genexu_FP_ADD_SUB.c" sc="0" tb="false" cflags="" csimflags="" blackbox="false"/>
         <file name="fp_exu.h" sc="0" tb="false" cflags="" csimflags="" blackbox="false"/>
     </files>
     <solutions xmlns="">

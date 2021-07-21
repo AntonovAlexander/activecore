@@ -56,7 +56,7 @@
         <value string="solution1"/>
     </name>
     <project>
-        <value string="fp_fma"/>
+        <value string="genexu_FP_ADD_SUB"/>
     </project>
     <flowTarget value="vivado"/>
     <targetInfo>
@@ -68,7 +68,7 @@
         <library value="xilinx/artix7/artix7" name="DefaultPlatform"/>
     </libraryList>
     <clockList>
-        <clock default="false" name="default" period="10"/>
+        <clock name="default" default="false" period="10"/>
     </clockList>
 </solution>
 

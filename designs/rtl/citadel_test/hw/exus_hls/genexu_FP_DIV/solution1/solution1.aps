@@ -56,7 +56,7 @@
         <value string="solution1"/>
     </name>
     <project>
-        <value string="fp_mul"/>
+        <value string="genexu_FP_DIV"/>
     </project>
     <flowTarget value="vivado"/>
     <targetInfo>

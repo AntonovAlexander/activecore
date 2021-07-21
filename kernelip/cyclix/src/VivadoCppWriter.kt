@@ -563,11 +563,6 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         for (subproc in cyclix_module.Subprocs) {
             subproc.value.src_module.export_to_vivado_cpp(pathname + "/" + subproc.value.src_module.name, DEBUG_FLAG)
         }
-        for (subproc in cyclix_module.Subprocs) {
-            if (subproc.value.src_module is Streaming) {
-                (subproc.value.src_module as Streaming).export_rtl_wrapper(pathname + "/" + subproc.value.src_module.name, DEBUG_FLAG)
-            }
-        }
         write_module(pathname)
     }
 }

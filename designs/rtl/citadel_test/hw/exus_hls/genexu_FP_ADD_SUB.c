@@ -1,6 +1,6 @@
 #include "fp_exu.h"
 
-t_dataout fp_add_sub (t_datain datain) {
+t_dataout genexu_FP_ADD_SUB (t_datain datain) {
 #pragma HLS pipeline II=1
 	s_dataout ret_val;
 	if (datain.opcode == 0) {

@@ -1,6 +1,6 @@
 #include "fp_exu.h"
 
-t_dataout fp_mul (t_datain datain) {
+t_dataout genexu_FP_MUL (t_datain datain) {
 #pragma HLS pipeline II=1
 	s_dataout ret_val;
 	ret_val.trx_id = datain.trx_id;
