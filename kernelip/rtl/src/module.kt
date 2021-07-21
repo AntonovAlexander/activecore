@@ -27,7 +27,15 @@ open class module(val name : String) : hw_astc_stdif() {
     fun submodule(inst_name : String, new_submod : module) : hw_submodule {
         if (FROZEN_FLAG) ERROR("Failed to add submodule " + inst_name + ": ASTC frozen")
         if (Submodules.containsKey(inst_name)) ERROR("Naming conflict for instance: " + inst_name)
-        var new_inst = hw_submodule(inst_name, new_submod, this)
+        var new_inst = hw_submodule(inst_name, new_submod, this, false)
+        Submodules.put(inst_name, new_inst)
+        return new_inst
+    }
+
+    fun submodule_bb(inst_name : String, new_submod : module) : hw_submodule {
+        if (FROZEN_FLAG) ERROR("Failed to add submodule " + inst_name + ": ASTC frozen")
+        if (Submodules.containsKey(inst_name)) ERROR("Naming conflict for instance: " + inst_name)
+        var new_inst = hw_submodule(inst_name, new_submod, this, true)
         Submodules.put(inst_name, new_inst)
         return new_inst
     }
@@ -571,3 +579,5 @@ open class module(val name : String) : hw_astc_stdif() {
         MSG("##################################")
     }
 }
+
+val DUMMY_MODULE = module("DUMMY")

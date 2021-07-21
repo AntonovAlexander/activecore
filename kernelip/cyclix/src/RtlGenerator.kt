@@ -242,11 +242,19 @@ class RtlGenerator(var cyclix_module : Generic) {
             var fifo_internal_in_descrs = mutableMapOf<String, fifo_internal_out_descr>()
             var fifo_internal_out_descrs = mutableMapOf<String, fifo_internal_in_descr>()
 
-            var submod_rtl_gen = subproc.value.src_module.export_to_rtl(DEBUG_FLAG)
-            if (subproc.value.src_module is Streaming) {                    // TODO: RTL/HLS switching
-                submod_rtl_gen = (subproc.value.src_module as Streaming).export_rtl_wrapper(DEBUG_FLAG)
+            var HLS_bb = false
+            if (subproc.value.src_module is Streaming) {
+                if ((subproc.value.src_module as Streaming).pref_impl == STREAM_PREF_IMPL.HLS)
+                    HLS_bb = true
             }
-            var rtl_submodule_inst = rtl_gen.submodule(subproc.value.inst_name, submod_rtl_gen)
+
+            var submod_rtl_gen = rtl.DUMMY_MODULE
+            var rtl_submodule_inst = rtl.DUMMY_SUBMODULE
+
+            if (HLS_bb) submod_rtl_gen = (subproc.value.src_module as Streaming).export_rtl_wrapper(DEBUG_FLAG)
+            else submod_rtl_gen = subproc.value.src_module.export_to_rtl(DEBUG_FLAG)
+
+            rtl_submodule_inst = rtl_gen.submodule(subproc.value.inst_name, submod_rtl_gen)
 
             rtl_submodule_inst.connect("clk_i", clk)
             rtl_submodule_inst.connect("rst_i", rst)

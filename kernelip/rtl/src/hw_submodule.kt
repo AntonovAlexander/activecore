@@ -2,7 +2,7 @@ package rtl
 
 import hwast.*
 
-class hw_submodule(var inst_name : String, var src_module: module, var parent_module: module) {
+class hw_submodule(var inst_name : String, var src_module: module, var parent_module: module, val bb : Boolean) {
 
     var Ports = mutableMapOf<String, hw_port>()
     var Connections = mutableMapOf<hw_port, hw_param>()
@@ -47,3 +47,5 @@ class hw_submodule(var inst_name : String, var src_module: module, var parent_mo
         connect(port_name, hw_imm(value))
     }
 }
+
+val DUMMY_SUBMODULE = hw_submodule("DUMMY", DUMMY_MODULE, DUMMY_MODULE, true)

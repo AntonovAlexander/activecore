@@ -8,6 +8,7 @@
 
 package reordex
 
+import cyclix.STREAM_PREF_IMPL
 import hwast.*
 
 open class Reordex_CFG(val RF_width : Int,
@@ -55,14 +56,15 @@ open class Reordex_CFG(val RF_width : Int,
 
 data class Exu_CFG(val ExecUnit : Exu,
                    val exu_num : Int,
-                   val iq_length : Int)
+                   val iq_length : Int,
+                   val pref_impl : STREAM_PREF_IMPL)
 
 open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_iq_size : Int) {
 
     var ExecUnits  = mutableMapOf<String, Exu_CFG>()
 
-    fun add_exu(exu : Exu, exu_num: Int, iq_length: Int) {
-        if (ExecUnits.put(exu.name, Exu_CFG(exu, exu_num, iq_length)) != null) {
+    fun add_exu(exu : Exu, exu_num: Int, iq_length: Int, pref_impl : STREAM_PREF_IMPL) {
+        if (ExecUnits.put(exu.name, Exu_CFG(exu, exu_num, iq_length, pref_impl)) != null) {
             ERROR("Exu addition error!")
         }
     }
@@ -199,7 +201,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             }
 
             MSG("generating submodules...")
-            var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, MultiExu_CFG.req_struct, MultiExu_CFG.resp_struct)
+            var exu_cyclix_gen = cyclix.Streaming("genexu_" + ExUnit.value.ExecUnit.name, MultiExu_CFG.req_struct, MultiExu_CFG.resp_struct, ExUnit.value.pref_impl)
             MSG("generating submodules: done")
 
             MSG("generating locals...")

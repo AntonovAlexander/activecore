@@ -8,6 +8,7 @@
 
 package citadel
 
+import cyclix.STREAM_PREF_IMPL
 import hwast.*
 import reordex.*
 
@@ -59,9 +60,9 @@ class EXU_FP_FMA() : reordex.Exu("FP_FMA", FPU_CFG_inst) {
 class fpu(name : String) : reordex.MultiExu(name, FPU_CFG_inst, 4) {
 
     init {
-        add_exu(EXU_FP_ADD_SUB(), 2, 4)
-        add_exu(EXU_FP_MUL(), 1, 3)
-        add_exu(EXU_FP_DIV(), 1, 3)
-        add_exu(EXU_FP_FMA(), 1, 3)
+        add_exu(EXU_FP_ADD_SUB(), 2, 4, STREAM_PREF_IMPL.HLS)
+        add_exu(EXU_FP_MUL(), 1, 3, STREAM_PREF_IMPL.HLS)
+        add_exu(EXU_FP_DIV(), 1, 3, STREAM_PREF_IMPL.HLS)
+        add_exu(EXU_FP_FMA(), 1, 3, STREAM_PREF_IMPL.HLS)
     }
 }

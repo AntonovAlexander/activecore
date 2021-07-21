@@ -370,9 +370,16 @@ open class Generic(name_in : String) : hw_astc_stdif() {
 }
 
 
+enum class STREAM_PREF_IMPL {
+    RTL,
+    HLS
+}
+
 var STREAM_REQ_BUS_NAME = "stream_req_bus"
 var STREAM_RESP_BUS_NAME = "stream_resp_bus"
-open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct: hw_struct) : Generic(name) {
+open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct: hw_struct, val pref_impl : STREAM_PREF_IMPL) : Generic(name) {
+
+    constructor(name : String, fifo_in_struct: hw_struct, fifo_out_struct: hw_struct) : this(name, fifo_in_struct, fifo_out_struct, STREAM_PREF_IMPL.RTL)
 
     var stream_req_bus = fifo_in(STREAM_REQ_BUS_NAME, hw_type(fifo_in_struct))
     var stream_req_var = local(GetGenName("stream_req_var"), fifo_in_struct)
@@ -437,7 +444,7 @@ open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct:
         var datain      = wrapped_module.uinput("datain", 0, 0, "0")
         var ap_return   = wrapped_module.uoutput("ap_return", 0, 0, "0")
 
-        var wrapped_module_inst = wrapper_rtl_gen.submodule(name + "_inst", wrapped_module)
+        var wrapped_module_inst = wrapper_rtl_gen.submodule_bb(name + "_inst", wrapped_module)
         wrapped_module_inst.connect(ap_clk, clk)
         wrapped_module_inst.connect(ap_rst, rst)
 

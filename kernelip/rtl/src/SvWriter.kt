@@ -406,7 +406,8 @@ class SvWriter(var mod : module) {
         // Submodules
         MSG("Exporting submodules...")
         for (submodule in mod.Submodules) {
-            submodule.value.src_module.export_to_sv(pathname + "/" + submodule.value.src_module.name, DEBUG_FLAG)
+            if (!submodule.value.bb)
+                submodule.value.src_module.export_to_sv(pathname + "/" + submodule.value.src_module.name, DEBUG_FLAG)
         }
         MSG("Exporting submodules: done")
 
