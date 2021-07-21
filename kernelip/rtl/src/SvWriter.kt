@@ -419,9 +419,9 @@ class SvWriter(var mod : module) {
             }
         }
         for (submodule in mod.Submodules) {
-            if (!mods_included.contains(submodule.value.src_module.name)) {
-                mods_included.add(submodule.value.src_module.name)
-            }
+            if (submodule.value.include_needed)            // Workaround for HLS-generated modules, TODO: fix
+                if (!mods_included.contains(submodule.value.src_module.name))
+                    mods_included.add(submodule.value.src_module.name)
         }
         mods_included.add(mod.name)
         for (incl_file in mods_included) {

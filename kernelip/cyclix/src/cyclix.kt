@@ -444,7 +444,7 @@ open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct:
         var datain      = wrapped_module.uinput("datain", 0, 0, "0")
         var ap_return   = wrapped_module.uoutput("ap_return", 0, 0, "0")
 
-        var wrapped_module_inst = wrapper_rtl_gen.submodule_bb(name + "_inst", wrapped_module)
+        var wrapped_module_inst = wrapper_rtl_gen.submodule_bb(name + "_inst", wrapped_module, false)
         wrapped_module_inst.connect(ap_clk, clk)
         wrapped_module_inst.connect(ap_rst, rst)
 
