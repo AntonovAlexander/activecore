@@ -12,19 +12,15 @@ KIP core's computational model typically includes:
 * pre-defined data structures and API for flow control, scheduling, communication, and synchronization "services" of the microarchitecture;
 * event model and handler procedures selectively exposed for behavioral-style programming of custom application functions and mechanisms.
 
-KIP core approach serves as intermediate solution for codification of custom microarchitectures between fixed-function IP cores and general-purpose HW synthesis tools:
-
-Fixed-function IP core <------ KIP core ------> General-purpose HW synthesis tool
-
 Compared to other hardware generation frameworks, ActiveCore is constructed according to the following prioritites:
 * Dynamic generation of all hardware-related content, including data instances, structures, dimensions, expressions, procedural blocks, etc;
 * Decoupling generation logic from certain programming styles (e.g. functional one). ActiveCore relies on basic object-oriented capabilities, however, you can use any paradigm in your generators;
 * Reusing generic AST constructor/container of behavioral HW specifications (see **hwast**) for various KIP cores, with its content being freely accessible for analysis and manipulation.
 
 The ultimate goal of the project is to provide top-down methodology and reusable components for explicit allocation of intermediate ***“microarchitectural middleware”*** design level for complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) decouples selected internal management mechanisms from application-specific logic in hardware microarchitectures, addressing:
-* rapid prototyping of functionally differentianted IP blocks with common microarchitectural mechanisms;
-* diversification of responsibility and competence of IP engineers: implementation of engines offering key microarchitectural mechanisms can be charged to the core of leading expert engineers, while developers of final designs can focus solely on application-specific functionality;
-* facilitating IP design centers to package, reuse and deliver templates for ***semi-custom IP cores*** instead of stitching management mechanisms and application-specific logic in monolithic designs.
+* rapid prototyping of ***functionally differentianted*** IP blocks with common microarchitectural mechanisms;
+* ***diversification of responsibility and competence*** of IP engineers: implementation of engines offering key microarchitectural mechanisms can be charged to the core of leading expert engineers, while developers of final designs can focus solely on application-specific functionality;
+* facilitating IP design centers to package, reuse and deliver basis for ***semi-custom IP cores*** instead of stitching management mechanisms and application-specific logic in monolithic designs.
 
 ![pic_test](kernelip/__img/kernelip_model.png)
 
