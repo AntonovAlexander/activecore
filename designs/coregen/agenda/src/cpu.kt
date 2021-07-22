@@ -9,9 +9,10 @@
 package agenda
 
 import hwast.*
+import cyclix.*
 import reordex.*
 
-class CPU_CFG() : Reordex_CFG(32, 32, true,64)
+class CPU_CFG() : Reordex_CFG(32, 32, true,64, 16, REORDEX_MODE.RISC)
 {
     var opcode = AddUImm("opcode", 6)
 
@@ -239,13 +240,12 @@ class EXU_FP_FMA() : reordex.Exu("FP_FMA", CPU_CFG_inst) {
 class cpu(name : String) : reordex.MultiExu(name, CPU_CFG_inst, 4) {
 
     init {
-        add_exu(EXU_ALU_INTEGER(), 4, 4)
-        add_exu(EXU_MUL_DIV(), 1, 2)
-        add_exu(EXU_LSU(), 2, 3)
+        add_exu(EXU_ALU_INTEGER(), 2, 4, STREAM_PREF_IMPL.RTL)
+        add_exu(EXU_MUL_DIV(), 1, 3, STREAM_PREF_IMPL.RTL)
 
-        add_exu(EXU_FP_ADD_SUB(), 2, 4)
-        add_exu(EXU_FP_MUL(), 1, 3)
-        add_exu(EXU_FP_DIV(), 1, 3)
-        add_exu(EXU_FP_FMA(), 1, 3)
+        //add_exu(EXU_FP_ADD_SUB(), 2, 4, STREAM_PREF_IMPL.RTL)
+        //add_exu(EXU_FP_MUL(), 1, 3, STREAM_PREF_IMPL.RTL)
+        //add_exu(EXU_FP_DIV(), 1, 3, STREAM_PREF_IMPL.RTL)
+        //add_exu(EXU_FP_FMA(), 1, 3, STREAM_PREF_IMPL.RTL)
     }
 }

@@ -25,3 +25,6 @@ class hw_fifo_out(name : String, vartype : hw_type)
 
 class hw_fifo_in(name : String, vartype : hw_type)
     : hw_structvar(name, vartype, "0")
+
+var DUMMY_FIFO_IN  = hw_fifo_in("DUMMY", hw_type(DATA_TYPE.BV_UNSIGNED, 0, 0))
+var DUMMY_FIFO_OUT = hw_fifo_out("DUMMY", hw_type(DATA_TYPE.BV_UNSIGNED, 0, 0))

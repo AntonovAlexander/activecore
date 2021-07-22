@@ -18,7 +18,7 @@ Compared to other hardware generation frameworks, ActiveCore is constructed acco
 * Reusing generic AST constructor/container of behavioral HW specifications (see **hwast**) for various KIP cores, with its content being freely accessible for analysis and manipulation.
 
 The ultimate goal of the project is to provide top-down methodology and reusable components for explicit allocation of intermediate ***“microarchitectural middleware”*** design level for complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) decouples selected internal management mechanisms from application-specific logic in hardware microarchitectures, addressing:
-* rapid prototyping of ***functionally differentianted*** IP blocks with common microarchitectural mechanisms;
+* rapid design of ***functionally differentianted*** IP blocks with common microarchitectural mechanisms;
 * ***diversification of responsibility and competence*** of IP engineers: implementation of engines offering key microarchitectural mechanisms can be charged to the core of leading expert engineers, while developers of final designs can focus solely on application-specific functionality;
 * facilitating IP design centers to package, reuse and deliver basis for ***semi-custom IP cores*** instead of stitching management mechanisms and application-specific logic in monolithic designs.
 
@@ -52,6 +52,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 * Demo FPGA-based SoCs:
 	* **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Can be learned within a single lab work, lab work manual included: https://github.com/AntonovAlexander/activecore/blob/master/designs/rtl/sigma/doc/sigma_lab_manual.pdf. Location: /designs/rtl/sigma
 	* **Magma** - NUMA MPSoC consisting of multiple sigma_tile modules connected by Ariele xbar. Location: /designs/rtl/magma
+	* **Kerygma** - MPU based on Agenda OoO CPU. Location: /designs/rtl/kerygma *(in development)*
 
 ### Publications
 
