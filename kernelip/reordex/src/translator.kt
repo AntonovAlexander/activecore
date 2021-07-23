@@ -129,6 +129,8 @@ class rob_buffer(cyclix_gen : cyclix.Generic,
     var curinstr_addr   = DUMMY_VAR
     var nextinstr_addr  = DUMMY_VAR
 
+    var rd_data         = DUMMY_VAR
+
     var mem_req         = DUMMY_VAR
     var mem_cmd         = DUMMY_VAR
     var mem_addr        = DUMMY_VAR
@@ -138,6 +140,8 @@ class rob_buffer(cyclix_gen : cyclix.Generic,
         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
             curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
             nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
+
+            rd_data         = AdduStageVar("rd_data", MultiExu_CFG.RF_width-1, 0, "0")
 
             mem_req         = AdduStageVar("mem_req", 0, 0, "0")
             mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")

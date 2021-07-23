@@ -349,33 +349,71 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cyclix_gen.MSG_COMMENT("ROB committing...")
         rob.preinit_ctrls()
         rob.init_locals()
-        cyclix_gen.begif(rob.ctrl_active)
-        run {
-            cyclix_gen.begif(rob.rdy)
+
+        if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
+            cyclix_gen.begif(rob.ctrl_active)
             run {
-                cyclix_gen.begif(rob.rd_tag_prev_clr)
+                cyclix_gen.begif(rob.rdy)
                 run {
-                    // PRF written, and previous tag can be remapped
-                    cyclix_gen.assign(
-                        PRF_mapped.GetFracRef(rob.rd_tag_prev),
-                        0)
+                    cyclix_gen.begif(rob.rd_tag_prev_clr)
+                    run {
+                        // PRF written, and previous tag can be remapped
+                        cyclix_gen.assign(
+                            PRF_mapped.GetFracRef(rob.rd_tag_prev),
+                            0)
+                    }; cyclix_gen.endif()
+                    cyclix_gen.assign(rob.pop, 1)
                 }; cyclix_gen.endif()
-                cyclix_gen.assign(rob.pop, 1)
             }; cyclix_gen.endif()
-        }; cyclix_gen.endif()
+        } else {
+            var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
+            var mem_data_wdata        = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
+            var mem_data_rdata        = cyclix_gen.local("mem_data_rdata", data_resp_fifo.vartype, "0")
+
+            cyclix_gen.begif(mem_rd_inprogress)
+            run {
+                cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, mem_data_rdata))
+                run {
+                    cyclix_gen.assign(mem_rd_inprogress, 0)
+                    cyclix_gen.assign(rob.pop, 1)
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
+            cyclix_gen.begelse()
+            run {
+                cyclix_gen.assign(rob.pop, 1)
+                cyclix_gen.begif(rob.mem_req)
+                run {
+                    cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), rob.mem_cmd)
+                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), rob.mem_addr)
+                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), rob.mem_be)
+                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), rob.rd_data)
+                    cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata)
+                    cyclix_gen.begif(!rob.mem_cmd)
+                    run {
+                        cyclix_gen.assign(rob.pop, 0)
+                    }; cyclix_gen.endif()
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
+        }
+
         // popping
         cyclix_gen.begif(rob.pop)
         run {
             rob.pop_trx()
         }; cyclix_gen.endif()
+        cyclix_gen.MSG_COMMENT("ROB committing: done")
+
+        cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB...")
         var rob_iter = cyclix_gen.begforall_asc(rob.TRX_BUF)
         run {
-            cyclix_gen.begif(cyclix_gen.eq2(rob_iter.iter_elem.GetFracRef("trx_id"), exu_cdb.GetFracRef(rob_iter.iter_elem.GetFracRef("cdb_id")).GetFracRef("data").GetFracRef("trx_id")))
+            var CDB_ref = exu_cdb.GetFracRef(rob_iter.iter_elem.GetFracRef("cdb_id"))
+            cyclix_gen.begif(cyclix_gen.eq2(rob_iter.iter_elem.GetFracRef("trx_id"), CDB_ref.GetFracRef("data").GetFracRef("trx_id")))
             run {
                 cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rdy"), 1)
+                if (MultiExu_CFG.mode == REORDEX_MODE.RISC) cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rd_data"), CDB_ref.GetFracRef("data").GetFracRef("wdata"))
             }; cyclix_gen.endif()
         }; cyclix_gen.endloop()
-        cyclix_gen.MSG_COMMENT("ROB committing: done")
+        cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
 
         cyclix_gen.MSG_COMMENT("IQ processing: store IQ...")
         store_iq.preinit_ctrls()
