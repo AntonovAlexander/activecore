@@ -848,7 +848,11 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, instr_data_rdata))
             run {
                 cyclix_gen.assign_subStructs(new_renamed_uop, instr_fetch.TRX_LOCAL)
+
+                cyclix_gen.assign(renamed_uop_buf.push, 1)
                 renamed_uop_buf.push_trx(new_renamed_uop)
+
+                cyclix_gen.assign(instr_fetch.pop, 1)
                 instr_fetch.pop_trx()
             }; cyclix_gen.endif()
 
@@ -865,11 +869,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
             cyclix_gen.add_gen(pc, pc, 4)
 
+            cyclix_gen.assign(new_fetch_buf.GetFracRef("enb"), 1)
             cyclix_gen.assign(new_fetch_buf.GetFracRef("nextinstr_addr"), pc)
 
+            cyclix_gen.assign(instr_fetch.push, 1)
             instr_fetch.push_trx(new_fetch_buf)
         }
-
 
         cyclix_gen.MSG_COMMENT("renaming: done")
 
