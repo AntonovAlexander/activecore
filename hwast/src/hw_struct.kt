@@ -17,8 +17,12 @@ open class hw_structvar(var name: String, vartype : hw_type, var defimm : hw_imm
 
     constructor(name: String, vartype : hw_type, defval : String) : this(name, vartype, hw_imm(defval))
     constructor(name: String, VarType : DATA_TYPE, dimensions : hw_dim_static, defval : String) : this(name, hw_type(VarType, dimensions), defval)
+    constructor(name: String, VarType : DATA_TYPE, dimensions : hw_dim_static, defimm : hw_imm) : this(name, hw_type(VarType, dimensions), defimm)
     constructor(name: String, VarType : DATA_TYPE, msb: Int, lsb: Int, defval : String) : this(name, hw_type(VarType, msb, lsb), defval)
+    constructor(name: String, VarType : DATA_TYPE, msb: Int, lsb: Int, defimm : hw_imm) : this(name, hw_type(VarType, msb, lsb), defimm)
     constructor(name: String, VarType : DATA_TYPE, defval : String) : this(name, hw_type(VarType, hw_dim_static(defval)), defval)
+    constructor(name: String, VarType : DATA_TYPE, defimm : hw_imm) : this(name, hw_type(VarType, defimm.dimensions), defimm)
+    constructor(name: String, src_struct : hw_struct, dimensions : hw_dim_static) : this(name, hw_type(src_struct, dimensions), hw_imm(0))
     constructor(name: String, src_struct : hw_struct) : this(name, hw_type(src_struct), "0")
 
     var defval = defimm.imm_value           // TODO: remove

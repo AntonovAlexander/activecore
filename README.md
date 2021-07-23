@@ -7,7 +7,7 @@ ActiveCore is a framework that demonstrates original hardware designing concept 
 
 KIP core is a hardware generator that provides custom synthesizable execution kernel constructed in accordance to certain microarchitectural template. Each KIP core offers hardware description within custom computational model inferred from computational process organization inside hardware microarchitecture, applies microarchitecture-aware optimizations, and generates design specifications in standard RTL/HLS form.
 
-KIP core's computational model typically includes:
+KIP core's computational model is intended to include:
 * special data types exhibiting behavior of "microarchitectural" execution units;
 * pre-defined data structures and API for flow control, scheduling, communication, and synchronization "services" of the microarchitecture;
 * event model and handler procedures selectively exposed for behavioral-style programming of custom application functions and mechanisms.
@@ -52,7 +52,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 * Demo FPGA-based SoCs:
 	* **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Can be learned within a single lab work, lab work manual included: https://github.com/AntonovAlexander/activecore/blob/master/designs/rtl/sigma/doc/sigma_lab_manual.pdf. Location: /designs/rtl/sigma
 	* **Magma** - NUMA MPSoC consisting of multiple sigma_tile modules connected by Ariele xbar. Location: /designs/rtl/magma
-	* **Kerygma** - MPU based on Agenda OoO CPU. Location: /designs/rtl/kerygma *(in development)*
+	* **Kerygma** - MPU based on Agenda CPU. Location: /designs/rtl/kerygma *(in development)*
 
 ### Publications
 

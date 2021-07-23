@@ -35,6 +35,70 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         return AddLocal(new_structvar)
     }
 
+    fun AddStageVar(name : String, vartype : hw_type, defimm : hw_imm) : hw_var {
+        return AddStageVar(hw_structvar(name, vartype, defimm))
+    }
+
+    fun AddStageVar(name : String, vartype : hw_type, defval : String) : hw_var {
+        return AddStageVar(hw_structvar(name, vartype, defval))
+    }
+
+    fun AddStageVar(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_var {
+        return AddStageVar(hw_structvar(name, src_struct_in, dimensions))
+    }
+
+    fun AddStageVar(name : String, src_struct_in : hw_struct) : hw_var {
+        return AddStageVar(hw_structvar(name, src_struct_in))
+    }
+
+    fun AdduStageVar(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, dimensions, defimm))
+    }
+
+    fun AdduStageVar(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, dimensions, defval))
+    }
+
+    fun AdduStageVar(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defimm))
+    }
+
+    fun AdduStageVar(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defval))
+    }
+
+    fun AdduStageVar(name : String, defimm : hw_imm) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, defimm))
+    }
+
+    fun AdduStageVar(name : String, defval : String) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, defval))
+    }
+
+    fun AddsStageVar(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_SIGNED, dimensions, defimm))
+    }
+
+    fun AddsStageVar(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_SIGNED, dimensions, defval))
+    }
+
+    fun AddsStageVar(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_SIGNED, msb, lsb, defimm))
+    }
+
+    fun AddsStageVar(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_SIGNED, msb, lsb, defval))
+    }
+
+    fun AddsStageVar(name : String, defimm : hw_imm) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_SIGNED, defimm))
+    }
+
+    fun AddsStageVar(name : String, defval : String) : hw_var {
+        return AddStageVar(hw_structvar(name, DATA_TYPE.BV_SIGNED, defval))
+    }
+
     fun GetPushTrx(name: String) : hw_var {
         return cyclix_gen.local(name, TRX_BUF.vartype.src_struct)
     }

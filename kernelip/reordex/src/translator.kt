@@ -74,6 +74,26 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
     val rd_tag_prev     = AddStageVar(hw_structvar("rd_tag_prev",       DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
     val rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
     val wb_ext          = AddStageVar(hw_structvar("wb_ext",            DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
+
+    var curinstr_addr   = DUMMY_VAR
+    var nextinstr_addr  = DUMMY_VAR
+
+    var mem_req         = DUMMY_VAR
+    var mem_cmd         = DUMMY_VAR
+    var mem_addr        = DUMMY_VAR
+    var mem_be          = DUMMY_VAR
+
+    init {
+        if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
+            curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
+            nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
+
+            mem_req         = AdduStageVar("mem_req", 0, 0, "0")
+            mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
+            mem_addr        = AdduStageVar("mem_addr", 31, 0, "0")
+            mem_be          = AdduStageVar("mem_be", 3, 0, "0")
+        }
+    }
 }
 
 class iq_buffer(cyclix_gen : cyclix.Generic,
@@ -105,6 +125,26 @@ class rob_buffer(cyclix_gen : cyclix.Generic,
     val rdy             = AddStageVar(hw_structvar("rdy",               DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
     var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0")
+
+    var curinstr_addr   = DUMMY_VAR
+    var nextinstr_addr  = DUMMY_VAR
+
+    var mem_req         = DUMMY_VAR
+    var mem_cmd         = DUMMY_VAR
+    var mem_addr        = DUMMY_VAR
+    var mem_be          = DUMMY_VAR
+
+    init {
+        if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
+            curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
+            nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
+
+            mem_req         = AdduStageVar("mem_req", 0, 0, "0")
+            mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
+            mem_addr        = AdduStageVar("mem_addr", 31, 0, "0")
+            mem_be          = AdduStageVar("mem_be", 3, 0, "0")
+        }
+    }
 }
 
 class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>)
