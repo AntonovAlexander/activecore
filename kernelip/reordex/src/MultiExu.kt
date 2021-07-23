@@ -362,17 +362,20 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             }; cyclix_gen.endif()
             cyclix_gen.begelse()
             run {
-                cyclix_gen.assign(rob.pop, 1)
-                cyclix_gen.begif(rob.mem_req)
+                cyclix_gen.begif(rob.ctrl_active)
                 run {
-                    cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), rob.mem_cmd)
-                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), rob.mem_addr)
-                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), rob.mem_be)
-                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), rob.rd_data)
-                    cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata)
-                    cyclix_gen.begif(!rob.mem_cmd)
+                    cyclix_gen.assign(rob.pop, 1)
+                    cyclix_gen.begif(rob.mem_req)
                     run {
-                        cyclix_gen.assign(rob.pop, 0)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), rob.mem_cmd)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), rob.mem_addr)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), rob.mem_be)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), rob.rd_data)
+                        cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata)
+                        cyclix_gen.begif(!rob.mem_cmd)
+                        run {
+                            cyclix_gen.assign(rob.pop, 0)
+                        }; cyclix_gen.endif()
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
@@ -845,7 +848,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             // instruction fetch/decode
             instr_fetch.preinit_ctrls()
             instr_fetch.init_locals()
-            cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, instr_data_rdata))
+            cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifo, instr_data_rdata))
             run {
                 cyclix_gen.assign_subStructs(new_renamed_uop, instr_fetch.TRX_LOCAL)
 
