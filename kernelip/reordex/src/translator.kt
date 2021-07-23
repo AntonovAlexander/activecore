@@ -151,4 +151,13 @@ class rob_buffer(cyclix_gen : cyclix.Generic,
     }
 }
 
+class instr_fetch_buffer(cyclix_gen : cyclix.Generic,
+                         name_prefix : String,
+                         TRX_BUF_SIZE : Int,
+                         MultiExu_CFG : Reordex_CFG) : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG) {
+
+    val curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")
+    val nextinstr_addr = AdduStageVar("nextinstr_addr", 31, 0, "0")
+}
+
 class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>)

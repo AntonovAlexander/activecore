@@ -75,30 +75,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         }
     }
 
-    /*
-    fun TranslateFifoOut(fifo : hw_fifo_out) : fifo_out_descr {
-        var ret_var = fifo_out_dict[fifo]
-        if (ret_var == null) ERROR("FIFO translation error")
-        return ret_var!!
-    }
-
-    fun TranslateFifoIn(fifo : hw_fifo_in) : fifo_in_descr {
-        var ret_var = fifo_in_dict[fifo]
-        if (ret_var == null) ERROR("FIFO translation error")
-        return ret_var!!
-    }
-    */
-
     fun reconstruct_expression(DEBUG_FLAG : Boolean,
                                cyclix_gen : hw_astc,
                                expr : hw_exec,
                                context : import_expr_context) {
 
         cyclix_gen as cyclix.Streaming
-
-        // cyclix_gen.MSG_COMMENT("#### Cyclix: exporting expression: " + expr.opcode.default_string)
-        // for (param in expr.params) cyclix_gen.MSG_COMMENT("param: " + param.GetString())
-        // for (wrvar in expr.wrvars) cyclix_gen.MSG_COMMENT("wrvar: " + wrvar.name)
 
         cyclix_gen.import_expr(DEBUG_FLAG, expr, context, ::reconstruct_expression)
     }
@@ -851,6 +833,41 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
+
+        } else {
+
+            var pc = cyclix_gen.uglobal("pc", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
+            var instr_fetch = instr_fetch_buffer(cyclix_gen, "instr_fetch", 1, MultiExu_CFG)
+
+            var instr_data_wdata = cyclix_gen.local("instr_data_wdata", instr_req_fifo.vartype, "0")
+            var instr_data_rdata = cyclix_gen.local("instr_data_rdata", instr_resp_fifo.vartype, "0")
+
+            // instruction fetch/decode
+            instr_fetch.preinit_ctrls()
+            instr_fetch.init_locals()
+            cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, instr_data_rdata))
+            run {
+                cyclix_gen.assign_subStructs(new_renamed_uop, instr_fetch.TRX_LOCAL)
+                renamed_uop_buf.push_trx(new_renamed_uop)
+                instr_fetch.pop_trx()
+            }; cyclix_gen.endif()
+
+            // instruction request
+            var new_fetch_buf = instr_fetch.GetPushTrx()
+
+            cyclix_gen.assign(new_fetch_buf.GetFracRef("curinstr_addr"), pc)
+
+            cyclix_gen.assign(instr_data_wdata.GetFracRef("we"), 0)
+            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("addr"), pc)
+            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("be"), 15)
+            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), 0)
+            cyclix_gen.fifo_wr_unblk(instr_req_fifo, instr_data_wdata)
+
+            cyclix_gen.add_gen(pc, pc, 4)
+
+            cyclix_gen.assign(new_fetch_buf.GetFracRef("nextinstr_addr"), pc)
+
+            instr_fetch.push_trx(new_fetch_buf)
         }
 
 
