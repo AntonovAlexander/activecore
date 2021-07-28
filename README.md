@@ -24,6 +24,8 @@ The ultimate goal of the project is to provide top-down methodology and reusable
 
 ![pic_test](kernelip/__img/kernelip_model.png)
 
+Somewhat like RISC-V that standardises (or provides a baseline) for processor architecture, ActiveCore attempts to do the same for microarchitecture.
+
 ### Project structure
 
 Current version of project is implemented as a collection of standalone Kotlin libraries that can be built using IntelliJ IDEA:
