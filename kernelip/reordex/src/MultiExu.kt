@@ -149,8 +149,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         var cmd_req = DUMMY_FIFO_IN
         var cmd_resp = DUMMY_FIFO_OUT
-        var instr_req_fifo = DUMMY_FIFO_OUT
-        var instr_resp_fifo = DUMMY_FIFO_IN
         var data_req_fifo = DUMMY_FIFO_OUT
         var data_resp_fifo = DUMMY_FIFO_IN
 
@@ -170,16 +168,9 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             val instr_name_prefix = "genmcopipe_instr_mem_"
             val data_name_prefix = "genmcopipe_data_mem_"
 
-            var wr_struct = hw_struct("genpmodule_" + name + "_" + instr_name_prefix + "genstruct_fifo_wdata")
-            wr_struct.addu("we", 0, 0, "0")
-            wr_struct.add("wdata", hw_type(busreq_mem_struct), "0")
-
             var rd_struct = hw_struct("genpmodule_" + name + "_" + data_name_prefix + "genstruct_fifo_wdata")
             rd_struct.addu("we", 0, 0, "0")
             rd_struct.add("wdata", hw_type(busreq_mem_struct), "0")
-
-            instr_req_fifo = cyclix_gen.fifo_out((instr_name_prefix + "req"), wr_struct)
-            instr_resp_fifo = cyclix_gen.ufifo_in((instr_name_prefix + "resp"), 31, 0)
 
             data_req_fifo = cyclix_gen.fifo_out((data_name_prefix + "req"), rd_struct)
             data_resp_fifo = cyclix_gen.ufifo_in((data_name_prefix + "resp"), 31, 0)
@@ -189,8 +180,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var cmd_resp_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_resp_data"), hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(MultiExu_CFG.RF_width-1, 0)), "0")
 
         MSG("generating interface structure: done")
-
-        // TODO: external memory interface
 
         MSG("generating internal structures...")
 
@@ -846,44 +835,11 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
 
-            var pc = cyclix_gen.uglobal("pc", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
-            var instr_fetch = instr_fetch_buffer(cyclix_gen, "instr_fetch", 1, MultiExu_CFG)
+            var instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", 1, MultiExu_CFG)
+            var instr_req = instr_req_stage(name, cyclix_gen, instr_fetch)
 
-            var instr_data_wdata = cyclix_gen.local("instr_data_wdata", instr_req_fifo.vartype, "0")
-            var instr_data_rdata = cyclix_gen.local("instr_data_rdata", instr_resp_fifo.vartype, "0")
-
-            // instruction fetch/decode
-            instr_fetch.preinit_ctrls()
-            instr_fetch.init_locals()
-            cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifo, instr_data_rdata))
-            run {
-                cyclix_gen.assign_subStructs(new_renamed_uop, instr_fetch.TRX_LOCAL)
-
-                cyclix_gen.assign(renamed_uop_buf.push, 1)
-                renamed_uop_buf.push_trx(new_renamed_uop)
-
-                cyclix_gen.assign(instr_fetch.pop, 1)
-                instr_fetch.pop_trx()
-            }; cyclix_gen.endif()
-
-            // instruction request
-            var new_fetch_buf = instr_fetch.GetPushTrx()
-
-            cyclix_gen.assign(new_fetch_buf.GetFracRef("curinstr_addr"), pc)
-
-            cyclix_gen.assign(instr_data_wdata.GetFracRef("we"), 0)
-            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("addr"), pc)
-            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("be"), 15)
-            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), 0)
-            cyclix_gen.fifo_wr_unblk(instr_req_fifo, instr_data_wdata)
-
-            cyclix_gen.add_gen(pc, pc, 4)
-
-            cyclix_gen.assign(new_fetch_buf.GetFracRef("enb"), 1)
-            cyclix_gen.assign(new_fetch_buf.GetFracRef("nextinstr_addr"), pc)
-
-            cyclix_gen.assign(instr_fetch.push, 1)
-            instr_fetch.push_trx(new_fetch_buf)
+            instr_fetch.Process(renamed_uop_buf)
+            instr_req.Process()
         }
 
         cyclix_gen.MSG_COMMENT("renaming: done")
