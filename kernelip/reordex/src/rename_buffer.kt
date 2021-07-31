@@ -25,6 +25,8 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
 
     fun Process(rob : rob_buffer, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, exu_descrs : MutableMap<String, __exu_descr>) {
 
+        cyclix_gen.MSG_COMMENT("sending new operations to IQs...")
+
         var rob_push_trx = rob.GetPushTrx()
         cyclix_gen.assign(rob_push_trx.GetFracRef("enb"), 1)
         cyclix_gen.assign(rob_push_trx.GetFracRef("rd_tag_prev"), rd_tag_prev)
@@ -109,6 +111,8 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
             pop_trx()
         }; cyclix_gen.endif()
         finalize_ctrls()               //  TODO: cleanup
+
+        cyclix_gen.MSG_COMMENT("sending new operation to IQs: done")
     }
 }
 
