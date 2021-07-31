@@ -149,31 +149,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         var cmd_req = DUMMY_FIFO_IN
         var cmd_resp = DUMMY_FIFO_OUT
-        var data_req_fifo = DUMMY_FIFO_OUT
-        var data_resp_fifo = DUMMY_FIFO_IN
 
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
             cmd_req = cyclix_gen.fifo_in("cmd_req",  hw_type(cmd_req_struct))
             cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(MultiExu_CFG.RF_width-1, 0)))
 
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
-            var irq_fifo    = cyclix_gen.ufifo_in("irq_fifo", 7, 0)
-
-            var busreq_mem_struct = hw_struct(name + "_busreq_mem_struct")
-
-            busreq_mem_struct.addu("addr",     31, 0, "0")
-            busreq_mem_struct.addu("be",       3,  0, "0")
-            busreq_mem_struct.addu("wdata",    31, 0, "0")
-
-            val instr_name_prefix = "genmcopipe_instr_mem_"
-            val data_name_prefix = "genmcopipe_data_mem_"
-
-            var rd_struct = hw_struct("genpmodule_" + name + "_" + data_name_prefix + "genstruct_fifo_wdata")
-            rd_struct.addu("we", 0, 0, "0")
-            rd_struct.add("wdata", hw_type(busreq_mem_struct), "0")
-
-            data_req_fifo = cyclix_gen.fifo_out((data_name_prefix + "req"), rd_struct)
-            data_resp_fifo = cyclix_gen.ufifo_in((data_name_prefix + "resp"), 31, 0)
         }
 
         var cmd_req_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_req_data"), cmd_req_struct)
@@ -190,7 +171,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         var rob =
             if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob_buffer(cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
-            else rob_buffer_risc(cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
+            else rob_buffer_risc(name, cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
 
         var TranslateInfo = __TranslateInfo()
 
@@ -322,66 +303,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cyclix_gen.MSG_COMMENT("Acquiring EXU CDB: done")
 
         cyclix_gen.MSG_COMMENT("ROB committing...")
-        rob.preinit_ctrls()
-        rob.init_locals()
-
-        if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
-            cyclix_gen.begif(rob.ctrl_active)
-            run {
-                cyclix_gen.begif(rob.rdy)
-                run {
-                    cyclix_gen.begif(rob.rd_tag_prev_clr)
-                    run {
-                        // PRF written, and previous tag can be remapped
-                        cyclix_gen.assign(
-                            PRF_mapped.GetFracRef(rob.rd_tag_prev),
-                            0)
-                    }; cyclix_gen.endif()
-                    cyclix_gen.assign(rob.pop, 1)
-                }; cyclix_gen.endif()
-            }; cyclix_gen.endif()
-
-        } else {    // MultiExu_CFG.mode == REORDEX_MODE.RISC
-            rob as rob_buffer_risc
-
-            var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
-            var mem_data_wdata        = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
-            var mem_data_rdata        = cyclix_gen.local("mem_data_rdata", data_resp_fifo.vartype, "0")
-
-            cyclix_gen.begif(mem_rd_inprogress)
-            run {
-                cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, mem_data_rdata))
-                run {
-                    cyclix_gen.assign(mem_rd_inprogress, 0)
-                    cyclix_gen.assign(rob.pop, 1)
-                }; cyclix_gen.endif()
-            }; cyclix_gen.endif()
-            cyclix_gen.begelse()
-            run {
-                cyclix_gen.begif(rob.ctrl_active)
-                run {
-                    cyclix_gen.assign(rob.pop, 1)
-                    cyclix_gen.begif(rob.mem_req)
-                    run {
-                        cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), rob.mem_cmd)
-                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), rob.mem_addr)
-                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), rob.mem_be)
-                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), rob.rd_data)
-                        cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata)
-                        cyclix_gen.begif(!rob.mem_cmd)
-                        run {
-                            cyclix_gen.assign(rob.pop, 0)
-                        }; cyclix_gen.endif()
-                    }; cyclix_gen.endif()
-                }; cyclix_gen.endif()
-            }; cyclix_gen.endif()
-        }
-
-        // popping
-        cyclix_gen.begif(rob.pop)
-        run {
-            rob.pop_trx()
-        }; cyclix_gen.endif()
+        rob.Commit(PRF_mapped)
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB...")
