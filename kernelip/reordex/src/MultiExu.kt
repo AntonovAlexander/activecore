@@ -507,7 +507,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             frontend.Send_toRenameBuf(renamed_uop_buf)
 
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
-            var instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", 1, MultiExu_CFG)
+            var instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", 1, MultiExu_CFG, global_structures)
             var instr_req = instr_req_stage(name, cyclix_gen, instr_fetch)
 
             instr_fetch.Process(renamed_uop_buf)

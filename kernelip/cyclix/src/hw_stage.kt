@@ -30,6 +30,73 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         return TRX_LOCAL.GetFracRef(new_structvar.name)
     }
 
+    //// Local vars ////
+    fun AddLocal(name : String, vartype : hw_type, defimm : hw_imm) : hw_var {
+        return AddLocal(hw_structvar(name, vartype, defimm))
+    }
+
+    fun AddLocal(name : String, vartype : hw_type, defval : String) : hw_var {
+        return AddLocal(hw_structvar(name, vartype, defval))
+    }
+
+    fun AddLocal(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_var {
+        return AddLocal(hw_structvar(name, src_struct_in, dimensions))
+    }
+
+    fun AddLocal(name : String, src_struct_in : hw_struct) : hw_var {
+        return AddLocal(hw_structvar(name, src_struct_in))
+    }
+
+    fun AdduLocal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, dimensions, defimm))
+    }
+
+    fun AdduLocal(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, dimensions, defval))
+    }
+
+    fun AdduLocal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defimm))
+    }
+
+    fun AdduLocal(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defval))
+    }
+
+    fun AdduLocal(name : String, defimm : hw_imm) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, defimm))
+    }
+
+    fun AdduLocal(name : String, defval : String) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_UNSIGNED, defval))
+    }
+
+    fun AddsLocal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_SIGNED, dimensions, defimm))
+    }
+
+    fun AddsLocal(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_SIGNED, dimensions, defval))
+    }
+
+    fun AddsLocal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_SIGNED, msb, lsb, defimm))
+    }
+
+    fun AddsLocal(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_SIGNED, msb, lsb, defval))
+    }
+
+    fun AddsLocal(name : String, defimm : hw_imm) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_SIGNED, defimm))
+    }
+
+    fun AddsLocal(name : String, defval : String) : hw_var {
+        return AddLocal(hw_structvar(name, DATA_TYPE.BV_SIGNED, defval))
+    }
+    ////////////////////
+
+    //// Stage vars ////
     fun AddStageVar(new_structvar : hw_structvar) : hw_var {
         AddBuf(new_structvar)
         return AddLocal(new_structvar)
@@ -98,6 +165,7 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
     fun AddsStageVar(name : String, defval : String) : hw_var {
         return AddStageVar(hw_structvar(name, DATA_TYPE.BV_SIGNED, defval))
     }
+    ////////////////////
 
     fun GetPushTrx(name: String) : hw_var {
         return cyclix_gen.local(name, TRX_BUF.vartype.src_struct)
