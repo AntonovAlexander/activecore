@@ -153,10 +153,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var instr_resp_fifo = DUMMY_FIFO_IN
         var data_req_fifo = DUMMY_FIFO_OUT
         var data_resp_fifo = DUMMY_FIFO_IN
+
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
             cmd_req = cyclix_gen.fifo_in("cmd_req",  hw_type(cmd_req_struct))
             cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(MultiExu_CFG.RF_width-1, 0)))
-        } else {
+
+        } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
             var irq_fifo    = cyclix_gen.ufifo_in("irq_fifo", 7, 0)
 
             var busreq_mem_struct = hw_struct(name + "_busreq_mem_struct")
@@ -197,7 +199,9 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cdb_struct.add("data", MultiExu_CFG.resp_struct)
         var exu_cdb     = cyclix_gen.local("genexu_cdb", cdb_struct, hw_dim_static(cdb_num-1, 0))
 
-        var rob = rob_buffer(cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
+        var rob =
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob_buffer(cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
+            else rob_buffer_risc(cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
 
         var TranslateInfo = __TranslateInfo()
 
@@ -347,7 +351,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     cyclix_gen.assign(rob.pop, 1)
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
-        } else {
+
+        } else {    // MultiExu_CFG.mode == REORDEX_MODE.RISC
+            rob as rob_buffer_risc
+
             var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
             var mem_data_wdata        = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
             var mem_data_rdata        = cyclix_gen.local("mem_data_rdata", data_resp_fifo.vartype, "0")
@@ -837,7 +844,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
 
-        } else {
+        } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
 
             var pc = cyclix_gen.uglobal("pc", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
             var instr_fetch = instr_fetch_buffer(cyclix_gen, "instr_fetch", 1, MultiExu_CFG)
