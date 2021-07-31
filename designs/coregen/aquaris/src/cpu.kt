@@ -198,7 +198,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
     //// RISC-V pipeline macro-operations ////
 
-    fun process_pc() {
+    fun Pipe_GenInstrAddr() {
         begif(jump_req_cmd)
         run {
             pc.assign(jump_vector_cmd)
@@ -211,7 +211,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         pc.assign_succ(nextinstr_addr)
     }
 
-    fun process_req_instrmem() {
+    fun Pipe_ReqInstrMem() {
         begif(jump_req_cmd)
         run {
             instr_req_done.accum(0)
@@ -231,21 +231,21 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         }; endif()
     }
 
-    fun process_resp_instrmem() {
+    fun Pipe_RespInstrMem() {
         begif(!instr_handle.resp(instr_code))
         run {
             pstall()
         }; endif()
     }
 
-    fun kill_if_jump() {
+    fun Pipe_KillIfJump() {
         begif(jump_req_cmd)
         run {
             pkill()
         }; endif()
     }
 
-    fun process_decode() {
+    fun Pipe_DecodeInstr() {
         opcode.assign(instr_code[6, 0])
         alu_unsigned.assign(0)
 
@@ -704,7 +704,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     // data fetching - reading regfile ##
-    fun process_regfetch () {
+    fun Pipe_RegFetch () {
 
         // unoptimized
         // rs1_rdata.assign(regfile[rs1_addr])
@@ -731,7 +731,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     // unblocking forwarding
-    fun forward_unblk (fw_stage : pipex.hw_pipex_stage) {
+    fun Pipe_ForwardUnblk (fw_stage : pipex.hw_pipex_stage) {
 
         begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
         run {
@@ -762,7 +762,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     // blocking forwarding
-    fun forward_blk (fw_stage : pipex.hw_pipex_stage) {
+    fun Pipe_ForwardBlk (fw_stage : pipex.hw_pipex_stage) {
 
         begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
         run {
@@ -801,7 +801,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     // interlocking
-    fun interlock (fw_stage : pipex.hw_pipex_stage) {
+    fun Pipe_InterlockIfDHazard (fw_stage : pipex.hw_pipex_stage) {
 
         begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
         run {
@@ -826,7 +826,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     // ALU multiplexing
-    fun process_alu_mux() {
+    fun Pipe_ALU_mux() {
         // multiplexing alu ops
         alu_op1.assign(rs1_rdata)
         begcase(op1_source)
@@ -868,7 +868,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         }; endif()
     }
 
-    fun process_irq() {
+    fun Pipe_FetchIrq() {
 
         begif(MIRQEN)
         run {
@@ -915,7 +915,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     // ALU processing ##
-    fun process_alu () {
+    fun Pipe_ALU () {
 
         alu_result_wide.assign(alu_op1_wide)
         begif(alu_req)
@@ -1030,11 +1030,11 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         }; endcase()
     }
 
-    fun process_curinstraddr_imm () {
+    fun Pipe_ComputeCurinstraddrImm () {
         curinstraddr_imm.assign(curinstr_addr + immediate)
     }
 
-    fun process_jump () {
+    fun Pipe_GenJump () {
         begcase(jump_src)
         run {
             begbranch(JMP_SRC_IMM)
@@ -1120,13 +1120,13 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     // mem addr processing
-    fun process_setup_mem_reqdata() {
+    fun Pipe_SetupReqDataMem() {
         mem_addr.assign(alu_result)
         mem_wdata.assign(rs2_rdata)
     }
 
     // branch control
-    fun process_branch() {
+    fun Pipe_SendJump() {
         begif(!jump_req_done)
         run {
             jump_req_cmd.assign(jump_req)
@@ -1135,7 +1135,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         }; endif()
     }
 
-    fun process_req_datamem() {
+    fun Pipe_ReqDataMem() {
         // memory access
 
         begif(mem_req)
@@ -1156,7 +1156,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         }; endif()
     }
 
-    fun process_resp_datamem() {
+    fun Pipe_RespDataMem() {
         begif(mem_req)
         run {
             begif(!mem_cmd)
@@ -1173,7 +1173,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         }; endif()
     }
 
-    fun process_rd_mem_wdata() {
+    fun Pipe_MemRdataToRdWdata() {
 
         begif(eq2(mem_be, 0x1))
         run {
@@ -1205,7 +1205,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         }; endif()
     }
 
-    fun process_wb() {
+    fun Pipe_RegWB() {
         begif(land(rd_req, rd_rdy))
         run {
             assign(regfile.GetFracRef(rd_addr), rd_wdata)
@@ -1227,25 +1227,25 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
             var EXEC = stage_handler("EXEC", STAGE_FC_MODE.FALL_THROUGH)
             EXEC.begin()
             run {
-                process_pc()
-                process_req_instrmem()
-                process_resp_instrmem()
-                process_decode()
-                process_regfetch()
-                process_alu_mux()
-                process_irq()
-                process_alu()
-                process_curinstraddr_imm()
-                process_jump()
-                process_setup_mem_reqdata()
-                process_branch()
+                Pipe_GenInstrAddr()
+                Pipe_ReqInstrMem()
+                Pipe_RespInstrMem()
+                Pipe_DecodeInstr()
+                Pipe_RegFetch()
+                Pipe_ALU_mux()
+                Pipe_FetchIrq()
+                Pipe_ALU()
+                Pipe_ComputeCurinstraddrImm()
+                Pipe_GenJump()
+                Pipe_SetupReqDataMem()
+                Pipe_SendJump()
 
                 // memory access
-                process_req_datamem()
-                process_resp_datamem()
+                Pipe_ReqDataMem()
+                Pipe_RespDataMem()
 
-                process_rd_mem_wdata()
-                process_wb()
+                Pipe_MemRdataToRdWdata()
+                Pipe_RegWB()
 
             }; endstage()
 
@@ -1257,33 +1257,33 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             IFETCH.begin()
             run {
-                process_pc()
-                process_req_instrmem()
+                Pipe_GenInstrAddr()
+                Pipe_ReqInstrMem()
 
             }; endstage()
 
             EXEC.begin()
             run {
-                process_resp_instrmem()
+                Pipe_RespInstrMem()
 
-                process_decode()
-                process_regfetch()
-                process_alu_mux()
+                Pipe_DecodeInstr()
+                Pipe_RegFetch()
+                Pipe_ALU_mux()
 
-                process_irq()
-                process_alu()
-                process_curinstraddr_imm()
-                process_jump()
-                process_setup_mem_reqdata()
+                Pipe_FetchIrq()
+                Pipe_ALU()
+                Pipe_ComputeCurinstraddrImm()
+                Pipe_GenJump()
+                Pipe_SetupReqDataMem()
 
-                process_branch()
+                Pipe_SendJump()
 
                 // memory access
-                process_req_datamem()
-                process_resp_datamem()
+                Pipe_ReqDataMem()
+                Pipe_RespDataMem()
 
-                process_rd_mem_wdata()
-                process_wb()
+                Pipe_MemRdataToRdWdata()
+                Pipe_RegWB()
 
             }; endstage()
 
@@ -1295,38 +1295,38 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             IFETCH.begin()
             run {
-                process_pc()
-                process_req_instrmem()
+                Pipe_GenInstrAddr()
+                Pipe_ReqInstrMem()
 
             }; endstage()
 
             EXEC.begin()
             run {
-                kill_if_jump()
-                process_resp_instrmem()
+                Pipe_KillIfJump()
+                Pipe_RespInstrMem()
 
-                process_decode()
-                process_regfetch()
-                interlock(MEMWB)
-                process_alu_mux()
-                process_irq()
+                Pipe_DecodeInstr()
+                Pipe_RegFetch()
+                Pipe_InterlockIfDHazard(MEMWB)
+                Pipe_ALU_mux()
+                Pipe_FetchIrq()
 
-                process_alu()
-                process_curinstraddr_imm()
-                process_jump()
-                process_setup_mem_reqdata()
+                Pipe_ALU()
+                Pipe_ComputeCurinstraddrImm()
+                Pipe_GenJump()
+                Pipe_SetupReqDataMem()
             }; endstage()
 
             MEMWB.begin()
             run {
-                process_branch()
+                Pipe_SendJump()
 
                 // memory access
-                process_req_datamem()
-                process_resp_datamem()
+                Pipe_ReqDataMem()
+                Pipe_RespDataMem()
 
-                process_rd_mem_wdata()
-                process_wb()
+                Pipe_MemRdataToRdWdata()
+                Pipe_RegWB()
 
             }; endstage()
 
@@ -1339,44 +1339,44 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             IFETCH.begin()
             run {
-                process_pc()
-                process_req_instrmem()
+                Pipe_GenInstrAddr()
+                Pipe_ReqInstrMem()
 
             }; endstage()
 
             IDECODE.begin()
             run {
-                kill_if_jump()
-                process_resp_instrmem()
-                process_decode()
-                process_regfetch()
-                forward_blk(MEMWB)
-                forward_blk(EXEC)
-                process_alu_mux()
+                Pipe_KillIfJump()
+                Pipe_RespInstrMem()
+                Pipe_DecodeInstr()
+                Pipe_RegFetch()
+                Pipe_ForwardBlk(MEMWB)
+                Pipe_ForwardBlk(EXEC)
+                Pipe_ALU_mux()
 
             }; endstage()
 
             EXEC.begin()
             run {
-                kill_if_jump()
-                process_irq()
-                process_alu()
-                process_curinstraddr_imm()
+                Pipe_KillIfJump()
+                Pipe_FetchIrq()
+                Pipe_ALU()
+                Pipe_ComputeCurinstraddrImm()
 
             }; endstage()
 
             MEMWB.begin()
             run {
-                process_jump()
-                process_setup_mem_reqdata()
-                process_branch()
+                Pipe_GenJump()
+                Pipe_SetupReqDataMem()
+                Pipe_SendJump()
 
                 // memory access
-                process_req_datamem()
-                process_resp_datamem()
+                Pipe_ReqDataMem()
+                Pipe_RespDataMem()
 
-                process_rd_mem_wdata()
-                process_wb()
+                Pipe_MemRdataToRdWdata()
+                Pipe_RegWB()
 
             }; endstage()
 
@@ -1390,50 +1390,50 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             IFETCH.begin()
             run {
-                process_pc()
-                process_req_instrmem()
+                Pipe_GenInstrAddr()
+                Pipe_ReqInstrMem()
 
             }; endstage()
 
             IDECODE.begin()
             run {
-                kill_if_jump()
+                Pipe_KillIfJump()
 
-                process_resp_instrmem()
-                process_decode()
-                process_regfetch()
+                Pipe_RespInstrMem()
+                Pipe_DecodeInstr()
+                Pipe_RegFetch()
 
-                forward_blk(WB)
-                forward_blk(MEM)
-                forward_blk(EXEC)
+                Pipe_ForwardBlk(WB)
+                Pipe_ForwardBlk(MEM)
+                Pipe_ForwardBlk(EXEC)
 
-                process_alu_mux()
+                Pipe_ALU_mux()
 
             }; endstage()
 
             EXEC.begin()
             run {
-                kill_if_jump()
-                process_irq()
-                process_alu()
-                process_curinstraddr_imm()
-                process_jump()
-                process_setup_mem_reqdata()
+                Pipe_KillIfJump()
+                Pipe_FetchIrq()
+                Pipe_ALU()
+                Pipe_ComputeCurinstraddrImm()
+                Pipe_GenJump()
+                Pipe_SetupReqDataMem()
 
             }; endstage()
 
             MEM.begin()
             run {
-                process_branch()
-                process_req_datamem()
+                Pipe_SendJump()
+                Pipe_ReqDataMem()
 
             }; endstage()
 
             WB.begin()
             run {
-                process_resp_datamem()
-                process_rd_mem_wdata()
-                process_wb()
+                Pipe_RespDataMem()
+                Pipe_MemRdataToRdWdata()
+                Pipe_RegWB()
 
             }; endstage()
 
@@ -1448,55 +1448,55 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             IADDR.begin()
             run {
-                process_pc()
+                Pipe_GenInstrAddr()
             }; endstage()
 
             IFETCH.begin()
             run {
-                kill_if_jump()
-                process_req_instrmem()
+                Pipe_KillIfJump()
+                Pipe_ReqInstrMem()
 
             }; endstage()
 
             IDECODE.begin()
             run {
-                kill_if_jump()
+                Pipe_KillIfJump()
 
-                process_resp_instrmem()
-                process_decode()
-                process_regfetch()
+                Pipe_RespInstrMem()
+                Pipe_DecodeInstr()
+                Pipe_RegFetch()
 
-                forward_blk(WB)
-                forward_blk(MEM)
-                forward_blk(EXEC)
+                Pipe_ForwardBlk(WB)
+                Pipe_ForwardBlk(MEM)
+                Pipe_ForwardBlk(EXEC)
 
-                process_alu_mux()
+                Pipe_ALU_mux()
 
             }; endstage()
 
             EXEC.begin()
             run {
-                kill_if_jump()
-                process_irq()
-                process_alu()
+                Pipe_KillIfJump()
+                Pipe_FetchIrq()
+                Pipe_ALU()
 
             }; endstage()
 
             MEM.begin()
             run {
-                process_curinstraddr_imm()
-                process_jump()
-                process_setup_mem_reqdata()
-                process_branch()
-                process_req_datamem()
+                Pipe_ComputeCurinstraddrImm()
+                Pipe_GenJump()
+                Pipe_SetupReqDataMem()
+                Pipe_SendJump()
+                Pipe_ReqDataMem()
 
             }; endstage()
 
             WB.begin()
             run {
-                process_resp_datamem()
-                process_rd_mem_wdata()
-                process_wb()
+                Pipe_RespDataMem()
+                Pipe_MemRdataToRdWdata()
+                Pipe_RegWB()
 
             }; endstage()
 
