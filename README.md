@@ -41,9 +41,9 @@ Current version of project is implemented as a collection of standalone Kotlin l
 ![pic_test](kernelip/__img/kernelip_overview.png)
 
 * Demo core generators based on KIP cores (/designs/coregen):
+	* **taylor_credit_pipeline** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex KIP core. Location: /designs/rtl/credit_test
 	* **Aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex KIP core
 	* **Ariele** - full xbar generator, based on Pipex KIP core
-	* **taylor_credit_pipeline** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex KIP core. Location: /designs/rtl/credit_test
 	* **Citadel** - OoO FPU coprocessor, based on Reordex KIP core
 	* **Agenda** - OoO RISC-V CPU, based on Reordex KIP core *(in development)*
 

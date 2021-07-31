@@ -70,47 +70,47 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
     }
 
     operator fun not(): hw_var {
-        return default_astc.AddExpr_op1(OP1_BITWISE_NOT, this)
+        return default_astc.bnot(this)
     }
 
     operator fun plus(src: hw_param): hw_var {
-        return default_astc.AddExpr_op2(OP2_ARITH_ADD, this, src)
+        return default_astc.add(this, src)
     }
 
     operator fun plus(src: Int): hw_var {
-        return default_astc.AddExpr_op2(OP2_ARITH_ADD, this, src)
+        return default_astc.add(this, src)
     }
 
     operator fun minus(src: hw_param): hw_var {
-        return default_astc.AddExpr_op2(OP2_ARITH_SUB, this, src)
+        return default_astc.sub(this, src)
     }
 
     operator fun minus(src: Int): hw_var {
-        return default_astc.AddExpr_op2(OP2_ARITH_SUB, this, src)
+        return default_astc.sub(this, src)
     }
 
     operator fun times(src: hw_param): hw_var {
-        return default_astc.AddExpr_op2(OP2_ARITH_MUL, this, src)
+        return default_astc.mul(this, src)
     }
 
     operator fun times(src: Int): hw_var {
-        return default_astc.AddExpr_op2(OP2_ARITH_MUL, this, src)
+        return default_astc.mul(this, src)
     }
 
     operator fun div(src: hw_param): hw_var {
-        return default_astc.AddExpr_op2(OP2_ARITH_DIV, this, src)
+        return default_astc.div(this, src)
     }
 
     operator fun div(src: Int): hw_var {
-        return default_astc.AddExpr_op2(OP2_ARITH_DIV, this, src)
+        return default_astc.div(this, src)
     }
 
     operator fun rem(src: hw_param): hw_var {
-        return default_astc.AddExpr_op2(OP2_ARITH_MOD, this, src)
+        return default_astc.mod(this, src)
     }
 
     operator fun rem(src: Int): hw_var {
-        return default_astc.AddExpr_op2(OP2_ARITH_MOD, this, src)
+        return default_astc.mod(this, src)
     }
 
     operator fun get(index: hw_param): hw_var {

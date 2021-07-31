@@ -68,19 +68,19 @@ open class hw_astc() : ArrayList<hw_exec>() {
         FROZEN_FLAG = true
     }
 
-    fun AddWrVar(new_wrvar: hw_var) {
+    protected fun AddWrVar(new_wrvar: hw_var) {
         for (cur_exec in this) {
             cur_exec.AddWrVar(new_wrvar)
         }
     }
 
-    fun AddRdVar(new_rdvar: hw_var) {
+    protected fun AddRdVar(new_rdvar: hw_var) {
         for (cur_exec in this) {
             cur_exec.AddRdVar(new_rdvar)
         }
     }
 
-    fun AddGenVar(new_genvar: hw_var) {
+    protected fun AddGenVar(new_genvar: hw_var) {
         for (cur_exec in this) {
             cur_exec.AddGenVar(new_genvar)
         }
@@ -88,7 +88,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         if (new_genvar is hw_var_frac) new_genvar.src_var.default_astc = this
     }
 
-    fun DistributeVars(new_expr: hw_exec) {
+    protected fun DistributeVars(new_expr: hw_exec) {
 
         for (new_wrvar in new_expr.wrvars) {
             AddWrVar(new_wrvar)
@@ -107,7 +107,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         }
     }
 
-    fun AddExpr(new_expr: hw_exec) {
+    protected fun AddExpr(new_expr: hw_exec) {
         if (FROZEN_FLAG) ERROR("Failed to add operation " + new_expr.opcode.default_string + ": ASTC frozen")
         if (size == 0) ERROR("Exec stack size error on opcode: " + new_expr.opcode.default_string + ", exec size: " + size)
         DistributeVars(new_expr)
@@ -115,7 +115,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         last().cursor++
     }
 
-    fun AddExpr_op_gen(opcode: hw_opcode, tgt: hw_var, srcs: ArrayList<hw_param>) {
+    protected fun AddExpr_op_gen(opcode: hw_opcode, tgt: hw_var, srcs: ArrayList<hw_param>) {
         var new_expr = hw_exec(opcode)
         new_expr.AddTgt(tgt)
         for (new_src in srcs) {
@@ -124,7 +124,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         AddExpr(new_expr)
     }
 
-    fun AddExpr_op_gen_withgen(opcode: hw_opcode, target: hw_var, params: ArrayList<hw_param>) {
+    protected fun AddExpr_op_gen_withgen(opcode: hw_opcode, target: hw_var, params: ArrayList<hw_param>) {
         var new_expr = hw_exec(opcode)
         new_expr.AddTgt(target)
         //MSG("opcode: " + opcode.default_string)
@@ -137,27 +137,27 @@ open class hw_astc() : ArrayList<hw_exec>() {
         AddExpr(new_expr)
     }
 
-    fun AddExpr_op1_gen(opcode: hw_opcode, tgt: hw_var, src: hw_param) {
+    protected fun AddExpr_op1_gen(opcode: hw_opcode, tgt: hw_var, src: hw_param) {
         var srcs = ArrayList<hw_param>()
         srcs.add(src)
         AddExpr_op_gen(opcode, tgt, srcs)
     }
 
-    fun AddExpr_op2_gen(opcode: hw_opcode, tgt: hw_var, src0: hw_param, src1: hw_param) {
+    protected fun AddExpr_op2_gen(opcode: hw_opcode, tgt: hw_var, src0: hw_param, src1: hw_param) {
         var srcs = ArrayList<hw_param>()
         srcs.add(src0)
         srcs.add(src1)
         AddExpr_op_gen(opcode, tgt, srcs)
     }
 
-    fun AddExpr_op2_gen(opcode: hw_opcode, tgt: hw_var, src0: hw_param, src1: Int) {
+    protected fun AddExpr_op2_gen(opcode: hw_opcode, tgt: hw_var, src0: hw_param, src1: Int) {
         var srcs = ArrayList<hw_param>()
         srcs.add(src0)
         srcs.add(hw_imm(src1))
         AddExpr_op_gen(opcode, tgt, srcs)
     }
 
-    fun AddExpr_op3_gen(opcode: hw_opcode, tgt: hw_var, src0: hw_param, src1: hw_param, src2: hw_param) {
+    protected fun AddExpr_op3_gen(opcode: hw_opcode, tgt: hw_var, src0: hw_param, src1: hw_param, src2: hw_param) {
         var srcs = ArrayList<hw_param>()
         srcs.add(src0)
         srcs.add(src1)
@@ -165,7 +165,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         AddExpr_op_gen(opcode, tgt, srcs)
     }
 
-    fun op2_gen_dimensions(opcode: hw_opcode, dim0: hw_dim_static, dim1: hw_dim_static): hw_dim_static {
+    protected fun op2_gen_dimensions(opcode: hw_opcode, dim0: hw_dim_static, dim1: hw_dim_static): hw_dim_static {
 
         var dim0_anlz = hw_dim_static()
         for (dim in dim0) dim0_anlz.add(dim)
@@ -255,7 +255,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return gen_dim
     }
 
-    fun op_generate_genvar(opcode: hw_opcode, params: ArrayList<hw_param>): hw_var {
+    protected fun op_generate_genvar(opcode: hw_opcode, params: ArrayList<hw_param>): hw_var {
         //MSG("op_generate_genvar, opcode: " + opcode.default_string)
         if ((opcode == OP1_BITWISE_NOT)
                 || (opcode == OP1_LOGICAL_NOT)
@@ -384,42 +384,42 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return hw_var(GetGenName("var"), DUMMY_STRUCT, 0, 0)
     }
 
-    fun AddExpr_op(opcode: hw_opcode, srcs: ArrayList<hw_param>): hw_var {
+    protected fun AddExpr_op(opcode: hw_opcode, srcs: ArrayList<hw_param>): hw_var {
         var genvar = op_generate_genvar(opcode, srcs)
         AddExpr_op_gen_withgen(opcode, genvar, srcs)
         return genvar
     }
 
-    fun AddExpr_op1(opcode: hw_opcode, src: hw_param): hw_var {
+    protected fun AddExpr_op1(opcode: hw_opcode, src: hw_param): hw_var {
         var srcs = ArrayList<hw_param>()
         srcs.add(src)
         return AddExpr_op(opcode, srcs)
     }
 
-    fun AddExpr_op1(opcode: hw_opcode, src: Int): hw_var {
+    protected fun AddExpr_op1(opcode: hw_opcode, src: Int): hw_var {
         return AddExpr_op1(opcode, hw_imm(src))
     }
 
-    fun AddExpr_op2(opcode: hw_opcode, src0: hw_param, src1: hw_param): hw_var {
+    protected fun AddExpr_op2(opcode: hw_opcode, src0: hw_param, src1: hw_param): hw_var {
         var srcs = ArrayList<hw_param>()
         srcs.add(src0)
         srcs.add(src1)
         return AddExpr_op(opcode, srcs)
     }
 
-    fun AddExpr_op2(opcode: hw_opcode, src0: hw_param, src1: Int): hw_var {
+    protected fun AddExpr_op2(opcode: hw_opcode, src0: hw_param, src1: Int): hw_var {
         return AddExpr_op2(opcode, src0, hw_imm(src1))
     }
 
-    fun AddExpr_op2(opcode: hw_opcode, src0: Int, src1: hw_param): hw_var {
+    protected fun AddExpr_op2(opcode: hw_opcode, src0: Int, src1: hw_param): hw_var {
         return AddExpr_op2(opcode, hw_imm(src0), src1)
     }
 
-    fun AddExpr_op2(opcode: hw_opcode, src0: Int, src1: Int): hw_var {
+    protected fun AddExpr_op2(opcode: hw_opcode, src0: Int, src1: Int): hw_var {
         return AddExpr_op2(opcode, hw_imm(src0), hw_imm(src1))
     }
 
-    fun AddExpr_op3(opcode: hw_opcode, src0: hw_param, src1: hw_param, src2: hw_param): hw_var {
+    protected fun AddExpr_op3(opcode: hw_opcode, src0: hw_param, src1: hw_param, src2: hw_param): hw_var {
         var srcs = ArrayList<hw_param>()
         srcs.add(src0)
         srcs.add(src1)
