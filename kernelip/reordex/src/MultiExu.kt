@@ -130,7 +130,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var PRF_src = cyclix_gen.uglobal("genPRF_src", prf_src_dim, "0") // uncomputed PRF sources
 
         var exu_descrs = mutableMapOf<String, __exu_descr>()
-        var global_structures = __global_structures(PRF, PRF_mapped, PRF_rdy, ARF_map, PRF_src, ExecUnits, exu_descrs)
+        var global_structures = __global_structures(cyclix_gen, MultiExu_CFG, PRF, PRF_mapped, PRF_rdy, ARF_map, PRF_src, ExecUnits, exu_descrs)
 
         MSG("generating control structures: done")
 
@@ -277,7 +277,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cyclix_gen.MSG_COMMENT("Acquiring EXU CDB: done")
 
         cyclix_gen.MSG_COMMENT("ROB committing...")
-        rob.Commit(PRF_mapped)
+        rob.Commit(global_structures)
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB...")

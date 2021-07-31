@@ -24,7 +24,7 @@ open class rob_buffer(cyclix_gen : cyclix.Generic,
 
     var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", GetWidthToContain(TRX_BUF_SIZE) -1, 0, "0")
 
-    open fun Commit(PRF_mapped: hw_var) {
+    open fun Commit(global_structures: __global_structures) {
         preinit_ctrls()
         init_locals()
 
@@ -34,10 +34,7 @@ open class rob_buffer(cyclix_gen : cyclix.Generic,
             run {
                 cyclix_gen.begif(rd_tag_prev_clr)
                 run {
-                    // PRF written, and previous tag can be remapped
-                    cyclix_gen.assign(
-                        PRF_mapped.GetFracRef(rd_tag_prev),
-                        0)
+                    global_structures.FreePRF(rd_tag_prev)
                 }; cyclix_gen.endif()
                 cyclix_gen.assign(pop, 1)
             }; cyclix_gen.endif()
@@ -77,7 +74,7 @@ class rob_buffer_risc(name: String,
 
     var irq_fifo    = cyclix_gen.ufifo_in("irq_fifo", 7, 0)
 
-    override fun Commit(PRF_mapped: hw_var) {
+    override fun Commit(global_structures: __global_structures) {
 
         busreq_mem_struct.addu("addr",     31, 0, "0")
         busreq_mem_struct.addu("be",       3,  0, "0")

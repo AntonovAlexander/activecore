@@ -158,18 +158,16 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
 
                 var rss_tags = ArrayList<hw_var>()
                 for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
-                    rss_tags.add(cyclix_gen.indexed(global_structures.ARF_map, cmd_req_data.GetFracRef("fu_rs" + RF_rs_idx)))
+                    rss_tags.add(global_structures.RenameRs(cmd_req_data.GetFracRef("fu_rs" + RF_rs_idx)))
                 }
-                var rd_tag = cyclix_gen.indexed(global_structures.ARF_map, cmd_req_data.GetFracRef("fu_rd"))
+                var rd_tag = global_structures.RenameRs(cmd_req_data.GetFracRef("fu_rd"))
 
-                for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                    for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
                     cyclix_gen.assign(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_tag"), rss_tags[RF_rs_idx])
-                    cyclix_gen.assign(
-                        new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdata"),
-                        cyclix_gen.indexed(global_structures.PRF, new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_tag")))
+                    global_structures.FetchRs(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdata"), new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_tag"))
                 }
 
-                var alloc_rd_tag = cyclix_gen.min0(global_structures.PRF_mapped)
+                var alloc_rd_tag = global_structures.GetFreePRF()
 
                 cyclix_gen.begif(cmd_req_data.GetFracRef("exec"))
                 run {
@@ -256,4 +254,33 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
     }
 }
 
-class __global_structures(val PRF : hw_var, val PRF_mapped : hw_var, val PRF_rdy : hw_var, val ARF_map : hw_var, val PRF_src : hw_var, val ExecUnits : MutableMap<String, Exu_CFG>, val exu_descrs : MutableMap<String, __exu_descr>)
+class __global_structures(val cyclix_gen : cyclix.Generic,
+                          val MultiExu_CFG : Reordex_CFG,
+                          val PRF : hw_var,
+                          val PRF_mapped : hw_var,
+                          val PRF_rdy : hw_var,
+                          val ARF_map : hw_var,
+                          val PRF_src : hw_var,
+                          val ExecUnits : MutableMap<String, Exu_CFG>,
+                          val exu_descrs : MutableMap<String, __exu_descr>) {
+
+    fun RenameRs(src_addr : hw_param) : hw_var {
+        return cyclix_gen.indexed(ARF_map, src_addr)
+    }
+
+    fun FetchRs(tgt_rdata : hw_var, src_tag : hw_param) {
+        cyclix_gen.assign(
+            tgt_rdata,
+            cyclix_gen.indexed(PRF, src_tag))
+    }
+
+    fun GetFreePRF() : hwast.hw_astc.bit_position {
+        return cyclix_gen.min0(PRF_mapped)
+    }
+
+    fun FreePRF(src_tag : hw_param) {
+        cyclix_gen.assign(
+            PRF_mapped.GetFracRef(src_tag),
+            0)
+    }
+}
