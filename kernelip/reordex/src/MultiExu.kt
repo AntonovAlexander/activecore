@@ -482,7 +482,9 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             fu_id++
         }
 
-        var renamed_uop_buf     = rename_buffer(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, cdb_num)
+        var renamed_uop_buf =
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rename_buffer(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, cdb_num)
+            else rename_buffer_risc(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, cdb_num)
 
         renamed_uop_buf.preinit_ctrls()
         renamed_uop_buf.init_locals()
