@@ -23,7 +23,7 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
     val rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
     val wb_ext          = AddStageVar(hw_structvar("wb_ext",            DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
-    fun Process(rob : rob_buffer, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, exu_descrs : MutableMap<String, __exu_descr>) {
+    fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, exu_descrs : MutableMap<String, __exu_descr>) {
 
         cyclix_gen.MSG_COMMENT("sending new operations to IQs...")
 
@@ -126,8 +126,86 @@ class rename_buffer_risc(cyclix_gen : cyclix.Generic,
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
 
+    // opcode signals
+    //var opcode          = AdduStageVar("opcode", 6, 0, "0")
+
+    // control transfer signals
+    var jump_req        = AdduStageVar("jump_req", 0, 0, "0")
+    var jump_req_cond   = AdduStageVar("jump_req_cond", 0, 0, "0")
+    var jump_src        = AdduStageVar("jump_src", 0, 0, "0")
+    var jump_vector     = AdduStageVar("jump_vector", 31, 0, "0")
+
+    // regfile control signals
+    var rs1_req         = AdduStageVar("rs1_req", 0, 0, "0")
+    var rs1_addr        = AdduStageVar("rs1_addr", 4, 0, "0")
+    //var rs1_rdata       = AdduStageVar("rs1_rdata", 31, 0, "0")
+
+    var rs2_req         = AdduStageVar("rs2_req", 0, 0, "0")
+    var rs2_addr        = AdduStageVar("rs2_addr", 4, 0, "0")
+    //var rs2_rdata       = AdduStageVar("rs2_rdata", 31, 0, "0")
+
+    var csr_rdata       = AdduStageVar("csr_rdata", 31, 0, "0")
+
+    var rd_req          = AdduStageVar("rd_req", 0, 0, "0")
+    var rd_source       = AdduStageVar("rd_source", 2, 0, "0")
+    var rd_addr         = AdduStageVar("rd_addr", 4, 0, "0")
+    var rd_wdata        = AdduStageVar("rd_wdata", 31, 0, "0")
+    var rd_rdy          = AdduStageVar("rd_rdy", 0, 0, "0")
+
+    var immediate_I     = AdduStageVar("immediate_I", 31, 0, "0")
+    var immediate_S     = AdduStageVar("immediate_S", 31, 0, "0")
+    var immediate_B     = AdduStageVar("immediate_B", 31, 0, "0")
+    var immediate_U     = AdduStageVar("immediate_U", 31, 0, "0")
+    var immediate_J     = AdduStageVar("immediate_J", 31, 0, "0")
+
+    var immediate       = AdduStageVar("immediate", 31, 0, "0")
+
+    var curinstraddr_imm    = AdduStageVar("curinstraddr_imm", 31, 0, "0")
+
+    var funct3          = AdduStageVar("funct3", 2, 0, "0")
+    var funct7          = AdduStageVar("funct7", 6, 0, "0")
+    var shamt           = AdduStageVar("shamt", 4, 0, "0")
+
+    var fencereq        = AdduStageVar("fencereq", 0, 0, "0")
+    var pred            = AdduStageVar("pred", 3, 0, "0")
+    var succ            = AdduStageVar("succ", 3, 0, "0")
+
+    var ecallreq        = AdduStageVar("ecallreq", 0, 0, "0")
+    var ebreakreq       = AdduStageVar("ebreakreq", 0, 0, "0")
+
+    var csrreq          = AdduStageVar("csrreq", 0, 0, "0")
+    var csrnum          = AdduStageVar("csrnum", 11, 0, "0")
+    var zimm            = AdduStageVar("zimm", 4, 0, "0")
+
+    var op1_source      = AdduStageVar("op1_source", 1, 0, "0")
+    var op2_source      = AdduStageVar("op2_source", 1, 0, "0")
+
+    // ALU control
+    var alu_req         = AdduStageVar("alu_req", 0, 0, "0")
+    var alu_op1         = AdduStageVar("alu_op1", 31, 0, "0")
+    var alu_op2         = AdduStageVar("alu_op2", 31, 0, "0")
+    var alu_op1_wide    = AdduStageVar("alu_op1_wide", 32, 0, "0")
+    var alu_op2_wide    = AdduStageVar("alu_op2_wide", 32, 0, "0")
+    var alu_opcode      = AdduStageVar("alu_opcode", 3, 0, "0")
+    var alu_unsigned    = AdduStageVar("alu_unsigned", 0, 0, "0")
+
+    var alu_result_wide = AdduStageVar("alu_result_wide", 32, 0, "0")
+    var alu_result      = AdduStageVar("alu_result", 31, 0, "0")
+    var alu_CF          = AdduStageVar("alu_CF", 0, 0, "0")
+    var alu_SF          = AdduStageVar("alu_SF", 0, 0, "0")
+    var alu_ZF          = AdduStageVar("alu_ZF", 0, 0, "0")
+    var alu_OF          = AdduStageVar("alu_OF", 0, 0, "0")
+    var alu_overflow    = AdduStageVar("alu_overflow", 0, 0, "0")
+
+    // data memory control
     var mem_req         = AdduStageVar("mem_req", 0, 0, "0")
     var mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
     var mem_addr        = AdduStageVar("mem_addr", 31, 0, "0")
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
+    var mem_wdata       = AdduStageVar("mem_wdata", 31, 0, "0")
+    var mem_rdata       = AdduStageVar("mem_rdata", 31, 0, "0")
+    var mem_rshift      = AdduStageVar("mem_rshift", 0, 0, "0")
+    var load_signext    = AdduStageVar("load_signext", 0, 0, "0")
+
+    var mret_req        = AdduStageVar("mret_req", 0, 0, "0")
 }

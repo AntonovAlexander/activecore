@@ -145,8 +145,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var exu_cdb     = cyclix_gen.local("genexu_cdb", cdb_struct, hw_dim_static(cdb_num-1, 0))
 
         var rob =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob_buffer(cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
-            else rob_buffer_risc(name, cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob(cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
+            else rob_risc(name, cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
 
         var TranslateInfo = __TranslateInfo()
 

@@ -1,5 +1,5 @@
 /*
- * rob_buffer.kt
+ * reorder_buffer.kt
  *
  *  Created on: 24.12.2020
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
@@ -10,11 +10,11 @@ package reordex
 
 import hwast.*
 
-open class rob_buffer(cyclix_gen : cyclix.Generic,
-                      name_prefix : String,
-                      TRX_BUF_SIZE : Int,
-                      MultiExu_CFG : Reordex_CFG,
-                      val cdb_num : Int) : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG) {
+open class rob(cyclix_gen : cyclix.Generic,
+               name_prefix : String,
+               TRX_BUF_SIZE : Int,
+               MultiExu_CFG : Reordex_CFG,
+               val cdb_num : Int) : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG) {
 
     var trx_id          = AddStageVar(hw_structvar("trx_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(MultiExu_CFG.trx_inflight_num) -1, 0, "0"))
     var rd_tag_prev     = AddStageVar(hw_structvar("rd_tag_prev",       DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
@@ -48,12 +48,12 @@ open class rob_buffer(cyclix_gen : cyclix.Generic,
     }
 }
 
-class rob_buffer_risc(name: String,
-                      cyclix_gen : cyclix.Generic,
-                      name_prefix : String,
-                      TRX_BUF_SIZE : Int,
-                      MultiExu_CFG : Reordex_CFG,
-                      cdb_num : Int) : rob_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, cdb_num) {
+class rob_risc(name: String,
+               cyclix_gen : cyclix.Generic,
+               name_prefix : String,
+               TRX_BUF_SIZE : Int,
+               MultiExu_CFG : Reordex_CFG,
+               cdb_num : Int) : rob(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, cdb_num) {
 
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
@@ -64,6 +64,12 @@ class rob_buffer_risc(name: String,
     var mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
     var mem_addr        = AdduStageVar("mem_addr", 31, 0, "0")
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
+
+    // control transfer signals
+    var jump_req        = AdduLocal("jump_req", 0, 0, "0")
+    var jump_req_cond   = AdduLocal("jump_req_cond", 0, 0, "0")
+    var jump_src        = AdduLocal("jump_src", 0, 0, "0")
+    var jump_vector     = AdduLocal("jump_vector", 31, 0, "0")
 
     var busreq_mem_struct = hw_struct(name + "_busreq_mem_struct")
     val data_name_prefix = "genmcopipe_data_mem_"
