@@ -810,9 +810,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
                     cyclix_gen.assign(nru_rd_tag_prev, rd_tag)
                     cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped, rd_tag))
 
-                    cyclix_gen.assign(global_structures.ARF_map.GetFracRef(cmd_req_data.GetFracRef("fu_rd")), alloc_rd_tag.position)
-                    cyclix_gen.assign(global_structures.PRF_mapped.GetFracRef(alloc_rd_tag.position), 1)
-                    cyclix_gen.assign(global_structures.PRF_rdy.GetFracRef(alloc_rd_tag.position), 0)
+                    global_structures.ReserveRd(cmd_req_data.GetFracRef("fu_rd"), alloc_rd_tag.position)
 
                     cyclix_gen.assign(nru_rdy, 0)
                     cyclix_gen.assign(nru_wb_ext, 0)
@@ -831,11 +829,8 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
                         cyclix_gen.assign(nru_rd_tag, alloc_rd_tag.position)        // TODO: check for availability flag
                         cyclix_gen.assign(nru_rd_tag_prev, rd_tag)
                         cyclix_gen.assign(nru_rd_tag_prev_clr, global_structures.PRF_mapped.GetFracRef(rd_tag))
-                        cyclix_gen.assign(global_structures.PRF_mapped.GetFracRef(alloc_rd_tag.position), 1)
 
-                        cyclix_gen.assign(global_structures.ARF_map.GetFracRef(cmd_req_data.GetFracRef("fu_rd")), alloc_rd_tag.position)
-                        cyclix_gen.assign(global_structures.PRF_rdy.GetFracRef(alloc_rd_tag.position), 1)
-                        cyclix_gen.assign(global_structures.PRF.GetFracRef(alloc_rd_tag.position), cmd_req_data.GetFracRef("rf_wdata"))
+                        global_structures.ReserveWriteRd(cmd_req_data.GetFracRef("fu_rd"), alloc_rd_tag.position, cmd_req_data.GetFracRef("rf_wdata"))
 
                     }; cyclix_gen.endif()
 
@@ -894,6 +889,24 @@ class __global_structures(val cyclix_gen : cyclix.Generic,
 
     fun GetFreePRF() : hwast.hw_astc.bit_position {
         return cyclix_gen.min0(PRF_mapped)
+    }
+
+    fun ReserveRd(src_rd : hw_param, src_tag : hw_param) {
+        cyclix_gen.assign(ARF_map.GetFracRef(src_rd), src_tag)
+        cyclix_gen.assign(PRF_mapped.GetFracRef(src_tag), 1)
+        cyclix_gen.assign(PRF_rdy.GetFracRef(src_tag), 0)
+    }
+
+    fun ReserveWriteRd(src_rd : hw_param, src_tag : hw_param, src_wdata : hw_param) {
+        cyclix_gen.assign(ARF_map.GetFracRef(src_rd), src_tag)
+        cyclix_gen.assign(PRF_mapped.GetFracRef(src_tag), 1)
+        cyclix_gen.assign(PRF_rdy.GetFracRef(src_tag), 1)
+        cyclix_gen.assign(PRF.GetFracRef(src_tag), src_wdata)
+    }
+
+    fun WriteRd(src_tag : hw_param, src_wdata : hw_param) {
+        cyclix_gen.assign(PRF_rdy.GetFracRef(src_tag), 1)
+        cyclix_gen.assign(PRF.GetFracRef(src_tag), src_wdata)
     }
 
     fun FreePRF(src_tag : hw_param) {
