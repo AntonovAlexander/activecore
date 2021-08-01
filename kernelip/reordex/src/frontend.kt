@@ -744,6 +744,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
 
                 cyclix_gen.assign(nru_fu_id,      cmd_req_data.GetFracRef("fu_id"))
 
+                // getting imms from req
                 for (imm_idx in 0 until MultiExu_CFG.imms.size) {
                     cyclix_gen.assign(
                         new_renamed_uop.GetFracRef(MultiExu_CFG.imms[imm_idx].name),
@@ -774,7 +775,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
                 }
                 var rd_tag = global_structures.RenameRs(cmd_req_data.GetFracRef("fu_rd"))
 
-                    for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
                     cyclix_gen.assign(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_tag"), rss_tags[RF_rs_idx])
                     global_structures.FetchRs(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdata"), new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_tag"))
                 }
@@ -788,6 +789,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
 
                     for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
 
+                        // processing RS use mask
                         var nru_rs_use = nru_rs_use_mask.GetFracRef(RF_rs_idx)
                         var exu_descr_idx = 0
                         for (exu_descr in global_structures.exu_descrs) {
@@ -801,7 +803,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
                         // fetching rdy flags from PRF_rdy and masking with rsX_req
                         cyclix_gen.assign(
                             new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdy"),
-                            cyclix_gen.bor(global_structures.PRF_rdy.GetFracRef(rss_tags[RF_rs_idx]), !nru_rs_use))
+                            cyclix_gen.bor(global_structures.FetchRsRdy(rss_tags[RF_rs_idx]), !nru_rs_use))
                     }
 
                     cyclix_gen.assign(nru_rd_tag, alloc_rd_tag.position)            // TODO: check for availability flag
@@ -884,6 +886,10 @@ class __global_structures(val cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(
             tgt_rdata,
             cyclix_gen.indexed(PRF, src_tag))
+    }
+
+    fun FetchRsRdy(src_index : hw_param) : hw_var {
+        return PRF_rdy.GetFracRef(src_index)
     }
 
     fun GetFreePRF() : hwast.hw_astc.bit_position {
