@@ -14,7 +14,7 @@ import reordex.*
 
 class CPU_CFG() : Reordex_CFG(32, 32, true,64, 16, REORDEX_MODE.RISC)
 {
-    var opcode = AddUImm("opcode", 6)
+    var opcode = AddSrcUImm("opcode", 6)
 
     var rs0 = AddRs()
     var rs1 = AddRs()

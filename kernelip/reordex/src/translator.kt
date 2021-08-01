@@ -48,8 +48,8 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
     val rdy         = AddStageVar(hw_structvar("rdy", DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
     init {
-        for (imm_idx in 0 until MultiExu_CFG.imms.size) {
-            imm_rsrv.add(AddStageVar(hw_structvar(MultiExu_CFG.imms[imm_idx].name, MultiExu_CFG.imms[imm_idx].vartype, MultiExu_CFG.imms[imm_idx].defimm)))
+        for (imm_idx in 0 until MultiExu_CFG.src_imms.size) {
+            imm_rsrv.add(AddStageVar(hw_structvar(MultiExu_CFG.src_imms[imm_idx].name, MultiExu_CFG.src_imms[imm_idx].vartype, MultiExu_CFG.src_imms[imm_idx].defimm)))
         }
         for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
             rs_rsrv.add(__RF_rs_req(

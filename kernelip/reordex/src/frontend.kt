@@ -746,8 +746,8 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
         cmd_req_struct.addu("rf_addr",    MultiExu_CFG.ARF_addr_width-1, 0, "0")
         cmd_req_struct.addu("rf_wdata",    MultiExu_CFG.RF_width-1, 0, "0")
         cmd_req_struct.addu("fu_id",    GetWidthToContain(global_structures.ExecUnits.size)-1, 0, "0")
-        for (imm_idx in 0 until MultiExu_CFG.imms.size) {
-            cmd_req_struct.add("fu_imm_" + MultiExu_CFG.imms[imm_idx].name, MultiExu_CFG.imms[imm_idx].vartype, MultiExu_CFG.imms[imm_idx].defimm)
+        for (imm_idx in 0 until MultiExu_CFG.src_imms.size) {
+            cmd_req_struct.add("fu_imm_" + MultiExu_CFG.src_imms[imm_idx].name, MultiExu_CFG.src_imms[imm_idx].vartype, MultiExu_CFG.src_imms[imm_idx].defimm)
         }
         for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
             cmd_req_struct.addu("fu_rs" + RF_rs_idx, MultiExu_CFG.ARF_addr_width-1, 0, "0")
@@ -776,10 +776,10 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
                 cyclix_gen.assign(nru_fu_id,      cmd_req_data.GetFracRef("fu_id"))
 
                 // getting imms from req
-                for (imm_idx in 0 until MultiExu_CFG.imms.size) {
+                for (imm_idx in 0 until MultiExu_CFG.src_imms.size) {
                     cyclix_gen.assign(
-                        new_renamed_uop.GetFracRef(MultiExu_CFG.imms[imm_idx].name),
-                        cmd_req_data.GetFracRef("fu_imm_" + MultiExu_CFG.imms[imm_idx].name))
+                        new_renamed_uop.GetFracRef(MultiExu_CFG.src_imms[imm_idx].name),
+                        cmd_req_data.GetFracRef("fu_imm_" + MultiExu_CFG.src_imms[imm_idx].name))
                 }
 
                 // LOAD/STORE commutation

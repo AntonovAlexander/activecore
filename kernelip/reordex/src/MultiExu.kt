@@ -29,18 +29,32 @@ open class Reordex_CFG(val RF_width : Int,
     var req_struct = hw_struct("req_struct")
     var resp_struct = hw_struct("resp_struct")
 
-    var imms = ArrayList<hw_var>()
-    fun AddImm(name : String, new_type : hw_type) : hw_var {
+    var src_imms = ArrayList<hw_var>()
+    fun AddSrcImm(name : String, new_type : hw_type) : hw_var {
         var new_var = hw_var(name, new_type, "0")
         req_struct.add(name, new_type, "0")
-        imms.add(new_var)
+        src_imms.add(new_var)
         return new_var
     }
-    fun AddUImm(name : String, new_width : Int) : hw_var {
-        return AddImm(name, hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(new_width)))
+    fun AddSrcUImm(name : String, new_width : Int) : hw_var {
+        return AddSrcImm(name, hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(new_width)))
     }
-    fun AddSImm(name : String, new_width : Int) : hw_var {
-        return AddImm(name, hw_type(DATA_TYPE.BV_SIGNED, hw_dim_static(new_width)))
+    fun AddSrcSImm(name : String, new_width : Int) : hw_var {
+        return AddSrcImm(name, hw_type(DATA_TYPE.BV_SIGNED, hw_dim_static(new_width)))
+    }
+
+    var dst_imms = ArrayList<hw_var>()
+    fun AddDstImm(name : String, new_type : hw_type) : hw_var {
+        var new_var = hw_var(name, new_type, "0")
+        resp_struct.add(name, new_type, "0")
+        dst_imms.add(new_var)
+        return new_var
+    }
+    fun AddDstUImm(name : String, new_width : Int) : hw_var {
+        return AddDstImm(name, hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(new_width)))
+    }
+    fun AddDstSImm(name : String, new_width : Int) : hw_var {
+        return AddDstImm(name, hw_type(DATA_TYPE.BV_SIGNED, hw_dim_static(new_width)))
     }
 
     var rss = ArrayList<hw_var>()
@@ -185,8 +199,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             MSG("generating locals...")
             for (local in ExUnit.value.ExecUnit.locals)
                 new_exu_descr.var_dict.put(local, exu_cyclix_gen.local(local.name, local.vartype, local.defimm))
-            for (imm_num in 0 until ExUnit.value.ExecUnit.imms.size)
-                new_exu_descr.var_dict.put(MultiExu_CFG.imms[imm_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.imms[imm_num]!!]!!)
+            for (imm_num in 0 until ExUnit.value.ExecUnit.src_imms.size)
+                new_exu_descr.var_dict.put(MultiExu_CFG.src_imms[imm_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.src_imms[imm_num]!!]!!)
             for (rs_num in 0 until ExUnit.value.ExecUnit.rss.size)
                 new_exu_descr.var_dict.put(MultiExu_CFG.rss[rs_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.rss[rs_num]!!]!!)
             MSG("generating locals: done")
@@ -205,8 +219,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
             exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict), exu_cyclix_gen.stream_req_var)
 
-            for (imm_num in 0 until MultiExu_CFG.imms.size) {
-                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.imms[imm_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), MultiExu_CFG.imms[imm_num].name))
+            for (imm_num in 0 until MultiExu_CFG.src_imms.size) {
+                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.src_imms[imm_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), MultiExu_CFG.src_imms[imm_num].name))
             }
             for (rs_num in 0 until MultiExu_CFG.rss.size) {
                 exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.rss[rs_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), "rs" + rs_num + "_rdata"))
