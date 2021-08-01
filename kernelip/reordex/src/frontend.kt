@@ -220,6 +220,8 @@ class instr_fetch_buffer(name: String,
     var rs1_rdy         = AdduLocal("rs1_rdy", 0, 0, "0")
     var rs1_tag         = AdduLocal("rs1_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
 
+    var rd_tag          = AdduLocal("rd_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+
     fun Process(renamed_uop_buf : rename_buffer) {
 
         var new_renamed_uop = renamed_uop_buf.GetPushTrx()
@@ -698,6 +700,8 @@ class instr_fetch_buffer(name: String,
             rs1_tag.assign(global_structures.RenameRs(rs1_addr))
             global_structures.FetchRs(rs1_rdata, global_structures.RenameRs(rs1_addr))
 
+            rd_tag.assign(global_structures.RenameRs(rd_addr))
+
             rs0_rdy.assign(1)
             cyclix_gen.begif(rs0_req)
             run {
@@ -713,6 +717,12 @@ class instr_fetch_buffer(name: String,
             cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
             cyclix_gen.assign(renamed_uop_buf.push, 1)
             renamed_uop_buf.push_trx(new_renamed_uop)
+
+            cyclix_gen.begif(rd_req)
+            run {
+                var alloc_rd_tag = global_structures.GetFreePRF()
+                global_structures.ReserveRd(rd_tag, alloc_rd_tag.position)      // TODO: "found" processing
+            }; cyclix_gen.endif()
 
             cyclix_gen.assign(pop, 1)
             pop_trx()

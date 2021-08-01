@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="riscv_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_kerygma_tile_sv " />
+            <top_module name="\$unit_sfr_sv " />
+            <top_module name="glbl" />
+            <top_module name="riscv_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="395001fs"></ZoomEndTime>
+      <Cursor1Time time="193000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="485"></NameColumnWidth>
+      <ValueColumnWidth column_width="261"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="11" />
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map" type="array">
+      <obj_property name="ElementShortName">genARF_map[31:0][5:0]</obj_property>
+      <obj_property name="ObjectShortName">genARF_map[31:0][5:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genPRF" type="array">
+      <obj_property name="ElementShortName">genPRF[63:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF[63:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genPRF_mapped" type="array">
+      <obj_property name="ElementShortName">genPRF_mapped[63:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF_mapped[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genPRF_rdy" type="array">
+      <obj_property name="ElementShortName">genPRF_rdy[63:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF_rdy[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genPRF_src" type="array">
+      <obj_property name="ElementShortName">genPRF_src[63:0][1:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF_src[63:0][1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="group121" type="group">
+      <obj_property name="label">instr bus</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="group123" type="group">
+         <obj_property name="label">instr req</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_instr_mem_req_genfifo_req_o" type="array">
+            <obj_property name="ElementShortName">genmcopipe_instr_mem_req_genfifo_req_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_instr_mem_req_genfifo_req_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_instr_mem_req_genfifo_wdata_bo" type="array">
+            <obj_property name="ElementShortName">genmcopipe_instr_mem_req_genfifo_wdata_bo</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_instr_mem_req_genfifo_wdata_bo</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_instr_mem_req_genfifo_ack_i" type="array">
+            <obj_property name="ElementShortName">genmcopipe_instr_mem_req_genfifo_ack_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_instr_mem_req_genfifo_ack_i[0:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group124" type="group">
+         <obj_property name="label">instr  resp</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_instr_mem_resp_genfifo_req_i" type="array">
+            <obj_property name="ElementShortName">genmcopipe_instr_mem_resp_genfifo_req_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_instr_mem_resp_genfifo_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_instr_mem_resp_genfifo_rdata_bi" type="array">
+            <obj_property name="ElementShortName">genmcopipe_instr_mem_resp_genfifo_rdata_bi[31:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_instr_mem_resp_genfifo_rdata_bi[31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_instr_mem_resp_genfifo_ack_o" type="array">
+            <obj_property name="ElementShortName">genmcopipe_instr_mem_resp_genfifo_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_instr_mem_resp_genfifo_ack_o[0:0]</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group87" type="group">
+      <obj_property name="label">instr_fetch</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/instr_fetch_TRX_BUF" type="array">
+         <obj_property name="ElementShortName">instr_fetch_TRX_BUF[0:0]</obj_property>
+         <obj_property name="ObjectShortName">instr_fetch_TRX_BUF[0:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/instr_fetch_TRX_BUF_COUNTER" type="array">
+         <obj_property name="ElementShortName">instr_fetch_TRX_BUF_COUNTER[0:0]</obj_property>
+         <obj_property name="ObjectShortName">instr_fetch_TRX_BUF_COUNTER[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/instr_fetch_TRX_BUF_COUNTER_NEMPTY" type="array">
+         <obj_property name="ElementShortName">instr_fetch_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         <obj_property name="ObjectShortName">instr_fetch_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/instr_fetch_TRX_BUF_COUNTER_FULL" type="array">
+         <obj_property name="ElementShortName">instr_fetch_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+         <obj_property name="ObjectShortName">instr_fetch_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group92" type="group">
+      <obj_property name="label">genrenamed_uop_buf</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrenamed_uop_buf_push" type="array">
+         <obj_property name="ElementShortName">genrenamed_uop_buf_push[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genrenamed_uop_buf_push[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrenamed_uop_buf_pop" type="array">
+         <obj_property name="ElementShortName">genrenamed_uop_buf_pop[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genrenamed_uop_buf_pop[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrenamed_uop_buf_TRX_BUF_COUNTER" type="array">
+         <obj_property name="ElementShortName">genrenamed_uop_buf_TRX_BUF_COUNTER[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genrenamed_uop_buf_TRX_BUF_COUNTER[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrenamed_uop_buf_TRX_BUF_COUNTER_NEMPTY" type="array">
+         <obj_property name="ElementShortName">genrenamed_uop_buf_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genrenamed_uop_buf_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrenamed_uop_buf_TRX_BUF_COUNTER_FULL" type="array">
+         <obj_property name="ElementShortName">genrenamed_uop_buf_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genrenamed_uop_buf_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrenamed_uop_buf_TRX_BUF" type="array">
+         <obj_property name="ElementShortName">genrenamed_uop_buf_TRX_BUF[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genrenamed_uop_buf_TRX_BUF[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrenamed_uop_buf_TRX_LOCAL" type="array">
+         <obj_property name="ElementShortName">genrenamed_uop_buf_TRX_LOCAL</obj_property>
+         <obj_property name="ObjectShortName">genrenamed_uop_buf_TRX_LOCAL</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group100" type="group">
+      <obj_property name="label">rob</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrob_push" type="array">
+         <obj_property name="ElementShortName">genrob_push[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genrob_push[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrob_pop" type="array">
+         <obj_property name="ElementShortName">genrob_pop[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genrob_pop[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrob_TRX_BUF_COUNTER_FULL" type="array">
+         <obj_property name="ElementShortName">genrob_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genrob_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrob_TRX_ID_COUNTER" type="array">
+         <obj_property name="ElementShortName">genrob_TRX_ID_COUNTER[5:0]</obj_property>
+         <obj_property name="ObjectShortName">genrob_TRX_ID_COUNTER[5:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensticky_genrob_TRX_BUF_COUNTER" type="array">
+         <obj_property name="ElementShortName">gensticky_genrob_TRX_BUF_COUNTER[5:0]</obj_property>
+         <obj_property name="ObjectShortName">gensticky_genrob_TRX_BUF_COUNTER[5:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensticky_genrob_TRX_BUF_COUNTER_NEMPTY" type="array">
+         <obj_property name="ElementShortName">gensticky_genrob_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensticky_genrob_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensticky_genrob_TRX_BUF_COUNTER_FULL" type="array">
+         <obj_property name="ElementShortName">gensticky_genrob_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensticky_genrob_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensticky_genrob_TRX_ID_COUNTER" type="array">
+         <obj_property name="ElementShortName">gensticky_genrob_TRX_ID_COUNTER[5:0]</obj_property>
+         <obj_property name="ObjectShortName">gensticky_genrob_TRX_ID_COUNTER[5:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensticky_genrob_TRX_BUF" type="array">
+         <obj_property name="ElementShortName">gensticky_genrob_TRX_BUF[63:0]</obj_property>
+         <obj_property name="ObjectShortName">gensticky_genrob_TRX_BUF[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrob_TRX_LOCAL" type="array">
+         <obj_property name="ElementShortName">genrob_TRX_LOCAL</obj_property>
+         <obj_property name="ObjectShortName">genrob_TRX_LOCAL</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group122" type="group">
+      <obj_property name="label">data bus</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="group125" type="group">
+         <obj_property name="label">data req</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_data_mem_req_genfifo_req_o" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_req_genfifo_req_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_req_genfifo_req_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_data_mem_req_genfifo_wdata_bo" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_req_genfifo_wdata_bo</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_req_genfifo_wdata_bo</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_data_mem_req_genfifo_ack_i" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_req_genfifo_ack_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_req_genfifo_ack_i[0:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group126" type="group">
+         <obj_property name="label">data resp</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_data_mem_resp_genfifo_req_i" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_resp_genfifo_req_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_resp_genfifo_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_data_mem_resp_genfifo_rdata_bi" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_resp_genfifo_rdata_bi[31:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_resp_genfifo_rdata_bi[31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_data_mem_resp_genfifo_ack_o" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_resp_genfifo_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_resp_genfifo_ack_o[0:0]</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+</wave_config>
