@@ -24,7 +24,7 @@ open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
 
     var imms        = ArrayList<hw_var>()
     var rss         = ArrayList<hw_var>()
-    var result      = ulocal("result", Exu_CFG.RF_width-1, 0, "0")
+    var rd0         = ulocal("rd0", Exu_CFG.RF_width-1, 0, "0")
 
     init {
         if (FROZEN_FLAG) ERROR("Failed to begin stage " + name + ": ASTC frozen")

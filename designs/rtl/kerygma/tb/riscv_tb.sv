@@ -110,7 +110,7 @@ begin
 	//udm.wr32(CSR_LED_ADDR, 32'hdeadbeef);
 	//udm.rd32(CSR_SW_ADDR);
 	
-	WAIT(5000);
+	WAIT(1000);
 
 	$display ("### TEST PROCEDURE FINISHED ###");
 	$stop;
