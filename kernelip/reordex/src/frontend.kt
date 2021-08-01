@@ -138,13 +138,13 @@ class instr_fetch_buffer(name: String,
     var jump_vector     = AdduLocal("jump_vector", 31, 0, "0")
 
     // regfile control signals
+    var rs0_req         = AdduLocal("rs0_req", 0, 0, "0")
+    var rs0_addr        = AdduLocal("rs0_addr", 4, 0, "0")
+    var rs0_rdata       = AdduLocal("rs0_rdata", 31, 0, "0")
+
     var rs1_req         = AdduLocal("rs1_req", 0, 0, "0")
     var rs1_addr        = AdduLocal("rs1_addr", 4, 0, "0")
     var rs1_rdata       = AdduLocal("rs1_rdata", 31, 0, "0")
-
-    var rs2_req         = AdduLocal("rs2_req", 0, 0, "0")
-    var rs2_addr        = AdduLocal("rs2_addr", 4, 0, "0")
-    var rs2_rdata       = AdduLocal("rs2_rdata", 31, 0, "0")
 
     var csr_rdata       = AdduLocal("csr_rdata", 31, 0, "0")
 
@@ -213,6 +213,12 @@ class instr_fetch_buffer(name: String,
 
     var MRETADDR        = cyclix_gen.uglobal("MRETADDR", 31, 0, "0")
 
+    //////////
+    var rs0_rdy         = AdduLocal("rs0_rdy", 0, 0, "0")
+    var rs0_tag         = AdduLocal("rs0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+
+    var rs1_rdy         = AdduLocal("rs1_rdy", 0, 0, "0")
+    var rs1_tag         = AdduLocal("rs1_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
 
     fun Process(renamed_uop_buf : rename_buffer) {
 
@@ -231,8 +237,8 @@ class instr_fetch_buffer(name: String,
             opcode.assign(instr_code[6, 0])
             alu_unsigned.assign(0)
 
-            rs1_addr.assign(instr_code[19, 15])
-            rs2_addr.assign(instr_code[24, 20])
+            rs0_addr.assign(instr_code[19, 15])
+            rs1_addr.assign(instr_code[24, 20])
             rd_addr.assign(instr_code[11, 7])
 
             funct3.assign(instr_code[14, 12])
@@ -308,7 +314,7 @@ class instr_fetch_buffer(name: String,
 
                 cyclix_gen.begbranch(opcode_JALR)
                 run {
-                    rs1_req.assign(1)
+                    rs0_req.assign(1)
                     op1_source.assign(OP1_SRC_RS1)
                     op2_source.assign(OP2_SRC_IMM)
                     alu_req.assign(1)
@@ -322,8 +328,8 @@ class instr_fetch_buffer(name: String,
 
                 cyclix_gen.begbranch(opcode_BRANCH)
                 run {
+                    rs0_req.assign(1)
                     rs1_req.assign(1)
-                    rs2_req.assign(1)
                     alu_req.assign(1)
                     alu_opcode.assign(aluop_SUB)
                     jump_req_cond.assign(1)
@@ -338,7 +344,7 @@ class instr_fetch_buffer(name: String,
 
                 cyclix_gen.begbranch(opcode_LOAD)
                 run {
-                    rs1_req.assign(1)
+                    rs0_req.assign(1)
                     op1_source.assign(OP1_SRC_RS1)
                     op2_source.assign(OP2_SRC_IMM)
                     rd_req.assign(1)
@@ -351,8 +357,8 @@ class instr_fetch_buffer(name: String,
 
                 cyclix_gen.begbranch(opcode_STORE)
                 run {
+                    rs0_req.assign(1)
                     rs1_req.assign(1)
-                    rs2_req.assign(1)
                     op1_source.assign(OP1_SRC_RS1)
                     op2_source.assign(OP2_SRC_IMM)
                     alu_req.assign(1)
@@ -363,7 +369,7 @@ class instr_fetch_buffer(name: String,
 
                 cyclix_gen.begbranch(opcode_OP_IMM)
                 run {
-                    rs1_req.assign(1)
+                    rs0_req.assign(1)
                     op1_source.assign(OP1_SRC_RS1)
                     op2_source.assign(OP2_SRC_IMM)
                     rd_req.assign(1)
@@ -447,8 +453,8 @@ class instr_fetch_buffer(name: String,
 
                 cyclix_gen.begbranch(opcode_OP)
                 run {
+                    rs0_req.assign(1)
                     rs1_req.assign(1)
-                    rs2_req.assign(1)
                     op1_source.assign(OP1_SRC_RS1)
                     op2_source.assign(OP2_SRC_RS2)
                     rd_req.assign(1)
@@ -564,7 +570,7 @@ class instr_fetch_buffer(name: String,
                         cyclix_gen.begbranch(0x1)
                         run {
                             csrreq.assign(1)
-                            rs1_req.assign(1)
+                            rs0_req.assign(1)
                             rd_req.assign(1)
                             rd_source.assign(RD_CSR)
                             op1_source.assign(OP1_SRC_RS1)
@@ -575,7 +581,7 @@ class instr_fetch_buffer(name: String,
                         cyclix_gen.begbranch(0x2)
                         run {
                             csrreq.assign(1)
-                            rs1_req.assign(1)
+                            rs0_req.assign(1)
                             rd_req.assign(1)
                             rd_source.assign(RD_CSR)
                             alu_req.assign(1)
@@ -588,7 +594,7 @@ class instr_fetch_buffer(name: String,
                         cyclix_gen.begbranch(0x3)
                         run {
                             csrreq.assign(1)
-                            rs1_req.assign(1)
+                            rs0_req.assign(1)
                             rd_req.assign(1)
                             rd_source.assign(RD_CSR)
                             alu_req.assign(1)
@@ -686,8 +692,23 @@ class instr_fetch_buffer(name: String,
 
             ////////////////////////
 
+            rs0_tag.assign(global_structures.RenameRs(rs0_addr))
+            global_structures.FetchRs(rs0_rdata, rs0_tag)
+
+            rs1_tag.assign(global_structures.RenameRs(rs1_addr))
             global_structures.FetchRs(rs1_rdata, global_structures.RenameRs(rs1_addr))
-            global_structures.FetchRs(rs2_rdata, global_structures.RenameRs(rs2_addr))
+
+            rs0_rdy.assign(1)
+            cyclix_gen.begif(rs0_req)
+            run {
+                rs0_rdy.assign(global_structures.FetchRsRdy(rs0_tag))
+            }; cyclix_gen.endif()
+
+            rs1_rdy.assign(1)
+            cyclix_gen.begif(rs1_req)
+            run {
+                rs1_rdy.assign(global_structures.FetchRsRdy(rs1_tag))
+            }; cyclix_gen.endif()
 
             cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
             cyclix_gen.assign(renamed_uop_buf.push, 1)
@@ -874,13 +895,13 @@ class __global_structures(val cyclix_gen : cyclix.Generic,
                           val exu_descrs : MutableMap<String, __exu_descr>) {
 
     fun RenameRs(src_addr : hw_param) : hw_var {
-        return cyclix_gen.indexed(ARF_map, src_addr)
+        return ARF_map.GetFracRef(src_addr)
     }
 
     fun FetchRs(tgt_rdata : hw_var, src_tag : hw_param) {
         cyclix_gen.assign(
             tgt_rdata,
-            cyclix_gen.indexed(PRF, src_tag))
+            PRF.GetFracRef(src_tag))
     }
 
     fun FetchRsRdy(src_index : hw_param) : hw_var {
