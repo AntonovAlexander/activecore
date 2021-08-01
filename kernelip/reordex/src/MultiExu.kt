@@ -51,9 +51,16 @@ open class Reordex_CFG(val RF_width : Int,
         return new_var
     }
 
+    var rds = ArrayList<hw_var>()
+    fun AddRd() : hw_var {
+        var new_var = hw_var("rd" + rds.size, RF_width-1, 0, "0")
+        req_struct.addu("rd" + rds.size + "_tag", RF_width-1, 0, "0")
+        rds.add(new_var)
+        return new_var
+    }
+
     init {
         req_struct.addu("trx_id",     31, 0, "0")       // TODO: clean up
-        req_struct.addu("rd_tag",     31, 0, "0")       // TODO: clean up
         resp_struct.addu("trx_id",     31, 0, "0")      // TODO: clean up
         resp_struct.addu("tag",     31, 0, "0")         // TODO: clean up
         resp_struct.addu("wdata",     RF_width-1, 0, "0")
@@ -215,7 +222,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict).GetFracRef("wdata"), TranslateVar(ExUnit.value.ExecUnit.result, new_exu_descr.var_dict) )
 
             exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var, TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict))
-            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("tag"), exu_cyclix_gen.stream_req_var.GetFracRef("rd_tag"))
+            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("tag"), exu_cyclix_gen.stream_req_var.GetFracRef("rd0_tag"))
             exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("trx_id"), exu_cyclix_gen.stream_req_var.GetFracRef("trx_id"))
 
             exu_cyclix_gen.end()
@@ -339,7 +346,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     var iq_entry            = IQ_inst.TRX_BUF.GetFracRef(iq_iter.iter_num)
                     var iq_entry_enb        = iq_entry.GetFracRef("enb")
                     var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
-                    var iq_entry_rd_tag     = iq_entry.GetFracRef("rd_tag")
+                    var iq_entry_rd0_tag     = iq_entry.GetFracRef("rd0_tag")
                     var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
 
                     cyclix_gen.begif(iq_entry_enb)
@@ -451,7 +458,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 var iq_entry            = IQ_inst.TRX_BUF.GetFracRef(iq_iter.iter_num)
                 var iq_entry_enb        = iq_entry.GetFracRef("enb")
                 var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
-                var iq_entry_rd_tag     = iq_entry.GetFracRef("rd_tag")
+                var iq_entry_rd0_tag     = iq_entry.GetFracRef("rd0_tag")
                 var iq_entry_wb_ext     = iq_entry.GetFracRef("wb_ext")
                 var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
 

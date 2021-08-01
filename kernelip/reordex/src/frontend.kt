@@ -760,7 +760,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
         var nru_fu_req          = new_renamed_uop.GetFracRef("fu_req")
         var nru_fu_id           = new_renamed_uop.GetFracRef("fu_id")
         var nru_wb_ext          = new_renamed_uop.GetFracRef("wb_ext")
-        var nru_rd_tag          = new_renamed_uop.GetFracRef("rd_tag")
+        var nru_rd_tag          = new_renamed_uop.GetFracRef("rd0_tag")
         var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
         var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
         var nru_rs_use_mask     = cyclix_gen.ulocal("genrs_use_mask", MultiExu_CFG.rss.size-1, 0, "0")

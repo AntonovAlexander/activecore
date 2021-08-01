@@ -19,6 +19,8 @@ class FPU_CFG() : Reordex_CFG(32, 32, true,64, 64, REORDEX_MODE.COPROCESSOR)
     var rs0 = AddRs()
     var rs1 = AddRs()
     var rs2 = AddRs()
+
+    var rd0 = AddRd()
 }
 val FPU_CFG_inst = FPU_CFG()
 

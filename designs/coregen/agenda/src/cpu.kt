@@ -19,6 +19,8 @@ class CPU_CFG() : Reordex_CFG(32, 32, true,64, 16, REORDEX_MODE.RISC)
     var rs0 = AddRs()
     var rs1 = AddRs()
     var rs2 = AddRs()
+
+    var rd0 = AddRd()
 }
 val CPU_CFG_inst = CPU_CFG()
 
