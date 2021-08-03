@@ -134,6 +134,8 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
         run {
             alu_overflow.assign(alu_OF)
         }; endif()
+
+        rd0.assign(alu_result)
     }
 }
 

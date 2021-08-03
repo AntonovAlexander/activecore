@@ -14,14 +14,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="395001fs"></ZoomEndTime>
-      <Cursor1Time time="193000fs"></Cursor1Time>
+      <ZoomEndTime time="238001fs"></ZoomEndTime>
+      <Cursor1Time time="174000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="485"></NameColumnWidth>
-      <ValueColumnWidth column_width="261"></ValueColumnWidth>
+      <NameColumnWidth column_width="526"></NameColumnWidth>
+      <ValueColumnWidth column_width="258"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="11" />
+   <WVObjectSize size="13" />
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/pc" type="array">
       <obj_property name="ElementShortName">pc[31:0]</obj_property>
       <obj_property name="ObjectShortName">pc[31:0]</obj_property>
@@ -106,6 +106,11 @@
          <obj_property name="ElementShortName">instr_fetch_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
          <obj_property name="ObjectShortName">instr_fetch_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
       </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/instr_fetch_TRX_LOCAL" type="array">
+         <obj_property name="ElementShortName">instr_fetch_TRX_LOCAL</obj_property>
+         <obj_property name="ObjectShortName">instr_fetch_TRX_LOCAL</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="group92" type="group">
       <obj_property name="label">genrenamed_uop_buf</obj_property>
@@ -139,6 +144,91 @@
          <obj_property name="ElementShortName">genrenamed_uop_buf_TRX_LOCAL</obj_property>
          <obj_property name="ObjectShortName">genrenamed_uop_buf_TRX_LOCAL</obj_property>
          <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group220" type="group">
+      <obj_property name="label">IQ INTEGER 0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_push" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_push[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_push[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_pop" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_pop[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_pop[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_genctrl_active" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_genctrl_active[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_genctrl_active[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_genctrl_working" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_genctrl_working[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_genctrl_working[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_genctrl_succ" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_genctrl_succ[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_genctrl_succ[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_genctrl_occupied" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_genctrl_occupied[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_genctrl_occupied[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_genctrl_rdy" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_genctrl_rdy[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_genctrl_rdy[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_BUF_COUNTER" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_TRX_BUF_COUNTER[1:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_TRX_BUF_COUNTER[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_BUF_COUNTER_NEMPTY" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_BUF_COUNTER_FULL" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_BUF" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_TRX_BUF[3:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_TRX_BUF[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_LOCAL" type="array">
+         <obj_property name="ElementShortName">geniq_INTEGER_0_TRX_LOCAL</obj_property>
+         <obj_property name="ObjectShortName">geniq_INTEGER_0_TRX_LOCAL</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group255" type="group">
+      <obj_property name="label">EXU INTEGER 0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_req" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_req[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_req[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_wdata" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_wdata</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_wdata</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_ack" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_ack[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_req_bus_genfifo_ack[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_req" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_req[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_req[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_rdata" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_rdata</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_rdata</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_ack" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_ack[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_ack[0:0]</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="group100" type="group">

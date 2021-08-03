@@ -360,7 +360,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     var iq_entry            = IQ_inst.TRX_BUF.GetFracRef(iq_iter.iter_num)
                     var iq_entry_enb        = iq_entry.GetFracRef("enb")
                     var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
-                    var iq_entry_rd0_tag     = iq_entry.GetFracRef("rd0_tag")
+                    var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
                     var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
 
                     cyclix_gen.begif(iq_entry_enb)
@@ -372,25 +372,22 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                         }
                         cyclix_gen.begif(rss_rdy)
                         run {
-                            cyclix_gen.begif(cyclix_gen.subStruct(iq_iter.iter_elem, "fu_req"))
+
+                            // writing op to FU
+                            cyclix_gen.begif(!iq_entry_fu_pending)
                             run {
 
-                                // writing op to FU
-                                cyclix_gen.begif(!iq_entry_fu_pending)
+                                // filling exu_req with iq data
+                                cyclix_gen.assign_subStructs(exu_req, iq_entry)
+
+                                cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(ExUnits_insts[fu_id][ExUnit_num], cyclix.STREAM_REQ_BUS_NAME, exu_req))
                                 run {
-
-                                    // filling exu_req with iq data
-                                    cyclix_gen.assign_subStructs(exu_req, iq_entry)
-
-                                    cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(ExUnits_insts[fu_id][ExUnit_num], cyclix.STREAM_REQ_BUS_NAME, exu_req))
-                                    run {
-                                        cyclix_gen.assign(iq_entry_fu_pending, 1)
-                                        cyclix_gen.assign(iq_entry_rdy, 1)
-                                    }; cyclix_gen.endif()
-
+                                    cyclix_gen.assign(iq_entry_fu_pending, 1)
+                                    cyclix_gen.assign(iq_entry_rdy, 1)
                                 }; cyclix_gen.endif()
 
                             }; cyclix_gen.endif()
+
                         }; cyclix_gen.endif()
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endloop()

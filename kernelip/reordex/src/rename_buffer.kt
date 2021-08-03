@@ -136,6 +136,10 @@ class rename_buffer_risc(cyclix_gen : cyclix.Generic,
     var jump_vector     = AdduStageVar("jump_vector", 31, 0, "0")
 
     // regfile control signals
+    var rs0_req         = AdduStageVar("rs0_req", 0, 0, "0")
+    var rs0_addr        = AdduStageVar("rs0_addr", 4, 0, "0")
+    //var rs0_rdata       = AdduStageVar("rs0_rdata", 31, 0, "0")
+
     var rs1_req         = AdduStageVar("rs1_req", 0, 0, "0")
     var rs1_addr        = AdduStageVar("rs1_addr", 4, 0, "0")
     //var rs1_rdata       = AdduStageVar("rs1_rdata", 31, 0, "0")

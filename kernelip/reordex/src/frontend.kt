@@ -146,6 +146,10 @@ class instr_fetch_buffer(name: String,
     var rs1_addr        = AdduLocal("rs1_addr", 4, 0, "0")
     var rs1_rdata       = AdduLocal("rs1_rdata", 31, 0, "0")
 
+    //var rs2_req         = AdduLocal("rs2_req", 0, 0, "0")
+    //var rs2_addr        = AdduLocal("rs2_addr", 4, 0, "0")
+    //var rs2_rdata       = AdduLocal("rs2_rdata", 31, 0, "0")
+
     var csr_rdata       = AdduLocal("csr_rdata", 31, 0, "0")
 
     var rd_req          = AdduLocal("rd_req", 0, 0, "0")
@@ -713,6 +717,8 @@ class instr_fetch_buffer(name: String,
             run {
                 rs1_rdy.assign(global_structures.FetchRsRdy(rs1_tag))
             }; cyclix_gen.endif()
+
+            opcode.assign(alu_opcode)
 
             cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
             cyclix_gen.assign(renamed_uop_buf.push, 1)
