@@ -698,6 +698,9 @@ class instr_fetch_buffer(name: String,
 
             ////////////////////////
 
+            var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
+            var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
+
             rs0_tag.assign(global_structures.RenameRs(rs0_addr))
             global_structures.FetchRs(rs0_rdata, rs0_tag)
 
@@ -721,17 +724,22 @@ class instr_fetch_buffer(name: String,
             opcode.assign(alu_opcode)
 
             cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
-            cyclix_gen.assign(renamed_uop_buf.push, 1)
-            renamed_uop_buf.push_trx(new_renamed_uop)
 
             cyclix_gen.begif(rd_req)
             run {
+                cyclix_gen.assign(nru_rd_tag_prev, rd_tag)
+                cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped, rd_tag))
+
                 var alloc_rd_tag = global_structures.GetFreePRF()
                 global_structures.ReserveRd(rd_tag, alloc_rd_tag.position)      // TODO: "found" processing
             }; cyclix_gen.endif()
 
+            cyclix_gen.assign(renamed_uop_buf.push, 1)
+            renamed_uop_buf.push_trx(new_renamed_uop)
+
             cyclix_gen.assign(pop, 1)
             pop_trx()
+
         }; cyclix_gen.endif()
     }
 }

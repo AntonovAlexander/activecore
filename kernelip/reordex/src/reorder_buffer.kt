@@ -127,7 +127,13 @@ class rob_risc(name: String,
         // popping
         cyclix_gen.begif(pop)
         run {
+            cyclix_gen.begif(rd_tag_prev_clr)
+            run {
+                global_structures.FreePRF(rd_tag_prev)
+            }; cyclix_gen.endif()
             pop_trx()
         }; cyclix_gen.endif()
+
+        finalize_ctrls()
     }
 }
