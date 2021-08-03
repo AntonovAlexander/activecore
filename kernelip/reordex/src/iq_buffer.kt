@@ -9,11 +9,12 @@
 package reordex
 
 import hwast.*
+import cyclix.*
 
 class iq_buffer(cyclix_gen : cyclix.Generic,
                 name_prefix : String,
                 TRX_BUF_SIZE : Int,
-                MultiExu_CFG : Reordex_CFG,
+                val MultiExu_CFG : Reordex_CFG,
                 val fu_id_num: hw_imm,
                 val iq_exu: Boolean,
                 var CDB_index : Int,
@@ -24,4 +25,60 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
     val rs_srcs     = ArrayList<hw_var>()
     val rd_tag      = AddStageVar(hw_structvar("rd0_tag",   DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
     val wb_ext      = AddStageVar(hw_structvar("wb_ext",    DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
+
+    fun Issue(ExUnit : Exu_CFG, exu_req : hw_var, subproc : hw_subproc, ExUnit_num : Int) {
+        cyclix_gen.MSG_COMMENT("selecting uop to issue...")
+
+        var op_issue = cyclix_gen.ulocal((ExUnit.ExecUnit.name + ExUnit_num + "_op_issue"), 0, 0, "0")
+        var op_issued_num = cyclix_gen.ulocal((ExUnit.ExecUnit.name + ExUnit_num + "_op_issued_num"), GetWidthToContain(TRX_BUF.GetWidth())-1, 0, "0")
+        cyclix_gen.assign(op_issue, 0)
+
+        var iq_iter = cyclix_gen.begforall_asc(TRX_BUF)
+        run {
+
+            cyclix_gen.begif(!op_issue)
+            run {
+
+                var iq_entry            = TRX_BUF.GetFracRef(iq_iter.iter_num)
+                var iq_entry_enb        = iq_entry.GetFracRef("enb")
+                var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
+                var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
+                var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
+
+                cyclix_gen.begif(iq_entry_enb)
+                run {
+                    var rss_rdy = cyclix_gen.ulocal(cyclix_gen.GetGenName("rss_rdy"), 0, 0, "0")
+                    cyclix_gen.assign(rss_rdy, 1)
+                    for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                        cyclix_gen.band_gen(rss_rdy, rss_rdy, iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy"))
+                    }
+                    cyclix_gen.begif(rss_rdy)
+                    run {
+                        cyclix_gen.assign(op_issue, 1)
+                        cyclix_gen.assign(op_issued_num, iq_iter.iter_num)
+                    }; cyclix_gen.endif()
+                }; cyclix_gen.endif()
+
+            }; cyclix_gen.endif()
+
+        }; cyclix_gen.endloop()
+
+        cyclix_gen.MSG_COMMENT("selecting uop to issue: done")
+
+        cyclix_gen.MSG_COMMENT("issuing IQ...")
+        cyclix_gen.begif(op_issue)
+        run {
+
+            // filling exu_req with iq data
+            cyclix_gen.assign_subStructs(exu_req, TRX_BUF.GetFracRef(op_issued_num))
+
+            // writing op to FU
+            cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(subproc, cyclix.STREAM_REQ_BUS_NAME, exu_req))
+            run {
+                remove_and_squash_trx(op_issued_num)
+            }; cyclix_gen.endif()
+
+        }; cyclix_gen.endif()
+        cyclix_gen.MSG_COMMENT("issuing IQ: done")
+    }
 }
