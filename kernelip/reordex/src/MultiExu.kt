@@ -353,16 +353,16 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 }; cyclix_gen.endif()
                 cyclix_gen.MSG_COMMENT("committing IQ head: done")
 
-                cyclix_gen.MSG_COMMENT("issuing uops...")
+                cyclix_gen.MSG_COMMENT("selecting uop to issue...")
 
-                var op_issued = cyclix_gen.ulocal((ExUnit.value.ExecUnit.name + ExUnit_num + "_op_issued"), 0, 0, "0")
+                var op_issue = cyclix_gen.ulocal((ExUnit.value.ExecUnit.name + ExUnit_num + "_op_issue"), 0, 0, "0")
                 var op_issued_num = cyclix_gen.ulocal((ExUnit.value.ExecUnit.name + ExUnit_num + "_op_issued_num"), GetWidthToContain(IQ_inst.TRX_BUF.GetWidth())-1, 0, "0")
-                cyclix_gen.assign(op_issued, 0)
+                cyclix_gen.assign(op_issue, 0)
 
                 var iq_iter = cyclix_gen.begforall_asc(IQ_inst.TRX_BUF)
                 run {
 
-                    cyclix_gen.begif(!op_issued)
+                    cyclix_gen.begif(!op_issue)
                     run {
 
                         var iq_entry            = IQ_inst.TRX_BUF.GetFracRef(iq_iter.iter_num)
@@ -380,17 +380,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                             }
                             cyclix_gen.begif(rss_rdy)
                             run {
-
-                                // filling exu_req with iq data
-                                cyclix_gen.assign_subStructs(exu_req, iq_entry)
-
-                                // writing op to FU
-                                cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(ExUnits_insts[fu_id][ExUnit_num], cyclix.STREAM_REQ_BUS_NAME, exu_req))
-                                run {
-                                    cyclix_gen.assign(op_issued, 1)
-                                    cyclix_gen.assign(op_issued_num, iq_iter.iter_num)
-                                }; cyclix_gen.endif()
-
+                                cyclix_gen.assign(op_issue, 1)
+                                cyclix_gen.assign(op_issued_num, iq_iter.iter_num)
                             }; cyclix_gen.endif()
                         }; cyclix_gen.endif()
 
@@ -398,14 +389,23 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
                 }; cyclix_gen.endloop()
 
-                cyclix_gen.MSG_COMMENT("issuing uops: done")
+                cyclix_gen.MSG_COMMENT("selecting uop to issue: done")
 
-                cyclix_gen.MSG_COMMENT("squashing IQ...")
-                cyclix_gen.begif(op_issued)
+                cyclix_gen.MSG_COMMENT("issuing IQ...")
+                cyclix_gen.begif(op_issue)
                 run {
-                    IQ_inst.remove_and_squash_trx(op_issued_num)
+
+                    // filling exu_req with iq data
+                    cyclix_gen.assign_subStructs(exu_req, IQ_inst.TRX_BUF.GetFracRef(op_issued_num))
+
+                    // writing op to FU
+                    cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(ExUnits_insts[fu_id][ExUnit_num], cyclix.STREAM_REQ_BUS_NAME, exu_req))
+                    run {
+                        IQ_inst.remove_and_squash_trx(op_issued_num)
+                    }; cyclix_gen.endif()
+
                 }; cyclix_gen.endif()
-                cyclix_gen.MSG_COMMENT("squashing IQ: done")
+                cyclix_gen.MSG_COMMENT("issuing IQ: done")
             }
             fu_id++
         }
