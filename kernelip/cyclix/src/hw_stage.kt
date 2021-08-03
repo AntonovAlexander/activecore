@@ -223,6 +223,26 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(TRX_BUF.GetFracRef(hw_fracs(TRX_BUF_SIZE-1)), 0)
         dec_trx_counter()
     }
+
+    fun remove_and_squash_trx(index_var : hw_param) {
+        for (elem_id in 0 until TRX_BUF.GetWidth()) {
+            cyclix_gen.begif(cyclix_gen.geq(hw_imm(elem_id), index_var))
+            run {
+
+                cyclix_gen.begif(cyclix_gen.eq2(hw_imm(elem_id), TRX_BUF.GetWidth()-1))
+                run {
+                    cyclix_gen.assign(TRX_BUF.GetFracRef(hw_fracs(TRX_BUF_SIZE-1)), 0)
+                }; cyclix_gen.endif()
+
+                cyclix_gen.begelse()
+                run {
+                    cyclix_gen.assign(TRX_BUF.GetFracRef(elem_id), TRX_BUF.GetFracRef(elem_id + 1))
+                }; cyclix_gen.endif()
+
+            }; cyclix_gen.endif()
+        }
+        dec_trx_counter()
+    }
 }
 
 enum class STAGE_FC_MODE {
