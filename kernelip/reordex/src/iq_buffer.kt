@@ -28,8 +28,9 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
     val rd_tag      = AddStageVar(hw_structvar("rd0_tag",   DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
     val wb_ext      = AddStageVar(hw_structvar("wb_ext",    DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
-    var op_issue = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_op_issue"), 0, 0, "0")
-    var op_issued_num = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_op_issued_num"), GetWidthToContain(TRX_BUF.GetWidth())-1, 0, "0")
+    var rss_rdy         = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_rss_rdy"), TRX_BUF_SIZE-1, 0, "0")
+    var op_issue        = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_op_issue"), 0, 0, "0")
+    var op_issued_num   = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_op_issued_num"), GetWidthToContain(TRX_BUF.GetWidth())-1, 0, "0")
 
     fun Issue(ExUnit : Exu_CFG, exu_req : hw_var, subproc : hw_subproc, ExUnit_num : Int) {
         cyclix_gen.MSG_COMMENT("selecting uop to issue...")
@@ -39,23 +40,23 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
         var iq_iter = cyclix_gen.begforall_asc(TRX_BUF)
         run {
 
+            var cur_rss_rdy         = rss_rdy.GetFracRef(iq_iter.iter_num)
+            var iq_entry            = TRX_BUF.GetFracRef(iq_iter.iter_num)
+            var iq_entry_enb        = iq_entry.GetFracRef("enb")
+            var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
+            var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
+            var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
+
             cyclix_gen.begif(!op_issue)
             run {
 
-                var iq_entry            = TRX_BUF.GetFracRef(iq_iter.iter_num)
-                var iq_entry_enb        = iq_entry.GetFracRef("enb")
-                var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
-                var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
-                var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
-
                 cyclix_gen.begif(iq_entry_enb)
                 run {
-                    var rss_rdy = cyclix_gen.ulocal(cyclix_gen.GetGenName("rss_rdy"), 0, 0, "0")
-                    cyclix_gen.assign(rss_rdy, 1)
+                    cyclix_gen.assign(cur_rss_rdy, 1)
                     for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
-                        cyclix_gen.band_gen(rss_rdy, rss_rdy, iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy"))
+                        cyclix_gen.band_gen(cur_rss_rdy, cur_rss_rdy, iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy"))
                     }
-                    cyclix_gen.begif(rss_rdy)
+                    cyclix_gen.begif(cur_rss_rdy)
                     run {
                         cyclix_gen.assign(op_issue, 1)
                         cyclix_gen.assign(op_issued_num, iq_iter.iter_num)

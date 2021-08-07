@@ -720,6 +720,8 @@ class instr_fetch_buffer(name: String,
                 rs1_rdy.assign(global_structures.FetchRsRdy(rs1_tag))
             }; cyclix_gen.endif()
 
+            cyclix_gen.assign(new_renamed_uop.GetFracRef("rs2_rdy"), 1)
+
             opcode.assign(alu_opcode)
 
             cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
