@@ -224,7 +224,7 @@ class instr_fetch_buffer(name: String,
     var rs1_rdy         = AdduLocal("rs1_rdy", 0, 0, "0")
     var rs1_tag         = AdduLocal("rs1_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
 
-    var rd_tag          = AdduLocal("rd_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+    var rd_tag          = AdduLocal("rd0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
 
     fun Process(renamed_uop_buf : rename_buffer) {
 

@@ -28,9 +28,7 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
         cyclix_gen.MSG_COMMENT("sending new operations to IQs...")
 
         var rob_push_trx = rob.GetPushTrx()
-        cyclix_gen.assign(rob_push_trx.GetFracRef("enb"), 1)
-        cyclix_gen.assign(rob_push_trx.GetFracRef("rd_tag_prev"), rd_tag_prev)
-        cyclix_gen.assign(rob_push_trx.GetFracRef("rd_tag_prev_clr"), rd_tag_prev_clr)
+        cyclix_gen.assign_subStructs(rob_push_trx, TRX_BUF_head_ref)
         cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
 
         cyclix_gen.begif(ctrl_active)

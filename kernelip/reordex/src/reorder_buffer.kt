@@ -66,10 +66,10 @@ class rob_risc(name: String,
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
 
     // control transfer signals
-    var jump_req        = AdduLocal("jump_req", 0, 0, "0")
-    var jump_req_cond   = AdduLocal("jump_req_cond", 0, 0, "0")
-    var jump_src        = AdduLocal("jump_src", 0, 0, "0")
-    var jump_vector     = AdduLocal("jump_vector", 31, 0, "0")
+    var jump_req        = AdduStageVar("jump_req", 0, 0, "0")
+    var jump_req_cond   = AdduStageVar("jump_req_cond", 0, 0, "0")
+    var jump_src        = AdduStageVar("jump_src", 0, 0, "0")
+    var jump_vector     = AdduStageVar("jump_vector", 31, 0, "0")
 
     var busreq_mem_struct = hw_struct(name + "_busreq_mem_struct")
     val data_name_prefix = "genmcopipe_data_mem_"
