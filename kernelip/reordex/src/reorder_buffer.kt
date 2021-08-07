@@ -63,12 +63,27 @@ class rob_risc(name: String,
     var rd_addr         = AdduStageVar("rd_addr", 4, 0, "0")
     var rd_wdata        = AdduStageVar("rd_wdata", MultiExu_CFG.RF_width-1, 0, "0")
 
+    var immediate           = AdduStageVar("immediate", 31, 0, "0")
+    var curinstraddr_imm    = AdduStageVar("curinstraddr_imm", 31, 0, "0")
+
+    var funct3          = AdduStageVar("funct3", 2, 0, "0")
+    var funct7          = AdduStageVar("funct7", 6, 0, "0")
+
+    var alu_result      = AdduStageVar("alu_result", 31, 0, "0")
+    var alu_CF          = AdduStageVar("alu_CF", 0, 0, "0")
+    var alu_SF          = AdduStageVar("alu_SF", 0, 0, "0")
+    var alu_ZF          = AdduStageVar("alu_ZF", 0, 0, "0")
+    var alu_OF          = AdduStageVar("alu_OF", 0, 0, "0")
+
     var mem_req         = AdduStageVar("mem_req", 0, 0, "0")
     var mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
     var mem_addr        = AdduStageVar("mem_addr", 31, 0, "0")
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
 
     // control transfer signals
+    // jmp sources
+    val JMP_SRC_IMM     = 0
+    val JMP_SRC_ALU     = 1
     var jump_req        = AdduStageVar("jump_req", 0, 0, "0")
     var jump_req_cond   = AdduStageVar("jump_req_cond", 0, 0, "0")
     var jump_src        = AdduStageVar("jump_src", 0, 0, "0")
@@ -169,10 +184,96 @@ class rob_risc(name: String,
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
 
+            cyclix_gen.COMMENT("expected_instraddr processing")
             cyclix_gen.assign(expected_instraddr, nextinstr_addr)
             cyclix_gen.begif(jump_req)
             run {
+
+                cyclix_gen.begcase(jump_src)
+                run {
+                    cyclix_gen.begbranch(JMP_SRC_IMM)
+                    run {
+                        jump_vector.assign(immediate)
+                    }; cyclix_gen.endbranch()
+
+                    cyclix_gen.begbranch(JMP_SRC_ALU)
+                    run {
+                        jump_vector.assign(alu_result)
+                    }; cyclix_gen.endbranch()
+
+                }; cyclix_gen.endcase()
+
+                cyclix_gen.begif(jump_req_cond)
+                run {
+
+                    cyclix_gen.begcase(funct3)
+                    run {
+                        // BEQ
+                        cyclix_gen.begbranch(0x0)
+                        run {
+                            cyclix_gen.begif(alu_ZF)
+                            run {
+                                jump_req.assign(1)
+                                jump_vector.assign(curinstraddr_imm)
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endbranch()
+
+                        // BNE
+                        cyclix_gen.begbranch(0x1)
+                        run {
+                            cyclix_gen.begif(!alu_ZF)
+                            run {
+                                jump_req.assign(1)
+                                jump_vector.assign(curinstraddr_imm)
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endbranch()
+
+                        // BLT
+                        cyclix_gen.begbranch(0x4)
+                        run {
+                            cyclix_gen.begif(alu_CF)
+                            run {
+                                jump_req.assign(1)
+                                jump_vector.assign(curinstraddr_imm)
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endbranch()
+
+                        // BGE
+                        cyclix_gen.begbranch(0x5)
+                        run {
+                            cyclix_gen.begif(!alu_CF)
+                            run {
+                                jump_req.assign(1)
+                                jump_vector.assign(curinstraddr_imm)
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endbranch()
+
+                        // BLTU
+                        cyclix_gen.begbranch(0x6)
+                        run {
+                            cyclix_gen.begif(alu_CF)
+                            run {
+                                jump_req.assign(1)
+                                jump_vector.assign(curinstraddr_imm)
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endbranch()
+
+                        // BGEU
+                        cyclix_gen.begbranch(0x7)
+                        run {
+                            cyclix_gen.begif(!alu_CF)
+                            run {
+                                jump_req.assign(1)
+                                jump_vector.assign(curinstraddr_imm)
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endbranch()
+
+                    }; cyclix_gen.endcase()
+
+                }; cyclix_gen.endif()
+
                 cyclix_gen.assign(expected_instraddr, jump_vector)
+
             }; cyclix_gen.endif()
 
             pop_trx()
