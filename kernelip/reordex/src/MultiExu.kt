@@ -9,6 +9,7 @@
 package reordex
 
 import cyclix.STREAM_PREF_IMPL
+import cyclix.hw_stage
 import hwast.*
 
 enum class REORDEX_MODE {
@@ -151,7 +152,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var PRF_src = cyclix_gen.uglobal("genPRF_src", prf_src_dim, "0") // uncomputed PRF sources
 
         var exu_descrs = mutableMapOf<String, __exu_descr>()
-        var global_structures = __global_structures(cyclix_gen, MultiExu_CFG, PRF, PRF_mapped, PRF_rdy, ARF_map, PRF_src, ExecUnits, exu_descrs)
+        var global_structures = __global_structures(cyclix_gen, MultiExu_CFG, PRF, PRF_mapped, PRF_rdy, ARF_map, ARF_map_default, PRF_src, ExecUnits, exu_descrs)
 
         MSG("generating control structures: done")
 
@@ -178,6 +179,13 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var exu_resp    = cyclix_gen.local(cyclix_gen.GetGenName("exu_resp"), MultiExu_CFG.resp_struct)
 
         MSG("generating internal structures: done")
+
+        var instr_fetch = (rob as hw_stage)
+        var instr_req = hw_imm(0)
+        if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
+            instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", 1, MultiExu_CFG, global_structures)
+            instr_req = instr_req_stage(name, cyclix_gen, instr_fetch)
+        }
 
         var ExUnit_idx = 0
         var fu_num = 0
@@ -297,8 +305,20 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         }
         cyclix_gen.MSG_COMMENT("Acquiring EXU CDB: done")
 
+        var renamed_uop_buf =
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rename_buffer(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, cdb_num)
+            else rename_buffer_risc(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, cdb_num)
+
         cyclix_gen.MSG_COMMENT("ROB committing...")
-        rob.Commit(global_structures)
+        if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob.Commit(global_structures)
+        else {
+            var bufs_to_reset = ArrayList<hw_stage>()
+            bufs_to_reset.add(rob)
+            for (IQ_inst in IQ_insts) bufs_to_reset.add(IQ_inst)
+            bufs_to_reset.add(renamed_uop_buf)
+            bufs_to_reset.add(instr_fetch)
+            (rob as rob_risc).Commit(global_structures, (instr_req as instr_req_stage).pc, bufs_to_reset)
+        }
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB...")
@@ -308,7 +328,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             cyclix_gen.begif(cyclix_gen.eq2(rob_iter.iter_elem.GetFracRef("trx_id"), CDB_ref.GetFracRef("data").GetFracRef("trx_id")))
             run {
                 cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rdy"), 1)
-                if (MultiExu_CFG.mode == REORDEX_MODE.RISC) cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rd_data"), CDB_ref.GetFracRef("data").GetFracRef("wdata"))
+                if (MultiExu_CFG.mode == REORDEX_MODE.RISC) cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rd_wdata"), CDB_ref.GetFracRef("data").GetFracRef("wdata"))
             }; cyclix_gen.endif()
         }; cyclix_gen.endloop()
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
@@ -345,10 +365,6 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             }
             fu_id++
         }
-
-        var renamed_uop_buf =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rename_buffer(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, cdb_num)
-            else rename_buffer_risc(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, cdb_num)
 
         renamed_uop_buf.preinit_ctrls()
         renamed_uop_buf.init_locals()
@@ -475,11 +491,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             frontend.Send_toRenameBuf(renamed_uop_buf)
 
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
-            var instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", 1, MultiExu_CFG, global_structures)
-            var instr_req = instr_req_stage(name, cyclix_gen, instr_fetch)
-
-            instr_fetch.Process(renamed_uop_buf)
-            instr_req.Process()
+            (instr_fetch as instr_fetch_buffer).Process(renamed_uop_buf)
+            (instr_req as instr_req_stage).Process()
         }
 
         cyclix_gen.MSG_COMMENT("renaming: done")

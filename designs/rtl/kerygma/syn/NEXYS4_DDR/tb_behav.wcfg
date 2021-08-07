@@ -14,12 +14,12 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="238001fs"></ZoomEndTime>
-      <Cursor1Time time="174000fs"></Cursor1Time>
+      <ZoomEndTime time="23801fs"></ZoomEndTime>
+      <Cursor1Time time="8000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="526"></NameColumnWidth>
-      <ValueColumnWidth column_width="258"></ValueColumnWidth>
+      <ValueColumnWidth column_width="253"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="13" />
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/pc" type="array">
@@ -275,6 +275,14 @@
          <obj_property name="ElementShortName">genrob_TRX_LOCAL</obj_property>
          <obj_property name="ObjectShortName">genrob_TRX_LOCAL</obj_property>
          <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/Backoff_ARF" type="array">
+         <obj_property name="ElementShortName">Backoff_ARF[31:0][31:0]</obj_property>
+         <obj_property name="ObjectShortName">Backoff_ARF[31:0][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/expected_instraddr" type="array">
+         <obj_property name="ElementShortName">expected_instraddr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">expected_instraddr[31:0]</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="group122" type="group">

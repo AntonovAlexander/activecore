@@ -9,6 +9,7 @@
 package reordex
 
 import hwast.*
+import cyclix.*
 
 open class rob(cyclix_gen : cyclix.Generic,
                name_prefix : String,
@@ -58,7 +59,9 @@ class rob_risc(name: String,
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
 
-    var rd_data         = AdduStageVar("rd_data", MultiExu_CFG.RF_width-1, 0, "0")
+    var rd_req          = AdduStageVar("rd_req", 0, 0, "0")
+    var rd_addr         = AdduStageVar("rd_addr", 4, 0, "0")
+    var rd_wdata        = AdduStageVar("rd_wdata", MultiExu_CFG.RF_width-1, 0, "0")
 
     var mem_req         = AdduStageVar("mem_req", 0, 0, "0")
     var mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
@@ -75,19 +78,29 @@ class rob_risc(name: String,
     val data_name_prefix = "genmcopipe_data_mem_"
     var rd_struct = hw_struct("genpmodule_" + name + "_" + data_name_prefix + "genstruct_fifo_wdata")
 
-    var data_req_fifo = cyclix_gen.fifo_out((data_name_prefix + "req"), rd_struct)
-    var data_resp_fifo = cyclix_gen.ufifo_in((data_name_prefix + "resp"), 31, 0)
+    var data_req_fifo   = cyclix_gen.fifo_out((data_name_prefix + "req"), rd_struct)
+    var data_resp_fifo  = cyclix_gen.ufifo_in((data_name_prefix + "resp"), 31, 0)
 
-    var irq_fifo    = cyclix_gen.ufifo_in("irq_fifo", 7, 0)
+    var irq_fifo        = cyclix_gen.ufifo_in("irq_fifo", 7, 0)
 
-    override fun Commit(global_structures: __global_structures) {
+    var rf_dim = hw_dim_static()
+    var Backoff_ARF = cyclix_gen.uglobal("Backoff_ARF", rf_dim, "0")
 
+    var expected_instraddr = cyclix_gen.uglobal("expected_instraddr", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
+
+    init {
         busreq_mem_struct.addu("addr",     31, 0, "0")
         busreq_mem_struct.addu("be",       3,  0, "0")
         busreq_mem_struct.addu("wdata",    31, 0, "0")
 
         rd_struct.addu("we", 0, 0, "0")
         rd_struct.add("wdata", hw_type(busreq_mem_struct), "0")
+
+        rf_dim.add(31, 0)
+        rf_dim.add(31, 0)
+    }
+
+    fun Commit(global_structures: __global_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>) {
 
         var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
         var mem_data_wdata      = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
@@ -108,29 +121,56 @@ class rob_risc(name: String,
         run {
             cyclix_gen.begif(ctrl_active)
             run {
-                cyclix_gen.assign(pop, 1)
-                cyclix_gen.begif(mem_req)
+
+                cyclix_gen.begif(cyclix_gen.eq2(expected_instraddr, curinstr_addr))     // branch prediction fine
                 run {
-                    cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
-                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
-                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
-                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), rd_data)
-                    cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata)
-                    cyclix_gen.begif(!mem_cmd)
+                    cyclix_gen.assign(pop, 1)
+
+                    cyclix_gen.begif(mem_req)
                     run {
-                        cyclix_gen.assign(pop, 0)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), rd_wdata)
+                        cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata)
+                        cyclix_gen.begif(!mem_cmd)
+                        run {
+                            cyclix_gen.assign(pop, 0)
+                        }; cyclix_gen.endif()
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
+
+                cyclix_gen.begelse()
+                run {
+                    cyclix_gen.assign(pc, expected_instraddr)
+                    for (buf_to_rollback in bufs_to_rollback) {
+                        buf_to_rollback.Reset()
+                    }
+                    global_structures.RollBack(Backoff_ARF)
+                }; cyclix_gen.endif()
+
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
 
-        // popping
+        // uop completed successfully, popping
         cyclix_gen.begif(pop)
         run {
+
             cyclix_gen.begif(rd_tag_prev_clr)
             run {
                 global_structures.FreePRF(rd_tag_prev)
+                cyclix_gen.begif(rd_req)
+                run {
+                    cyclix_gen.assign(Backoff_ARF.GetFracRef(rd_addr), rd_wdata)
+                }; cyclix_gen.endif()
             }; cyclix_gen.endif()
+
+            cyclix_gen.assign(expected_instraddr, nextinstr_addr)
+            cyclix_gen.begif(jump_req)
+            run {
+                cyclix_gen.assign(expected_instraddr, jump_vector)
+            }; cyclix_gen.endif()
+
             pop_trx()
         }; cyclix_gen.endif()
 

@@ -10,8 +10,7 @@ package reordex
 
 import hwast.*
 
-
-class instr_req_stage(val name : String, val cyclix_gen : cyclix.Generic, val instr_fetch : instr_fetch_buffer) {
+class instr_req_stage(val name : String, val cyclix_gen : cyclix.Generic, val instr_fetch : instr_fetch_buffer) : hw_imm(0) {
 
     var pc = cyclix_gen.uglobal("pc", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
 
@@ -914,6 +913,7 @@ class __global_structures(val cyclix_gen : cyclix.Generic,
                           val PRF_mapped : hw_var,
                           val PRF_rdy : hw_var,
                           val ARF_map : hw_var,
+                          val ARF_map_default : hw_imm_arr,
                           val PRF_src : hw_var,
                           val ExecUnits : MutableMap<String, Exu_CFG>,
                           val exu_descrs : MutableMap<String, __exu_descr>) {
@@ -958,5 +958,18 @@ class __global_structures(val cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(
             PRF_mapped.GetFracRef(src_tag),
             0)
+    }
+
+    fun RollBack(Backoff_ARF : hw_var) {
+        cyclix_gen.assign(PRF_mapped, PRF_mapped.defimm)
+        cyclix_gen.assign(PRF_rdy, PRF_rdy.defimm)
+        //cyclix_gen.assign(ARF_map, ARF_map_default)  // TODO: fix error
+        for (reg_idx in 0 until ARF_map.GetWidth()) {
+            cyclix_gen.assign(ARF_map.GetFracRef(reg_idx), hw_imm(reg_idx))
+        }
+        cyclix_gen.assign(PRF_src, PRF_src.defimm)
+        for (reg_idx in 0 until Backoff_ARF.GetWidth()) {
+            cyclix_gen.assign(PRF.GetFracRef(reg_idx), Backoff_ARF.GetFracRef(reg_idx))
+        }
     }
 }
