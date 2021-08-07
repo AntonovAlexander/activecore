@@ -12,6 +12,8 @@ import hwast.*
 import cyclix.*
 
 class iq_buffer(cyclix_gen : cyclix.Generic,
+                ExUnit_name : String,
+                ExUnit_num : Int,
                 name_prefix : String,
                 TRX_BUF_SIZE : Int,
                 val MultiExu_CFG : Reordex_CFG,
@@ -26,11 +28,12 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
     val rd_tag      = AddStageVar(hw_structvar("rd0_tag",   DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
     val wb_ext      = AddStageVar(hw_structvar("wb_ext",    DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
+    var op_issue = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_op_issue"), 0, 0, "0")
+    var op_issued_num = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_op_issued_num"), GetWidthToContain(TRX_BUF.GetWidth())-1, 0, "0")
+
     fun Issue(ExUnit : Exu_CFG, exu_req : hw_var, subproc : hw_subproc, ExUnit_num : Int) {
         cyclix_gen.MSG_COMMENT("selecting uop to issue...")
 
-        var op_issue = cyclix_gen.ulocal((ExUnit.ExecUnit.name + ExUnit_num + "_op_issue"), 0, 0, "0")
-        var op_issued_num = cyclix_gen.ulocal((ExUnit.ExecUnit.name + ExUnit_num + "_op_issued_num"), GetWidthToContain(TRX_BUF.GetWidth())-1, 0, "0")
         cyclix_gen.assign(op_issue, 0)
 
         var iq_iter = cyclix_gen.begforall_asc(TRX_BUF)

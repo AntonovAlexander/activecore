@@ -119,6 +119,7 @@ class rob_risc(name: String,
                 cyclix_gen.assign(pop, 1)
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
+
         cyclix_gen.begelse()
         run {
             cyclix_gen.begif(ctrl_active)
