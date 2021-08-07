@@ -24,4 +24,4 @@
     modport Slave   (input req, output ack, input addr, input we, input wdata, input be, output resp, output rdata);
   endinterface
 
-`endif
+`endif    // __SIGMA_TILE_H

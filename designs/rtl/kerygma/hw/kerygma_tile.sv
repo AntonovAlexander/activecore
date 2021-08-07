@@ -7,7 +7,7 @@
  */
 
 
-`include "kerygma_tile.svh"
+`include "sigma_tile.svh"
 
 `include "agenda_cpu.svh"
 

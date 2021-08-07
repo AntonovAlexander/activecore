@@ -106,6 +106,8 @@ class rob_risc(name: String,
         var mem_data_wdata      = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
         var mem_data_rdata      = cyclix_gen.local("mem_data_rdata", data_resp_fifo.vartype, "0")
 
+        var backoff_cmd         = cyclix_gen.ulocal("backoff_cmd", 0, 0, "0")
+
         preinit_ctrls()
         init_locals()
 
@@ -142,6 +144,7 @@ class rob_risc(name: String,
 
                 cyclix_gen.begelse()
                 run {
+                    cyclix_gen.assign(backoff_cmd, 1)
                     cyclix_gen.assign(pc, expected_instraddr)
                     for (buf_to_rollback in bufs_to_rollback) {
                         buf_to_rollback.Reset()
