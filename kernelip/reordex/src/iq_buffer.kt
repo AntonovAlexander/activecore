@@ -80,6 +80,7 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
             cyclix_gen.begif(cyclix_gen.fifo_internal_wr_unblk(subproc, cyclix.STREAM_REQ_BUS_NAME, exu_req))
             run {
                 remove_and_squash_trx(op_issued_num)
+                pop.assign(1)
             }; cyclix_gen.endif()
 
         }; cyclix_gen.endif()

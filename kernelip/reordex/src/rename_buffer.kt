@@ -188,7 +188,6 @@ class rename_buffer_risc(cyclix_gen : cyclix.Generic,
     var alu_op2         = AdduStageVar("alu_op2", 31, 0, "0")
     var alu_op1_wide    = AdduStageVar("alu_op1_wide", 32, 0, "0")
     var alu_op2_wide    = AdduStageVar("alu_op2_wide", 32, 0, "0")
-    var alu_opcode      = AdduStageVar("alu_opcode", 3, 0, "0")
 
     var alu_result_wide = AdduStageVar("alu_result_wide", 32, 0, "0")
     var alu_result      = AdduStageVar("alu_result", 31, 0, "0")
