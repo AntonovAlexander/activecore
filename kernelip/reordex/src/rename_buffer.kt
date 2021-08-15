@@ -103,6 +103,7 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
             cyclix_gen.begif(rob.push)
             run {
                 cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
+                cyclix_gen.assign(rob_push_trx.GetFracRef("rdy"), 0)
                 cyclix_gen.assign(rob.TRX_ID_COUNTER, cyclix_gen.add(rob.TRX_ID_COUNTER, 1))
                 rob.push_trx(rob_push_trx)
             }; cyclix_gen.endif()

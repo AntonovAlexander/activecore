@@ -324,11 +324,16 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB...")
         var rob_iter = cyclix_gen.begforall_asc(rob.TRX_BUF)
         run {
-            var CDB_ref = exu_cdb.GetFracRef(rob_iter.iter_elem.GetFracRef("cdb_id"))
-            cyclix_gen.begif(cyclix_gen.eq2(rob_iter.iter_elem.GetFracRef("trx_id"), CDB_ref.GetFracRef("data").GetFracRef("trx_id")))
+            var CDB_ref         = exu_cdb.GetFracRef(rob_iter.iter_elem.GetFracRef("cdb_id"))
+            var CDB_ref_enb     = CDB_ref.GetFracRef("enb")
+            var CDB_ref_data    = CDB_ref.GetFracRef("data")
+            cyclix_gen.begif(CDB_ref_enb)
             run {
-                cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rdy"), 1)
-                if (MultiExu_CFG.mode == REORDEX_MODE.RISC) cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("alu_result"), CDB_ref.GetFracRef("data").GetFracRef("wdata"))
+                cyclix_gen.begif(cyclix_gen.eq2(rob_iter.iter_elem.GetFracRef("trx_id"), CDB_ref_data.GetFracRef("trx_id")))
+                run {
+                    cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rdy"), 1)
+                    if (MultiExu_CFG.mode == REORDEX_MODE.RISC) cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("alu_result"), CDB_ref_data.GetFracRef("wdata"))
+                }; cyclix_gen.endif()
             }; cyclix_gen.endif()
         }; cyclix_gen.endloop()
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
