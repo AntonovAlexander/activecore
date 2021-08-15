@@ -149,9 +149,9 @@ class rob_risc(name: String,
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
 
-        cyclix_gen.begelse()
+        cyclix_gen.begelsif(ctrl_active)
         run {
-            cyclix_gen.begif(ctrl_active)
+            cyclix_gen.begif(rdy)
             run {
 
                 cyclix_gen.begif(cyclix_gen.eq2(expected_instraddr, curinstr_addr))     // branch prediction fine

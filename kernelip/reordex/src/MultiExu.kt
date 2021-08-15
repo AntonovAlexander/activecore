@@ -328,7 +328,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             cyclix_gen.begif(cyclix_gen.eq2(rob_iter.iter_elem.GetFracRef("trx_id"), CDB_ref.GetFracRef("data").GetFracRef("trx_id")))
             run {
                 cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rdy"), 1)
-                if (MultiExu_CFG.mode == REORDEX_MODE.RISC) cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rd_wdata"), CDB_ref.GetFracRef("data").GetFracRef("wdata"))
+                if (MultiExu_CFG.mode == REORDEX_MODE.RISC) cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("alu_result"), CDB_ref.GetFracRef("data").GetFracRef("wdata"))
             }; cyclix_gen.endif()
         }; cyclix_gen.endloop()
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")

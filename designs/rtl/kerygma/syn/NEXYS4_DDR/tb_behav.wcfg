@@ -13,13 +13,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="381001fs"></ZoomEndTime>
-      <Cursor1Time time="105000fs"></Cursor1Time>
+      <ZoomStartTime time="394300fs"></ZoomStartTime>
+      <ZoomEndTime time="471001fs"></ZoomEndTime>
+      <Cursor1Time time="419700fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="526"></NameColumnWidth>
-      <ValueColumnWidth column_width="248"></ValueColumnWidth>
+      <ValueColumnWidth column_width="243"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="13" />
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/pc" type="array">
@@ -158,13 +158,18 @@
          <obj_property name="ElementShortName">geniq_INTEGER_0_pop[0:0]</obj_property>
          <obj_property name="ObjectShortName">geniq_INTEGER_0_pop[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/INTEGER0_op_issued_num" type="array">
-         <obj_property name="ElementShortName">INTEGER0_op_issued_num[1:0]</obj_property>
-         <obj_property name="ObjectShortName">INTEGER0_op_issued_num[1:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/INTEGER0_rss_rdy" type="array">
+         <obj_property name="ElementShortName">INTEGER0_rss_rdy[3:0]</obj_property>
+         <obj_property name="ObjectShortName">INTEGER0_rss_rdy[3:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/INTEGER0_op_issue" type="array">
          <obj_property name="ElementShortName">INTEGER0_op_issue[0:0]</obj_property>
          <obj_property name="ObjectShortName">INTEGER0_op_issue[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/INTEGER0_op_issued_num" type="array">
+         <obj_property name="ElementShortName">INTEGER0_op_issued_num[1:0]</obj_property>
+         <obj_property name="ObjectShortName">INTEGER0_op_issued_num[1:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_genctrl_active" type="array">
          <obj_property name="ElementShortName">geniq_INTEGER_0_genctrl_active[0:0]</obj_property>
@@ -201,6 +206,7 @@
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_BUF" type="array">
          <obj_property name="ElementShortName">geniq_INTEGER_0_TRX_BUF[3:0]</obj_property>
          <obj_property name="ObjectShortName">geniq_INTEGER_0_TRX_BUF[3:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_LOCAL" type="array">
          <obj_property name="ElementShortName">geniq_INTEGER_0_TRX_LOCAL</obj_property>
@@ -237,6 +243,50 @@
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_ack" type="array">
          <obj_property name="ElementShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_ack[0:0]</obj_property>
          <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_0_stream_resp_bus_genfifo_ack[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_INTEGER_0/alu_opcode" type="array">
+         <obj_property name="ElementShortName">alu_opcode[3:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_opcode[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_INTEGER_0/alu_op0" type="array">
+         <obj_property name="ElementShortName">alu_op0[31:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_op0[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_INTEGER_0/alu_op1" type="array">
+         <obj_property name="ElementShortName">alu_op1[31:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_op1[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_INTEGER_0/alu_unsigned" type="array">
+         <obj_property name="ElementShortName">alu_unsigned[0:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_unsigned[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_INTEGER_0/alu_result_wide" type="array">
+         <obj_property name="ElementShortName">alu_result_wide[32:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_result_wide[32:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_INTEGER_0/alu_result" type="array">
+         <obj_property name="ElementShortName">alu_result[31:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_result[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_INTEGER_0/rd0" type="array">
+         <obj_property name="ElementShortName">rd0[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rd0[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_INTEGER_0/alu_CF" type="array">
+         <obj_property name="ElementShortName">alu_CF[0:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_CF[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_INTEGER_0/alu_SF" type="array">
+         <obj_property name="ElementShortName">alu_SF[0:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_SF[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_INTEGER_0/alu_ZF" type="array">
+         <obj_property name="ElementShortName">alu_ZF[0:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_ZF[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_INTEGER_0/alu_OF" type="array">
+         <obj_property name="ElementShortName">alu_OF[0:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_OF[0:0]</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="group100" type="group">
