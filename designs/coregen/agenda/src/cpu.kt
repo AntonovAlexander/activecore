@@ -37,10 +37,10 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
     val aluop_XOR		= 7
     val aluop_CLRB		= 8
 
+    var alu_op0         = ulocal("alu_op0", 31, 0, "0")
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
-    var alu_op2         = ulocal("alu_op2", 31, 0, "0")
+    var alu_op0_wide    = ulocal("alu_op0_wide", 32, 0, "0")
     var alu_op1_wide    = ulocal("alu_op1_wide", 32, 0, "0")
-    var alu_op2_wide    = ulocal("alu_op2_wide", 32, 0, "0")
     var alu_opcode      = ulocal("alu_opcode", 3, 0, "0")
     var alu_unsigned    = ulocal("alu_unsigned", 0, 0, "0")
 
@@ -53,69 +53,69 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
     var alu_overflow    = ulocal("alu_overflow", 0, 0, "0")
 
     init {
-        alu_op1.assign(subStruct(req_data, "rs0_rdata"))
-        alu_op2.assign(subStruct(req_data, "rs1_rdata"))
+        alu_op0.assign(subStruct(req_data, "rs0_rdata"))
+        alu_op1.assign(subStruct(req_data, "rs1_rdata"))
         alu_opcode.assign(subStruct(req_data, "opcode"))
 
         begif(alu_unsigned)
         run {
+            alu_op0_wide.assign(zeroext(alu_op0, 33))
             alu_op1_wide.assign(zeroext(alu_op1, 33))
-            alu_op2_wide.assign(zeroext(alu_op2, 33))
         }; endif()
         begelse()
         run {
+            alu_op0_wide.assign(signext(alu_op0, 33))
             alu_op1_wide.assign(signext(alu_op1, 33))
-            alu_op2_wide.assign(signext(alu_op2, 33))
         }; endif()
 
-        alu_result_wide.assign(alu_op1_wide)
+        alu_result_wide.assign(alu_op0_wide)
 
         // computing result
         begcase(alu_opcode)
         run {
             begbranch(aluop_ADD)
             run {
-                alu_result_wide.assign(alu_op1_wide + alu_op2_wide)
+                alu_result_wide.assign(alu_op0_wide + alu_op1_wide)
             }; endbranch()
 
             begbranch(aluop_SUB)
             run {
-                alu_result_wide.assign(alu_op1_wide - alu_op2_wide)
+                alu_result_wide.assign(alu_op0_wide - alu_op1_wide)
             }; endbranch()
 
             begbranch(aluop_AND)
             run {
-                alu_result_wide.assign(band(alu_op1_wide, alu_op2_wide))
+                alu_result_wide.assign(band(alu_op0_wide, alu_op1_wide))
             }; endbranch()
 
             begbranch(aluop_OR)
             run {
-                alu_result_wide.assign(bor(alu_op1_wide, alu_op2_wide))
+                alu_result_wide.assign(bor(alu_op0_wide, alu_op1_wide))
             }; endbranch()
 
             begbranch(aluop_SLL)
             run {
-                alu_result_wide.assign(sll(alu_op1_wide, alu_op2_wide))
+                alu_result_wide.assign(sll(alu_op0_wide, alu_op1_wide))
             }; endbranch()
 
             begbranch(aluop_SRL)
             run {
-                alu_result_wide.assign(srl(zeroext(alu_op1_wide[31, 0], 64), alu_op2_wide[4, 0]))
+                alu_result_wide.assign(srl(zeroext(alu_op0_wide[31, 0], 64), alu_op1_wide[4, 0]))
             }; endbranch()
 
             begbranch(aluop_SRA)
             run {
-                alu_result_wide.assign(sra(signext(alu_op1_wide[31, 0], 64), alu_op2_wide[4, 0]))
+                alu_result_wide.assign(sra(signext(alu_op0_wide[31, 0], 64), alu_op1_wide[4, 0]))
             }; endbranch()
 
             begbranch(aluop_XOR)
             run {
-                alu_result_wide.assign(bxor(alu_op1_wide, alu_op2_wide))
+                alu_result_wide.assign(bxor(alu_op0_wide, alu_op1_wide))
             }; endbranch()
 
             begbranch(aluop_CLRB)
             run {
-                alu_result_wide.assign(band(alu_op1_wide, !alu_op2_wide))
+                alu_result_wide.assign(band(alu_op0_wide, !alu_op1_wide))
             }; endbranch()
         }; endcase()
 
@@ -124,7 +124,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
         alu_CF.assign(alu_result_wide[32])
         alu_SF.assign(alu_result_wide[31])
         alu_ZF.assign(bnot(ror(alu_result)))
-        alu_OF.assign(bor(band(!alu_op1[31], band(!alu_op2[31], alu_result[31])), band(alu_op1[31], band(alu_op2[31], !alu_result[31]))))
+        alu_OF.assign(bor(band(!alu_op0[31], band(!alu_op1[31], alu_result[31])), band(alu_op0[31], band(alu_op1[31], !alu_result[31]))))
 
         begif(alu_unsigned)
         run {
@@ -145,29 +145,29 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CPU_CFG_inst) {
     val aluop_MUL		= 0
     val aluop_DIV		= 1
 
+    var alu_op0         = ulocal("alu_op0", 31, 0, "0")
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
-    var alu_op2         = ulocal("alu_op2", 31, 0, "0")
+    var alu_op0_wide    = ulocal("alu_op0_wide", 32, 0, "0")
     var alu_op1_wide    = ulocal("alu_op1_wide", 32, 0, "0")
-    var alu_op2_wide    = ulocal("alu_op2_wide", 32, 0, "0")
     var alu_opcode      = ulocal("alu_opcode", 3, 0, "0")
     var alu_result_wide = ulocal("alu_result_wide", 32, 0, "0")
     var alu_result      = ulocal("alu_result", 31, 0, "0")
 
     init {
-        alu_op1.assign(subStruct(req_data, "rs0_rdata"))
-        alu_op2.assign(subStruct(req_data, "rs1_rdata"))
+        alu_op0.assign(subStruct(req_data, "rs0_rdata"))
+        alu_op1.assign(subStruct(req_data, "rs1_rdata"))
         alu_opcode.assign(subStruct(req_data, "opcode"))
 
         begcase(alu_opcode)
         run {
             begbranch(aluop_MUL)
             run {
-                alu_result_wide.assign(alu_op1_wide * alu_op2_wide)
+                alu_result_wide.assign(alu_op0_wide * alu_op1_wide)
             }; endbranch()
 
             begbranch(aluop_DIV)
             run {
-                alu_result_wide.assign(alu_op1_wide / alu_op2_wide)
+                alu_result_wide.assign(alu_op0_wide / alu_op1_wide)
             }; endbranch()
         }; endcase()
 
