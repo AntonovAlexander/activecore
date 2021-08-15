@@ -14,7 +14,8 @@ import reordex.*
 
 class CPU_CFG() : Reordex_CFG(32, 32, true,64, 16, REORDEX_MODE.RISC)
 {
-    var opcode = AddSrcUImm("opcode", 6)
+    var exu_opcode      = AddSrcUImm("exu_opcode", 6)
+    var alu_unsigned    = AddSrcUImm("alu_unsigned", 1)
 
     var rs0 = AddRs()
     var rs1 = AddRs()
@@ -42,7 +43,6 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
     var alu_op0_wide    = ulocal("alu_op0_wide", 32, 0, "0")
     var alu_op1_wide    = ulocal("alu_op1_wide", 32, 0, "0")
     var alu_opcode      = ulocal("alu_opcode", 3, 0, "0")
-    var alu_unsigned    = ulocal("alu_unsigned", 0, 0, "0")
 
     var alu_result_wide = ulocal("alu_result_wide", 32, 0, "0")
     var alu_result      = ulocal("alu_result", 31, 0, "0")
@@ -55,9 +55,9 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
     init {
         alu_op0.assign(subStruct(req_data, "rs0_rdata"))
         alu_op1.assign(subStruct(req_data, "rs1_rdata"))
-        alu_opcode.assign(subStruct(req_data, "opcode"))
+        alu_opcode.assign(subStruct(req_data, "exu_opcode"))
 
-        begif(alu_unsigned)
+        begif(CPU_CFG_inst.alu_unsigned)
         run {
             alu_op0_wide.assign(zeroext(alu_op0, 33))
             alu_op1_wide.assign(zeroext(alu_op1, 33))
@@ -126,7 +126,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
         alu_ZF.assign(bnot(ror(alu_result)))
         alu_OF.assign(bor(band(!alu_op0[31], band(!alu_op1[31], alu_result[31])), band(alu_op0[31], band(alu_op1[31], !alu_result[31]))))
 
-        begif(alu_unsigned)
+        begif(CPU_CFG_inst.alu_unsigned)
         run {
             alu_overflow.assign(alu_CF)
         }; endif()
@@ -156,7 +156,7 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CPU_CFG_inst) {
     init {
         alu_op0.assign(subStruct(req_data, "rs0_rdata"))
         alu_op1.assign(subStruct(req_data, "rs1_rdata"))
-        alu_opcode.assign(subStruct(req_data, "opcode"))
+        alu_opcode.assign(subStruct(req_data, "exu_opcode"))
 
         begcase(alu_opcode)
         run {
@@ -189,9 +189,9 @@ class EXU_LSU() : reordex.Exu("LSU", CPU_CFG_inst) {
     init {
         mem_addr.assign(subStruct(req_data, "rs0_rdata"))
         mem_wdata.assign(subStruct(req_data, "rs1_rdata"))
-        mem_opcode.assign(subStruct(req_data, "opcode"))
+        mem_opcode.assign(subStruct(req_data, "exu_opcode"))
 
-        begcase(CPU_CFG_inst.opcode)
+        begcase(CPU_CFG_inst.exu_opcode)
         run {
             begbranch(op_LD)
             run {
@@ -209,7 +209,7 @@ class EXU_LSU() : reordex.Exu("LSU", CPU_CFG_inst) {
 class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", CPU_CFG_inst) {
 
     init {
-        begif(eq2(CPU_CFG_inst.opcode, 0))
+        begif(eq2(CPU_CFG_inst.exu_opcode, 0))
         run {
             rd0.assign(rss[0] + rss[1])
         }; endif()
