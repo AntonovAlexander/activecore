@@ -648,6 +648,8 @@ class instr_fetch_buffer(name: String,
 
             }; cyclix_gen.endcase()
 
+            curinstraddr_imm.assign(curinstr_addr + immediate)
+
             cyclix_gen.begif(mem_req)
             run {
                 cyclix_gen.begcase(funct3)

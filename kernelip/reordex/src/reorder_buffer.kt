@@ -80,10 +80,24 @@ class rob_risc(name: String,
     var mem_addr        = AdduStageVar("mem_addr", 31, 0, "0")
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
 
-    // control transfer signals
+    //// committing RF signals
+    // rd sources
+    val RD_LUI		    = 0
+    val RD_ALU		    = 1
+    val RD_CF_COND	    = 2
+    val RD_OF_COND	    = 3
+    val RD_PC_INC	    = 4
+    val RD_MEM		    = 5
+    val RD_CSR		    = 6
+
+    var rd_source       = AdduStageVar("rd_source", 2, 0, RD_ALU.toString())
+    var rd_rdy          = AdduStageVar("rd_rdy", 0, 0, "0")
+
+    //// control transfer signals
     // jmp sources
     val JMP_SRC_IMM     = 0
     val JMP_SRC_ALU     = 1
+
     var jump_req        = AdduStageVar("jump_req", 0, 0, "0")
     var jump_req_cond   = AdduStageVar("jump_req_cond", 0, 0, "0")
     var jump_src        = AdduStageVar("jump_src", 0, 0, "0")
@@ -172,8 +186,54 @@ class rob_risc(name: String,
         }; cyclix_gen.endif()
 
         // uop completed successfully, popping
+        cyclix_gen.COMMENT("uop completion...")
         cyclix_gen.begif(pop)
         run {
+
+            cyclix_gen.COMMENT("committing RF...")
+
+            // rd wdata processing
+            cyclix_gen.begcase(rd_source)
+            run {
+                cyclix_gen.begbranch(RD_LUI)
+                run {
+                    rd_wdata.assign(immediate)
+                    rd_rdy.assign(1)
+                }; cyclix_gen.endbranch()
+
+                cyclix_gen.begbranch(RD_ALU)
+                run {
+                    rd_wdata.assign(alu_result)
+                    rd_rdy.assign(1)
+                }; cyclix_gen.endbranch()
+
+                cyclix_gen.begbranch(RD_CF_COND)
+                run {
+                    rd_wdata.assign(alu_CF)
+                    rd_rdy.assign(1)
+                }; cyclix_gen.endbranch()
+
+                cyclix_gen.begbranch(RD_OF_COND)
+                run {
+                    rd_wdata.assign(alu_OF)
+                    rd_rdy.assign(1)
+                }; cyclix_gen.endbranch()
+
+                cyclix_gen.begbranch(RD_PC_INC)
+                run {
+                    rd_wdata.assign(nextinstr_addr)
+                    rd_rdy.assign(1)
+                }; cyclix_gen.endbranch()
+
+                /*
+                cyclix_gen.begbranch(RD_CSR)
+                run {
+                    rd_wdata.assign(csr_rdata)
+                    rd_rdy.assign(1)
+                }; cyclix_gen.endbranch()
+                */
+
+            }; cyclix_gen.endcase()
 
             cyclix_gen.begif(rd_tag_prev_clr)
             run {
@@ -183,8 +243,9 @@ class rob_risc(name: String,
                     cyclix_gen.assign(Backoff_ARF.GetFracRef(rd_addr), rd_wdata)
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
+            cyclix_gen.COMMENT("committing RF: done")
 
-            cyclix_gen.COMMENT("expected_instraddr processing")
+            cyclix_gen.COMMENT("control transfer...")
             cyclix_gen.assign(expected_instraddr, nextinstr_addr)
             cyclix_gen.begif(jump_req)
             run {
@@ -275,9 +336,12 @@ class rob_risc(name: String,
                 cyclix_gen.assign(expected_instraddr, jump_vector)
 
             }; cyclix_gen.endif()
+            cyclix_gen.COMMENT("control transfer: done")
 
             pop_trx()
+
         }; cyclix_gen.endif()
+        cyclix_gen.COMMENT("uop completion: done")
 
         finalize_ctrls()
     }
