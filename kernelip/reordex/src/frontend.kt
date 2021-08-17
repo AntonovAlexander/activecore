@@ -237,536 +237,541 @@ class instr_fetch_buffer(name: String,
         preinit_ctrls()
         init_locals()
 
-        cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifo, instr_code))
+        cyclix_gen.begif(ctrl_active)
         run {
 
-            //// instruction decoding ////
-
-            opcode.assign(instr_code[6, 0])
-            alu_unsigned.assign(0)
-
-            rs0_addr.assign(instr_code[19, 15])
-            rs1_addr.assign(instr_code[24, 20])
-            rd_addr.assign(instr_code[11, 7])
-
-            funct3.assign(instr_code[14, 12])
-            funct7.assign(instr_code[31, 25])
-            shamt.assign(instr_code[24, 20])
-            pred.assign(instr_code[27, 24])
-            succ.assign(instr_code[23, 20])
-            csrnum.assign(instr_code[31, 20])
-            zimm.assign(instr_code[19, 15])
-
-            immediate_I.assign(cyclix_gen.signext(instr_code[31, 20], 32))
-
-            var immediate_S_src = ArrayList<hw_param>()
-            immediate_S_src.add(instr_code[31, 25])
-            immediate_S_src.add(instr_code[11, 7])
-            immediate_S.assign(cyclix_gen.signext(cyclix_gen.cnct(immediate_S_src), 32))
-
-            var immediate_B_src = ArrayList<hw_param>()
-            immediate_B_src.add(instr_code[31])
-            immediate_B_src.add(instr_code[7])
-            immediate_B_src.add(instr_code[30, 25])
-            immediate_B_src.add(instr_code[11, 8])
-            immediate_B_src.add(hw_imm(1, "0"))
-            immediate_B.assign(cyclix_gen.signext(cyclix_gen.cnct(immediate_B_src), 32))
-
-            var immediate_U_src = ArrayList<hw_param>()
-            immediate_U_src.add(instr_code[31, 12])
-            immediate_U_src.add(hw_imm(12, "0"))
-            immediate_U.assign(cyclix_gen.cnct(immediate_U_src))
-
-            var immediate_J_src = ArrayList<hw_param>()
-            immediate_J_src.add(instr_code[31])
-            immediate_J_src.add(instr_code[19, 12])
-            immediate_J_src.add(instr_code[20])
-            immediate_J_src.add(instr_code[30, 21])
-            immediate_J_src.add(hw_imm(1, "0"))
-            immediate_J.assign(cyclix_gen.signext(cyclix_gen.cnct(immediate_J_src), 32))
-
-            cyclix_gen.begcase(opcode)
+            cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifo, instr_code))
             run {
-                cyclix_gen.begbranch(opcode_LUI)
-                run {
-                    op0_source.assign(OP0_SRC_IMM)
-                    rd_req.assign(1)
-                    rd_source.assign(RD_LUI)
-                    immediate.assign(immediate_U)
-                }
-                cyclix_gen.endbranch()
 
-                cyclix_gen.begbranch(opcode_AUIPC)
-                run {
-                    op0_source.assign(OP0_SRC_PC)
-                    op1_source.assign(OP1_SRC_IMM)
-                    alu_req.assign(1)
-                    alu_opcode.assign(aluop_ADD)
-                    rd_req.assign(1)
-                    rd_source.assign(RD_ALU)
-                    immediate.assign(immediate_U)
-                }; cyclix_gen.endbranch()
+                //// instruction decoding ////
 
-                cyclix_gen.begbranch(opcode_JAL)
-                run {
-                    op0_source.assign(OP0_SRC_PC)
-                    op1_source.assign(OP1_SRC_IMM)
-                    alu_req.assign(1)
-                    alu_opcode.assign(aluop_ADD)
-                    rd_req.assign(1)
-                    rd_source.assign(RD_PC_INC)
-                    jump_req.assign(1)
-                    jump_src.assign(JMP_SRC_ALU)
-                    immediate.assign(immediate_J)
-                }; cyclix_gen.endbranch()
+                opcode.assign(instr_code[6, 0])
+                alu_unsigned.assign(0)
 
-                cyclix_gen.begbranch(opcode_JALR)
-                run {
-                    rs0_req.assign(1)
-                    op0_source.assign(OP0_SRC_RS1)
-                    op1_source.assign(OP1_SRC_IMM)
-                    alu_req.assign(1)
-                    alu_opcode.assign(aluop_ADD)
-                    rd_req.assign(1)
-                    rd_source.assign(RD_PC_INC)
-                    jump_req.assign(1)
-                    jump_src.assign(JMP_SRC_ALU)
-                    immediate.assign(immediate_I)
-                }; cyclix_gen.endbranch()
+                rs0_addr.assign(instr_code[19, 15])
+                rs1_addr.assign(instr_code[24, 20])
+                rd_addr.assign(instr_code[11, 7])
 
-                cyclix_gen.begbranch(opcode_BRANCH)
-                run {
-                    rs0_req.assign(1)
-                    rs1_req.assign(1)
-                    alu_req.assign(1)
-                    alu_opcode.assign(aluop_SUB)
-                    jump_req_cond.assign(1)
-                    jump_src.assign(JMP_SRC_ALU)
-                    immediate.assign(immediate_B)
+                funct3.assign(instr_code[14, 12])
+                funct7.assign(instr_code[31, 25])
+                shamt.assign(instr_code[24, 20])
+                pred.assign(instr_code[27, 24])
+                succ.assign(instr_code[23, 20])
+                csrnum.assign(instr_code[31, 20])
+                zimm.assign(instr_code[19, 15])
 
-                    cyclix_gen.begif(cyclix_gen.bor(cyclix_gen.eq2(funct3, 0x6), cyclix_gen.eq2(funct3, 0x7)))
+                immediate_I.assign(cyclix_gen.signext(instr_code[31, 20], 32))
+
+                var immediate_S_src = ArrayList<hw_param>()
+                immediate_S_src.add(instr_code[31, 25])
+                immediate_S_src.add(instr_code[11, 7])
+                immediate_S.assign(cyclix_gen.signext(cyclix_gen.cnct(immediate_S_src), 32))
+
+                var immediate_B_src = ArrayList<hw_param>()
+                immediate_B_src.add(instr_code[31])
+                immediate_B_src.add(instr_code[7])
+                immediate_B_src.add(instr_code[30, 25])
+                immediate_B_src.add(instr_code[11, 8])
+                immediate_B_src.add(hw_imm(1, "0"))
+                immediate_B.assign(cyclix_gen.signext(cyclix_gen.cnct(immediate_B_src), 32))
+
+                var immediate_U_src = ArrayList<hw_param>()
+                immediate_U_src.add(instr_code[31, 12])
+                immediate_U_src.add(hw_imm(12, "0"))
+                immediate_U.assign(cyclix_gen.cnct(immediate_U_src))
+
+                var immediate_J_src = ArrayList<hw_param>()
+                immediate_J_src.add(instr_code[31])
+                immediate_J_src.add(instr_code[19, 12])
+                immediate_J_src.add(instr_code[20])
+                immediate_J_src.add(instr_code[30, 21])
+                immediate_J_src.add(hw_imm(1, "0"))
+                immediate_J.assign(cyclix_gen.signext(cyclix_gen.cnct(immediate_J_src), 32))
+
+                cyclix_gen.begcase(opcode)
+                run {
+                    cyclix_gen.begbranch(opcode_LUI)
                     run {
-                        alu_unsigned.assign(1)
-                    }; cyclix_gen.endif()
-                }; cyclix_gen.endbranch()
+                        op0_source.assign(OP0_SRC_IMM)
+                        rd_req.assign(1)
+                        rd_source.assign(RD_LUI)
+                        immediate.assign(immediate_U)
+                    }
+                    cyclix_gen.endbranch()
 
-                cyclix_gen.begbranch(opcode_LOAD)
-                run {
-                    rs0_req.assign(1)
-                    op0_source.assign(OP0_SRC_RS1)
-                    op1_source.assign(OP1_SRC_IMM)
-                    rd_req.assign(1)
-                    rd_source.assign(RD_MEM)
-                    alu_req.assign(1)
-                    mem_req.assign(1)
-                    mem_cmd.assign(0)
-                    immediate.assign(immediate_I)
-                }; cyclix_gen.endbranch()
-
-                cyclix_gen.begbranch(opcode_STORE)
-                run {
-                    rs0_req.assign(1)
-                    rs1_req.assign(1)
-                    op0_source.assign(OP0_SRC_RS1)
-                    op1_source.assign(OP1_SRC_IMM)
-                    alu_req.assign(1)
-                    mem_req.assign(1)
-                    mem_cmd.assign(1)
-                    immediate.assign(immediate_S)
-                }; cyclix_gen.endbranch()
-
-                cyclix_gen.begbranch(opcode_OP_IMM)
-                run {
-                    rs0_req.assign(1)
-                    op0_source.assign(OP0_SRC_RS1)
-                    op1_source.assign(OP1_SRC_IMM)
-                    rd_req.assign(1)
-                    immediate.assign(immediate_I)
-                    alu_req.assign(1)
-
-                    cyclix_gen.begcase(funct3)
+                    cyclix_gen.begbranch(opcode_AUIPC)
                     run {
-                        // ADDI
-                        cyclix_gen.begbranch(0x0)
-                        run {
-                            alu_opcode.assign(aluop_ADD)
-                            rd_source.assign(RD_ALU)
-                        }; cyclix_gen.endbranch()
+                        op0_source.assign(OP0_SRC_PC)
+                        op1_source.assign(OP1_SRC_IMM)
+                        alu_req.assign(1)
+                        alu_opcode.assign(aluop_ADD)
+                        rd_req.assign(1)
+                        rd_source.assign(RD_ALU)
+                        immediate.assign(immediate_U)
+                    }; cyclix_gen.endbranch()
 
-                        // SLLI
-                        cyclix_gen.begbranch(0x1)
-                        run {
-                            alu_opcode.assign(aluop_SLL)
-                            rd_source.assign(RD_ALU)
-                            immediate.assign(cyclix_gen.zeroext(instr_code[24, 20], 32))
-                        }; cyclix_gen.endbranch()
+                    cyclix_gen.begbranch(opcode_JAL)
+                    run {
+                        op0_source.assign(OP0_SRC_PC)
+                        op1_source.assign(OP1_SRC_IMM)
+                        alu_req.assign(1)
+                        alu_opcode.assign(aluop_ADD)
+                        rd_req.assign(1)
+                        rd_source.assign(RD_PC_INC)
+                        jump_req.assign(1)
+                        jump_src.assign(JMP_SRC_ALU)
+                        immediate.assign(immediate_J)
+                    }; cyclix_gen.endbranch()
 
-                        // SLTI
-                        cyclix_gen.begbranch(0x2)
-                        run {
-                            alu_opcode.assign(aluop_SUB)
-                            rd_source.assign(RD_CF_COND)
-                        }; cyclix_gen.endbranch()
+                    cyclix_gen.begbranch(opcode_JALR)
+                    run {
+                        rs0_req.assign(1)
+                        op0_source.assign(OP0_SRC_RS1)
+                        op1_source.assign(OP1_SRC_IMM)
+                        alu_req.assign(1)
+                        alu_opcode.assign(aluop_ADD)
+                        rd_req.assign(1)
+                        rd_source.assign(RD_PC_INC)
+                        jump_req.assign(1)
+                        jump_src.assign(JMP_SRC_ALU)
+                        immediate.assign(immediate_I)
+                    }; cyclix_gen.endbranch()
 
-                        // SLTIU
-                        cyclix_gen.begbranch(0x3)
+                    cyclix_gen.begbranch(opcode_BRANCH)
+                    run {
+                        rs0_req.assign(1)
+                        rs1_req.assign(1)
+                        alu_req.assign(1)
+                        alu_opcode.assign(aluop_SUB)
+                        jump_req_cond.assign(1)
+                        jump_src.assign(JMP_SRC_ALU)
+                        immediate.assign(immediate_B)
+
+                        cyclix_gen.begif(cyclix_gen.bor(cyclix_gen.eq2(funct3, 0x6), cyclix_gen.eq2(funct3, 0x7)))
                         run {
-                            alu_opcode.assign(aluop_SUB)
                             alu_unsigned.assign(1)
-                            rd_source.assign(RD_CF_COND)
-                        }; cyclix_gen.endbranch()
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endbranch()
 
-                        // XORI
-                        cyclix_gen.begbranch(0x4)
-                        run {
-                            alu_opcode.assign(aluop_XOR)
-                            rd_source.assign(RD_ALU)
-                        }; cyclix_gen.endbranch()
-
-                        // SRLI, SRAI
-                        cyclix_gen.begbranch(0x5)
-                        run {
-                            // SRAI
-                            cyclix_gen.begif(instr_code[30])
-                            run {
-                                alu_opcode.assign(aluop_SRA)
-                            }; cyclix_gen.endif()
-
-                            // SRLI
-                            cyclix_gen.begelse()
-                            run {
-                                alu_opcode.assign(aluop_SRL)
-                            }; cyclix_gen.endif()
-
-                            rd_source.assign(RD_ALU)
-                            immediate.assign(cyclix_gen.zeroext(instr_code[24, 20], 32))
-                        }; cyclix_gen.endbranch()
-
-                        // ORI
-                        cyclix_gen.begbranch(0x6)
-                        run {
-                            alu_opcode.assign(aluop_OR)
-                            rd_source.assign(RD_ALU)
-                        }; cyclix_gen.endbranch()
-
-                        // ANDI
-                        cyclix_gen.begbranch(0x7)
-                        run {
-                            alu_opcode.assign(aluop_AND)
-                            rd_source.assign(RD_ALU)
-                        }; cyclix_gen.endbranch()
-
-                    }; cyclix_gen.endcase()
-                }; cyclix_gen.endbranch()
-
-                cyclix_gen.begbranch(opcode_OP)
-                run {
-                    rs0_req.assign(1)
-                    rs1_req.assign(1)
-                    op0_source.assign(OP0_SRC_RS1)
-                    op1_source.assign(OP1_SRC_RS2)
-                    rd_req.assign(1)
-                    rd_source.assign(RD_ALU)
-                    alu_req.assign(1)
-
-                    cyclix_gen.begcase(funct3)
+                    cyclix_gen.begbranch(opcode_LOAD)
                     run {
-                        // ADD/SUB
-                        cyclix_gen.begbranch(0x0)
-                        run {
-                            // SUB
-                            cyclix_gen.begif(instr_code[30])
-                            run {
-                                alu_opcode.assign(aluop_SUB)
-                            }; cyclix_gen.endif()
+                        rs0_req.assign(1)
+                        op0_source.assign(OP0_SRC_RS1)
+                        op1_source.assign(OP1_SRC_IMM)
+                        rd_req.assign(1)
+                        rd_source.assign(RD_MEM)
+                        alu_req.assign(1)
+                        mem_req.assign(1)
+                        mem_cmd.assign(0)
+                        immediate.assign(immediate_I)
+                    }; cyclix_gen.endbranch()
 
-                            // ADD
-                            cyclix_gen.begelse()
+                    cyclix_gen.begbranch(opcode_STORE)
+                    run {
+                        rs0_req.assign(1)
+                        rs1_req.assign(1)
+                        op0_source.assign(OP0_SRC_RS1)
+                        op1_source.assign(OP1_SRC_IMM)
+                        alu_req.assign(1)
+                        mem_req.assign(1)
+                        mem_cmd.assign(1)
+                        immediate.assign(immediate_S)
+                    }; cyclix_gen.endbranch()
+
+                    cyclix_gen.begbranch(opcode_OP_IMM)
+                    run {
+                        rs0_req.assign(1)
+                        op0_source.assign(OP0_SRC_RS1)
+                        op1_source.assign(OP1_SRC_IMM)
+                        rd_req.assign(1)
+                        immediate.assign(immediate_I)
+                        alu_req.assign(1)
+
+                        cyclix_gen.begcase(funct3)
+                        run {
+                            // ADDI
+                            cyclix_gen.begbranch(0x0)
                             run {
                                 alu_opcode.assign(aluop_ADD)
-                            }; cyclix_gen.endif()
-                            rd_source.assign(RD_ALU)
-                        }; cyclix_gen.endbranch()
+                                rd_source.assign(RD_ALU)
+                            }; cyclix_gen.endbranch()
 
-                        // SLL
-                        cyclix_gen.begbranch(0x1)
-                        run {
-                            alu_opcode.assign(aluop_SLL)
-                            rd_source.assign(RD_ALU)
-                        }; cyclix_gen.endbranch()
-
-                        // SLT
-                        cyclix_gen.begbranch(0x2)
-                        run {
-                            alu_opcode.assign(aluop_SUB)
-                            rd_source.assign(RD_CF_COND)
-                        }; cyclix_gen.endbranch()
-
-                        // SLTU
-                        cyclix_gen.begbranch(0x3)
-                        run {
-                            alu_opcode.assign(aluop_SUB)
-                            alu_unsigned.assign(1)
-                            rd_source.assign(RD_CF_COND)
-                        }; cyclix_gen.endbranch()
-
-                        // XORI
-                        cyclix_gen.begbranch(0x4)
-                        run {
-                            alu_opcode.assign(aluop_XOR)
-                            rd_source.assign(RD_ALU)
-                        }; cyclix_gen.endbranch()
-
-                        // SRL/SRA
-                        cyclix_gen.begbranch(0x5)
-                        run {
-                            // SRA
-                            cyclix_gen.begif(instr_code[30])
+                            // SLLI
+                            cyclix_gen.begbranch(0x1)
                             run {
-                                alu_opcode.assign(aluop_SRA)
-                            }; cyclix_gen.endif()
-                            // SRL
-                            cyclix_gen.begelse()
+                                alu_opcode.assign(aluop_SLL)
+                                rd_source.assign(RD_ALU)
+                                immediate.assign(cyclix_gen.zeroext(instr_code[24, 20], 32))
+                            }; cyclix_gen.endbranch()
+
+                            // SLTI
+                            cyclix_gen.begbranch(0x2)
                             run {
-                                alu_opcode.assign(aluop_SRL)
-                            }; cyclix_gen.endif()
-                            rd_source.assign(RD_ALU)
-                        }; cyclix_gen.endbranch()
+                                alu_opcode.assign(aluop_SUB)
+                                rd_source.assign(RD_CF_COND)
+                            }; cyclix_gen.endbranch()
 
-                        // OR
-                        cyclix_gen.begbranch(0x6)
+                            // SLTIU
+                            cyclix_gen.begbranch(0x3)
+                            run {
+                                alu_opcode.assign(aluop_SUB)
+                                alu_unsigned.assign(1)
+                                rd_source.assign(RD_CF_COND)
+                            }; cyclix_gen.endbranch()
+
+                            // XORI
+                            cyclix_gen.begbranch(0x4)
+                            run {
+                                alu_opcode.assign(aluop_XOR)
+                                rd_source.assign(RD_ALU)
+                            }; cyclix_gen.endbranch()
+
+                            // SRLI, SRAI
+                            cyclix_gen.begbranch(0x5)
+                            run {
+                                // SRAI
+                                cyclix_gen.begif(instr_code[30])
+                                run {
+                                    alu_opcode.assign(aluop_SRA)
+                                }; cyclix_gen.endif()
+
+                                // SRLI
+                                cyclix_gen.begelse()
+                                run {
+                                    alu_opcode.assign(aluop_SRL)
+                                }; cyclix_gen.endif()
+
+                                rd_source.assign(RD_ALU)
+                                immediate.assign(cyclix_gen.zeroext(instr_code[24, 20], 32))
+                            }; cyclix_gen.endbranch()
+
+                            // ORI
+                            cyclix_gen.begbranch(0x6)
+                            run {
+                                alu_opcode.assign(aluop_OR)
+                                rd_source.assign(RD_ALU)
+                            }; cyclix_gen.endbranch()
+
+                            // ANDI
+                            cyclix_gen.begbranch(0x7)
+                            run {
+                                alu_opcode.assign(aluop_AND)
+                                rd_source.assign(RD_ALU)
+                            }; cyclix_gen.endbranch()
+
+                        }; cyclix_gen.endcase()
+                    }; cyclix_gen.endbranch()
+
+                    cyclix_gen.begbranch(opcode_OP)
+                    run {
+                        rs0_req.assign(1)
+                        rs1_req.assign(1)
+                        op0_source.assign(OP0_SRC_RS1)
+                        op1_source.assign(OP1_SRC_RS2)
+                        rd_req.assign(1)
+                        rd_source.assign(RD_ALU)
+                        alu_req.assign(1)
+
+                        cyclix_gen.begcase(funct3)
                         run {
-                            alu_opcode.assign(aluop_OR)
-                            rd_source.assign(RD_ALU)
-                        }; cyclix_gen.endbranch()
+                            // ADD/SUB
+                            cyclix_gen.begbranch(0x0)
+                            run {
+                                // SUB
+                                cyclix_gen.begif(instr_code[30])
+                                run {
+                                    alu_opcode.assign(aluop_SUB)
+                                }; cyclix_gen.endif()
 
-                        // AND
-                        cyclix_gen.begbranch(0x7)
+                                // ADD
+                                cyclix_gen.begelse()
+                                run {
+                                    alu_opcode.assign(aluop_ADD)
+                                }; cyclix_gen.endif()
+                                rd_source.assign(RD_ALU)
+                            }; cyclix_gen.endbranch()
+
+                            // SLL
+                            cyclix_gen.begbranch(0x1)
+                            run {
+                                alu_opcode.assign(aluop_SLL)
+                                rd_source.assign(RD_ALU)
+                            }; cyclix_gen.endbranch()
+
+                            // SLT
+                            cyclix_gen.begbranch(0x2)
+                            run {
+                                alu_opcode.assign(aluop_SUB)
+                                rd_source.assign(RD_CF_COND)
+                            }; cyclix_gen.endbranch()
+
+                            // SLTU
+                            cyclix_gen.begbranch(0x3)
+                            run {
+                                alu_opcode.assign(aluop_SUB)
+                                alu_unsigned.assign(1)
+                                rd_source.assign(RD_CF_COND)
+                            }; cyclix_gen.endbranch()
+
+                            // XORI
+                            cyclix_gen.begbranch(0x4)
+                            run {
+                                alu_opcode.assign(aluop_XOR)
+                                rd_source.assign(RD_ALU)
+                            }; cyclix_gen.endbranch()
+
+                            // SRL/SRA
+                            cyclix_gen.begbranch(0x5)
+                            run {
+                                // SRA
+                                cyclix_gen.begif(instr_code[30])
+                                run {
+                                    alu_opcode.assign(aluop_SRA)
+                                }; cyclix_gen.endif()
+                                // SRL
+                                cyclix_gen.begelse()
+                                run {
+                                    alu_opcode.assign(aluop_SRL)
+                                }; cyclix_gen.endif()
+                                rd_source.assign(RD_ALU)
+                            }; cyclix_gen.endbranch()
+
+                            // OR
+                            cyclix_gen.begbranch(0x6)
+                            run {
+                                alu_opcode.assign(aluop_OR)
+                                rd_source.assign(RD_ALU)
+                            }; cyclix_gen.endbranch()
+
+                            // AND
+                            cyclix_gen.begbranch(0x7)
+                            run {
+                                alu_opcode.assign(aluop_AND)
+                                rd_source.assign(RD_ALU)
+                            }; cyclix_gen.endbranch()
+
+                        }; cyclix_gen.endcase()
+                    }; cyclix_gen.endbranch()
+
+                    cyclix_gen.begbranch(opcode_MISC_MEM)
+                    run {
+                        fencereq.assign(1)
+                    }; cyclix_gen.endbranch()
+
+                    cyclix_gen.begbranch(opcode_SYSTEM)
+                    run {
+                        cyclix_gen.begcase(funct3)
                         run {
-                            alu_opcode.assign(aluop_AND)
-                            rd_source.assign(RD_ALU)
-                        }; cyclix_gen.endbranch()
+                            // EBREAK/ECALL
+                            cyclix_gen.begbranch(0x0)
+                            run {
+                                // EBREAK
+                                cyclix_gen.begif(instr_code[20])
+                                run {
+                                    ebreakreq.assign(1)
+                                }; cyclix_gen.endif()
+                                // ECALL
+                                cyclix_gen.begelse()
+                                run {
+                                    ecallreq.assign(1)
+                                }; cyclix_gen.endif()
+                            }; cyclix_gen.endbranch()
 
-                    }; cyclix_gen.endcase()
-                }; cyclix_gen.endbranch()
+                            //CSRRW
+                            cyclix_gen.begbranch(0x1)
+                            run {
+                                csrreq.assign(1)
+                                rs0_req.assign(1)
+                                rd_req.assign(1)
+                                rd_source.assign(RD_CSR)
+                                op0_source.assign(OP0_SRC_RS1)
+                                op1_source.assign(OP1_SRC_CSR)
+                            }; cyclix_gen.endbranch()
 
-                cyclix_gen.begbranch(opcode_MISC_MEM)
-                run {
-                    fencereq.assign(1)
-                }; cyclix_gen.endbranch()
+                            // CSRRS
+                            cyclix_gen.begbranch(0x2)
+                            run {
+                                csrreq.assign(1)
+                                rs0_req.assign(1)
+                                rd_req.assign(1)
+                                rd_source.assign(RD_CSR)
+                                alu_req.assign(1)
+                                alu_opcode.assign(aluop_OR)
+                                op0_source.assign(OP0_SRC_RS1)
+                                op1_source.assign(OP1_SRC_CSR)
+                            }; cyclix_gen.endbranch()
 
-                cyclix_gen.begbranch(opcode_SYSTEM)
+                            // CSRRC
+                            cyclix_gen.begbranch(0x3)
+                            run {
+                                csrreq.assign(1)
+                                rs0_req.assign(1)
+                                rd_req.assign(1)
+                                rd_source.assign(RD_CSR)
+                                alu_req.assign(1)
+                                alu_opcode.assign(aluop_CLRB)
+                                op0_source.assign(OP0_SRC_RS1)
+                                op1_source.assign(OP1_SRC_CSR)
+                            }; cyclix_gen.endbranch()
+
+                            // CSRRWI
+                            cyclix_gen.begbranch(0x5)
+                            run {
+                                csrreq.assign(1)
+                                rd_req.assign(1)
+                                op0_source.assign(OP0_SRC_IMM)
+                                op1_source.assign(OP1_SRC_CSR)
+                                immediate.assign(cyclix_gen.zeroext(zimm, 32))
+                            }; cyclix_gen.endbranch()
+
+                            // CSRRSI
+                            cyclix_gen.begbranch(0x6)
+                            run {
+                                csrreq.assign(1)
+                                rd_req.assign(1)
+                                rd_source.assign(RD_CSR)
+                                alu_req.assign(1)
+                                alu_opcode.assign(aluop_CLRB)
+                                op0_source.assign(OP0_SRC_IMM)
+                                op1_source.assign(OP1_SRC_CSR)
+                                immediate.assign(cyclix_gen.zeroext(zimm, 32))
+                            }; cyclix_gen.endbranch()
+
+                            // CSRRSI
+                            cyclix_gen.begbranch(0x7)
+                            run {
+                                csrreq.assign(1)
+                                rd_req.assign(1)
+                                rd_source.assign(RD_CSR)
+                                alu_req.assign(1)
+                                alu_opcode.assign(aluop_CLRB)
+                                op0_source.assign(OP0_SRC_IMM)
+                                op1_source.assign(OP1_SRC_CSR)
+                                immediate.assign(cyclix_gen.zeroext(zimm, 32))
+                            }; cyclix_gen.endbranch()
+                        }; cyclix_gen.endcase()
+                    }; cyclix_gen.endbranch()
+
+                }; cyclix_gen.endcase()
+
+                curinstraddr_imm.assign(curinstr_addr + immediate)
+
+                cyclix_gen.begif(mem_req)
                 run {
                     cyclix_gen.begcase(funct3)
                     run {
-                        // EBREAK/ECALL
                         cyclix_gen.begbranch(0x0)
                         run {
-                            // EBREAK
-                            cyclix_gen.begif(instr_code[20])
-                            run {
-                                ebreakreq.assign(1)
-                            }; cyclix_gen.endif()
-                            // ECALL
-                            cyclix_gen.begelse()
-                            run {
-                                ecallreq.assign(1)
-                            }; cyclix_gen.endif()
+                            mem_be.assign(0x1)
+                            load_signext.assign(1)
                         }; cyclix_gen.endbranch()
 
-                        //CSRRW
                         cyclix_gen.begbranch(0x1)
                         run {
-                            csrreq.assign(1)
-                            rs0_req.assign(1)
-                            rd_req.assign(1)
-                            rd_source.assign(RD_CSR)
-                            op0_source.assign(OP0_SRC_RS1)
-                            op1_source.assign(OP1_SRC_CSR)
+                            mem_be.assign(0x3)
+                            load_signext.assign(1)
                         }; cyclix_gen.endbranch()
 
-                        // CSRRS
                         cyclix_gen.begbranch(0x2)
                         run {
-                            csrreq.assign(1)
-                            rs0_req.assign(1)
-                            rd_req.assign(1)
-                            rd_source.assign(RD_CSR)
-                            alu_req.assign(1)
-                            alu_opcode.assign(aluop_OR)
-                            op0_source.assign(OP0_SRC_RS1)
-                            op1_source.assign(OP1_SRC_CSR)
+                            mem_be.assign(0xf)
                         }; cyclix_gen.endbranch()
 
-                        // CSRRC
-                        cyclix_gen.begbranch(0x3)
+                        cyclix_gen.begbranch(0x4)
                         run {
-                            csrreq.assign(1)
-                            rs0_req.assign(1)
-                            rd_req.assign(1)
-                            rd_source.assign(RD_CSR)
-                            alu_req.assign(1)
-                            alu_opcode.assign(aluop_CLRB)
-                            op0_source.assign(OP0_SRC_RS1)
-                            op1_source.assign(OP1_SRC_CSR)
+                            mem_be.assign(0x1)
                         }; cyclix_gen.endbranch()
 
-                        // CSRRWI
                         cyclix_gen.begbranch(0x5)
                         run {
-                            csrreq.assign(1)
-                            rd_req.assign(1)
-                            op0_source.assign(OP0_SRC_IMM)
-                            op1_source.assign(OP1_SRC_CSR)
-                            immediate.assign(cyclix_gen.zeroext(zimm, 32))
-                        }; cyclix_gen.endbranch()
-
-                        // CSRRSI
-                        cyclix_gen.begbranch(0x6)
-                        run {
-                            csrreq.assign(1)
-                            rd_req.assign(1)
-                            rd_source.assign(RD_CSR)
-                            alu_req.assign(1)
-                            alu_opcode.assign(aluop_CLRB)
-                            op0_source.assign(OP0_SRC_IMM)
-                            op1_source.assign(OP1_SRC_CSR)
-                            immediate.assign(cyclix_gen.zeroext(zimm, 32))
-                        }; cyclix_gen.endbranch()
-
-                        // CSRRSI
-                        cyclix_gen.begbranch(0x7)
-                        run {
-                            csrreq.assign(1)
-                            rd_req.assign(1)
-                            rd_source.assign(RD_CSR)
-                            alu_req.assign(1)
-                            alu_opcode.assign(aluop_CLRB)
-                            op0_source.assign(OP0_SRC_IMM)
-                            op1_source.assign(OP1_SRC_CSR)
-                            immediate.assign(cyclix_gen.zeroext(zimm, 32))
+                            mem_be.assign(0x3)
                         }; cyclix_gen.endbranch()
                     }; cyclix_gen.endcase()
-                }; cyclix_gen.endbranch()
+                }; cyclix_gen.endif()
 
-            }; cyclix_gen.endcase()
-
-            curinstraddr_imm.assign(curinstr_addr + immediate)
-
-            cyclix_gen.begif(mem_req)
-            run {
-                cyclix_gen.begcase(funct3)
+                cyclix_gen.begif(cyclix_gen.eq2(instr_code, instrcode_MRET))
                 run {
-                    cyclix_gen.begbranch(0x0)
-                    run {
-                        mem_be.assign(0x1)
-                        load_signext.assign(1)
-                    }; cyclix_gen.endbranch()
+                    mret_req.assign(1)
+                    jump_req.assign(1)
+                    jump_req_cond.assign(0)
+                    jump_src.assign(JMP_SRC_IMM)
+                    immediate.assign(MRETADDR)
+                }; cyclix_gen.endif()
 
-                    cyclix_gen.begbranch(0x1)
-                    run {
-                        mem_be.assign(0x3)
-                        load_signext.assign(1)
-                    }; cyclix_gen.endbranch()
+                cyclix_gen.begif(cyclix_gen.eq2(rd_addr, 0))
+                run {
+                    rd_req.assign(0)
+                }; cyclix_gen.endif()
 
-                    cyclix_gen.begbranch(0x2)
-                    run {
-                        mem_be.assign(0xf)
-                    }; cyclix_gen.endbranch()
+                ////////////////////////
 
-                    cyclix_gen.begbranch(0x4)
-                    run {
-                        mem_be.assign(0x1)
-                    }; cyclix_gen.endbranch()
+                var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
+                var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
 
-                    cyclix_gen.begbranch(0x5)
-                    run {
-                        mem_be.assign(0x3)
-                    }; cyclix_gen.endbranch()
-                }; cyclix_gen.endcase()
-            }; cyclix_gen.endif()
+                rs0_rdy.assign(1)
+                cyclix_gen.begif(rs0_req)
+                run {
+                    rs0_tag.assign(global_structures.RenameReg(rs0_addr))
+                    global_structures.FetchRs(rs0_rdata, rs0_tag)
+                    rs0_rdy.assign(global_structures.FetchRsRdy(rs0_tag))
+                }; cyclix_gen.endif()
 
-            cyclix_gen.begif(cyclix_gen.eq2(instr_code, instrcode_MRET))
-            run {
-                mret_req.assign(1)
-                jump_req.assign(1)
-                jump_req_cond.assign(0)
-                jump_src.assign(JMP_SRC_IMM)
-                immediate.assign(MRETADDR)
-            }; cyclix_gen.endif()
+                //// TODO: cleanup
+                cyclix_gen.begif(cyclix_gen.eq2(op0_source, OP0_SRC_IMM))
+                run {
+                    rs0_rdata.assign(immediate)
+                }; cyclix_gen.endif()
 
-            cyclix_gen.begif(cyclix_gen.eq2(rd_addr, 0))
-            run {
-                rd_req.assign(0)
-            }; cyclix_gen.endif()
+                cyclix_gen.begif(cyclix_gen.eq2(op0_source, OP0_SRC_PC))
+                run {
+                    rs0_rdata.assign(curinstr_addr)
+                }; cyclix_gen.endif()
+                ////
 
-            ////////////////////////
+                rs1_rdy.assign(1)
+                cyclix_gen.begif(rs1_req)
+                run {
+                    rs1_tag.assign(global_structures.RenameReg(rs1_addr))
+                    global_structures.FetchRs(rs1_rdata, global_structures.RenameReg(rs1_addr))
+                    rs1_rdy.assign(global_structures.FetchRsRdy(rs1_tag))
+                }; cyclix_gen.endif()
 
-            var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
-            var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
+                //// TODO: cleanup
+                cyclix_gen.begif(cyclix_gen.eq2(op1_source, OP1_SRC_IMM))
+                run {
+                    rs1_rdata.assign(immediate)
+                }; cyclix_gen.endif()
+                ////
 
-            rs0_rdy.assign(1)
-            cyclix_gen.begif(rs0_req)
-            run {
-                rs0_tag.assign(global_structures.RenameReg(rs0_addr))
-                global_structures.FetchRs(rs0_rdata, rs0_tag)
-                rs0_rdy.assign(global_structures.FetchRsRdy(rs0_tag))
-            }; cyclix_gen.endif()
+                // TODO: CSR
 
-            //// TODO: cleanup
-            cyclix_gen.begif(cyclix_gen.eq2(op0_source, OP0_SRC_IMM))
-            run {
-                rs0_rdata.assign(immediate)
-            }; cyclix_gen.endif()
+                cyclix_gen.assign(new_renamed_uop.GetFracRef("rs2_rdy"), 1)
 
-            cyclix_gen.begif(cyclix_gen.eq2(op0_source, OP0_SRC_PC))
-            run {
-                rs0_rdata.assign(curinstr_addr)
-            }; cyclix_gen.endif()
-            ////
+                opcode.assign(alu_opcode)
 
-            rs1_rdy.assign(1)
-            cyclix_gen.begif(rs1_req)
-            run {
-                rs1_tag.assign(global_structures.RenameReg(rs1_addr))
-                global_structures.FetchRs(rs1_rdata, global_structures.RenameReg(rs1_addr))
-                rs1_rdy.assign(global_structures.FetchRsRdy(rs1_tag))
-            }; cyclix_gen.endif()
+                cyclix_gen.begif(rd_req)
+                run {
+                    cyclix_gen.assign(nru_rd_tag_prev, global_structures.RenameReg(rd_addr))
+                    cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped, nru_rd_tag_prev))
 
-            //// TODO: cleanup
-            cyclix_gen.begif(cyclix_gen.eq2(op1_source, OP1_SRC_IMM))
-            run {
-                rs1_rdata.assign(immediate)
-            }; cyclix_gen.endif()
-            ////
+                    var alloc_rd_tag = global_structures.GetFreePRF()
+                    cyclix_gen.assign(rd_tag, alloc_rd_tag.position)
+                    global_structures.ReserveRd(rd_addr, rd_tag)      // TODO: "free not found" processing
+                }; cyclix_gen.endif()
 
-            // TODO: CSR
+                cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
+                cyclix_gen.assign(new_renamed_uop.GetFracRef("exu_opcode"), alu_opcode)
+                cyclix_gen.assign(new_renamed_uop.GetFracRef("rdy"), !alu_req)
 
-            cyclix_gen.assign(new_renamed_uop.GetFracRef("rs2_rdy"), 1)
+                cyclix_gen.begif(renamed_uop_buf.ctrl_rdy)
+                run {
+                    cyclix_gen.assign(renamed_uop_buf.push, 1)
+                    renamed_uop_buf.push_trx(new_renamed_uop)
 
-            opcode.assign(alu_opcode)
+                    cyclix_gen.assign(pop, 1)
+                    pop_trx()
+                }; cyclix_gen.endif()
 
-            cyclix_gen.begif(rd_req)
-            run {
-                cyclix_gen.assign(nru_rd_tag_prev, global_structures.RenameReg(rd_addr))
-                cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped, nru_rd_tag_prev))
-
-                var alloc_rd_tag = global_structures.GetFreePRF()
-                cyclix_gen.assign(rd_tag, alloc_rd_tag.position)
-                global_structures.ReserveRd(rd_addr, rd_tag)      // TODO: "free not found" processing
-            }; cyclix_gen.endif()
-
-            cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
-            cyclix_gen.assign(new_renamed_uop.GetFracRef("exu_opcode"), alu_opcode)
-            cyclix_gen.assign(new_renamed_uop.GetFracRef("rdy"), !alu_req)
-
-            cyclix_gen.begif(renamed_uop_buf.ctrl_rdy)
-            run {
-                cyclix_gen.assign(renamed_uop_buf.push, 1)
-                renamed_uop_buf.push_trx(new_renamed_uop)
-
-                cyclix_gen.assign(pop, 1)
-                pop_trx()
             }; cyclix_gen.endif()
 
         }; cyclix_gen.endif()
