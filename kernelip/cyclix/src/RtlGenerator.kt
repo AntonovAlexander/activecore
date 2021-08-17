@@ -195,6 +195,7 @@ class RtlGenerator(var cyclix_module : Generic) {
 
         MSG("Generating combinationals...")
         for (local in cyclix_module.locals) {
+            if (local.read_done && !local.write_done) ERROR("Local signal " + local.name + " is read but never written!")
             var new_comb = rtl_gen.comb(local.name, local.vartype, local.defimm)
             var_dict.put(local, new_comb)
         }
@@ -257,7 +258,14 @@ class RtlGenerator(var cyclix_module : Generic) {
             rtl_submodule_inst = rtl_gen.submodule(subproc.value.inst_name, submod_rtl_gen)
 
             rtl_submodule_inst.connect("clk_i", clk)
-            rtl_submodule_inst.connect("rst_i", rst)
+            rtl_submodule_inst.connect("rst_i", subproc.value.RootResetDriver)
+            rtl_gen.cproc_begin()
+            run {
+                rtl_gen.assign(var_dict[subproc.value.RootResetDriver]!!, rst)
+                for (reset_driver in subproc.value.AppResetDrivers) {
+                    rtl_gen.bor_gen(var_dict[subproc.value.RootResetDriver]!!, var_dict[subproc.value.RootResetDriver]!!, var_dict[reset_driver]!!)
+                }
+            }; rtl_gen.cproc_end()
 
             for (fifo_if in subproc.value.fifo_ifs) {
 

@@ -387,6 +387,11 @@ open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct:
     var stream_resp_bus = fifo_out(STREAM_RESP_BUS_NAME, hw_type(fifo_out_struct))
     var stream_resp_var = local(GetGenName("stream_resp_var"), fifo_out_struct)
 
+    init {
+        stream_req_var.write_done = true
+        stream_resp_var.read_done = true
+    }
+
     fun export_rtl_wrapper(DEBUG_FLAG : Boolean) : rtl.module {
 
         NEWLINE()

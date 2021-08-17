@@ -12,6 +12,9 @@ import hwast.*
 
 class hw_subproc(var inst_name : String, var src_module: Generic, var parent_module: Generic) {
 
+    var RootResetDriver = parent_module.ulocal("gensubmod_" + inst_name + "_genrst", 0, 0, "0")
+    var AppResetDrivers = ArrayList<hw_var>()
+
     var Ports = mutableMapOf<String, hw_port>()
     var PortConnections = mutableMapOf<hw_port, hw_param>()
 
@@ -22,10 +25,20 @@ class hw_subproc(var inst_name : String, var src_module: Generic, var parent_mod
         for (port in src_module.Ports) {
             Ports.put(port.name, port)
         }
-
         for (fifo in src_module.fifo_ifs) {
             fifo_ifs.put(fifo.value.name, fifo.value)
         }
+    }
+
+    fun AddResetDriver() : hw_var {
+        var rst_var = parent_module.ulocal(parent_module.GetGenName("genrst"), 0, 0, "0")
+        AppResetDrivers.add(rst_var)
+        return rst_var
+    }
+
+    fun AddResetDriver(rst_var : hw_var) : hw_var {
+        AppResetDrivers.add(rst_var)
+        return rst_var
     }
 
     fun getPortByName(name : String) : hw_port {

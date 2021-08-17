@@ -73,7 +73,8 @@ class __global_structures(val cyclix_gen : cyclix.Generic,
                           val ARF_map_default : hw_imm_arr,
                           val PRF_src : hw_var,
                           val ExecUnits : MutableMap<String, Exu_CFG>,
-                          val exu_descrs : MutableMap<String, __exu_descr>) {
+                          val exu_descrs : MutableMap<String, __exu_descr>,
+                          val exu_rst : hw_var) {
 
     fun RenameReg(src_addr : hw_param) : hw_var {
         return ARF_map.GetFracRef(src_addr)
@@ -118,6 +119,7 @@ class __global_structures(val cyclix_gen : cyclix.Generic,
     }
 
     fun RollBack(Backoff_ARF : hw_var) {
+        cyclix_gen.assign(exu_rst, 1)
         cyclix_gen.assign(PRF_mapped, PRF_mapped.defimm)
         cyclix_gen.assign(PRF_rdy, PRF_rdy.defimm)
         //cyclix_gen.assign(ARF_map, ARF_map_default)               // TODO: fix error

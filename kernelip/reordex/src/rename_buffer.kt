@@ -13,7 +13,7 @@ import hwast.*
 open class rename_buffer(cyclix_gen : cyclix.Generic,
                          name_prefix : String,
                          TRX_BUF_SIZE : Int,
-                         MultiExu_CFG : Reordex_CFG,
+                         val MultiExu_CFG : Reordex_CFG,
                          ExecUnits_size : Int,
                          cdb_num : Int) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, cdb_num) {
 
@@ -43,26 +43,30 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
                     num_rs++
                 }
 
-                cyclix_gen.begif(wb_ext)
-                run {
-                    cyclix_gen.begif(store_iq.ctrl_rdy)
+                cyclix_gen.clrif()
+
+                if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
+                    cyclix_gen.begif(wb_ext)
                     run {
+                        cyclix_gen.begif(store_iq.ctrl_rdy)
+                        run {
 
-                        // signaling iq_wr
-                        cyclix_gen.assign(store_iq.push, 1)
+                            // signaling iq_wr
+                            cyclix_gen.assign(store_iq.push, 1)
 
-                        var store_push_trx = store_iq.GetPushTrx()
-                        cyclix_gen.assign_subStructs(store_push_trx, TRX_BUF_head_ref)
-                        cyclix_gen.assign(store_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
-                        store_iq.push_trx(store_push_trx)
+                            var store_push_trx = store_iq.GetPushTrx()
+                            cyclix_gen.assign_subStructs(store_push_trx, TRX_BUF_head_ref)
+                            cyclix_gen.assign(store_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
+                            store_iq.push_trx(store_push_trx)
 
-                        cyclix_gen.assign(rob_push_trx.GetFracRef("cdb_id"), store_iq.CDB_index)
+                            cyclix_gen.assign(rob_push_trx.GetFracRef("cdb_id"), store_iq.CDB_index)
 
-                        // clearing renamed uop buffer
-                        cyclix_gen.assign(pop, 1)
+                            // clearing renamed uop buffer
+                            cyclix_gen.assign(pop, 1)
 
+                        }; cyclix_gen.endif()
                     }; cyclix_gen.endif()
-                }; cyclix_gen.endif()
+                }
 
                 cyclix_gen.begelse()
                 run {

@@ -152,7 +152,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var PRF_src = cyclix_gen.uglobal("genPRF_src", prf_src_dim, "0") // uncomputed PRF sources
 
         var exu_descrs = mutableMapOf<String, __exu_descr>()
-        var global_structures = __global_structures(cyclix_gen, MultiExu_CFG, PRF, PRF_mapped, PRF_rdy, ARF_map, ARF_map_default, PRF_src, ExecUnits, exu_descrs)
+        var exu_rst = cyclix_gen.ulocal("genexu_rst", 0, 0, "0")
+        var global_structures = __global_structures(cyclix_gen, MultiExu_CFG, PRF, PRF_mapped, PRF_rdy, ARF_map, ARF_map_default, PRF_src, ExecUnits, exu_descrs, exu_rst)
 
         MSG("generating control structures: done")
 
@@ -255,6 +256,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             var ExUnit_insts = ArrayList<cyclix.hw_subproc>()
             for (exu_num in 0 until ExUnit.value.exu_num) {
                 var exu_inst = cyclix_gen.subproc(exu_cyclix_gen.name + "_" + exu_num, exu_cyclix_gen)
+                exu_inst.AddResetDriver(exu_rst)
                 ExUnit_insts.add(exu_inst)
             }
             ExUnits_insts.add(ExUnit_insts)
@@ -338,22 +340,24 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         }; cyclix_gen.endloop()
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
 
-        cyclix_gen.MSG_COMMENT("IQ processing: store IQ...")
-        store_iq.preinit_ctrls()
-        store_iq.init_locals()
-        cyclix_gen.begif(store_iq.ctrl_active)
-        run {
-            cyclix_gen.begif(store_iq.rs_rsrv[0].rs_rdy)
+        if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
+            cyclix_gen.MSG_COMMENT("IQ processing: store IQ...")
+            store_iq.preinit_ctrls()
+            store_iq.init_locals()
+            cyclix_gen.begif(store_iq.ctrl_active)
             run {
-                if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) cyclix_gen.assign(store_iq.pop, cyclix_gen.fifo_wr_unblk(cmd_resp, store_iq.rs_rsrv[0].rs_rdata))
+                cyclix_gen.begif(store_iq.rs_rsrv[0].rs_rdy)
+                run {
+                    cyclix_gen.assign(store_iq.pop, cyclix_gen.fifo_wr_unblk(cmd_resp, store_iq.rs_rsrv[0].rs_rdata))
+                }; cyclix_gen.endif()
             }; cyclix_gen.endif()
-        }; cyclix_gen.endif()
-        // popping
-        cyclix_gen.begif(store_iq.pop)
-        run {
-            store_iq.pop_trx()
-        }; cyclix_gen.endif()
-        cyclix_gen.MSG_COMMENT("IQ processing: store IQ: done")
+            // popping
+            cyclix_gen.begif(store_iq.pop)
+            run {
+                store_iq.pop_trx()
+            }; cyclix_gen.endif()
+            cyclix_gen.MSG_COMMENT("IQ processing: store IQ: done")
+        }
 
         var fu_id = 0
         for (ExUnit in ExecUnits) {

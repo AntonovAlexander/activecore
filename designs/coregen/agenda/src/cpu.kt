@@ -158,6 +158,17 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CPU_CFG_inst) {
         alu_op1.assign(subStruct(req_data, "rs1_rdata"))
         alu_opcode.assign(subStruct(req_data, "exu_opcode"))
 
+        begif(CPU_CFG_inst.alu_unsigned)
+        run {
+            alu_op0_wide.assign(zeroext(alu_op0, 33))
+            alu_op1_wide.assign(zeroext(alu_op1, 33))
+        }; endif()
+        begelse()
+        run {
+            alu_op0_wide.assign(signext(alu_op0, 33))
+            alu_op1_wide.assign(signext(alu_op1, 33))
+        }; endif()
+
         begcase(alu_opcode)
         run {
             begbranch(aluop_MUL)
@@ -172,6 +183,8 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CPU_CFG_inst) {
         }; endcase()
 
         alu_result.assign(alu_result_wide[31, 0])
+
+        rd0.assign(alu_result)
     }
 }
 
