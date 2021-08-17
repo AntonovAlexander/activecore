@@ -746,12 +746,6 @@ class instr_fetch_buffer(name: String,
 
             opcode.assign(alu_opcode)
 
-            cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
-
-            cyclix_gen.assign(new_renamed_uop.GetFracRef("exu_opcode"), alu_opcode)
-
-            cyclix_gen.assign(new_renamed_uop.GetFracRef("rdy"), !alu_req)
-
             cyclix_gen.begif(rd_req)
             run {
                 cyclix_gen.assign(nru_rd_tag_prev, global_structures.RenameReg(rd_addr))
@@ -761,6 +755,10 @@ class instr_fetch_buffer(name: String,
                 cyclix_gen.assign(rd_tag, alloc_rd_tag.position)
                 global_structures.ReserveRd(rd_addr, rd_tag)      // TODO: "free not found" processing
             }; cyclix_gen.endif()
+
+            cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
+            cyclix_gen.assign(new_renamed_uop.GetFracRef("exu_opcode"), alu_opcode)
+            cyclix_gen.assign(new_renamed_uop.GetFracRef("rdy"), !alu_req)
 
             cyclix_gen.begif(renamed_uop_buf.ctrl_rdy)
             run {
