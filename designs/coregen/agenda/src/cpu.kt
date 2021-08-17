@@ -21,6 +21,11 @@ class CPU_CFG() : Reordex_CFG(32, 32, true,64, 16, REORDEX_MODE.RISC)
     var rs1 = AddRs()
     var rs2 = AddRs()
 
+    var alu_CF          = AddDstUImm("alu_CF", 1)
+    var alu_SF          = AddDstUImm("alu_SF", 1)
+    var alu_ZF          = AddDstUImm("alu_ZF", 1)
+    var alu_OF          = AddDstUImm("alu_OF", 1)
+
     var rd0 = AddRd()
 }
 val CPU_CFG_inst = CPU_CFG()
@@ -136,6 +141,10 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
         }; endif()
 
         rd0.assign(alu_result)
+        assign(CPU_CFG_inst.alu_CF, alu_CF)
+        assign(CPU_CFG_inst.alu_SF, alu_SF)
+        assign(CPU_CFG_inst.alu_ZF, alu_ZF)
+        assign(CPU_CFG_inst.alu_OF, alu_OF)
     }
 }
 

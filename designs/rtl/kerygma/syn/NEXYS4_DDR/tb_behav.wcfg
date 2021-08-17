@@ -13,9 +13,9 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="950416fs"></ZoomStartTime>
-      <ZoomEndTime time="1336417fs"></ZoomEndTime>
-      <Cursor1Time time="1000000fs"></Cursor1Time>
+      <ZoomStartTime time="1043035fs"></ZoomStartTime>
+      <ZoomEndTime time="1197436fs"></ZoomEndTime>
+      <Cursor1Time time="1097435fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="526"></NameColumnWidth>
@@ -971,6 +971,16 @@
          <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_data_mem_req_genfifo_wdata_bo" type="array">
             <obj_property name="ElementShortName">genmcopipe_data_mem_req_genfifo_wdata_bo</obj_property>
             <obj_property name="ObjectShortName">genmcopipe_data_mem_req_genfifo_wdata_bo</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_data_mem_req_genfifo_wdata_bo.we" type="array">
+               <obj_property name="ElementShortName">.we[0:0]</obj_property>
+               <obj_property name="ObjectShortName">.we[0:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_data_mem_req_genfifo_wdata_bo.wdata" type="array">
+               <obj_property name="ElementShortName">.wdata</obj_property>
+               <obj_property name="ObjectShortName">.wdata</obj_property>
+               <obj_property name="isExpanded"></obj_property>
+            </wvobject>
          </wvobject>
          <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmcopipe_data_mem_req_genfifo_ack_i" type="array">
             <obj_property name="ElementShortName">genmcopipe_data_mem_req_genfifo_ack_i[0:0]</obj_property>

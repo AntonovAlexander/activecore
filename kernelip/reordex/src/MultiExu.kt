@@ -224,6 +224,11 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 new_exu_descr.var_dict.put(genvar, exu_cyclix_gen.local(genvar.name, genvar.vartype, genvar.defimm))
             MSG("generating intermediates: done")
 
+            MSG("generating DstIms...")
+            for (dst_imm in MultiExu_CFG.dst_imms)
+                new_exu_descr.var_dict.put(dst_imm, TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict).GetFracRef(dst_imm.name))
+            MSG("generating DstIms: done")
+
             MSG("generating logic...")
 
             exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict), exu_cyclix_gen.stream_req_var)
@@ -334,7 +339,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 cyclix_gen.begif(cyclix_gen.eq2(rob_iter.iter_elem.GetFracRef("trx_id"), CDB_ref_data.GetFracRef("trx_id")))
                 run {
                     cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rdy"), 1)
-                    if (MultiExu_CFG.mode == REORDEX_MODE.RISC) cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("alu_result"), CDB_ref_data.GetFracRef("wdata"))
+                    if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
+                        cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("alu_result"), CDB_ref_data.GetFracRef("wdata"))
+                        for (dst_imm in MultiExu_CFG.dst_imms) {
+                            cyclix_gen.assign(rob_iter.iter_elem.GetFracRef(dst_imm.name), CDB_ref_data.GetFracRef(dst_imm.name))
+                        }
+                    }
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
         }; cyclix_gen.endloop()

@@ -78,6 +78,7 @@ class rob_risc(name: String,
     var mem_req         = AdduStageVar("mem_req", 0, 0, "0")
     var mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
     var mem_addr        = AdduStageVar("mem_addr", 31, 0, "0")
+    var mem_wdata       = AdduStageVar("mem_wdata", 31, 0, "0")
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
 
     //// committing RF signals
@@ -160,11 +161,16 @@ class rob_risc(name: String,
 
                     cyclix_gen.begif(mem_req)
                     run {
+
+                        cyclix_gen.assign(mem_addr, alu_result)
+                        cyclix_gen.assign(mem_wdata, rd_wdata)
+
                         cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
                         cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
                         cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
-                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), rd_wdata)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
                         cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata)
+
                         cyclix_gen.begif(!mem_cmd)
                         run {
                             cyclix_gen.assign(mem_rd_inprogress, 1)
