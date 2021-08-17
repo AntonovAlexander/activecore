@@ -13,13 +13,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="324774fs"></ZoomStartTime>
-      <ZoomEndTime time="478175fs"></ZoomEndTime>
-      <Cursor1Time time="429774fs"></Cursor1Time>
+      <ZoomStartTime time="100fs"></ZoomStartTime>
+      <ZoomEndTime time="386101fs"></ZoomEndTime>
+      <Cursor1Time time="140600fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="526"></NameColumnWidth>
-      <ValueColumnWidth column_width="243"></ValueColumnWidth>
+      <ValueColumnWidth column_width="238"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="13" />
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/pc" type="array">
@@ -29,6 +29,168 @@
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map" type="array">
       <obj_property name="ElementShortName">genARF_map[31:0][5:0]</obj_property>
       <obj_property name="ObjectShortName">genARF_map[31:0][5:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[31]" type="array">
+         <obj_property name="ElementShortName">[31][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[31][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[30]" type="array">
+         <obj_property name="ElementShortName">[30][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[30][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[29]" type="array">
+         <obj_property name="ElementShortName">[29][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[29][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[28]" type="array">
+         <obj_property name="ElementShortName">[28][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[28][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[27]" type="array">
+         <obj_property name="ElementShortName">[27][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[27][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[26]" type="array">
+         <obj_property name="ElementShortName">[26][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[26][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[25]" type="array">
+         <obj_property name="ElementShortName">[25][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[25][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[24]" type="array">
+         <obj_property name="ElementShortName">[24][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[24][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[23]" type="array">
+         <obj_property name="ElementShortName">[23][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[23][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[22]" type="array">
+         <obj_property name="ElementShortName">[22][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[22][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[21]" type="array">
+         <obj_property name="ElementShortName">[21][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[21][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[20]" type="array">
+         <obj_property name="ElementShortName">[20][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[20][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[19]" type="array">
+         <obj_property name="ElementShortName">[19][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[19][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[18]" type="array">
+         <obj_property name="ElementShortName">[18][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[18][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[17]" type="array">
+         <obj_property name="ElementShortName">[17][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[17][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[16]" type="array">
+         <obj_property name="ElementShortName">[16][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[16][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[15]" type="array">
+         <obj_property name="ElementShortName">[15][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[15][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[14]" type="array">
+         <obj_property name="ElementShortName">[14][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[14][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[13]" type="array">
+         <obj_property name="ElementShortName">[13][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[13][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[12]" type="array">
+         <obj_property name="ElementShortName">[12][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[12][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[11]" type="array">
+         <obj_property name="ElementShortName">[11][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[11][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[10]" type="array">
+         <obj_property name="ElementShortName">[10][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[10][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[9]" type="array">
+         <obj_property name="ElementShortName">[9][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[9][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[8]" type="array">
+         <obj_property name="ElementShortName">[8][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[8][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[7]" type="array">
+         <obj_property name="ElementShortName">[7][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[7][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[6]" type="array">
+         <obj_property name="ElementShortName">[6][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[6][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[5]" type="array">
+         <obj_property name="ElementShortName">[5][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[5][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[4]" type="array">
+         <obj_property name="ElementShortName">[4][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[4][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[3]" type="array">
+         <obj_property name="ElementShortName">[3][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[3][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[2]" type="array">
+         <obj_property name="ElementShortName">[2][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[2][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[1]" type="array">
+         <obj_property name="ElementShortName">[1][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[1][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genARF_map[0]" type="array">
+         <obj_property name="ElementShortName">[0][5:0]</obj_property>
+         <obj_property name="ObjectShortName">[0][5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genPRF" type="array">
       <obj_property name="ElementShortName">genPRF[63:0][31:0]</obj_property>
@@ -89,7 +251,6 @@
    <wvobject fp_name="group87" type="group">
       <obj_property name="label">instr_fetch</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/instr_fetch_TRX_BUF" type="array">
          <obj_property name="ElementShortName">instr_fetch_TRX_BUF[0:0]</obj_property>
          <obj_property name="ObjectShortName">instr_fetch_TRX_BUF[0:0]</obj_property>
@@ -208,6 +369,23 @@
          <obj_property name="ElementShortName">geniq_INTEGER_0_TRX_BUF[3:0]</obj_property>
          <obj_property name="ObjectShortName">geniq_INTEGER_0_TRX_BUF[3:0]</obj_property>
          <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_BUF[3]" type="array">
+            <obj_property name="ElementShortName">[3]</obj_property>
+            <obj_property name="ObjectShortName">[3]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_BUF[2]" type="array">
+            <obj_property name="ElementShortName">[2]</obj_property>
+            <obj_property name="ObjectShortName">[2]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_BUF[1]" type="array">
+            <obj_property name="ElementShortName">[1]</obj_property>
+            <obj_property name="ObjectShortName">[1]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_BUF[0]" type="array">
+            <obj_property name="ElementShortName">[0]</obj_property>
+            <obj_property name="ObjectShortName">[0]</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_LOCAL" type="array">
          <obj_property name="ElementShortName">geniq_INTEGER_0_TRX_LOCAL</obj_property>

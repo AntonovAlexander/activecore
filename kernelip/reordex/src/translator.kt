@@ -63,3 +63,70 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
 }
 
 class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>)
+
+class __global_structures(val cyclix_gen : cyclix.Generic,
+                          val MultiExu_CFG : Reordex_CFG,
+                          val PRF : hw_var,
+                          val PRF_mapped : hw_var,
+                          val PRF_rdy : hw_var,
+                          val ARF_map : hw_var,
+                          val ARF_map_default : hw_imm_arr,
+                          val PRF_src : hw_var,
+                          val ExecUnits : MutableMap<String, Exu_CFG>,
+                          val exu_descrs : MutableMap<String, __exu_descr>) {
+
+    fun RenameReg(src_addr : hw_param) : hw_var {
+        return ARF_map.GetFracRef(src_addr)
+    }
+
+    fun FetchRs(tgt_rdata : hw_var, src_tag : hw_param) {
+        cyclix_gen.assign(
+            tgt_rdata,
+            PRF.GetFracRef(src_tag))
+    }
+
+    fun FetchRsRdy(src_prf_index : hw_param) : hw_var {
+        return PRF_rdy.GetFracRef(src_prf_index)
+    }
+
+    fun GetFreePRF() : hwast.hw_astc.bit_position {
+        return cyclix_gen.min0(PRF_mapped)
+    }
+
+    fun ReserveRd(rd_addr : hw_param, rd_tag : hw_param) {
+        cyclix_gen.assign(ARF_map.GetFracRef(rd_addr), rd_tag)
+        cyclix_gen.assign(PRF_mapped.GetFracRef(rd_tag), 1)
+        cyclix_gen.assign(PRF_rdy.GetFracRef(rd_tag), 0)
+    }
+
+    fun ReserveWriteRd(src_rd : hw_param, src_tag : hw_param, src_wdata : hw_param) {
+        cyclix_gen.assign(ARF_map.GetFracRef(src_rd), src_tag)
+        cyclix_gen.assign(PRF_mapped.GetFracRef(src_tag), 1)
+        cyclix_gen.assign(PRF_rdy.GetFracRef(src_tag), 1)
+        cyclix_gen.assign(PRF.GetFracRef(src_tag), src_wdata)
+    }
+
+    fun WriteRd(src_tag : hw_param, src_wdata : hw_param) {
+        cyclix_gen.assign(PRF_rdy.GetFracRef(src_tag), 1)
+        cyclix_gen.assign(PRF.GetFracRef(src_tag), src_wdata)
+    }
+
+    fun FreePRF(src_tag : hw_param) {
+        cyclix_gen.assign(
+            PRF_mapped.GetFracRef(src_tag),
+            0)
+    }
+
+    fun RollBack(Backoff_ARF : hw_var) {
+        cyclix_gen.assign(PRF_mapped, PRF_mapped.defimm)
+        cyclix_gen.assign(PRF_rdy, PRF_rdy.defimm)
+        //cyclix_gen.assign(ARF_map, ARF_map_default)               // TODO: fix error
+        for (reg_idx in 0 until ARF_map.GetWidth()) {
+            cyclix_gen.assign(ARF_map.GetFracRef(reg_idx), hw_imm(reg_idx))
+        }
+        cyclix_gen.assign(PRF_src, PRF_src.defimm)
+        for (reg_idx in 0 until Backoff_ARF.GetWidth()) {
+            cyclix_gen.assign(PRF.GetFracRef(reg_idx), Backoff_ARF.GetFracRef(reg_idx))
+        }
+    }
+}

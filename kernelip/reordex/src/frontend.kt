@@ -705,12 +705,10 @@ class instr_fetch_buffer(name: String,
             var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
             var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
 
-            rd_tag.assign(global_structures.RenameRs(rd_addr))
-
             rs0_rdy.assign(1)
             cyclix_gen.begif(rs0_req)
             run {
-                rs0_tag.assign(global_structures.RenameRs(rs0_addr))
+                rs0_tag.assign(global_structures.RenameReg(rs0_addr))
                 global_structures.FetchRs(rs0_rdata, rs0_tag)
                 rs0_rdy.assign(global_structures.FetchRsRdy(rs0_tag))
             }; cyclix_gen.endif()
@@ -730,8 +728,8 @@ class instr_fetch_buffer(name: String,
             rs1_rdy.assign(1)
             cyclix_gen.begif(rs1_req)
             run {
-                rs1_tag.assign(global_structures.RenameRs(rs1_addr))
-                global_structures.FetchRs(rs1_rdata, global_structures.RenameRs(rs1_addr))
+                rs1_tag.assign(global_structures.RenameReg(rs1_addr))
+                global_structures.FetchRs(rs1_rdata, global_structures.RenameReg(rs1_addr))
                 rs1_rdy.assign(global_structures.FetchRsRdy(rs1_tag))
             }; cyclix_gen.endif()
 
@@ -756,11 +754,12 @@ class instr_fetch_buffer(name: String,
 
             cyclix_gen.begif(rd_req)
             run {
-                cyclix_gen.assign(nru_rd_tag_prev, rd_tag)
-                cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped, rd_tag))
+                cyclix_gen.assign(nru_rd_tag_prev, global_structures.RenameReg(rd_addr))
+                cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped, nru_rd_tag_prev))
 
                 var alloc_rd_tag = global_structures.GetFreePRF()
-                global_structures.ReserveRd(rd_tag, alloc_rd_tag.position)      // TODO: "found" processing
+                cyclix_gen.assign(rd_tag, alloc_rd_tag.position)
+                global_structures.ReserveRd(rd_addr, rd_tag)      // TODO: "free not found" processing
             }; cyclix_gen.endif()
 
             cyclix_gen.begif(renamed_uop_buf.ctrl_rdy)
@@ -848,9 +847,9 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
 
                 var rss_tags = ArrayList<hw_var>()
                 for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
-                    rss_tags.add(global_structures.RenameRs(cmd_req_data.GetFracRef("fu_rs" + RF_rs_idx)))
+                    rss_tags.add(global_structures.RenameReg(cmd_req_data.GetFracRef("fu_rs" + RF_rs_idx)))
                 }
-                var rd_tag = global_structures.RenameRs(cmd_req_data.GetFracRef("fu_rd"))
+                var rd_tag = global_structures.RenameReg(cmd_req_data.GetFracRef("fu_rd"))
 
                 for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
                     cyclix_gen.assign(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_tag"), rss_tags[RF_rs_idx])
@@ -937,72 +936,5 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
 
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
-    }
-}
-
-class __global_structures(val cyclix_gen : cyclix.Generic,
-                          val MultiExu_CFG : Reordex_CFG,
-                          val PRF : hw_var,
-                          val PRF_mapped : hw_var,
-                          val PRF_rdy : hw_var,
-                          val ARF_map : hw_var,
-                          val ARF_map_default : hw_imm_arr,
-                          val PRF_src : hw_var,
-                          val ExecUnits : MutableMap<String, Exu_CFG>,
-                          val exu_descrs : MutableMap<String, __exu_descr>) {
-
-    fun RenameRs(src_addr : hw_param) : hw_var {
-        return ARF_map.GetFracRef(src_addr)
-    }
-
-    fun FetchRs(tgt_rdata : hw_var, src_tag : hw_param) {
-        cyclix_gen.assign(
-            tgt_rdata,
-            PRF.GetFracRef(src_tag))
-    }
-
-    fun FetchRsRdy(src_index : hw_param) : hw_var {
-        return PRF_rdy.GetFracRef(src_index)
-    }
-
-    fun GetFreePRF() : hwast.hw_astc.bit_position {
-        return cyclix_gen.min0(PRF_mapped)
-    }
-
-    fun ReserveRd(src_rd : hw_param, src_tag : hw_param) {
-        cyclix_gen.assign(ARF_map.GetFracRef(src_rd), src_tag)
-        cyclix_gen.assign(PRF_mapped.GetFracRef(src_tag), 1)
-        cyclix_gen.assign(PRF_rdy.GetFracRef(src_tag), 0)
-    }
-
-    fun ReserveWriteRd(src_rd : hw_param, src_tag : hw_param, src_wdata : hw_param) {
-        cyclix_gen.assign(ARF_map.GetFracRef(src_rd), src_tag)
-        cyclix_gen.assign(PRF_mapped.GetFracRef(src_tag), 1)
-        cyclix_gen.assign(PRF_rdy.GetFracRef(src_tag), 1)
-        cyclix_gen.assign(PRF.GetFracRef(src_tag), src_wdata)
-    }
-
-    fun WriteRd(src_tag : hw_param, src_wdata : hw_param) {
-        cyclix_gen.assign(PRF_rdy.GetFracRef(src_tag), 1)
-        cyclix_gen.assign(PRF.GetFracRef(src_tag), src_wdata)
-    }
-
-    fun FreePRF(src_tag : hw_param) {
-        cyclix_gen.assign(
-            PRF_mapped.GetFracRef(src_tag),
-            0)
-    }
-
-    fun RollBack(Backoff_ARF : hw_var) {
-        cyclix_gen.assign(PRF_mapped, PRF_mapped.defimm)
-        cyclix_gen.assign(PRF_rdy, PRF_rdy.defimm)
-        //cyclix_gen.assign(ARF_map, ARF_map_default)  // TODO: fix error
-        for (reg_idx in 0 until ARF_map.GetWidth()) {
-            cyclix_gen.assign(ARF_map.GetFracRef(reg_idx), hw_imm(reg_idx))
-        }
-        cyclix_gen.assign(PRF_src, PRF_src.defimm)
-        for (reg_idx in 0 until Backoff_ARF.GetWidth()) {
-            cyclix_gen.assign(PRF.GetFracRef(reg_idx), Backoff_ARF.GetFracRef(reg_idx))
-        }
     }
 }
