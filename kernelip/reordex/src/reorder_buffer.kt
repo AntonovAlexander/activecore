@@ -167,6 +167,7 @@ class rob_risc(name: String,
                         cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata)
                         cyclix_gen.begif(!mem_cmd)
                         run {
+                            cyclix_gen.assign(mem_rd_inprogress, 1)
                             cyclix_gen.assign(pop, 0)
                         }; cyclix_gen.endif()
                     }; cyclix_gen.endif()
