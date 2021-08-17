@@ -20,7 +20,7 @@ class instr_req_stage(val name : String, val cyclix_gen : cyclix.Generic, val in
     var wr_struct = hw_struct("genpmodule_" + name + "_" + instr_name_prefix + "genstruct_fifo_wdata")
     var instr_req_fifo = cyclix_gen.fifo_out((instr_name_prefix + "req"), wr_struct)
 
-    fun Process() {
+    fun Process(instr_fetch : instr_fetch_buffer) {
 
         var new_fetch_buf = instr_fetch.GetPushTrx()
         var instr_data_wdata = cyclix_gen.local("instr_data_wdata", instr_req_fifo.vartype, "0")
@@ -35,19 +35,22 @@ class instr_req_stage(val name : String, val cyclix_gen : cyclix.Generic, val in
 
         cyclix_gen.assign(new_fetch_buf.GetFracRef("curinstr_addr"), pc)
 
-        cyclix_gen.assign(instr_data_wdata.GetFracRef("we"), 0)
-        cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("addr"), pc)
-        cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("be"), 15)
-        cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), 0)
-        cyclix_gen.fifo_wr_unblk(instr_req_fifo, instr_data_wdata)
+        cyclix_gen.begif(instr_fetch.ctrl_rdy)
+        run {
+            cyclix_gen.assign(instr_data_wdata.GetFracRef("we"), 0)
+            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("addr"), pc)
+            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("be"), 15)
+            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), 0)
+            cyclix_gen.fifo_wr_unblk(instr_req_fifo, instr_data_wdata)
 
-        cyclix_gen.add_gen(pc, pc, 4)
+            cyclix_gen.add_gen(pc, pc, 4)
 
-        cyclix_gen.assign(new_fetch_buf.GetFracRef("enb"), 1)
-        cyclix_gen.assign(new_fetch_buf.GetFracRef("nextinstr_addr"), pc)
+            cyclix_gen.assign(new_fetch_buf.GetFracRef("enb"), 1)
+            cyclix_gen.assign(new_fetch_buf.GetFracRef("nextinstr_addr"), pc)
 
-        cyclix_gen.assign(instr_fetch.push, 1)
-        instr_fetch.push_trx(new_fetch_buf)
+            cyclix_gen.assign(instr_fetch.push, 1)
+            instr_fetch.push_trx(new_fetch_buf)
+        }; cyclix_gen.endif()
     }
 }
 
@@ -760,11 +763,14 @@ class instr_fetch_buffer(name: String,
                 global_structures.ReserveRd(rd_tag, alloc_rd_tag.position)      // TODO: "found" processing
             }; cyclix_gen.endif()
 
-            cyclix_gen.assign(renamed_uop_buf.push, 1)
-            renamed_uop_buf.push_trx(new_renamed_uop)
+            cyclix_gen.begif(renamed_uop_buf.ctrl_rdy)
+            run {
+                cyclix_gen.assign(renamed_uop_buf.push, 1)
+                renamed_uop_buf.push_trx(new_renamed_uop)
 
-            cyclix_gen.assign(pop, 1)
-            pop_trx()
+                cyclix_gen.assign(pop, 1)
+                pop_trx()
+            }; cyclix_gen.endif()
 
         }; cyclix_gen.endif()
     }

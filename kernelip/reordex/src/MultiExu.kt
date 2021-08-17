@@ -497,7 +497,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
             (instr_fetch as instr_fetch_buffer).Process(renamed_uop_buf)
-            (instr_req as instr_req_stage).Process()
+            (instr_req as instr_req_stage).Process(instr_fetch)
         }
 
         cyclix_gen.MSG_COMMENT("renaming: done")
