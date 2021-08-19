@@ -290,10 +290,12 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             MSG("generating execution unit " + ExUnit.value.ExecUnit.name + ": done")
         }
 
-        MSG("generating store IQ...")
-        var store_iq = iq_buffer(cyclix_gen, "genwb", 0, "genwb", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, cdb_num)
-        IQ_insts.add(store_iq)
-        MSG("generating store IQ: done")
+        MSG("generating I/O IQ...")
+        var io_iq =
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) iq_buffer(cyclix_gen, "genstore", 0, "genstore", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, cdb_num)
+            else iq_buffer(cyclix_gen, "genlsu", 0, "genlsu", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, cdb_num)
+        IQ_insts.add(io_iq)
+        MSG("generating I/O IQ: done")
 
         MSG("generating logic...")
 
@@ -350,24 +352,26 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         }; cyclix_gen.endloop()
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
 
+        cyclix_gen.MSG_COMMENT("IQ processing: I/O IQ...")
+        io_iq.preinit_ctrls()
+        io_iq.init_locals()
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
-            cyclix_gen.MSG_COMMENT("IQ processing: store IQ...")
-            store_iq.preinit_ctrls()
-            store_iq.init_locals()
-            cyclix_gen.begif(store_iq.ctrl_active)
+            cyclix_gen.begif(io_iq.ctrl_active)
             run {
-                cyclix_gen.begif(store_iq.rs_rsrv[0].rs_rdy)
+                cyclix_gen.begif(io_iq.rs_rsrv[0].rs_rdy)
                 run {
-                    cyclix_gen.assign(store_iq.pop, cyclix_gen.fifo_wr_unblk(cmd_resp, store_iq.rs_rsrv[0].rs_rdata))
+                    cyclix_gen.assign(io_iq.pop, cyclix_gen.fifo_wr_unblk(cmd_resp, io_iq.rs_rsrv[0].rs_rdata))
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
             // popping
-            cyclix_gen.begif(store_iq.pop)
+            cyclix_gen.begif(io_iq.pop)
             run {
-                store_iq.pop_trx()
+                io_iq.pop_trx()
             }; cyclix_gen.endif()
-            cyclix_gen.MSG_COMMENT("IQ processing: store IQ: done")
+        } else {
+            // TODO: LSU IQ processing
         }
+        cyclix_gen.MSG_COMMENT("IQ processing: store IQ: done")
 
         var fu_id = 0
         for (ExUnit in ExecUnits) {
@@ -501,7 +505,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer: done")
 
-        renamed_uop_buf.Process(rob, PRF_src, store_iq, ExecUnits, exu_descrs)
+        renamed_uop_buf.Process(rob, PRF_src, io_iq, ExecUnits, exu_descrs)
 
         cyclix_gen.MSG_COMMENT("renaming...")
 
