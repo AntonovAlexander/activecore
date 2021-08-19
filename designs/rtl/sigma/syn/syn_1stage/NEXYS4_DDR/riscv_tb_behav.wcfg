@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="900600fs"></ZoomStartTime>
-      <ZoomEndTime time="1119601fs"></ZoomEndTime>
-      <Cursor1Time time="945000fs"></Cursor1Time>
+      <ZoomStartTime time="960600000fs"></ZoomStartTime>
+      <ZoomEndTime time="1167000001fs"></ZoomEndTime>
+      <Cursor1Time time="1015000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="330"></NameColumnWidth>
-      <ValueColumnWidth column_width="111"></ValueColumnWidth>
+      <NameColumnWidth column_width="398"></NameColumnWidth>
+      <ValueColumnWidth column_width="106"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="13" />
+   <WVObjectSize size="14" />
    <wvobject fp_name="/riscv_tb/CLK_100MHZ" type="logic">
       <obj_property name="ElementShortName">CLK_100MHZ</obj_property>
       <obj_property name="ObjectShortName">CLK_100MHZ</obj_property>
@@ -57,17 +57,11 @@
       <obj_property name="ElementShortName">CSR_SW_ADDR[31:0]</obj_property>
       <obj_property name="ObjectShortName">CSR_SW_ADDR[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_curinstr_addr" type="array">
+   <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_pc" type="array">
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">genpstage_EXEC_curinstr_addr[31:0]</obj_property>
-      <obj_property name="ObjectShortName">genpstage_EXEC_curinstr_addr[31:0]</obj_property>
-      <obj_property name="label">CPU instruction address</obj_property>
-   </wvobject>
-   <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_instr_code" type="array">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">genpstage_EXEC_instr_code[31:0]</obj_property>
-      <obj_property name="ObjectShortName">genpstage_EXEC_instr_code[31:0]</obj_property>
-      <obj_property name="label">CPU instruction code</obj_property>
+      <obj_property name="ElementShortName">genpsticky_glbl_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">genpsticky_glbl_pc[31:0]</obj_property>
+      <obj_property name="label">PC</obj_property>
    </wvobject>
    <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile" type="array">
       <obj_property name="DisplayName">label</obj_property>
@@ -75,315 +69,54 @@
       <obj_property name="ObjectShortName">genpsticky_glbl_regfile[31:1][31:0]</obj_property>
       <obj_property name="isExpanded"></obj_property>
       <obj_property name="label">CPU registers</obj_property>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[31]" type="array">
+   </wvobject>
+   <wvobject fp_name="group215" type="group">
+      <obj_property name="label">data mem</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="group213" type="group">
+         <obj_property name="label">data mem req</obj_property>
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[31][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[31][31:0]</obj_property>
-         <obj_property name="label">t6</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_req_genfifo_ack_i" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_req_genfifo_ack_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_req_genfifo_ack_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_req_genfifo_req_o" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_req_genfifo_req_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_req_genfifo_req_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_req_genfifo_wdata_bo" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_req_genfifo_wdata_bo</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_req_genfifo_wdata_bo</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_req_genfifo_wdata_bo.we" type="array">
+               <obj_property name="ElementShortName">.we[0:0]</obj_property>
+               <obj_property name="ObjectShortName">.we[0:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_req_genfifo_wdata_bo.wdata" type="array">
+               <obj_property name="ElementShortName">.wdata</obj_property>
+               <obj_property name="ObjectShortName">.wdata</obj_property>
+               <obj_property name="isExpanded"></obj_property>
+            </wvobject>
+         </wvobject>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[30]" type="array">
+      <wvobject fp_name="group214" type="group">
+         <obj_property name="label">data mem ack</obj_property>
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[30][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[30][31:0]</obj_property>
-         <obj_property name="label">t5</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[29]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[29][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[29][31:0]</obj_property>
-         <obj_property name="label">t4</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[28]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[28][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[28][31:0]</obj_property>
-         <obj_property name="label">t3</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[27]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[27][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[27][31:0]</obj_property>
-         <obj_property name="label">s11</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[26]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[26][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[26][31:0]</obj_property>
-         <obj_property name="label">s10</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[25]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[25][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[25][31:0]</obj_property>
-         <obj_property name="label">s9</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[24]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[24][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[24][31:0]</obj_property>
-         <obj_property name="label">s8</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[23]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[23][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[23][31:0]</obj_property>
-         <obj_property name="label">s7</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[22]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[22][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[22][31:0]</obj_property>
-         <obj_property name="label">s6</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[21]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[21][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[21][31:0]</obj_property>
-         <obj_property name="label">s5</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[20]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[20][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[20][31:0]</obj_property>
-         <obj_property name="label">s4</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[19]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[19][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[19][31:0]</obj_property>
-         <obj_property name="label">s3</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[18]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[18][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[18][31:0]</obj_property>
-         <obj_property name="label">s2</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[17]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[17][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[17][31:0]</obj_property>
-         <obj_property name="label">a7</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[16]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[16][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[16][31:0]</obj_property>
-         <obj_property name="label">a6</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[15]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[15][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[15][31:0]</obj_property>
-         <obj_property name="label">a5</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[14]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[14][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[14][31:0]</obj_property>
-         <obj_property name="label">a4</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[13]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[13][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[13][31:0]</obj_property>
-         <obj_property name="label">a3</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[12]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[12][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[12][31:0]</obj_property>
-         <obj_property name="label">a2</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[11]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[11][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[11][31:0]</obj_property>
-         <obj_property name="label">a1</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[10]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[10][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[10][31:0]</obj_property>
-         <obj_property name="label">a0</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[9]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[9][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[9][31:0]</obj_property>
-         <obj_property name="label">s1</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[8]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[8][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[8][31:0]</obj_property>
-         <obj_property name="label">s0</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[7]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[7][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[7][31:0]</obj_property>
-         <obj_property name="label">t2</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[6]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[6][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[6][31:0]</obj_property>
-         <obj_property name="label">t1</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[5]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[5][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[5][31:0]</obj_property>
-         <obj_property name="label">t0</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[4]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[4][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[4][31:0]</obj_property>
-         <obj_property name="label">tp</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[3]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[3][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[3][31:0]</obj_property>
-         <obj_property name="label">gp</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[2]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[2][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[2][31:0]</obj_property>
-         <obj_property name="label">sp</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[1]" type="array">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">[1][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[1][31:0]</obj_property>
-         <obj_property name="label">ra</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[31]" type="array">
-         <obj_property name="ElementShortName">[31][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[31][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[30]" type="array">
-         <obj_property name="ElementShortName">[30][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[30][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[29]" type="array">
-         <obj_property name="ElementShortName">[29][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[29][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[28]" type="array">
-         <obj_property name="ElementShortName">[28][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[28][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[27]" type="array">
-         <obj_property name="ElementShortName">[27][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[27][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[26]" type="array">
-         <obj_property name="ElementShortName">[26][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[26][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[25]" type="array">
-         <obj_property name="ElementShortName">[25][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[25][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[24]" type="array">
-         <obj_property name="ElementShortName">[24][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[24][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[23]" type="array">
-         <obj_property name="ElementShortName">[23][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[23][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[22]" type="array">
-         <obj_property name="ElementShortName">[22][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[22][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[21]" type="array">
-         <obj_property name="ElementShortName">[21][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[21][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[20]" type="array">
-         <obj_property name="ElementShortName">[20][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[20][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[19]" type="array">
-         <obj_property name="ElementShortName">[19][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[19][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[18]" type="array">
-         <obj_property name="ElementShortName">[18][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[18][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[17]" type="array">
-         <obj_property name="ElementShortName">[17][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[17][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[16]" type="array">
-         <obj_property name="ElementShortName">[16][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[16][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[15]" type="array">
-         <obj_property name="ElementShortName">[15][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[15][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[14]" type="array">
-         <obj_property name="ElementShortName">[14][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[14][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[13]" type="array">
-         <obj_property name="ElementShortName">[13][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[13][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[12]" type="array">
-         <obj_property name="ElementShortName">[12][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[12][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[11]" type="array">
-         <obj_property name="ElementShortName">[11][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[11][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[10]" type="array">
-         <obj_property name="ElementShortName">[10][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[10][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[9]" type="array">
-         <obj_property name="ElementShortName">[9][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[9][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[8]" type="array">
-         <obj_property name="ElementShortName">[8][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[8][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[7]" type="array">
-         <obj_property name="ElementShortName">[7][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[7][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[6]" type="array">
-         <obj_property name="ElementShortName">[6][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[6][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[5]" type="array">
-         <obj_property name="ElementShortName">[5][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[5][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[4]" type="array">
-         <obj_property name="ElementShortName">[4][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[4][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[3]" type="array">
-         <obj_property name="ElementShortName">[3][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[3][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[2]" type="array">
-         <obj_property name="ElementShortName">[2][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[2][31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile[1]" type="array">
-         <obj_property name="ElementShortName">[1][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_resp_genfifo_ack_o" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_resp_genfifo_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_resp_genfifo_ack_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_resp_genfifo_req_i" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_resp_genfifo_req_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_resp_genfifo_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_resp_genfifo_rdata_bi" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_resp_genfifo_rdata_bi[31:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_resp_genfifo_rdata_bi[31:0]</obj_property>
+         </wvobject>
       </wvobject>
    </wvobject>
    <wvobject fp_name="group86" type="group">

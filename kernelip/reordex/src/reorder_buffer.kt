@@ -166,7 +166,6 @@ class rob_risc(name: String,
                     run {
 
                         cyclix_gen.assign(mem_addr, alu_result)
-                        cyclix_gen.assign(mem_wdata, rd_wdata)
 
                         cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
                         cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
