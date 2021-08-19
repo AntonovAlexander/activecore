@@ -255,96 +255,97 @@ class rob_risc(name: String,
             cyclix_gen.COMMENT("committing RF: done")
 
             cyclix_gen.COMMENT("control transfer...")
+
             cyclix_gen.assign(expected_instraddr, nextinstr_addr)
-            cyclix_gen.begif(jump_req)
+
+            cyclix_gen.begcase(jump_src)
+            run {
+                cyclix_gen.begbranch(JMP_SRC_IMM)
+                run {
+                    jump_vector.assign(immediate)
+                }; cyclix_gen.endbranch()
+
+                cyclix_gen.begbranch(JMP_SRC_ALU)
+                run {
+                    jump_vector.assign(alu_result)
+                }; cyclix_gen.endbranch()
+
+            }; cyclix_gen.endcase()
+
+            cyclix_gen.begif(jump_req_cond)
             run {
 
-                cyclix_gen.begcase(jump_src)
+                cyclix_gen.begcase(funct3)
                 run {
-                    cyclix_gen.begbranch(JMP_SRC_IMM)
+                    // BEQ
+                    cyclix_gen.begbranch(0x0)
                     run {
-                        jump_vector.assign(immediate)
+                        cyclix_gen.begif(alu_ZF)
+                        run {
+                            jump_req.assign(1)
+                            jump_vector.assign(curinstraddr_imm)
+                        }; cyclix_gen.endif()
                     }; cyclix_gen.endbranch()
 
-                    cyclix_gen.begbranch(JMP_SRC_ALU)
+                    // BNE
+                    cyclix_gen.begbranch(0x1)
                     run {
-                        jump_vector.assign(alu_result)
+                        cyclix_gen.begif(!alu_ZF)
+                        run {
+                            jump_req.assign(1)
+                            jump_vector.assign(curinstraddr_imm)
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endbranch()
+
+                    // BLT
+                    cyclix_gen.begbranch(0x4)
+                    run {
+                        cyclix_gen.begif(alu_CF)
+                        run {
+                            jump_req.assign(1)
+                            jump_vector.assign(curinstraddr_imm)
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endbranch()
+
+                    // BGE
+                    cyclix_gen.begbranch(0x5)
+                    run {
+                        cyclix_gen.begif(!alu_CF)
+                        run {
+                            jump_req.assign(1)
+                            jump_vector.assign(curinstraddr_imm)
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endbranch()
+
+                    // BLTU
+                    cyclix_gen.begbranch(0x6)
+                    run {
+                        cyclix_gen.begif(alu_CF)
+                        run {
+                            jump_req.assign(1)
+                            jump_vector.assign(curinstraddr_imm)
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endbranch()
+
+                    // BGEU
+                    cyclix_gen.begbranch(0x7)
+                    run {
+                        cyclix_gen.begif(!alu_CF)
+                        run {
+                            jump_req.assign(1)
+                            jump_vector.assign(curinstraddr_imm)
+                        }; cyclix_gen.endif()
                     }; cyclix_gen.endbranch()
 
                 }; cyclix_gen.endcase()
 
-                cyclix_gen.begif(jump_req_cond)
-                run {
-
-                    cyclix_gen.begcase(funct3)
-                    run {
-                        // BEQ
-                        cyclix_gen.begbranch(0x0)
-                        run {
-                            cyclix_gen.begif(alu_ZF)
-                            run {
-                                jump_req.assign(1)
-                                jump_vector.assign(curinstraddr_imm)
-                            }; cyclix_gen.endif()
-                        }; cyclix_gen.endbranch()
-
-                        // BNE
-                        cyclix_gen.begbranch(0x1)
-                        run {
-                            cyclix_gen.begif(!alu_ZF)
-                            run {
-                                jump_req.assign(1)
-                                jump_vector.assign(curinstraddr_imm)
-                            }; cyclix_gen.endif()
-                        }; cyclix_gen.endbranch()
-
-                        // BLT
-                        cyclix_gen.begbranch(0x4)
-                        run {
-                            cyclix_gen.begif(alu_CF)
-                            run {
-                                jump_req.assign(1)
-                                jump_vector.assign(curinstraddr_imm)
-                            }; cyclix_gen.endif()
-                        }; cyclix_gen.endbranch()
-
-                        // BGE
-                        cyclix_gen.begbranch(0x5)
-                        run {
-                            cyclix_gen.begif(!alu_CF)
-                            run {
-                                jump_req.assign(1)
-                                jump_vector.assign(curinstraddr_imm)
-                            }; cyclix_gen.endif()
-                        }; cyclix_gen.endbranch()
-
-                        // BLTU
-                        cyclix_gen.begbranch(0x6)
-                        run {
-                            cyclix_gen.begif(alu_CF)
-                            run {
-                                jump_req.assign(1)
-                                jump_vector.assign(curinstraddr_imm)
-                            }; cyclix_gen.endif()
-                        }; cyclix_gen.endbranch()
-
-                        // BGEU
-                        cyclix_gen.begbranch(0x7)
-                        run {
-                            cyclix_gen.begif(!alu_CF)
-                            run {
-                                jump_req.assign(1)
-                                jump_vector.assign(curinstraddr_imm)
-                            }; cyclix_gen.endif()
-                        }; cyclix_gen.endbranch()
-
-                    }; cyclix_gen.endcase()
-
-                }; cyclix_gen.endif()
-
-                cyclix_gen.assign(expected_instraddr, jump_vector)
-
             }; cyclix_gen.endif()
+
+            cyclix_gen.begif(jump_req)
+            run {
+                cyclix_gen.assign(expected_instraddr, jump_vector)
+            }; cyclix_gen.endif()
+
             cyclix_gen.COMMENT("control transfer: done")
 
             pop_trx()
