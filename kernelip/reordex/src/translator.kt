@@ -107,9 +107,9 @@ class __global_structures(val cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(PRF.GetFracRef(src_tag), src_wdata)
     }
 
-    fun WriteRd(src_tag : hw_param, src_wdata : hw_param) {
-        cyclix_gen.assign(PRF_rdy.GetFracRef(src_tag), 1)
-        cyclix_gen.assign(PRF.GetFracRef(src_tag), src_wdata)
+    fun WritePRF(rd_tag : hw_param, src_wdata : hw_param) {
+        cyclix_gen.assign(PRF_rdy.GetFracRef(rd_tag), 1)
+        cyclix_gen.assign(PRF.GetFracRef(rd_tag), src_wdata)
     }
 
     fun FreePRF(src_tag : hw_param) {

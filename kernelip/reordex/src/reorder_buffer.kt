@@ -93,6 +93,7 @@ class rob_risc(name: String,
 
     var rd_source       = AdduStageVar("rd_source", 2, 0, RD_ALU.toString())
     var rd_rdy          = AdduStageVar("rd_rdy", 0, 0, "0")
+    val rd_tag          = AdduStageVar("rd0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
 
     //// control transfer signals
     // jmp sources
@@ -145,6 +146,8 @@ class rob_risc(name: String,
         run {
             cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, mem_data_rdata))
             run {
+                global_structures.WritePRF(rd_tag, mem_data_rdata)
+                cyclix_gen.assign(rd_wdata, mem_data_rdata)
                 cyclix_gen.assign(mem_rd_inprogress, 0)
                 cyclix_gen.assign(pop, 1)
             }; cyclix_gen.endif()
