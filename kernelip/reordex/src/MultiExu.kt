@@ -352,9 +352,11 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         }; cyclix_gen.endloop()
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
 
-        cyclix_gen.MSG_COMMENT("IQ processing: I/O IQ...")
+        cyclix_gen.MSG_COMMENT("I/O IQ processing...")
+
         io_iq.preinit_ctrls()
         io_iq.init_locals()
+
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
             cyclix_gen.begif(io_iq.ctrl_active)
             run {
@@ -368,10 +370,50 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             run {
                 io_iq.pop_trx()
             }; cyclix_gen.endif()
+
         } else {
-            // TODO: LSU IQ processing
+
+            var lsu_iq_done = cyclix_gen.ulocal("lsu_iq_done", 0, 0, "0")
+            var lsu_iq_num  = cyclix_gen.ulocal("lsu_iq_num", GetWidthToContain(io_iq.TRX_BUF.GetWidth())-1, 0, "0")
+
+            cyclix_gen.begif(io_iq.ctrl_active)
+            run {
+
+                cyclix_gen.begif(!lsu_iq_done)
+                run {
+                    var io_iq_iter = cyclix_gen.begforall_asc(io_iq.TRX_BUF)
+                    run {
+
+                        var io_iq_entry      = io_iq.TRX_BUF.GetFracRef(io_iq_iter.iter_num)
+                        var io_iq_entry_enb  = io_iq_entry.GetFracRef("enb")
+                        var cur_rss_rdy      = io_iq.rss_rdy.GetFracRef(io_iq_iter.iter_num)
+
+                        cyclix_gen.begif(io_iq_entry_enb)
+                        run {
+                            cyclix_gen.assign(cur_rss_rdy, 1)
+                            for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                                cyclix_gen.band_gen(cur_rss_rdy, cur_rss_rdy, io_iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy"))
+                            }
+                            cyclix_gen.begif(cur_rss_rdy)
+                            run {
+                                cyclix_gen.assign(lsu_iq_done, 1)
+                                cyclix_gen.assign(lsu_iq_num, io_iq_iter.iter_num)
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endif()
+
+                    }; cyclix_gen.endloop()
+                }; cyclix_gen.endif()
+
+                cyclix_gen.begif(lsu_iq_done)
+                run {
+                    // TODO: LSU IQ to ROB
+                    io_iq.remove_and_squash_trx(lsu_iq_num)
+                    io_iq.pop.assign(1)
+                }; cyclix_gen.endif()
+
+            }; cyclix_gen.endif()
         }
-        cyclix_gen.MSG_COMMENT("IQ processing: store IQ: done")
+        cyclix_gen.MSG_COMMENT("I/O IQ processing: done")
 
         var fu_id = 0
         for (ExUnit in ExecUnits) {
@@ -458,7 +500,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 var iq_entry            = IQ_inst.TRX_BUF.GetFracRef(iq_iter.iter_num)
                 var iq_entry_enb        = iq_entry.GetFracRef("enb")
                 var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
-                var iq_entry_rd0_tag     = iq_entry.GetFracRef("rd0_tag")
+                var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
                 var iq_entry_wb_ext     = iq_entry.GetFracRef("wb_ext")
                 var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
 
