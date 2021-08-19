@@ -741,6 +741,7 @@ class instr_fetch_buffer(name: String,
                 cyclix_gen.begif(cyclix_gen.eq2(op1_source, OP1_SRC_IMM))
                 run {
                     rs1_rdata.assign(immediate)
+                    rs1_rdy.assign(1)
                 }; cyclix_gen.endif()
                 ////
 

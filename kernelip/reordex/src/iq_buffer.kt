@@ -32,6 +32,8 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
     var op_issue        = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_op_issue"), 0, 0, "0")
     var op_issued_num   = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_op_issued_num"), GetWidthToContain(TRX_BUF.GetWidth())-1, 0, "0")
 
+    val curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")          // for debug purposes
+
     fun Issue(ExUnit : Exu_CFG, exu_req : hw_var, subproc : hw_subproc, ExUnit_num : Int) {
         cyclix_gen.MSG_COMMENT("selecting uop to issue...")
 
