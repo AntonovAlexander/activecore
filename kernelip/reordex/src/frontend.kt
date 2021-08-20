@@ -764,6 +764,7 @@ class instr_fetch_buffer(name: String,
                 cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
                 cyclix_gen.assign(new_renamed_uop.GetFracRef("exu_opcode"), alu_opcode)
                 cyclix_gen.assign(new_renamed_uop.GetFracRef("rdy"), !alu_req)
+                cyclix_gen.assign(new_renamed_uop.GetFracRef("wb_ext"), mem_req)
 
                 cyclix_gen.begif(renamed_uop_buf.ctrl_rdy)
                 run {
