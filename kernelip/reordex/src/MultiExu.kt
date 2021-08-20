@@ -348,7 +348,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             for (IQ_inst in IQ_insts) bufs_to_reset.add(IQ_inst)
             bufs_to_reset.add(renamed_uop_buf)
             bufs_to_reset.add(instr_fetch)
-            (rob as rob_risc).Commit(global_structures, (instr_req as instr_req_stage).pc, bufs_to_reset)
+            (rob as rob_risc).Commit(global_structures, (instr_req as instr_req_stage).pc, bufs_to_reset, exu_cdb.GetFracRef(risc_commit_idx))
         }
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 
@@ -488,13 +488,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 cyclix_gen.begif(exu_cdb_inst_enb)
                 run {
 
-                    // updating PRF state
-                    cyclix_gen.assign(
-                        PRF_rdy.GetFracRef(exu_cdb_inst_tag),
-                        1)
-                    cyclix_gen.assign(
-                        PRF.GetFracRef(exu_cdb_inst_tag),
-                        exu_cdb_inst_wdata)
+                    global_structures.WritePRF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
 
                     // broadcasting FU results to renamed buffer
                     for (renamed_uop_buf_idx in 0 until renamed_uop_buf.TRX_BUF_SIZE) {

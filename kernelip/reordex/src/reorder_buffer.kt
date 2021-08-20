@@ -131,7 +131,7 @@ class rob_risc(name: String,
         rf_dim.add(31, 0)
     }
 
-    fun Commit(global_structures: __global_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>) {
+    fun Commit(global_structures: __global_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, commit_cdb : hw_var) {
 
         var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
         var mem_data_wdata      = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
@@ -146,10 +146,19 @@ class rob_risc(name: String,
         run {
             cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, mem_data_rdata))
             run {
-                global_structures.WritePRF(rd_tag, mem_data_rdata)
+
+                var exu_cdb_inst_enb    = commit_cdb.GetFracRef("enb")
+                var exu_cdb_inst_data   = commit_cdb.GetFracRef("data")
+                var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
+                var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
+                cyclix_gen.assign(exu_cdb_inst_enb, 1)
+                cyclix_gen.assign(exu_cdb_inst_tag, rd_tag)
+                cyclix_gen.assign(exu_cdb_inst_wdata, mem_data_rdata)
+
                 cyclix_gen.assign(rd_wdata, mem_data_rdata)
                 cyclix_gen.assign(mem_rd_inprogress, 0)
                 cyclix_gen.assign(pop, 1)
+
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
 
