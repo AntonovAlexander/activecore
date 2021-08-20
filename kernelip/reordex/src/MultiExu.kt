@@ -304,6 +304,24 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             MSG("generating execution unit " + ExUnit.value.ExecUnit.name + ": done")
         }
 
+        var cdb_exu     = ArrayList<hw_var>()
+        var cdb_datagen = ArrayList<hw_var>()
+        var cdb_torob   = ArrayList<hw_var>()
+        var exu_cdb_num = 0
+        for (exu_num in 0 until ExUnits_insts.size) {
+            for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
+                cdb_exu.add(exu_cdb.GetFracRef(exu_cdb_num))
+                cdb_datagen.add(exu_cdb.GetFracRef(exu_cdb_num))
+                cdb_torob.add(exu_cdb.GetFracRef(exu_cdb_num))
+                exu_cdb_num++
+            }
+        }
+        if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
+            cdb_datagen.add(exu_cdb.GetFracRef(exu_cdb_num))
+            exu_cdb_num++
+            cdb_torob.add(exu_cdb.GetFracRef(exu_cdb_num))
+        }
+
         MSG("generating I/O IQ...")
         var io_iq =
             if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) iq_buffer(cyclix_gen, "genstore", 0, "genstore", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, cdb_num)
@@ -316,15 +334,14 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cyclix_gen.MSG_COMMENT("Initializing CDB...")
 
         // EXU
-        var exu_cdb_num = 0
-        for (exu_num in 0 until ExUnits_insts.size) {           // TODO: RISC commit
+        exu_cdb_num = 0
+        for (exu_num in 0 until ExUnits_insts.size) {
             for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
                 var exu_cdb_inst        = exu_cdb.GetFracRef(exu_cdb_num)
                 var exu_cdb_inst_enb    = exu_cdb_inst.GetFracRef("enb")
                 var exu_cdb_inst_data   = exu_cdb_inst.GetFracRef("data")
 
                 cyclix_gen.assign(exu_cdb_inst_enb, cyclix_gen.fifo_internal_rd_unblk(ExUnits_insts[exu_num][exu_inst_num], cyclix.STREAM_RESP_BUS_NAME, exu_cdb_inst_data))
-
                 exu_cdb_num++
             }
         }
@@ -474,53 +491,46 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         renamed_uop_buf.init_locals()
 
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer...")
-        fu_id = 0
-        exu_cdb_num = 0
-        for (exu_num in 0 until ExUnits_insts.size) {
-            for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
+        for (exu_cdb_inst in cdb_datagen) {
 
-                var exu_cdb_inst        = exu_cdb.GetFracRef(exu_cdb_num)
-                var exu_cdb_inst_enb    = exu_cdb_inst.GetFracRef("enb")
-                var exu_cdb_inst_data   = exu_cdb_inst.GetFracRef("data")
-                var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
-                var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
+            var exu_cdb_inst_enb    = exu_cdb_inst.GetFracRef("enb")
+            var exu_cdb_inst_data   = exu_cdb_inst.GetFracRef("data")
+            var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
+            var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
 
-                cyclix_gen.begif(exu_cdb_inst_enb)
-                run {
+            cyclix_gen.begif(exu_cdb_inst_enb)
+            run {
 
-                    global_structures.WritePRF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
+                global_structures.WritePRF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
 
-                    // broadcasting FU results to renamed buffer
-                    for (renamed_uop_buf_idx in 0 until renamed_uop_buf.TRX_BUF_SIZE) {
-                        var renamed_uop_buf_entry = renamed_uop_buf.TRX_BUF.GetFracRef(renamed_uop_buf_idx)
-                        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                // broadcasting FU results to renamed buffer
+                for (renamed_uop_buf_idx in 0 until renamed_uop_buf.TRX_BUF_SIZE) {
+                    var renamed_uop_buf_entry = renamed_uop_buf.TRX_BUF.GetFracRef(renamed_uop_buf_idx)
+                    for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
 
-                            var rs_rdy      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_rdy")
-                            var rs_tag      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_tag")
-                            var rs_rdata    = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_rdata")
+                        var rs_rdy      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_rdy")
+                        var rs_tag      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_tag")
+                        var rs_rdata    = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_rdata")
 
-                            cyclix_gen.begif(!rs_rdy)
-                            run {
-                                cyclix_gen.begif(cyclix_gen.eq2(rs_tag, exu_cdb_inst_tag))
-                                run {
-                                    // setting IQ entry ready
-                                    cyclix_gen.assign(rs_rdata, exu_cdb_inst_wdata)
-                                    cyclix_gen.assign(rs_rdy, 1)
-                                }; cyclix_gen.endif()
-                            }; cyclix_gen.endif()
-                        }
-
-                        //// setting rdy for wb_ext if data generated ////
-                        cyclix_gen.begif(renamed_uop_buf_entry.GetFracRef("wb_ext"))
+                        cyclix_gen.begif(!rs_rdy)
                         run {
-                            cyclix_gen.assign(renamed_uop_buf_entry.GetFracRef("rdy"), renamed_uop_buf_entry.GetFracRef("rs0_rdy"))
+                            cyclix_gen.begif(cyclix_gen.eq2(rs_tag, exu_cdb_inst_tag))
+                            run {
+                                // setting IQ entry ready
+                                cyclix_gen.assign(rs_rdata, exu_cdb_inst_wdata)
+                                cyclix_gen.assign(rs_rdy, 1)
+                            }; cyclix_gen.endif()
                         }; cyclix_gen.endif()
                     }
 
-                }; cyclix_gen.endif()
-                exu_cdb_num++
-            }
-            fu_id++
+                    //// setting rdy for wb_ext if data generated ////
+                    cyclix_gen.begif(renamed_uop_buf_entry.GetFracRef("wb_ext"))
+                    run {
+                        cyclix_gen.assign(renamed_uop_buf_entry.GetFracRef("rdy"), renamed_uop_buf_entry.GetFracRef("rs0_rdy"))
+                    }; cyclix_gen.endif()
+                }
+
+            }; cyclix_gen.endif()
         }
 
         // broadcasting FU results to IQ
