@@ -304,7 +304,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         MSG("generating I/O IQ...")
         var io_iq =
             if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) iq_buffer(cyclix_gen, "genstore", 0, "genstore", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, cdb_num)
-            else iq_buffer(cyclix_gen, "genlsu", 0, "genlsu", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, cdb_num)
+            else iq_buffer(cyclix_gen, "genlsu", 0, "genlsu", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, risc_lsu_idx, cdb_num)
         IQ_insts.add(io_iq)
         MSG("generating I/O IQ: done")
 

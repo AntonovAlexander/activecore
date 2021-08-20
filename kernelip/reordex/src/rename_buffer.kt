@@ -61,6 +61,8 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
                         // clearing renamed uop buffer
                         cyclix_gen.assign(pop, 1)
 
+                        if (MultiExu_CFG.mode == REORDEX_MODE.RISC) cyclix_gen.assign(rob.push, 1)
+
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
 
