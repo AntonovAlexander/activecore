@@ -736,14 +736,14 @@ class instr_fetch_buffer(name: String,
                     rs1_rdy.assign(global_structures.FetchRsRdy(rs1_tag))
                 }; cyclix_gen.endif()
 
-                //// TODO: cleanup
-                mem_wdata.assign(rs1_rdata)
-                cyclix_gen.begif(cyclix_gen.eq2(op1_source, OP1_SRC_IMM))
+                cyclix_gen.begif(!mem_req)
                 run {
-                    rs1_rdata.assign(immediate)
-                    rs1_rdy.assign(1)
+                    cyclix_gen.begif(cyclix_gen.eq2(op1_source, OP1_SRC_IMM))
+                    run {
+                        rs1_rdata.assign(immediate)
+                        rs1_rdy.assign(1)
+                    }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
-                ////
 
                 // TODO: CSR
 

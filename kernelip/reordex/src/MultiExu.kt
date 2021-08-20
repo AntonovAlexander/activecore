@@ -177,6 +177,9 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var io_cdb_buf  =
             if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) DUMMY_VAR
             else cyclix_gen.global("io_cdb_buf", cdb_struct)
+        var io_cdb_rs1_wdata_buf =
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) DUMMY_VAR
+            else cyclix_gen.uglobal("io_cdb_rs1_wdata_buf", MultiExu_CFG.RF_width-1, 0, "0")
 
         var rob =
             if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob(cyclix_gen, "genrob", 64, MultiExu_CFG, cdb_num)
@@ -314,7 +317,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         // EXU
         var exu_cdb_num = 0
-        for (exu_num in 0 until ExUnits_insts.size) {
+        for (exu_num in 0 until ExUnits_insts.size) {           // TODO: RISC commit
             for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
                 var exu_cdb_inst        = exu_cdb.GetFracRef(exu_cdb_num)
                 var exu_cdb_inst_enb    = exu_cdb_inst.GetFracRef("enb")
@@ -362,6 +365,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rdy"), 1)
                     if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
                         cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("alu_result"), CDB_ref_data.GetFracRef("wdata"))
+                        cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("mem_wdata"), io_cdb_rs1_wdata_buf)
                         for (dst_imm in MultiExu_CFG.dst_imms) {
                             cyclix_gen.assign(rob_iter.iter_elem.GetFracRef(dst_imm.name), CDB_ref_data.GetFracRef(dst_imm.name))
                         }
@@ -439,7 +443,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     cyclix_gen.assign(io_cdb_enb, 1)
                     cyclix_gen.assign(io_cdb_trx_id, io_iq_cmd.GetFracRef("trx_id"))
                     cyclix_gen.assign(io_cdb_tag, io_iq_cmd.GetFracRef("rd0_tag"))
-                    cyclix_gen.assign(io_cdb_wdata, cyclix_gen.add(io_iq_cmd.GetFracRef("rs0_rdata"), io_iq_cmd.GetFracRef("rs1_rdata")) )
+                    cyclix_gen.assign(io_cdb_wdata, cyclix_gen.add(io_iq_cmd.GetFracRef("rs0_rdata"), io_iq_cmd.GetFracRef("immediate")) )
+                    cyclix_gen.assign(io_cdb_rs1_wdata_buf, io_iq_cmd.GetFracRef("rs1_rdata"))
 
                     io_iq.remove_and_squash_trx(lsu_iq_num)
                     io_iq.pop.assign(1)
