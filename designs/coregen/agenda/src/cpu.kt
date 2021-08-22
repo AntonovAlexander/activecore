@@ -42,6 +42,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
     val aluop_SRA		= 6
     val aluop_XOR		= 7
     val aluop_CLRB		= 8
+    val aluop_SLT		= 9
 
     var alu_op0         = ulocal("alu_op0", 31, 0, "0")
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
@@ -122,6 +123,11 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
             run {
                 alu_result_wide.assign(band(alu_op0_wide, !alu_op1_wide))
             }; endbranch()
+
+            begbranch(aluop_SLT)
+            run {
+                alu_result_wide.assign(alu_op0_wide - alu_op1_wide)
+            }; endbranch()
         }; endcase()
 
         // formation of result and flags
@@ -130,6 +136,11 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
         alu_SF.assign(alu_result_wide[31])
         alu_ZF.assign(bnot(ror(alu_result)))
         alu_OF.assign(bor(band(!alu_op0[31], band(!alu_op1[31], alu_result[31])), band(alu_op0[31], band(alu_op1[31], !alu_result[31]))))
+
+        begif(eq2(alu_opcode, aluop_SLT))
+        run {
+            alu_result.assign(alu_CF)
+        }; endif()
 
         begif(CPU_CFG_inst.alu_unsigned)
         run {

@@ -105,6 +105,7 @@ class instr_fetch_buffer(name: String,
     val aluop_SRA		= 6
     val aluop_XOR		= 7
     val aluop_CLRB		= 8
+    val aluop_SLT		= 9
 
     // op1 sources
     val OP0_SRC_RS1     = 0
@@ -407,14 +408,14 @@ class instr_fetch_buffer(name: String,
                             // SLTI
                             cyclix_gen.begbranch(0x2)
                             run {
-                                alu_opcode.assign(aluop_SUB)
+                                alu_opcode.assign(aluop_SLT)
                                 rd_source.assign(RD_CF_COND)
                             }; cyclix_gen.endbranch()
 
                             // SLTIU
                             cyclix_gen.begbranch(0x3)
                             run {
-                                alu_opcode.assign(aluop_SUB)
+                                alu_opcode.assign(aluop_SLT)
                                 alu_unsigned.assign(1)
                                 rd_source.assign(RD_CF_COND)
                             }; cyclix_gen.endbranch()
@@ -501,14 +502,14 @@ class instr_fetch_buffer(name: String,
                             // SLT
                             cyclix_gen.begbranch(0x2)
                             run {
-                                alu_opcode.assign(aluop_SUB)
+                                alu_opcode.assign(aluop_SLT)
                                 rd_source.assign(RD_CF_COND)
                             }; cyclix_gen.endbranch()
 
                             // SLTU
                             cyclix_gen.begbranch(0x3)
                             run {
-                                alu_opcode.assign(aluop_SUB)
+                                alu_opcode.assign(aluop_SLT)
                                 alu_unsigned.assign(1)
                                 rd_source.assign(RD_CF_COND)
                             }; cyclix_gen.endbranch()
