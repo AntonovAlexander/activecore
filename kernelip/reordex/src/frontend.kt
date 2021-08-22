@@ -771,7 +771,7 @@ class instr_fetch_buffer(name: String,
                 cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
                 cyclix_gen.assign(new_renamed_uop.GetFracRef("exu_opcode"), alu_opcode)
                 cyclix_gen.assign(new_renamed_uop.GetFracRef("rdy"), !alu_req)
-                cyclix_gen.assign(new_renamed_uop.GetFracRef("wb_ext"), mem_req)
+                cyclix_gen.assign(new_renamed_uop.GetFracRef("io_req"), mem_req)
 
                 cyclix_gen.begif(renamed_uop_buf.ctrl_rdy)
                 run {
@@ -817,7 +817,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
         var nru_rdy             = new_renamed_uop.GetFracRef("rdy")
         var nru_fu_req          = new_renamed_uop.GetFracRef("fu_req")
         var nru_fu_id           = new_renamed_uop.GetFracRef("fu_id")
-        var nru_wb_ext          = new_renamed_uop.GetFracRef("wb_ext")
+        var nru_io_req          = new_renamed_uop.GetFracRef("io_req")
         var nru_rd_tag          = new_renamed_uop.GetFracRef("rd0_tag")
         var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
         var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
@@ -902,7 +902,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
                     global_structures.ReserveRd(cmd_req_data.GetFracRef("fu_rd"), alloc_rd_tag.position)
 
                     cyclix_gen.assign(nru_rdy, 0)
-                    cyclix_gen.assign(nru_wb_ext, 0)
+                    cyclix_gen.assign(nru_io_req, 0)
 
                     cyclix_gen.assign(renamed_uop_buf.push, 1)
                 }; cyclix_gen.endif()
@@ -933,7 +933,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
                         }
 
                         cyclix_gen.assign(nru_rdy, new_renamed_uop.GetFracRef("rs0_rdy"))
-                        cyclix_gen.assign(nru_wb_ext, 1)
+                        cyclix_gen.assign(nru_io_req, 1)
 
                         cyclix_gen.assign(renamed_uop_buf.push, 1)
 

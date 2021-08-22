@@ -26,7 +26,7 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
     var fu_pending  = AddStageVar(hw_structvar("fu_pending", DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
     val rs_srcs     = ArrayList<hw_var>()
     val rd_tag      = AddStageVar(hw_structvar("rd0_tag",   DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
-    val wb_ext      = AddStageVar(hw_structvar("wb_ext",    DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
+    val io_req      = AddStageVar(hw_structvar("io_req",    DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
     var rss_rdy         = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_rss_rdy"), TRX_BUF_SIZE-1, 0, "0")
     var op_issue        = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_op_issue"), 0, 0, "0")

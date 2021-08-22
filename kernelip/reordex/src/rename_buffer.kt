@@ -21,7 +21,7 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
     val rd_tag          = AddStageVar(hw_structvar("rd0_tag",           DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
     val rd_tag_prev     = AddStageVar(hw_structvar("rd_tag_prev",       DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
     val rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
-    val wb_ext          = AddStageVar(hw_structvar("wb_ext",            DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
+    val io_req          = AddStageVar(hw_structvar("io_req",            DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
     fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, IQ_insts : ArrayList<iq_buffer>) {
 
@@ -43,7 +43,7 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
                     num_rs++
                 }
 
-                cyclix_gen.begif(wb_ext)
+                cyclix_gen.begif(io_req)
                 run {
                     cyclix_gen.begif(store_iq.ctrl_rdy)
                     run {

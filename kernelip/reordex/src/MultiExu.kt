@@ -523,8 +523,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                         }; cyclix_gen.endif()
                     }
 
-                    //// setting rdy for wb_ext if data generated ////
-                    cyclix_gen.begif(renamed_uop_buf_entry.GetFracRef("wb_ext"))
+                    //// setting rdy for io_req if data generated ////
+                    cyclix_gen.begif(renamed_uop_buf_entry.GetFracRef("io_req"))
                     run {
                         cyclix_gen.assign(renamed_uop_buf_entry.GetFracRef("rdy"), renamed_uop_buf_entry.GetFracRef("rs0_rdy"))
                     }; cyclix_gen.endif()
@@ -543,7 +543,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 var iq_entry_enb        = iq_entry.GetFracRef("enb")
                 var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
                 var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
-                var iq_entry_wb_ext     = iq_entry.GetFracRef("wb_ext")
+                var iq_entry_io_req     = iq_entry.GetFracRef("io_req")
                 var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
 
                 cyclix_gen.begif(iq_entry_enb)
@@ -575,8 +575,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                     }
 
                     //// setting rdy if data generated ////
-                    // wb_ext //
-                    cyclix_gen.begif(iq_entry_wb_ext)
+                    // io_req //
+                    cyclix_gen.begif(iq_entry_io_req)
                     run {
                         cyclix_gen.assign(iq_entry_rdy, iq_entry.GetFracRef("rs0_rdy"))
                     }; cyclix_gen.endif()
