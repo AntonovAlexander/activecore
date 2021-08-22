@@ -80,6 +80,7 @@ class rob_risc(name: String,
     var mem_addr        = AdduStageVar("mem_addr", 31, 0, "0")
     var mem_wdata       = AdduStageVar("mem_wdata", 31, 0, "0")
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
+    var load_signext    = AdduStageVar("load_signext", 0, 0, "0")
 
     //// committing RF signals
     // rd sources
@@ -146,6 +147,30 @@ class rob_risc(name: String,
         run {
             cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, mem_data_rdata))
             run {
+
+                cyclix_gen.begif(cyclix_gen.eq2(mem_be, 0x1))
+                run {
+                    cyclix_gen.begif(load_signext)
+                    run {
+                        mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[7, 0], 32))
+                    }; cyclix_gen.endif()
+                    cyclix_gen.begelse()
+                    run {
+                        mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[7, 0], 32))
+                    }; cyclix_gen.endif()
+                }; cyclix_gen.endif()
+
+                cyclix_gen.begif(cyclix_gen.eq2(mem_be, 0x3))
+                run {
+                    cyclix_gen.begif(load_signext)
+                    run {
+                        mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[15, 0], 32))
+                    }; cyclix_gen.endif()
+                    cyclix_gen.begelse()
+                    run {
+                        mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[15, 0], 32))
+                    }; cyclix_gen.endif()
+                }; cyclix_gen.endif()
 
                 var exu_cdb_inst_enb    = commit_cdb.GetFracRef("enb")
                 var exu_cdb_inst_data   = commit_cdb.GetFracRef("data")
