@@ -711,9 +711,12 @@ class instr_fetch_buffer(name: String,
                 rs0_rdy.assign(1)
                 cyclix_gen.begif(rs0_req)
                 run {
-                    rs0_tag.assign(global_structures.RenameReg(rs0_addr))
-                    global_structures.FetchRs(rs0_rdata, rs0_tag)
-                    rs0_rdy.assign(global_structures.FetchRsRdy(rs0_tag))
+                    cyclix_gen.begif(cyclix_gen.neq2(rs0_addr, 0))
+                    run {
+                        rs0_tag.assign(global_structures.RenameReg(rs0_addr))
+                        global_structures.FetchRs(rs0_rdata, rs0_tag)
+                        rs0_rdy.assign(global_structures.FetchRsRdy(rs0_tag))
+                    }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
 
                 //// TODO: cleanup
@@ -731,9 +734,12 @@ class instr_fetch_buffer(name: String,
                 rs1_rdy.assign(1)
                 cyclix_gen.begif(rs1_req)
                 run {
-                    rs1_tag.assign(global_structures.RenameReg(rs1_addr))
-                    global_structures.FetchRs(rs1_rdata, global_structures.RenameReg(rs1_addr))
-                    rs1_rdy.assign(global_structures.FetchRsRdy(rs1_tag))
+                    cyclix_gen.begif(cyclix_gen.neq2(rs1_addr, 0))
+                    run {
+                        rs1_tag.assign(global_structures.RenameReg(rs1_addr))
+                        global_structures.FetchRs(rs1_rdata, global_structures.RenameReg(rs1_addr))
+                        rs1_rdy.assign(global_structures.FetchRsRdy(rs1_tag))
+                    }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
 
                 cyclix_gen.begif(!mem_req)
