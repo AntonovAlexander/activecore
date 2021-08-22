@@ -56,6 +56,8 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
                         cyclix_gen.assign(store_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
                         store_iq.push_trx(store_push_trx)
 
+                        cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), IQ_insts.last().CDB_index-1)      // risc_commit_idx
+
                         cyclix_gen.assign(rob_push_trx.GetFracRef("cdb_id"), store_iq.CDB_index)
 
                         // clearing renamed uop buffer
