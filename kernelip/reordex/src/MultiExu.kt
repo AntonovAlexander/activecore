@@ -589,7 +589,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer: done")
 
-        renamed_uop_buf.Process(rob, PRF_src, io_iq, ExecUnits, exu_descrs)
+        renamed_uop_buf.Process(rob, PRF_src, io_iq, ExecUnits, IQ_insts)
 
         cyclix_gen.MSG_COMMENT("renaming...")
 

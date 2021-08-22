@@ -23,7 +23,7 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
     val rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
     val wb_ext          = AddStageVar(hw_structvar("wb_ext",            DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
-    fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, exu_descrs : MutableMap<String, __exu_descr>) {
+    fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, IQ_insts : ArrayList<iq_buffer>) {
 
         cyclix_gen.MSG_COMMENT("sending new operations to IQs...")
 
@@ -68,10 +68,8 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
 
                 cyclix_gen.begelse()
                 run {
-                    var ExUnit_num = 0
-                    for (ExUnit in ExecUnits) {
-                        var IQ_inst = exu_descrs[ExUnit.key]!!.IQ_insts[0]      // TODO: multiple queues
 
+                    for (IQ_inst in IQ_insts) {
                         cyclix_gen.begif(cyclix_gen.eq2(fu_id, IQ_inst.fu_id_num))
                         run {
                             cyclix_gen.begif(IQ_inst.ctrl_rdy)
@@ -96,8 +94,6 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
 
                             }; cyclix_gen.endif()
                         }; cyclix_gen.endif()
-
-                        ExUnit_num++
                     }
                 }; cyclix_gen.endif()
 
