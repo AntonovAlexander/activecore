@@ -45,7 +45,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 	* **Aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex KIP core
 	* **Ariele** - full xbar generator, based on Pipex KIP core
 	* **Citadel** - OoO FPU coprocessor, based on Reordex KIP core
-	* **Agenda** - OoO RISC-V (RV32I) CPU, based on Reordex KIP core *(in development)*
+	* **Agenda** - OoO RISC-V (RV32I) CPU, based on Reordex KIP core *(passes compliance tests, optimization in progress)*
 
 * Auxiliary reusable cores:
 	* **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Lab work manual included: https://github.com/AntonovAlexander/activecore/blob/master/designs/rtl/udm/doc/udm_lab_manual.pdf. Location: /designs/rtl/udm

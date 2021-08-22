@@ -40,37 +40,42 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
 
         cyclix_gen.assign(op_issue, 0)
 
-        var iq_iter = cyclix_gen.begforall_asc(TRX_BUF)
+        cyclix_gen.begif(ctrl_active)
         run {
 
-            var cur_rss_rdy         = rss_rdy.GetFracRef(iq_iter.iter_num)
-            var iq_entry            = TRX_BUF.GetFracRef(iq_iter.iter_num)
-            var iq_entry_enb        = iq_entry.GetFracRef("enb")
-            var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
-            var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
-            var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
-
-            cyclix_gen.begif(!op_issue)
+            var iq_iter = cyclix_gen.begforall_asc(TRX_BUF)
             run {
 
-                cyclix_gen.begif(iq_entry_enb)
+                var cur_rss_rdy         = rss_rdy.GetFracRef(iq_iter.iter_num)
+                var iq_entry            = TRX_BUF.GetFracRef(iq_iter.iter_num)
+                var iq_entry_enb        = iq_entry.GetFracRef("enb")
+                var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
+                var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
+                var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
+
+                cyclix_gen.begif(!op_issue)
                 run {
-                    cyclix_gen.assign(cur_rss_rdy, 1)
-                    for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
-                        cyclix_gen.band_gen(cur_rss_rdy, cur_rss_rdy, iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy"))
-                    }
-                    cyclix_gen.begif(cur_rss_rdy)
+
+                    cyclix_gen.begif(iq_entry_enb)
                     run {
-                        cyclix_gen.assign(op_issue, 1)
-                        cyclix_gen.assign(op_issued_num, iq_iter.iter_num)
+                        cyclix_gen.assign(cur_rss_rdy, 1)
+                        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                            cyclix_gen.band_gen(cur_rss_rdy, cur_rss_rdy, iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy"))
+                        }
+                        cyclix_gen.begif(cur_rss_rdy)
+                        run {
+                            cyclix_gen.assign(op_issue, 1)
+                            cyclix_gen.assign(op_issued_num, iq_iter.iter_num)
+                        }; cyclix_gen.endif()
                     }; cyclix_gen.endif()
+
                 }; cyclix_gen.endif()
 
-            }; cyclix_gen.endif()
+            }; cyclix_gen.endloop()
 
-        }; cyclix_gen.endloop()
+            cyclix_gen.MSG_COMMENT("selecting uop to issue: done")
 
-        cyclix_gen.MSG_COMMENT("selecting uop to issue: done")
+        }; cyclix_gen.endif()
 
         cyclix_gen.MSG_COMMENT("issuing IQ...")
         cyclix_gen.begif(op_issue)
