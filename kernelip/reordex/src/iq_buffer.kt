@@ -94,4 +94,140 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
         }; cyclix_gen.endif()
         cyclix_gen.MSG_COMMENT("issuing IQ: done")
     }
+
+    fun FillFromCDB(cdb : hw_var) {
+        var iq_iter = cyclix_gen.begforall_asc(TRX_BUF)
+        run {
+
+            var iq_entry            = TRX_BUF.GetFracRef(iq_iter.iter_num)
+            var iq_entry_enb        = iq_entry.GetFracRef("enb")
+            var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
+            var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
+            var iq_entry_io_req     = iq_entry.GetFracRef("io_req")
+            var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
+
+            cyclix_gen.begif(iq_entry_enb)
+            run {
+
+                for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+
+                    var iq_entry_rs_tag     = iq_entry.GetFracRef("rs" + RF_rs_idx + "_tag")
+                    var iq_entry_rs_src     = iq_entry.GetFracRef("rs" + RF_rs_idx + "_src")
+                    var iq_entry_rs_rdy     = iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy")
+                    var iq_entry_rs_rdata   = iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdata")
+
+                    cyclix_gen.begif(!iq_entry_rs_rdy)
+                    run {
+
+                        var src_cdb         = cdb.GetFracRef(iq_entry_rs_src)
+                        var src_cdb_enb     = src_cdb.GetFracRef("enb")
+                        var src_cdb_data    = src_cdb.GetFracRef("data")
+                        var src_cdb_tag     = src_cdb_data.GetFracRef("tag")
+                        var src_cdb_wdata   = src_cdb_data.GetFracRef("wdata")
+
+                        cyclix_gen.begif(cyclix_gen.eq2(iq_entry_rs_tag, src_cdb_tag))
+                        run {
+                            // setting IQ entry ready
+                            cyclix_gen.assign(iq_entry_rs_rdata, src_cdb_wdata)
+                            cyclix_gen.assign(iq_entry_rs_rdy, 1)
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endif()
+                }
+
+                //// setting rdy if data generated ////
+                // io_req //
+                cyclix_gen.begif(iq_entry_io_req)
+                run {
+                    cyclix_gen.assign(iq_entry_rdy, iq_entry.GetFracRef("rs0_rdy"))
+                }; cyclix_gen.endif()
+
+            }; cyclix_gen.endif()
+
+        }; cyclix_gen.endloop()
+    }
+
+    fun ProcessIO(io_cdb_buf : hw_var, io_cdb_rs1_wdata_buf : hw_var) {
+
+        var cmd_resp = DUMMY_FIFO_OUT
+        if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(MultiExu_CFG.RF_width-1, 0)))
+
+        cyclix_gen.MSG_COMMENT("I/O IQ processing...")
+
+        preinit_ctrls()
+        init_locals()
+
+        if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
+            cyclix_gen.begif(ctrl_active)
+            run {
+                cyclix_gen.begif(rs_rsrv[0].rs_rdy)
+                run {
+                    cyclix_gen.assign(pop, cyclix_gen.fifo_wr_unblk(cmd_resp, rs_rsrv[0].rs_rdata))
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
+            // popping
+            cyclix_gen.begif(pop)
+            run {
+                pop_trx()
+            }; cyclix_gen.endif()
+
+        } else {
+
+            var lsu_iq_done = cyclix_gen.ulocal("lsu_iq_done", 0, 0, "0")
+            var lsu_iq_num  = cyclix_gen.ulocal("lsu_iq_num", GetWidthToContain(TRX_BUF.GetWidth())-1, 0, "0")
+            var io_iq_cmd   = TRX_BUF.GetFracRef(lsu_iq_num)
+
+            var io_cdb_enb      = io_cdb_buf.GetFracRef("enb")
+            var io_cdb_data     = io_cdb_buf.GetFracRef("data")
+            var io_cdb_trx_id   = io_cdb_data.GetFracRef("trx_id")
+            var io_cdb_tag      = io_cdb_data.GetFracRef("tag")
+            var io_cdb_wdata    = io_cdb_data.GetFracRef("wdata")
+
+            cyclix_gen.assign(io_cdb_enb, 0)
+            cyclix_gen.assign(io_cdb_data, 0)
+
+            cyclix_gen.begif(ctrl_active)
+            run {
+
+                cyclix_gen.begif(!lsu_iq_done)
+                run {
+                    var io_iq_iter = cyclix_gen.begforall_asc(TRX_BUF)
+                    run {
+
+                        var io_iq_entry      = TRX_BUF.GetFracRef(io_iq_iter.iter_num)
+                        var io_iq_entry_enb  = io_iq_entry.GetFracRef("enb")
+                        var cur_rss_rdy      = rss_rdy.GetFracRef(io_iq_iter.iter_num)
+
+                        cyclix_gen.begif(io_iq_entry_enb)
+                        run {
+                            cyclix_gen.assign(cur_rss_rdy, 1)
+                            for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                                cyclix_gen.band_gen(cur_rss_rdy, cur_rss_rdy, io_iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy"))
+                            }
+                            cyclix_gen.begif(cur_rss_rdy)
+                            run {
+                                cyclix_gen.assign(lsu_iq_done, 1)
+                                cyclix_gen.assign(lsu_iq_num, io_iq_iter.iter_num)
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endif()
+
+                    }; cyclix_gen.endloop()
+                }; cyclix_gen.endif()
+
+                cyclix_gen.begif(lsu_iq_done)
+                run {
+
+                    cyclix_gen.assign(io_cdb_enb, 1)
+                    cyclix_gen.assign(io_cdb_trx_id, io_iq_cmd.GetFracRef("trx_id"))
+                    cyclix_gen.assign(io_cdb_tag, io_iq_cmd.GetFracRef("rd0_tag"))
+                    cyclix_gen.assign(io_cdb_wdata, cyclix_gen.add(io_iq_cmd.GetFracRef("rs0_rdata"), io_iq_cmd.GetFracRef("immediate")) )
+                    cyclix_gen.assign(io_cdb_rs1_wdata_buf, io_iq_cmd.GetFracRef("rs1_rdata"))
+
+                    remove_and_squash_trx(lsu_iq_num)
+                    pop.assign(1)
+                }; cyclix_gen.endif()
+
+            }; cyclix_gen.endif()
+        }
+        cyclix_gen.MSG_COMMENT("I/O IQ processing: done")
+    }
 }

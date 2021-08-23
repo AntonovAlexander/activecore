@@ -25,6 +25,31 @@ open class rob(cyclix_gen : cyclix.Generic,
 
     var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", GetWidthToContain(TRX_BUF_SIZE) -1, 0, "0")
 
+    fun FillFromRRB(MultiExu_CFG : Reordex_CFG, rrb : hw_var, io_cdb_rs1_wdata_buf : hw_var) {
+        cyclix_gen.MSG_COMMENT("Filling ROB with data from RRB...")
+        var rob_iter = cyclix_gen.begforall_asc(TRX_BUF)
+        run {
+            var RRB_ref         = rrb.GetFracRef(rob_iter.iter_elem.GetFracRef("rrb_id"))
+            var RRB_ref_enb     = RRB_ref.GetFracRef("enb")
+            var RRB_ref_data    = RRB_ref.GetFracRef("data")
+            cyclix_gen.begif(RRB_ref_enb)
+            run {
+                cyclix_gen.begif(cyclix_gen.eq2(rob_iter.iter_elem.GetFracRef("trx_id"), RRB_ref_data.GetFracRef("trx_id")))
+                run {
+                    cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rdy"), 1)
+                    if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
+                        cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("alu_result"), RRB_ref_data.GetFracRef("wdata"))
+                        cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("mem_wdata"), io_cdb_rs1_wdata_buf)
+                        for (dst_imm in MultiExu_CFG.dst_imms) {
+                            cyclix_gen.assign(rob_iter.iter_elem.GetFracRef(dst_imm.name), RRB_ref_data.GetFracRef(dst_imm.name))
+                        }
+                    }
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
+        }; cyclix_gen.endloop()
+        cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
+    }
+
     open fun Commit(global_structures: __global_structures) {
         preinit_ctrls()
         init_locals()
