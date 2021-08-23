@@ -351,100 +351,100 @@
       <obj_property name="ElementShortName">CLK_100MHZ</obj_property>
       <obj_property name="ObjectShortName">CLK_100MHZ</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb" type="array">
-      <obj_property name="ElementShortName">genexu_cdb[4:0]</obj_property>
-      <obj_property name="ObjectShortName">genexu_cdb[4:0]</obj_property>
+   <wvobject fp_name="/tb_direct/citadel_inst/gencdb" type="array">
+      <obj_property name="ElementShortName">gencdb[4:0]</obj_property>
+      <obj_property name="ObjectShortName">gencdb[4:0]</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[4]" type="array">
+      <wvobject fp_name="/tb_direct/citadel_inst/gencdb[4]" type="array">
          <obj_property name="ElementShortName">[4]</obj_property>
          <obj_property name="ObjectShortName">[4]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[3]" type="array">
+      <wvobject fp_name="/tb_direct/citadel_inst/gencdb[3]" type="array">
          <obj_property name="ElementShortName">[3]</obj_property>
          <obj_property name="ObjectShortName">[3]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[2]" type="array">
+      <wvobject fp_name="/tb_direct/citadel_inst/gencdb[2]" type="array">
          <obj_property name="ElementShortName">[2]</obj_property>
          <obj_property name="ObjectShortName">[2]</obj_property>
          <obj_property name="isExpanded"></obj_property>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[2].enb" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[2].enb" type="array">
             <obj_property name="ElementShortName">.enb[0:0]</obj_property>
             <obj_property name="ObjectShortName">.enb[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[2].data" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[2].data" type="array">
             <obj_property name="ElementShortName">.data</obj_property>
             <obj_property name="ObjectShortName">.data</obj_property>
             <obj_property name="isExpanded"></obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[2].enb" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[2].enb" type="array">
             <obj_property name="ElementShortName">.enb[0:0]</obj_property>
             <obj_property name="ObjectShortName">.enb[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[2].data" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[2].data" type="array">
             <obj_property name="ElementShortName">.data</obj_property>
             <obj_property name="ObjectShortName">.data</obj_property>
          </wvobject>
       </wvobject>
-      <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[1]" type="array">
+      <wvobject fp_name="/tb_direct/citadel_inst/gencdb[1]" type="array">
          <obj_property name="ElementShortName">[1]</obj_property>
          <obj_property name="ObjectShortName">[1]</obj_property>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[1].enb" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[1].enb" type="array">
             <obj_property name="ElementShortName">.enb[0:0]</obj_property>
             <obj_property name="ObjectShortName">.enb[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[1].data" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[1].data" type="array">
             <obj_property name="ElementShortName">.data</obj_property>
             <obj_property name="ObjectShortName">.data</obj_property>
             <obj_property name="isExpanded"></obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[1].enb" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[1].enb" type="array">
             <obj_property name="ElementShortName">.enb[0:0]</obj_property>
             <obj_property name="ObjectShortName">.enb[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[1].data" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[1].data" type="array">
             <obj_property name="ElementShortName">.data</obj_property>
             <obj_property name="ObjectShortName">.data</obj_property>
          </wvobject>
       </wvobject>
-      <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[0]" type="array">
+      <wvobject fp_name="/tb_direct/citadel_inst/gencdb[0]" type="array">
          <obj_property name="ElementShortName">[0]</obj_property>
          <obj_property name="ObjectShortName">[0]</obj_property>
          <obj_property name="isExpanded"></obj_property>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[0].enb" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[0].enb" type="array">
             <obj_property name="ElementShortName">.enb[0:0]</obj_property>
             <obj_property name="ObjectShortName">.enb[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[0].data" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[0].data" type="array">
             <obj_property name="ElementShortName">.data</obj_property>
             <obj_property name="ObjectShortName">.data</obj_property>
             <obj_property name="isExpanded"></obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[0].enb" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[0].enb" type="array">
             <obj_property name="ElementShortName">.enb[0:0]</obj_property>
             <obj_property name="ObjectShortName">.enb[0:0]</obj_property>
          </wvobject>
-         <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[0].data" type="array">
+         <wvobject fp_name="/tb_direct/citadel_inst/gencdb[0].data" type="array">
             <obj_property name="ElementShortName">.data</obj_property>
             <obj_property name="ObjectShortName">.data</obj_property>
          </wvobject>
       </wvobject>
-      <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[4]" type="array">
+      <wvobject fp_name="/tb_direct/citadel_inst/gencdb[4]" type="array">
          <obj_property name="ElementShortName">[4]</obj_property>
          <obj_property name="ObjectShortName">[4]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[3]" type="array">
+      <wvobject fp_name="/tb_direct/citadel_inst/gencdb[3]" type="array">
          <obj_property name="ElementShortName">[3]</obj_property>
          <obj_property name="ObjectShortName">[3]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[2]" type="array">
+      <wvobject fp_name="/tb_direct/citadel_inst/gencdb[2]" type="array">
          <obj_property name="ElementShortName">[2]</obj_property>
          <obj_property name="ObjectShortName">[2]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[1]" type="array">
+      <wvobject fp_name="/tb_direct/citadel_inst/gencdb[1]" type="array">
          <obj_property name="ElementShortName">[1]</obj_property>
          <obj_property name="ObjectShortName">[1]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb_direct/citadel_inst/genexu_cdb[0]" type="array">
+      <wvobject fp_name="/tb_direct/citadel_inst/gencdb[0]" type="array">
          <obj_property name="ElementShortName">[0]</obj_property>
          <obj_property name="ObjectShortName">[0]</obj_property>
       </wvobject>

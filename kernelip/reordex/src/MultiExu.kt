@@ -119,15 +119,24 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         MSG("generating control structures...")
 
-        var cdb_num = 0
-        var risc_commit_idx = 0
-        var risc_lsu_idx = 0
-        for (ExUnit in ExecUnits) cdb_num += ExUnit.value.exu_num
+        var CDB_NUM = 0
+        var RRB_NUM = 0
+        var EXU_NUM = 0
+        var RISC_COMMIT_NUM = 0
+        var RISC_LSU_NUM = 0
+        var CDB_RISC_COMMIT_POS = 0
+        var RRB_RISC_LSU_POS = 0
+
+        for (ExUnit in ExecUnits) EXU_NUM += ExUnit.value.exu_num
+        CDB_NUM = EXU_NUM
+        RRB_NUM = EXU_NUM
         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-            risc_commit_idx = cdb_num
-            cdb_num += 1
-            risc_lsu_idx = cdb_num
-            cdb_num += 1
+            RISC_COMMIT_NUM = 1
+            RISC_LSU_NUM = 1
+            CDB_RISC_COMMIT_POS = EXU_NUM
+            RRB_RISC_LSU_POS = EXU_NUM
+            CDB_NUM += RISC_COMMIT_NUM
+            RRB_NUM += RISC_LSU_NUM
         }
 
         var prf_dim = hw_dim_static()
@@ -155,7 +164,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var ARF_map = cyclix_gen.uglobal("genARF_map", arf_map_dim, ARF_map_default)        // ARF-to-PRF mappings
 
         var prf_src_dim = hw_dim_static()
-        prf_src_dim.add(GetWidthToContain(cdb_num)-1, 0)
+        prf_src_dim.add(GetWidthToContain(CDB_NUM)-1, 0)
         prf_src_dim.add(MultiExu_CFG.PRF_depth-1, 0)
         var PRF_src = cyclix_gen.uglobal("genPRF_src", prf_src_dim, "0") // uncomputed PRF sources
 
@@ -173,7 +182,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var cdb_struct  = hw_struct("cdb_struct")
         cdb_struct.addu("enb", 0, 0, "0")
         cdb_struct.add("data", MultiExu_CFG.resp_struct)
-        var exu_cdb = cyclix_gen.local("genexu_cdb", cdb_struct, hw_dim_static(cdb_num-1, 0))
+        var cdb = cyclix_gen.local("gencdb", cdb_struct, hw_dim_static(CDB_NUM-1, 0))
+        var rrb = cyclix_gen.local("genrrb", cdb_struct, hw_dim_static(RRB_NUM-1, 0))
         var io_cdb_buf  =
             if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) DUMMY_VAR
             else cyclix_gen.global("io_cdb_buf", cdb_struct)
@@ -182,8 +192,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             else cyclix_gen.uglobal("io_cdb_rs1_wdata_buf", MultiExu_CFG.RF_width-1, 0, "0")
 
         var rob =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob(cyclix_gen, "genrob", MultiExu_CFG.trx_inflight_num, MultiExu_CFG, cdb_num)
-            else rob_risc(name, cyclix_gen, "genrob", MultiExu_CFG.trx_inflight_num, MultiExu_CFG, cdb_num)
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob(cyclix_gen, "genrob", MultiExu_CFG.trx_inflight_num, MultiExu_CFG, RRB_NUM)
+            else rob_risc(name, cyclix_gen, "genrob", MultiExu_CFG.trx_inflight_num, MultiExu_CFG, RRB_NUM)
 
         var TranslateInfo = __TranslateInfo()
 
@@ -210,7 +220,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             var new_exu_descr = __exu_descr(mutableMapOf(), ArrayList(), ArrayList())
 
             for (ExUnit_num in 0 until ExUnit.value.exu_num) {
-                var iq_buf = iq_buffer(cyclix_gen, ExUnit.key, ExUnit_num, "geniq_" + ExUnit.key + "_" + ExUnit_num, ExUnit.value.iq_length, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true, fu_num, cdb_num)
+                var iq_buf = iq_buffer(cyclix_gen, ExUnit.key, ExUnit_num, "geniq_" + ExUnit.key + "_" + ExUnit_num, ExUnit.value.iq_length, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true, fu_num, CDB_NUM)
                 new_exu_descr.IQ_insts.add(iq_buf)
                 IQ_insts.add(iq_buf)
             }
@@ -304,28 +314,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             MSG("generating execution unit " + ExUnit.value.ExecUnit.name + ": done")
         }
 
-        var cdb_exu     = ArrayList<hw_var>()
-        var cdb_datagen = ArrayList<hw_var>()
-        var cdb_torob   = ArrayList<hw_var>()
-        var exu_cdb_num = 0
-        for (exu_num in 0 until ExUnits_insts.size) {
-            for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
-                cdb_exu.add(exu_cdb.GetFracRef(exu_cdb_num))
-                cdb_datagen.add(exu_cdb.GetFracRef(exu_cdb_num))
-                cdb_torob.add(exu_cdb.GetFracRef(exu_cdb_num))
-                exu_cdb_num++
-            }
-        }
-        if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-            cdb_datagen.add(exu_cdb.GetFracRef(exu_cdb_num))
-            exu_cdb_num++
-            cdb_torob.add(exu_cdb.GetFracRef(exu_cdb_num))
-        }
-
         MSG("generating I/O IQ...")
         var io_iq =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) iq_buffer(cyclix_gen, "genstore", 0, "genstore", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, cdb_num)
-            else iq_buffer(cyclix_gen, "genlsu", 0, "genlsu", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, risc_lsu_idx, cdb_num)
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) iq_buffer(cyclix_gen, "genstore", 0, "genstore", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, CDB_NUM)
+            else iq_buffer(cyclix_gen, "genlsu", 0, "genlsu", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, RRB_RISC_LSU_POS, CDB_NUM)
         IQ_insts.add(io_iq)
         MSG("generating I/O IQ: done")
 
@@ -334,10 +326,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         cyclix_gen.MSG_COMMENT("Initializing CDB...")
 
         // EXU
-        exu_cdb_num = 0
+        var exu_cdb_num = 0
         for (exu_num in 0 until ExUnits_insts.size) {
             for (exu_inst_num in 0 until ExUnits_insts[exu_num].size) {
-                var exu_cdb_inst        = exu_cdb.GetFracRef(exu_cdb_num)
+                var exu_cdb_inst        = cdb.GetFracRef(exu_cdb_num)
                 var exu_cdb_inst_enb    = exu_cdb_inst.GetFracRef("enb")
                 var exu_cdb_inst_data   = exu_cdb_inst.GetFracRef("data")
 
@@ -345,17 +337,20 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                 exu_cdb_num++
             }
         }
+        for (exu_num in 0 until EXU_NUM) {
+            cyclix_gen.assign(rrb.GetFracRef(exu_num), cdb.GetFracRef(exu_num))
+        }
 
         // RISC LSU
         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-            cyclix_gen.assign(exu_cdb.GetFracRef(risc_lsu_idx), io_cdb_buf)
+            cyclix_gen.assign(rrb.GetFracRef(RRB_RISC_LSU_POS), io_cdb_buf)
         }
 
         cyclix_gen.MSG_COMMENT("Initializing CDB: done")
 
         var renamed_uop_buf =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rename_buffer(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, cdb_num)
-            else rename_buffer_risc(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, cdb_num)
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rename_buffer(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM)
+            else rename_buffer_risc(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM)
 
         cyclix_gen.MSG_COMMENT("ROB committing...")
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob.Commit(global_structures)
@@ -365,26 +360,26 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
             for (IQ_inst in IQ_insts) bufs_to_reset.add(IQ_inst)
             bufs_to_reset.add(renamed_uop_buf)
             bufs_to_reset.add(instr_fetch)
-            (rob as rob_risc).Commit(global_structures, (instr_req as instr_req_stage).pc, bufs_to_reset, exu_cdb.GetFracRef(risc_commit_idx))
+            (rob as rob_risc).Commit(global_structures, (instr_req as instr_req_stage).pc, bufs_to_reset, cdb.GetFracRef(CDB_RISC_COMMIT_POS))
         }
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 
-        cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB...")
+        cyclix_gen.MSG_COMMENT("Filling ROB with data from RRB...")
         var rob_iter = cyclix_gen.begforall_asc(rob.TRX_BUF)
         run {
-            var CDB_ref         = exu_cdb.GetFracRef(rob_iter.iter_elem.GetFracRef("cdb_id"))
-            var CDB_ref_enb     = CDB_ref.GetFracRef("enb")
-            var CDB_ref_data    = CDB_ref.GetFracRef("data")
-            cyclix_gen.begif(CDB_ref_enb)
+            var RRB_ref         = rrb.GetFracRef(rob_iter.iter_elem.GetFracRef("rrb_id"))
+            var RRB_ref_enb     = RRB_ref.GetFracRef("enb")
+            var RRB_ref_data    = RRB_ref.GetFracRef("data")
+            cyclix_gen.begif(RRB_ref_enb)
             run {
-                cyclix_gen.begif(cyclix_gen.eq2(rob_iter.iter_elem.GetFracRef("trx_id"), CDB_ref_data.GetFracRef("trx_id")))
+                cyclix_gen.begif(cyclix_gen.eq2(rob_iter.iter_elem.GetFracRef("trx_id"), RRB_ref_data.GetFracRef("trx_id")))
                 run {
                     cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("rdy"), 1)
                     if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-                        cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("alu_result"), CDB_ref_data.GetFracRef("wdata"))
+                        cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("alu_result"), RRB_ref_data.GetFracRef("wdata"))
                         cyclix_gen.assign(rob_iter.iter_elem.GetFracRef("mem_wdata"), io_cdb_rs1_wdata_buf)
                         for (dst_imm in MultiExu_CFG.dst_imms) {
-                            cyclix_gen.assign(rob_iter.iter_elem.GetFracRef(dst_imm.name), CDB_ref_data.GetFracRef(dst_imm.name))
+                            cyclix_gen.assign(rob_iter.iter_elem.GetFracRef(dst_imm.name), RRB_ref_data.GetFracRef(dst_imm.name))
                         }
                     }
                 }; cyclix_gen.endif()
@@ -491,8 +486,9 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         renamed_uop_buf.init_locals()
 
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer...")
-        for (exu_cdb_inst in cdb_datagen) {
+        for (cdb_idx in 0 until CDB_NUM) {
 
+            var exu_cdb_inst        = cdb.GetFracRef(cdb_idx)
             var exu_cdb_inst_enb    = exu_cdb_inst.GetFracRef("enb")
             var exu_cdb_inst_data   = exu_cdb_inst.GetFracRef("data")
             var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
@@ -559,7 +555,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
                         cyclix_gen.begif(!iq_entry_rs_rdy)
                         run {
 
-                            var src_cdb         = exu_cdb.GetFracRef(iq_entry_rs_src)
+                            var src_cdb         = cdb.GetFracRef(iq_entry_rs_src)
                             var src_cdb_enb     = src_cdb.GetFracRef("enb")
                             var src_cdb_data    = src_cdb.GetFracRef("data")
                             var src_cdb_tag     = src_cdb_data.GetFracRef("tag")
@@ -589,7 +585,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer: done")
 
-        renamed_uop_buf.Process(rob, PRF_src, io_iq, ExecUnits, IQ_insts)
+        renamed_uop_buf.Process(rob, PRF_src, io_iq, ExecUnits, IQ_insts, CDB_RISC_COMMIT_POS)
 
         cyclix_gen.MSG_COMMENT("renaming...")
 

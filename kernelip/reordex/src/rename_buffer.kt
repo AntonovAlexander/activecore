@@ -17,13 +17,14 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
                          ExecUnits_size : Int,
                          cdb_num : Int) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, cdb_num) {
 
-    var fu_id           = AddStageVar(hw_structvar("fu_id",             DATA_TYPE.BV_UNSIGNED, GetWidthToContain(ExecUnits_size), 0, "0"))
-    val rd_tag          = AddStageVar(hw_structvar("rd0_tag",           DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
-    val rd_tag_prev     = AddStageVar(hw_structvar("rd_tag_prev",       DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
-    val rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
-    val io_req          = AddStageVar(hw_structvar("io_req",            DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
+    var fu_id           = AdduStageVar("fu_id",             GetWidthToContain(ExecUnits_size), 0, "0")
+    val rd_tag          = AdduStageVar("rd0_tag",           MultiExu_CFG.PRF_addr_width-1, 0, "0")
+    val rd_tag_prev     = AdduStageVar("rd_tag_prev",       MultiExu_CFG.PRF_addr_width-1, 0, "0")
+    val rd_tag_prev_clr = AdduStageVar("rd_tag_prev_clr",   0, 0, "0")
+    val io_req          = AdduStageVar("io_req",            0, 0, "0")
+    var mem_cmd         = AdduStageVar("mem_cmd",           0, 0, "1")
 
-    fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, IQ_insts : ArrayList<iq_buffer>) {
+    fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, IQ_insts : ArrayList<iq_buffer>, CDB_RISC_COMMIT_POS : Int) {
 
         cyclix_gen.MSG_COMMENT("sending new operations to IQs...")
 
@@ -56,9 +57,12 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
                         cyclix_gen.assign(store_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
                         store_iq.push_trx(store_push_trx)
 
-                        cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), IQ_insts.last().CDB_index-1)      // risc_commit_idx
+                        cyclix_gen.begif(!mem_cmd)
+                        run {
+                            cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), CDB_RISC_COMMIT_POS)
+                        }; cyclix_gen.endif()
 
-                        cyclix_gen.assign(rob_push_trx.GetFracRef("cdb_id"), store_iq.CDB_index)
+                        cyclix_gen.assign(rob_push_trx.GetFracRef("rrb_id"), store_iq.RRB_index)
 
                         // clearing renamed uop buffer
                         cyclix_gen.assign(pop, 1)
@@ -85,9 +89,9 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
                                 cyclix_gen.assign(iq_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
                                 IQ_inst.push_trx(iq_push_trx)
 
-                                cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), IQ_inst.CDB_index)
+                                cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), IQ_inst.RRB_index)
 
-                                cyclix_gen.assign(rob_push_trx.GetFracRef("cdb_id"), IQ_inst.CDB_index)
+                                cyclix_gen.assign(rob_push_trx.GetFracRef("rrb_id"), IQ_inst.RRB_index)
 
                                 // clearing renamed uop buffer
                                 cyclix_gen.assign(pop, 1)
@@ -205,7 +209,7 @@ class rename_buffer_risc(cyclix_gen : cyclix.Generic,
 
     // data memory control
     var mem_req         = AdduStageVar("mem_req", 0, 0, "0")
-    var mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
+    //var mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
     var mem_addr        = AdduStageVar("mem_addr", 31, 0, "0")
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
     var mem_wdata       = AdduStageVar("mem_wdata", 31, 0, "0")

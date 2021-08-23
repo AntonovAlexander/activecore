@@ -19,7 +19,7 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
                 val MultiExu_CFG : Reordex_CFG,
                 val fu_id_num: hw_imm,
                 val iq_exu: Boolean,
-                var CDB_index : Int,
+                var RRB_index : Int,
                 cdb_num : Int) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, cdb_num) {
 
     var trx_id      = AddStageVar(hw_structvar("trx_id",     DATA_TYPE.BV_UNSIGNED, GetWidthToContain(MultiExu_CFG.trx_inflight_num)-1, 0, "0"))
