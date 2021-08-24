@@ -361,6 +361,17 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         }
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 
+        if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
+            cyclix_gen.MSG_COMMENT("Deactivating CDB in case of backoff...")
+            cyclix_gen.begif(global_structures.exu_rst)
+            run {
+                for (cdb_idx in 0 until cdb.GetWidth()) {
+                    cyclix_gen.assign(cdb.GetFracRef(cdb_idx).GetFracRef("enb"), 0)
+                }
+            }; cyclix_gen.endif()
+            cyclix_gen.MSG_COMMENT("Deactivating CDB in case of backoff: done")
+        }
+
         rob.FillFromRRB(MultiExu_CFG, rrb, io_cdb_rs1_wdata_buf)
 
         io_iq.ProcessIO(io_cdb_buf, io_cdb_rs1_wdata_buf)
