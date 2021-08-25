@@ -107,6 +107,8 @@ class rob_risc(name: String,
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
     var load_signext    = AdduStageVar("load_signext", 0, 0, "0")
 
+    var mret_req        = AdduStageVar("mret_req", 0, 0, "0")
+
     //// committing RF signals
     // rd sources
     val RD_LUI		    = 0
@@ -138,12 +140,22 @@ class rob_risc(name: String,
     var data_req_fifo   = cyclix_gen.fifo_out((data_name_prefix + "req"), rd_struct)
     var data_resp_fifo  = cyclix_gen.ufifo_in((data_name_prefix + "resp"), 31, 0)
 
-    var irq_fifo        = cyclix_gen.ufifo_in("irq_fifo", 7, 0)
-
     var rf_dim = hw_dim_static()
     var Backoff_ARF = cyclix_gen.uglobal("Backoff_ARF", rf_dim, "0")
 
     var expected_instraddr = cyclix_gen.uglobal("expected_instraddr", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
+
+    val irq_width   = 8
+    val IRQ_ADDR    = 0x80
+    var irq_fifo    = cyclix_gen.ufifo_in("irq_fifo", irq_width-1, 0)
+    var irq_mcause  = cyclix_gen.ulocal("irq_mcause", irq_width-1, 0, "0")
+    var irq_recv    = cyclix_gen.ulocal("irq_recv", 0, 0, "0")
+    var MIRQEN      = cyclix_gen.uglobal("MIRQEN", 0, 0, "1")
+
+    // CSRs
+    var CSR_MCAUSE      = cyclix_gen.uglobal("CSR_MCAUSE", 7, 0, "0")
+
+    var backoff_cmd         = cyclix_gen.ulocal("backoff_cmd", 0, 0, "0")
 
     init {
         busreq_mem_struct.addu("addr",     31, 0, "0")
@@ -157,13 +169,11 @@ class rob_risc(name: String,
         rf_dim.add(31, 0)
     }
 
-    fun Commit(global_structures: __global_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, commit_cdb : hw_var) {
+    fun Commit(global_structures: __global_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, commit_cdb : hw_var, MRETADDR : hw_var) {
 
         var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
         var mem_data_wdata      = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
         var mem_data_rdata      = cyclix_gen.local("mem_data_rdata", data_resp_fifo.vartype, "0")
-
-        var backoff_cmd         = cyclix_gen.ulocal("backoff_cmd", 0, 0, "0")
 
         var commit_cdb_buf      = cyclix_gen.global("commit_cdb_buf", commit_cdb.vartype, "0")
 
@@ -217,45 +227,76 @@ class rob_risc(name: String,
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
 
-        cyclix_gen.begelsif(ctrl_active)
+        cyclix_gen.begelse()
         run {
-            cyclix_gen.begif(rdy)
+
+            cyclix_gen.begif(MIRQEN)             // checking for interrupts
             run {
-
-                cyclix_gen.begif(cyclix_gen.eq2(expected_instraddr, curinstr_addr))     // branch prediction fine
-                run {
-                    cyclix_gen.assign(pop, 1)
-
-                    cyclix_gen.begif(mem_req)
-                    run {
-
-                        cyclix_gen.assign(mem_addr, alu_result)
-
-                        cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
-                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
-                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
-                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
-                        cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata)
-
-                        cyclix_gen.begif(!mem_cmd)
-                        run {
-                            cyclix_gen.assign(mem_rd_inprogress, 1)
-                            cyclix_gen.assign(pop, 0)
-                        }; cyclix_gen.endif()
-                    }; cyclix_gen.endif()
-                }; cyclix_gen.endif()
-
-                cyclix_gen.begelse()
+                cyclix_gen.assign(irq_recv, cyclix_gen.fifo_rd_unblk(irq_fifo, irq_mcause))
+                cyclix_gen.begif(irq_recv)
                 run {
                     cyclix_gen.assign(backoff_cmd, 1)
-                    cyclix_gen.assign(pc, expected_instraddr)
-                    for (buf_to_rollback in bufs_to_rollback) {
-                        buf_to_rollback.Reset()
-                    }
-                    global_structures.RollBack(Backoff_ARF)
+                    cyclix_gen.assign(expected_instraddr, hw_imm(IRQ_ADDR))
+                    MIRQEN.assign(0)
+                    CSR_MCAUSE.assign(irq_mcause)
+                    MRETADDR.assign(curinstr_addr)
                 }; cyclix_gen.endif()
-
             }; cyclix_gen.endif()
+
+            cyclix_gen.begif(!irq_recv)
+            run {
+                cyclix_gen.begif(ctrl_active)
+                run {
+                    cyclix_gen.begif(rdy)
+                    run {
+
+                        cyclix_gen.begif(cyclix_gen.eq2(expected_instraddr, curinstr_addr))      // instruction flow fine
+                        run {
+                            cyclix_gen.assign(pop, 1)
+
+                            cyclix_gen.begif(mem_req)
+                            run {
+
+                                cyclix_gen.assign(mem_addr, alu_result)
+
+                                cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
+                                cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
+                                cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
+                                cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
+                                cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata)
+
+                                cyclix_gen.begif(!mem_cmd)
+                                run {
+                                    cyclix_gen.assign(mem_rd_inprogress, 1)
+                                    cyclix_gen.assign(pop, 0)
+                                }; cyclix_gen.endif()
+                            }; cyclix_gen.endif()
+
+                            cyclix_gen.begif(mret_req)
+                            run {
+                                MIRQEN.assign(1)
+                            }; cyclix_gen.endif()
+
+                        }; cyclix_gen.endif()
+
+                        cyclix_gen.begelse()                                                        // unpredicted branch
+                        run {
+                            cyclix_gen.assign(backoff_cmd, 1)
+                        }; cyclix_gen.endif()
+
+                    }; cyclix_gen.endif()
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
+
+        }; cyclix_gen.endif()
+
+        cyclix_gen.begif(backoff_cmd)
+        run {
+            cyclix_gen.assign(pc, expected_instraddr)
+            for (buf_to_rollback in bufs_to_rollback) {
+                buf_to_rollback.Reset()
+            }
+            global_structures.RollBack(Backoff_ARF)
         }; cyclix_gen.endif()
 
         // uop completed successfully, popping

@@ -200,6 +200,10 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val io_iq
         var exu_req     = cyclix_gen.local(cyclix_gen.GetGenName("exu_req"), MultiExu_CFG.req_struct)
         var exu_resp    = cyclix_gen.local(cyclix_gen.GetGenName("exu_resp"), MultiExu_CFG.resp_struct)
 
+        var MRETADDR =
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) DUMMY_VAR
+            else cyclix_gen.uglobal("MRETADDR", 31, 0, "0")
+
         MSG("generating internal structures: done")
 
         var instr_fetch = (rob as hw_stage)
@@ -357,7 +361,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val io_iq
             for (IQ_inst in IQ_insts) bufs_to_reset.add(IQ_inst)
             bufs_to_reset.add(renamed_uop_buf)
             bufs_to_reset.add(instr_fetch)
-            (rob as rob_risc).Commit(global_structures, (instr_req as instr_req_stage).pc, bufs_to_reset, cdb.GetFracRef(CDB_RISC_COMMIT_POS))
+            (rob as rob_risc).Commit(global_structures, (instr_req as instr_req_stage).pc, bufs_to_reset, cdb.GetFracRef(CDB_RISC_COMMIT_POS), MRETADDR)
         }
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 
@@ -453,7 +457,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val io_iq
             frontend.Send_toRenameBuf(renamed_uop_buf)
 
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
-            (instr_fetch as instr_fetch_buffer).Process(renamed_uop_buf)
+            (instr_fetch as instr_fetch_buffer).Process(renamed_uop_buf, MRETADDR)
             (instr_req as instr_req_stage).Process(instr_fetch)
         }
 

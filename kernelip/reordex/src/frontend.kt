@@ -219,8 +219,6 @@ class instr_fetch_buffer(name: String,
 
     var mret_req        = AdduLocal("mret_req", 0, 0, "0")
 
-    var MRETADDR        = cyclix_gen.uglobal("MRETADDR", 31, 0, "0")
-
     //////////
     var rs0_rdy         = AdduLocal("rs0_rdy", 0, 0, "0")
     var rs0_tag         = AdduLocal("rs0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
@@ -230,7 +228,7 @@ class instr_fetch_buffer(name: String,
 
     var rd_tag          = AdduLocal("rd0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
 
-    fun Process(renamed_uop_buf : rename_buffer) {
+    fun Process(renamed_uop_buf : rename_buffer, MRETADDR : hw_var) {
 
         var new_renamed_uop = renamed_uop_buf.GetPushTrx()
 
