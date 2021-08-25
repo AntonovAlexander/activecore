@@ -87,7 +87,7 @@ data class Exu_CFG(val ExecUnit : Exu,
                    val iq_length : Int,
                    val pref_impl : STREAM_PREF_IMPL)
 
-open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_iq_size : Int) {
+open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val io_iq_size : Int) {
 
     var ExecUnits  = mutableMapOf<String, Exu_CFG>()
 
@@ -313,8 +313,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
 
         MSG("generating I/O IQ...")
         var io_iq =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) iq_buffer(cyclix_gen, "genstore", 0, "genstore", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, CDB_NUM)
-            else iq_buffer(cyclix_gen, "genlsu", 0, "genlsu", out_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, RRB_RISC_LSU_POS, CDB_NUM)
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) iq_buffer(cyclix_gen, "genstore", 0, "genstore", io_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, CDB_NUM)
+            else iq_buffer(cyclix_gen, "genlsu", 0, "genlsu", io_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, RRB_RISC_LSU_POS, CDB_NUM)
         IQ_insts.add(io_iq)
         MSG("generating I/O IQ: done")
 

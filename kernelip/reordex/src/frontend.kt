@@ -67,7 +67,8 @@ class instr_fetch_buffer(name: String,
     val instr_name_prefix = "genmcopipe_instr_mem_"
     var instr_resp_fifo = cyclix_gen.ufifo_in((instr_name_prefix + "resp"), 31, 0)
 
-    var instr_code      = AddLocal("instr_code", instr_resp_fifo.vartype, "0")
+    var instr_recv      = AdduStageVar("instr_recv", 0, 0, "0")
+    var instr_code      = AddStageVar("instr_code", instr_resp_fifo.vartype, "0")
 
     //// base opcodes ///////////
 
@@ -241,7 +242,14 @@ class instr_fetch_buffer(name: String,
         cyclix_gen.begif(ctrl_active)
         run {
 
-            cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifo, instr_code))
+            cyclix_gen.begif(!instr_recv)
+            run {
+                accum(instr_recv, cyclix_gen.fifo_rd_unblk(instr_resp_fifo, instr_code))
+                accum(instr_code, instr_code)
+            }; cyclix_gen.endif()
+
+
+            cyclix_gen.begif(instr_recv)
             run {
 
                 //// instruction decoding ////

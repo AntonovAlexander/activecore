@@ -274,7 +274,7 @@ class EXU_FP_FMA() : reordex.Exu("FP_FMA", CPU_CFG_inst) {
     }
 }
 
-class cpu(name : String) : reordex.MultiExu(name, CPU_CFG_inst, 8) {
+class cpu(name : String) : reordex.MultiExu(name, CPU_CFG_inst, 4) {
 
     init {
         add_exu(EXU_ALU_INTEGER(), 2, 4, STREAM_PREF_IMPL.RTL)
