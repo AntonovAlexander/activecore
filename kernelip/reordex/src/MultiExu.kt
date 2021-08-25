@@ -179,8 +179,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val out_i
         var cdb_struct  = hw_struct("cdb_struct")
         cdb_struct.addu("enb", 0, 0, "0")
         cdb_struct.add("data", MultiExu_CFG.resp_struct)
-        var cdb = cyclix_gen.local("gencdb", cdb_struct, hw_dim_static(CDB_NUM-1, 0))
-        var rrb = cyclix_gen.local("genrrb", cdb_struct, hw_dim_static(RRB_NUM-1, 0))
+        var cdb = cyclix_gen.local("gencdb", cdb_struct, hw_dim_static(CDB_NUM-1, 0))       // Common Data Bus
+        var rrb = cyclix_gen.local("genrrb", cdb_struct, hw_dim_static(RRB_NUM-1, 0))       // Return to ROB Bus
         var io_cdb_buf  =
             if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) DUMMY_VAR
             else cyclix_gen.global("io_cdb_buf", cdb_struct)

@@ -165,6 +165,11 @@ class rob_risc(name: String,
 
         var backoff_cmd         = cyclix_gen.ulocal("backoff_cmd", 0, 0, "0")
 
+        var commit_cdb_buf      = cyclix_gen.global("commit_cdb_buf", commit_cdb.vartype, "0")
+
+        cyclix_gen.assign(commit_cdb, commit_cdb_buf)
+        cyclix_gen.assign(commit_cdb_buf, 0)
+
         preinit_ctrls()
         init_locals()
 
@@ -197,8 +202,8 @@ class rob_risc(name: String,
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
 
-                var exu_cdb_inst_enb    = commit_cdb.GetFracRef("enb")
-                var exu_cdb_inst_data   = commit_cdb.GetFracRef("data")
+                var exu_cdb_inst_enb    = commit_cdb_buf.GetFracRef("enb")
+                var exu_cdb_inst_data   = commit_cdb_buf.GetFracRef("data")
                 var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
                 var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
                 cyclix_gen.assign(exu_cdb_inst_enb, 1)

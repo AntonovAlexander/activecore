@@ -12,7 +12,7 @@ import hwast.*
 import cyclix.*
 import reordex.*
 
-class CPU_CFG() : Reordex_CFG(32, 32, true,64, 16, REORDEX_MODE.RISC)
+class CPU_CFG() : Reordex_CFG(32, 32, true,48, 16, REORDEX_MODE.RISC)
 {
     var exu_opcode      = AddSrcUImm("exu_opcode", 6)
     var alu_unsigned    = AddSrcUImm("alu_unsigned", 1)
@@ -274,7 +274,7 @@ class EXU_FP_FMA() : reordex.Exu("FP_FMA", CPU_CFG_inst) {
     }
 }
 
-class cpu(name : String) : reordex.MultiExu(name, CPU_CFG_inst, 4) {
+class cpu(name : String) : reordex.MultiExu(name, CPU_CFG_inst, 8) {
 
     init {
         add_exu(EXU_ALU_INTEGER(), 2, 4, STREAM_PREF_IMPL.RTL)
