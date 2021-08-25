@@ -228,7 +228,7 @@ class instr_fetch_buffer(name: String,
 
     var rd_tag          = AdduLocal("rd0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
 
-    fun Process(renamed_uop_buf : rename_buffer, MRETADDR : hw_var) {
+    fun Process(renamed_uop_buf : rename_buffer, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
 
         var new_renamed_uop = renamed_uop_buf.GetPushTrx()
 
@@ -749,13 +749,26 @@ class instr_fetch_buffer(name: String,
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
 
+                cyclix_gen.begif(csrreq)
+                run {
+                    csr_rdata.assign(CSR_MCAUSE)
+                }; cyclix_gen.endif()
+
                 cyclix_gen.begif(!mem_req)
                 run {
+
                     cyclix_gen.begif(cyclix_gen.eq2(op1_source, OP1_SRC_IMM))
                     run {
                         rs1_rdata.assign(immediate)
                         rs1_rdy.assign(1)
                     }; cyclix_gen.endif()
+
+                    cyclix_gen.begif(cyclix_gen.eq2(op1_source, OP1_SRC_CSR))
+                    run {
+                        rs1_rdata.assign(csr_rdata)
+                        rs1_rdy.assign(1)
+                    }; cyclix_gen.endif()
+
                 }; cyclix_gen.endif()
 
                 // TODO: CSR

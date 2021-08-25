@@ -88,6 +88,8 @@ class rob_risc(name: String,
     var rd_addr         = AdduStageVar("rd_addr", 4, 0, "0")
     var rd_wdata        = AdduStageVar("rd_wdata", MultiExu_CFG.RF_width-1, 0, "0")
 
+    var csr_rdata       = AdduStageVar("csr_rdata", 31, 0, "0")
+
     var immediate           = AdduStageVar("immediate", 31, 0, "0")
     var curinstraddr_imm    = AdduStageVar("curinstraddr_imm", 31, 0, "0")
 
@@ -152,10 +154,7 @@ class rob_risc(name: String,
     var irq_recv    = cyclix_gen.ulocal("irq_recv", 0, 0, "0")
     var MIRQEN      = cyclix_gen.uglobal("MIRQEN", 0, 0, "1")
 
-    // CSRs
-    var CSR_MCAUSE      = cyclix_gen.uglobal("CSR_MCAUSE", 7, 0, "0")
-
-    var backoff_cmd         = cyclix_gen.ulocal("backoff_cmd", 0, 0, "0")
+    var backoff_cmd     = cyclix_gen.ulocal("backoff_cmd", 0, 0, "0")
 
     init {
         busreq_mem_struct.addu("addr",     31, 0, "0")
@@ -169,7 +168,7 @@ class rob_risc(name: String,
         rf_dim.add(31, 0)
     }
 
-    fun Commit(global_structures: __global_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, commit_cdb : hw_var, MRETADDR : hw_var) {
+    fun Commit(global_structures: __global_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, commit_cdb : hw_var, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
 
         var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
         var mem_data_wdata      = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
@@ -339,13 +338,11 @@ class rob_risc(name: String,
                     rd_rdy.assign(1)
                 }; cyclix_gen.endbranch()
 
-                /*
                 cyclix_gen.begbranch(RD_CSR)
                 run {
                     rd_wdata.assign(csr_rdata)
                     rd_rdy.assign(1)
                 }; cyclix_gen.endbranch()
-                */
 
             }; cyclix_gen.endcase()
 
