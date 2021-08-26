@@ -234,11 +234,11 @@ class rob_risc(name: String,
                 cyclix_gen.assign(irq_recv, cyclix_gen.fifo_rd_unblk(irq_fifo, irq_mcause))
                 cyclix_gen.begif(irq_recv)
                 run {
-                    cyclix_gen.assign(backoff_cmd, 1)
-                    cyclix_gen.assign(expected_instraddr, hw_imm(IRQ_ADDR))
                     MIRQEN.assign(0)
                     CSR_MCAUSE.assign(irq_mcause)
-                    MRETADDR.assign(curinstr_addr)
+                    MRETADDR.assign(expected_instraddr)
+                    cyclix_gen.assign(backoff_cmd, 1)
+                    cyclix_gen.assign(expected_instraddr, hw_imm(IRQ_ADDR))
                 }; cyclix_gen.endif()
             }; cyclix_gen.endif()
 
