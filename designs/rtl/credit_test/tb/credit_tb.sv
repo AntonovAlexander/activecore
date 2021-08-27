@@ -37,7 +37,7 @@ always @(posedge clk) if (datain_ack) datain = (datain == 400) ? 1 : (datain + 1
 logic [15:0] dataout_buf;
 always @(posedge clk) if (dataout_req && dataout_ack) dataout_buf <= dataout;
 
-Taylor taylor_inst (
+taylor_pipeline taylor_inst (
 	.clk_i(clk)
 	, .rst_i(rst)
 

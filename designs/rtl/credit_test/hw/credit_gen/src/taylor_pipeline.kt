@@ -2,7 +2,7 @@ import hwast.*
 import cyclix.*
 import pipex.*
 
-class taylor_pipeline() : pipex.Pipeline("Taylor", PIPELINE_FC_MODE.CREDIT_BASED) {
+class taylor_pipeline() : pipex.Pipeline("taylor_pipeline", PIPELINE_FC_MODE.CREDIT_BASED) {
 
     val x               = ulocal("x", 15, 0, "0")
     val div6            = hw_imm(16, IMM_BASE_TYPE.HEX, "2a")
