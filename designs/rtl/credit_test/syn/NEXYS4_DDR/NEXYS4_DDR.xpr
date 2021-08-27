@@ -136,13 +136,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../hw/credit_gen/coregen/sverilog/taylor_credit_pipeline.svh">
+      <File Path="$PPRDIR/../../hw/credit_gen/coregen/sverilog/Taylor.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../hw/credit_gen/coregen/sverilog/taylor_credit_pipeline.sv">
+      <File Path="$PPRDIR/../../hw/credit_gen/coregen/sverilog/Taylor.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>

@@ -20,11 +20,11 @@ Compared to other hardware generation frameworks, ActiveCore is constructed acco
 The ultimate goal of the project is to provide top-down methodology and reusable components for explicit allocation of intermediate ***“microarchitectural middleware”*** design level for complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) decouples application-related logic from selected management mechanisms of hardware microarchitectures, addressing:
 * rapid design of ***functionally differentianted*** IP blocks with common microarchitectural mechanisms;
 * ***diversification of responsibility and competence*** of IP engineers: implementation of engines offering key microarchitectural mechanisms can be charged to the core of leading expert engineers, while developers of final designs can focus solely on application-specific functionality;
-* facilitating IP design centers to package, reuse and deliver basis for ***semi-custom IP cores***, enabling broad reuse of microarchitectural competence for unique, highly specialized designs.
+* facilitating IP design centers to package, reuse and deliver basis for ***semi-custom IP cores***, enabling seamless reuse of microarchitectural competence for unique, highly specialized designs.
 
 ![pic_test](kernelip/__img/kernelip_model.png)
 
-Aligned to the strategy of e.g. RISC-V project that standardises (or provides a baseline for) RISC CPU architecture, ActiveCore endeavours to propose generic reference implementations of common microarchitectures (abstracted from certain architecture).
+Aligned to the strategy of e.g. RISC-V project that standardises open (or provides a baseline for) RISC CPU architecture, ActiveCore endeavours to propose open reference implementations of common microarchitectures (abstracted from certain architecture).
 
 ### Project structure
 
@@ -41,7 +41,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 ![pic_test](kernelip/__img/kernelip_overview.png)
 
 * Demo core generators based on KIP cores (/designs/coregen):
-	* **taylor_credit_pipeline** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex KIP core. Location: /designs/rtl/credit_test
+	* **Taylor** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex KIP core. Location: /designs/rtl/credit_test
 	* **Aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex KIP core
 	* **Ariele** - full xbar generator, based on Pipex KIP core
 	* **Citadel** - OoO FPU coprocessor, based on Reordex KIP core
@@ -54,7 +54,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 * Demo FPGA-based SoCs:
 	* **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Can be learned within a single lab work, lab work manual included: https://github.com/AntonovAlexander/activecore/blob/master/designs/rtl/sigma/doc/sigma_lab_manual.pdf. Location: /designs/rtl/sigma
 	* **Magma** - NUMA MPSoC consisting of multiple sigma_tile modules connected by Ariele xbar. Location: /designs/rtl/magma
-	* **Kerygma** - MPU based on Agenda CPU. Location: /designs/rtl/kerygma *(in development)*
+	* **Kerygma** - MPU based on Agenda CPU. Location: /designs/rtl/kerygma *(passes tests, optimization in progress)*
 
 ### Publications
 
