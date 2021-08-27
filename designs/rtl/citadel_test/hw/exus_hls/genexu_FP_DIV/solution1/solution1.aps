@@ -63,8 +63,6 @@
         <TargetInfo value="xc7a100t:-csg324:-3"/>
     </targetInfo>
     <libraryList>
-        <library name="DefaultPlatform" value="xilinx/artix7/artix7"/>
-        <library name="DefaultPlatform" value="xilinx/artix7/artix7_fpv6"/>
         <library value="xilinx/artix7/artix7" name="DefaultPlatform"/>
     </libraryList>
     <clockList>

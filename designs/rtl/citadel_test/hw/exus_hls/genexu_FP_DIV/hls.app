@@ -1,4 +1,4 @@
-<project xmlns="com.autoesl.autopilot.project" top="genexu_FP_DIV" name="genexu_FP_DIV">
+<project xmlns="com.autoesl.autopilot.project" name="genexu_FP_DIV" top="genexu_FP_DIV">
     <includePaths/>
     <libraryPaths/>
     <Simulation>

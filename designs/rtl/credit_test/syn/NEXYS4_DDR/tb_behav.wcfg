@@ -11,15 +11,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="10500001fs"></ZoomEndTime>
-      <Cursor1Time time="2070000fs"></Cursor1Time>
+      <ZoomStartTime time="16913000fs"></ZoomStartTime>
+      <ZoomEndTime time="17375001fs"></ZoomEndTime>
+      <Cursor1Time time="17099000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="175"></NameColumnWidth>
-      <ValueColumnWidth column_width="128"></ValueColumnWidth>
+      <NameColumnWidth column_width="379"></NameColumnWidth>
+      <ValueColumnWidth column_width="103"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="8" />
+   <WVObjectSize size="17" />
    <wvobject fp_name="/credit_tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -28,32 +28,96 @@
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
-   <wvobject fp_name="/credit_tb/datain_req" type="logic">
-      <obj_property name="ElementShortName">datain_req</obj_property>
-      <obj_property name="ObjectShortName">datain_req</obj_property>
+   <wvobject fp_name="group10" type="group">
+      <obj_property name="label">datain</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/credit_tb/datain_req" type="logic">
+         <obj_property name="ElementShortName">datain_req</obj_property>
+         <obj_property name="ObjectShortName">datain_req</obj_property>
+      </wvobject>
+      <wvobject fp_name="/credit_tb/datain_ack" type="logic">
+         <obj_property name="ElementShortName">datain_ack</obj_property>
+         <obj_property name="ObjectShortName">datain_ack</obj_property>
+      </wvobject>
+      <wvobject fp_name="/credit_tb/datain" type="array">
+         <obj_property name="ElementShortName">datain[15:0]</obj_property>
+         <obj_property name="ObjectShortName">datain[15:0]</obj_property>
+         <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+         <obj_property name="CellHeight">100</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject fp_name="/credit_tb/datain_ack" type="logic">
-      <obj_property name="ElementShortName">datain_ack</obj_property>
-      <obj_property name="ObjectShortName">datain_ack</obj_property>
+   <wvobject fp_name="group11" type="group">
+      <obj_property name="label">dataout</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/credit_tb/dataout_req" type="logic">
+         <obj_property name="ElementShortName">dataout_req</obj_property>
+         <obj_property name="ObjectShortName">dataout_req</obj_property>
+      </wvobject>
+      <wvobject fp_name="/credit_tb/dataout_ack" type="logic">
+         <obj_property name="ElementShortName">dataout_ack</obj_property>
+         <obj_property name="ObjectShortName">dataout_ack</obj_property>
+      </wvobject>
+      <wvobject fp_name="/credit_tb/dataout" type="array">
+         <obj_property name="ElementShortName">dataout[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dataout[15:0]</obj_property>
+         <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject fp_name="/credit_tb/datain" type="array">
-      <obj_property name="ElementShortName">datain[15:0]</obj_property>
-      <obj_property name="ObjectShortName">datain[15:0]</obj_property>
+   <wvobject fp_name="/credit_tb/dataout_buf" type="array">
+      <obj_property name="ElementShortName">dataout_buf[15:0]</obj_property>
+      <obj_property name="ObjectShortName">dataout_buf[15:0]</obj_property>
       <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
       <obj_property name="CellHeight">100</obj_property>
    </wvobject>
-   <wvobject fp_name="/credit_tb/dataout_req" type="logic">
-      <obj_property name="ElementShortName">dataout_req</obj_property>
-      <obj_property name="ObjectShortName">dataout_req</obj_property>
+   <wvobject fp_name="/credit_tb/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject fp_name="/credit_tb/dataout_ack" type="logic">
-      <obj_property name="ElementShortName">dataout_ack</obj_property>
-      <obj_property name="ObjectShortName">dataout_ack</obj_property>
+   <wvobject fp_name="/credit_tb/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
-   <wvobject fp_name="/credit_tb/dataout" type="array">
-      <obj_property name="ElementShortName">dataout[15:0]</obj_property>
-      <obj_property name="ObjectShortName">dataout[15:0]</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
+   <wvobject fp_name="/credit_tb/taylor_inst/gencredit_counter" type="array">
+      <obj_property name="ElementShortName">gencredit_counter[2:0]</obj_property>
+      <obj_property name="ObjectShortName">gencredit_counter[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/gensticky_gencredit_counter" type="array">
+      <obj_property name="ElementShortName">gensticky_gencredit_counter[2:0]</obj_property>
+      <obj_property name="ObjectShortName">gensticky_gencredit_counter[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_ACQ_POW2_genpctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_ACQ_POW2_genpctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_ACQ_POW2_genpctrl_succ[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_POW3_genpctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_POW3_genpctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_POW3_genpctrl_succ[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_TERM1_POW5_genpctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_TERM1_POW5_genpctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_TERM1_POW5_genpctrl_succ[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_TERM2_genpctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_TERM2_genpctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_TERM2_genpctrl_succ[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_GENRESULT_genpctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_GENRESULT_genpctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_GENRESULT_genpctrl_succ[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_SENDRESULT_genpctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_SENDRESULT_genpctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_SENDRESULT_genpctrl_succ[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_SENDRESULT_TRX_BUF" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_SENDRESULT_TRX_BUF[4:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_SENDRESULT_TRX_BUF[4:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_SENDRESULT_TRX_BUF_COUNTER" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_SENDRESULT_TRX_BUF_COUNTER[2:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_SENDRESULT_TRX_BUF_COUNTER[2:0]</obj_property>
    </wvobject>
 </wave_config>

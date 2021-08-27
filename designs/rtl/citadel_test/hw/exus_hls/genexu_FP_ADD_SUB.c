@@ -2,7 +2,7 @@
 
 t_dataout genexu_FP_ADD_SUB (t_datain datain) {
 #pragma HLS pipeline II=1
-	s_dataout ret_val;
+	t_dataout ret_val;
 	if (datain.opcode == 0) {
 		ret_val.wdata = datain.rs0_rdata + datain.rs1_rdata;
 	} else {

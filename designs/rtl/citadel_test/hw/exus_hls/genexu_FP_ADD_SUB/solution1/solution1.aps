@@ -63,12 +63,10 @@
         <TargetInfo value="xc7a100t:-csg324:-3"/>
     </targetInfo>
     <libraryList>
-        <library name="DefaultPlatform" value="xilinx/artix7/artix7"/>
-        <library name="DefaultPlatform" value="xilinx/artix7/artix7_fpv6"/>
         <library value="xilinx/artix7/artix7" name="DefaultPlatform"/>
     </libraryList>
     <clockList>
-        <clock name="default" default="false" period="10"/>
+        <clock default="false" name="default" period="10"/>
     </clockList>
 </solution>
 
