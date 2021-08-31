@@ -59,7 +59,7 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
                     cyclix_gen.begif(iq_entry_enb)
                     run {
                         cyclix_gen.assign(cur_rss_rdy, 1)
-                        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                        for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
                             cyclix_gen.band_gen(cur_rss_rdy, cur_rss_rdy, iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy"))
                         }
                         cyclix_gen.begif(cur_rss_rdy)
@@ -109,7 +109,7 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
             cyclix_gen.begif(iq_entry_enb)
             run {
 
-                for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
 
                     var iq_entry_rs_tag     = iq_entry.GetFracRef("rs" + RF_rs_idx + "_tag")
                     var iq_entry_rs_src     = iq_entry.GetFracRef("rs" + RF_rs_idx + "_src")
@@ -200,7 +200,7 @@ class iq_buffer(cyclix_gen : cyclix.Generic,
                         cyclix_gen.begif(io_iq_entry_enb)
                         run {
                             cyclix_gen.assign(cur_rss_rdy, 1)
-                            for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                            for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
                                 cyclix_gen.band_gen(cur_rss_rdy, cur_rss_rdy, io_iq_entry.GetFracRef("rs" + RF_rs_idx + "_rdy"))
                             }
                             cyclix_gen.begif(cur_rss_rdy)

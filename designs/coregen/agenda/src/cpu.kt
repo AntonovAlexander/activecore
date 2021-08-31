@@ -17,9 +17,8 @@ class CPU_CFG() : Reordex_CFG(32, 32, true,48, 16, REORDEX_MODE.RISC)
     var exu_opcode      = AddSrcUImm("exu_opcode", 6)
     var alu_unsigned    = AddSrcUImm("alu_unsigned", 1)
 
-    var rs0 = AddRs()
-    var rs1 = AddRs()
-    var rs2 = AddRs()
+    var src0 = AddSrc()
+    var src1 = AddSrc()
 
     var alu_CF          = AddDstUImm("alu_CF", 1)
     var alu_SF          = AddDstUImm("alu_SF", 1)

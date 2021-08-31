@@ -181,8 +181,6 @@ class instr_fetch_buffer(name: String,
 
                 // TODO: CSR
 
-                cyclix_gen.assign(new_renamed_uop.GetFracRef("rs2_rdy"), 1)
-
                 TranslateVar(MultiExu_inst.RISCDecode.opcode).assign(TranslateVar(MultiExu_inst.RISCDecode.alu_opcode))
 
                 cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rd_req))
@@ -234,7 +232,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
         for (imm_idx in 0 until MultiExu_CFG.src_imms.size) {
             cmd_req_struct.add("fu_imm_" + MultiExu_CFG.src_imms[imm_idx].name, MultiExu_CFG.src_imms[imm_idx].vartype, MultiExu_CFG.src_imms[imm_idx].defimm)
         }
-        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+        for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
             cmd_req_struct.addu("fu_rs" + RF_rs_idx, MultiExu_CFG.ARF_addr_width-1, 0, "0")
         }
         cmd_req_struct.addu("fu_rd",    MultiExu_CFG.ARF_addr_width-1, 0, "0")
@@ -248,7 +246,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
         var nru_rd_tag          = new_renamed_uop.GetFracRef("rd0_tag")
         var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
         var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
-        var nru_rs_use_mask     = cyclix_gen.ulocal("genrs_use_mask", MultiExu_CFG.rss.size-1, 0, "0")
+        var nru_rs_use_mask     = cyclix_gen.ulocal("genrs_use_mask", MultiExu_CFG.srcs.size-1, 0, "0")
 
         cyclix_gen.begif(renamed_uop_buf.ctrl_rdy)
         run {
@@ -286,12 +284,12 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
                 }; cyclix_gen.endif()
 
                 var rss_tags = ArrayList<hw_var>()
-                for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
                     rss_tags.add(global_structures.RenameReg(cmd_req_data.GetFracRef("fu_rs" + RF_rs_idx)))
                 }
                 var rd_tag = global_structures.RenameReg(cmd_req_data.GetFracRef("fu_rd"))
 
-                for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
                     cyclix_gen.assign(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_tag"), rss_tags[RF_rs_idx])
                     global_structures.FetchRs(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdata"), new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_tag"))
                 }
@@ -303,7 +301,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
 
                     cyclix_gen.assign(nru_fu_req, 1)
 
-                    for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                    for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
 
                         // processing RS use mask
                         var nru_rs_use = nru_rs_use_mask.GetFracRef(RF_rs_idx)
@@ -355,7 +353,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
                     run {
                         cyclix_gen.assign(new_renamed_uop.GetFracRef("rs0_rdy"), global_structures.PRF_rdy.GetFracRef(rss_tags[0]))
 
-                        for (RF_rs_idx in 1 until MultiExu_CFG.rss.size) {
+                        for (RF_rs_idx in 1 until MultiExu_CFG.srcs.size) {
                             cyclix_gen.assign(new_renamed_uop.GetFracRef("rs" + RF_rs_idx + "_rdy"), 1)
                         }
 

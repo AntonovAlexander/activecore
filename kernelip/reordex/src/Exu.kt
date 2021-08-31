@@ -35,7 +35,7 @@ open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
             src_imms.add(local(Exu_imm.name, Exu_imm.vartype, Exu_imm.defimm))
         }
 
-        for (Exu_rs in Exu_CFG.rss) {
+        for (Exu_rs in Exu_CFG.srcs) {
             rss.add(local(Exu_rs.name, Exu_rs.vartype, Exu_rs.defimm))
         }
 

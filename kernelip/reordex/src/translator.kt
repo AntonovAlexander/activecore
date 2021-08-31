@@ -51,7 +51,7 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
         for (imm_idx in 0 until MultiExu_CFG.src_imms.size) {
             imm_rsrv.add(AddStageVar(hw_structvar(MultiExu_CFG.src_imms[imm_idx].name, MultiExu_CFG.src_imms[imm_idx].vartype, MultiExu_CFG.src_imms[imm_idx].defimm)))
         }
-        for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+        for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
             rs_rsrv.add(__RF_rs_req(
                 AddStageVar(hw_structvar("rs" + RF_rs_idx + "_rdy",     DATA_TYPE.BV_UNSIGNED,     0, 0, "0")),
                 AddStageVar(hw_structvar("rs" + RF_rs_idx + "_tag",     DATA_TYPE.BV_UNSIGNED,     MultiExu_CFG.PRF_addr_width-1, 0, "0")),

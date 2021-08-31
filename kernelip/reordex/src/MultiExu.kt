@@ -8,14 +8,15 @@
 
 package reordex
 
-import cyclix.STREAM_PREF_IMPL
-import cyclix.hw_stage
 import hwast.*
+import cyclix.*
 
 enum class REORDEX_MODE {
     COPROCESSOR,
     RISC
 }
+
+class src_handle()
 
 open class Reordex_CFG(val RF_width : Int,
                        val ARF_depth : Int,
@@ -58,12 +59,12 @@ open class Reordex_CFG(val RF_width : Int,
         return AddDstImm(name, hw_type(DATA_TYPE.BV_SIGNED, hw_dim_static(new_width)))
     }
 
-    var rss = ArrayList<hw_var>()
-    fun AddRs() : hw_var {
-        var new_var = hw_var("rs" + rss.size, RF_width-1, 0, "0")
-        req_struct.addu("rs" + rss.size + "_rdata", RF_width-1, 0, "0")
-        rss.add(new_var)
-        return new_var
+    var srcs = ArrayList<hw_var>()
+    fun AddSrc() : hw_var {
+        var new_src = hw_var("src" + srcs.size, RF_width-1, 0, "0")
+        req_struct.addu("rs" + srcs.size + "_rdata", RF_width-1, 0, "0")
+        srcs.add(new_src)
+        return new_src
     }
 
     var rds = ArrayList<hw_var>()
@@ -371,7 +372,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             for (imm_num in 0 until ExUnit.value.ExecUnit.src_imms.size)
                 new_exu_descr.var_dict.put(MultiExu_CFG.src_imms[imm_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.src_imms[imm_num]!!]!!)
             for (rs_num in 0 until ExUnit.value.ExecUnit.rss.size)
-                new_exu_descr.var_dict.put(MultiExu_CFG.rss[rs_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.rss[rs_num]!!]!!)
+                new_exu_descr.var_dict.put(MultiExu_CFG.srcs[rs_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.rss[rs_num]!!]!!)
             MSG("generating locals: done")
 
             MSG("generating globals...")
@@ -396,7 +397,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             for (imm_num in 0 until MultiExu_CFG.src_imms.size) {
                 exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.src_imms[imm_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), MultiExu_CFG.src_imms[imm_num].name))
             }
-            for (rs_num in 0 until MultiExu_CFG.rss.size) {
+            for (rs_num in 0 until MultiExu_CFG.srcs.size) {
                 exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.rss[rs_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), "rs" + rs_num + "_rdata"))
             }
 
@@ -551,7 +552,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                 // broadcasting FU results to renamed buffer
                 for (renamed_uop_buf_idx in 0 until renamed_uop_buf.TRX_BUF_SIZE) {
                     var renamed_uop_buf_entry = renamed_uop_buf.TRX_BUF.GetFracRef(renamed_uop_buf_idx)
-                    for (RF_rs_idx in 0 until MultiExu_CFG.rss.size) {
+                    for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
 
                         var rs_rdy      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_rdy")
                         var rs_tag      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_tag")
