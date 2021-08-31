@@ -580,9 +580,9 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
     var alu_overflow    = ulocal("alu_overflow", 0, 0, "0")
 
     init {
-        alu_op0.assign(subStruct(req_data, "rs0_rdata"))
-        alu_op1.assign(subStruct(req_data, "rs1_rdata"))
-        alu_opcode.assign(subStruct(req_data, "exu_opcode"))
+        alu_op0.assign(CPU_CFG_inst.src0)
+        alu_op1.assign(CPU_CFG_inst.src1)
+        alu_opcode.assign(CPU_CFG_inst.exu_opcode)
 
         begif(CPU_CFG_inst.alu_unsigned)
         run {
@@ -695,9 +695,9 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CPU_CFG_inst) {
     var alu_result      = ulocal("alu_result", 31, 0, "0")
 
     init {
-        alu_op0.assign(subStruct(req_data, "rs0_rdata"))
-        alu_op1.assign(subStruct(req_data, "rs1_rdata"))
-        alu_opcode.assign(subStruct(req_data, "exu_opcode"))
+        alu_op0.assign(CPU_CFG_inst.src0)
+        alu_op1.assign(CPU_CFG_inst.src1)
+        alu_opcode.assign(CPU_CFG_inst.exu_opcode)
 
         begif(CPU_CFG_inst.alu_unsigned)
         run {
