@@ -1,7 +1,7 @@
 import citadel.*
 
 fun main(args: Array<String>) {
-    println("Citadel: generating experimental FPU")
+    println("Citadel: generating FPU")
 
     var multiexu = citadel.fpu("citadel_fpu")
 

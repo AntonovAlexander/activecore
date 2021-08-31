@@ -82,6 +82,641 @@ open class Reordex_CFG(val RF_width : Int,
     }
 }
 
+open class RISCDecodeContainer (MultiExu_CFG : Reordex_CFG) : hw_astc_stdif() {
+
+    var RootExec = hw_exec(hw_opcode("TEST"))
+
+    init {
+        add(RootExec)
+    }
+}
+
+class RISCDecodeLogic (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiExu_CFG) {
+
+    var instr_code = ugenvar("instr_code", 31, 0, "0")
+
+    //// base opcodes ///////////
+
+    val opcode_LOAD			= 0x03
+    val opcode_LOAD_FP		= 0x07
+    val opcode_MISC_MEM		= 0x0f
+    val opcode_OP_IMM		= 0x13
+    val opcode_AUIPC		= 0x17
+    val opcode_OP_IMM_32	= 0x1b
+    val opcode_STORE		= 0x23
+    val opcode_STORE_FP		= 0x27
+    val opcode_AMO			= 0x2f
+    val opcode_OP			= 0x33
+    val opcode_LUI			= 0x37
+    val opcode_OP_32		= 0x3b
+    val opcode_MADD			= 0x43
+    val opcode_MSUB			= 0x47
+    val opcode_NMSUB		= 0x4b
+    val opcode_NMADD		= 0x4f
+    val opcode_OP_FP		= 0x53
+    val opcode_BRANCH		= 0x63
+    val opcode_JALR			= 0x67
+    val opcode_JAL			= 0x6f
+    val opcode_SYSTEM		= 0x73
+
+    val instrcode_MRET        = 0x30200073
+
+    // ALU opcodes
+    val aluop_ADD		= 0
+    val aluop_SUB		= 1
+    val aluop_AND		= 2
+    val aluop_OR		= 3
+    val aluop_SLL		= 4
+    val aluop_SRL		= 5
+    val aluop_SRA		= 6
+    val aluop_XOR		= 7
+    val aluop_CLRB		= 8
+    val aluop_SLT		= 9
+
+    // op1 sources
+    val OP0_SRC_RS1     = 0
+    val OP0_SRC_IMM     = 1
+    val OP0_SRC_PC 	    = 2
+    // op2 sources
+    val OP1_SRC_RS2     = 0
+    val OP1_SRC_IMM     = 1
+    val OP1_SRC_CSR     = 2
+
+    // rd sources
+    val RD_LUI		    = 0
+    val RD_ALU		    = 1
+    val RD_CF_COND	    = 2
+    val RD_OF_COND	    = 3
+    val RD_PC_INC	    = 4
+    val RD_MEM		    = 5
+    val RD_CSR		    = 6
+
+    // jmp sources
+    val JMP_SRC_IMM     = 0
+    val JMP_SRC_ALU     = 1
+
+    var opcode          = ugenvar("opcode", 6, 0, "0")
+    val curinstr_addr   = ugenvar("curinstr_addr_decoder", 31, 0, "0")
+
+    ///////////////////////
+
+    // control transfer signals
+    var jump_req        = ugenvar("jump_req", 0, 0, "0")
+    var jump_req_cond   = ugenvar("jump_req_cond", 0, 0, "0")
+    var jump_src        = ugenvar("jump_src", 0, 0, JMP_SRC_IMM.toString())
+    var jump_vector     = ugenvar("jump_vector", 31, 0, "0")
+
+    // regfile control signals
+    var rs0_req         = ugenvar("rs0_req", 0, 0, "0")
+    var rs0_addr        = ugenvar("rs0_addr", 4, 0, "0")
+    var rs0_rdata       = ugenvar("rs0_rdata", 31, 0, "0")
+
+    var rs1_req         = ugenvar("rs1_req", 0, 0, "0")
+    var rs1_addr        = ugenvar("rs1_addr", 4, 0, "0")
+    var rs1_rdata       = ugenvar("rs1_rdata", 31, 0, "0")
+
+    //var rs2_req         = AdduLocal("rs2_req", 0, 0, "0")
+    //var rs2_addr        = AdduLocal("rs2_addr", 4, 0, "0")
+    //var rs2_rdata       = AdduLocal("rs2_rdata", 31, 0, "0")
+
+    var csr_rdata       = ugenvar("csr_rdata", 31, 0, "0")
+
+    var rd_req          = ugenvar("rd_req", 0, 0, "0")
+    var rd_source       = ugenvar("rd_source", 2, 0, RD_ALU.toString())
+    var rd_addr         = ugenvar("rd_addr", 4, 0, "0")
+    var rd_wdata        = ugenvar("rd_wdata", 31, 0, "0")
+    var rd_rdy          = ugenvar("rd_rdy", 0, 0, "0")
+
+    var immediate_I     = ugenvar("immediate_I", 31, 0, "0")
+    var immediate_S     = ugenvar("immediate_S", 31, 0, "0")
+    var immediate_B     = ugenvar("immediate_B", 31, 0, "0")
+    var immediate_U     = ugenvar("immediate_U", 31, 0, "0")
+    var immediate_J     = ugenvar("immediate_J", 31, 0, "0")
+
+    var immediate       = ugenvar("immediate", 31, 0, "0")
+
+    var curinstraddr_imm    = ugenvar("curinstraddr_imm", 31, 0, "0")
+
+    var funct3          = ugenvar("funct3", 2, 0, "0")
+    var funct7          = ugenvar("funct7", 6, 0, "0")
+    var shamt           = ugenvar("shamt", 4, 0, "0")
+
+    var fencereq        = ugenvar("fencereq", 0, 0, "0")
+    var pred            = ugenvar("pred", 3, 0, "0")
+    var succ            = ugenvar("succ", 3, 0, "0")
+
+    var ecallreq        = ugenvar("ecallreq", 0, 0, "0")
+    var ebreakreq       = ugenvar("ebreakreq", 0, 0, "0")
+
+    var csrreq          = ugenvar("csrreq", 0, 0, "0")
+    var csrnum          = ugenvar("csrnum", 11, 0, "0")
+    var zimm            = ugenvar("zimm", 4, 0, "0")
+
+    var op0_source      = ugenvar("op0_source", 1, 0, OP0_SRC_RS1.toString())
+    var op1_source      = ugenvar("op1_source", 1, 0, OP1_SRC_RS2.toString())
+
+    // ALU control
+    var alu_req         = ugenvar("alu_req", 0, 0, "0")
+    var alu_op1         = ugenvar("alu_op1", 31, 0, "0")
+    var alu_op2         = ugenvar("alu_op2", 31, 0, "0")
+    var alu_op1_wide    = ugenvar("alu_op1_wide", 32, 0, "0")
+    var alu_op2_wide    = ugenvar("alu_op2_wide", 32, 0, "0")
+    var alu_opcode      = ugenvar("alu_opcode", 3, 0, "0")
+    var alu_unsigned    = ugenvar("alu_unsigned", 0, 0, "0")
+
+    var alu_result_wide = ugenvar("alu_result_wide", 32, 0, "0")
+    var alu_result      = ugenvar("alu_result", 31, 0, "0")
+    var alu_CF          = ugenvar("alu_CF", 0, 0, "0")
+    var alu_SF          = ugenvar("alu_SF", 0, 0, "0")
+    var alu_ZF          = ugenvar("alu_ZF", 0, 0, "0")
+    var alu_OF          = ugenvar("alu_OF", 0, 0, "0")
+    var alu_overflow    = ugenvar("alu_overflow", 0, 0, "0")
+
+    // data memory control
+    var mem_req         = ugenvar("mem_req", 0, 0, "0")
+    var mem_cmd         = ugenvar("mem_cmd", 0, 0, "0")
+    var mem_addr        = ugenvar("mem_addr", 31, 0, "0")
+    var mem_be          = ugenvar("mem_be", 3, 0, "0")
+    var mem_wdata       = ugenvar("mem_wdata", 31, 0, "0")
+    var mem_rdata       = ugenvar("mem_rdata", 31, 0, "0")
+    var mem_rshift      = ugenvar("mem_rshift", 0, 0, "0")
+    var load_signext    = ugenvar("load_signext", 0, 0, "0")
+
+    var mret_req        = ugenvar("mret_req", 0, 0, "0")
+    var MRETADDR        = ugenvar("MRETADDR", 31, 0, "0")
+
+    //////////
+    var rs0_rdy         = ugenvar("rs0_rdy", 0, 0, "0")
+    var rs0_tag         = ugenvar("rs0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+
+    var rs1_rdy         = ugenvar("rs1_rdy", 0, 0, "0")
+    var rs1_tag         = ugenvar("rs1_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+
+    var rd_tag          = ugenvar("rd0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+
+    init {
+        //// instruction decoding ////
+        opcode.assign(instr_code[6, 0])
+        alu_unsigned.assign(0)
+
+        rs0_addr.assign(instr_code[19, 15])
+        rs1_addr.assign(instr_code[24, 20])
+        rd_addr.assign(instr_code[11, 7])
+
+        funct3.assign(instr_code[14, 12])
+        funct7.assign(instr_code[31, 25])
+        shamt.assign(instr_code[24, 20])
+        pred.assign(instr_code[27, 24])
+        succ.assign(instr_code[23, 20])
+        csrnum.assign(instr_code[31, 20])
+        zimm.assign(instr_code[19, 15])
+
+        immediate_I.assign(signext(instr_code[31, 20], 32))
+
+        var immediate_S_src = ArrayList<hw_param>()
+        immediate_S_src.add(instr_code[31, 25])
+        immediate_S_src.add(instr_code[11, 7])
+        immediate_S.assign(signext(cnct(immediate_S_src), 32))
+
+        var immediate_B_src = ArrayList<hw_param>()
+        immediate_B_src.add(instr_code[31])
+        immediate_B_src.add(instr_code[7])
+        immediate_B_src.add(instr_code[30, 25])
+        immediate_B_src.add(instr_code[11, 8])
+        immediate_B_src.add(hw_imm(1, "0"))
+        immediate_B.assign(signext(cnct(immediate_B_src), 32))
+
+        var immediate_U_src = ArrayList<hw_param>()
+        immediate_U_src.add(instr_code[31, 12])
+        immediate_U_src.add(hw_imm(12, "0"))
+        immediate_U.assign(cnct(immediate_U_src))
+
+        var immediate_J_src = ArrayList<hw_param>()
+        immediate_J_src.add(instr_code[31])
+        immediate_J_src.add(instr_code[19, 12])
+        immediate_J_src.add(instr_code[20])
+        immediate_J_src.add(instr_code[30, 21])
+        immediate_J_src.add(hw_imm(1, "0"))
+        immediate_J.assign(signext(cnct(immediate_J_src), 32))
+
+        begcase(opcode)
+        run {
+            begbranch(opcode_LUI)
+            run {
+                op0_source.assign(OP0_SRC_IMM)
+                rd_req.assign(1)
+                rd_source.assign(RD_LUI)
+                immediate.assign(immediate_U)
+            }
+            endbranch()
+
+            begbranch(opcode_AUIPC)
+            run {
+                op0_source.assign(OP0_SRC_PC)
+                op1_source.assign(OP1_SRC_IMM)
+                alu_req.assign(1)
+                alu_opcode.assign(aluop_ADD)
+                rd_req.assign(1)
+                rd_source.assign(RD_ALU)
+                immediate.assign(immediate_U)
+            }; endbranch()
+
+            begbranch(opcode_JAL)
+            run {
+                op0_source.assign(OP0_SRC_PC)
+                op1_source.assign(OP1_SRC_IMM)
+                alu_req.assign(1)
+                alu_opcode.assign(aluop_ADD)
+                rd_req.assign(1)
+                rd_source.assign(RD_PC_INC)
+                jump_req.assign(1)
+                jump_src.assign(JMP_SRC_ALU)
+                immediate.assign(immediate_J)
+            }; endbranch()
+
+            begbranch(opcode_JALR)
+            run {
+                rs0_req.assign(1)
+                op0_source.assign(OP0_SRC_RS1)
+                op1_source.assign(OP1_SRC_IMM)
+                alu_req.assign(1)
+                alu_opcode.assign(aluop_ADD)
+                rd_req.assign(1)
+                rd_source.assign(RD_PC_INC)
+                jump_req.assign(1)
+                jump_src.assign(JMP_SRC_ALU)
+                immediate.assign(immediate_I)
+            }; endbranch()
+
+            begbranch(opcode_BRANCH)
+            run {
+                rs0_req.assign(1)
+                rs1_req.assign(1)
+                alu_req.assign(1)
+                alu_opcode.assign(aluop_SUB)
+                jump_req_cond.assign(1)
+                jump_src.assign(JMP_SRC_ALU)
+                immediate.assign(immediate_B)
+
+                begif(bor(eq2(funct3, 0x6), eq2(funct3, 0x7)))
+                run {
+                    alu_unsigned.assign(1)
+                }; endif()
+            }; endbranch()
+
+            begbranch(opcode_LOAD)
+            run {
+                rs0_req.assign(1)
+                op0_source.assign(OP0_SRC_RS1)
+                op1_source.assign(OP1_SRC_IMM)
+                rd_req.assign(1)
+                rd_source.assign(RD_MEM)
+                alu_req.assign(1)
+                mem_req.assign(1)
+                mem_cmd.assign(0)
+                immediate.assign(immediate_I)
+            }; endbranch()
+
+            begbranch(opcode_STORE)
+            run {
+                rs0_req.assign(1)
+                rs1_req.assign(1)
+                op0_source.assign(OP0_SRC_RS1)
+                op1_source.assign(OP1_SRC_IMM)
+                alu_req.assign(1)
+                mem_req.assign(1)
+                mem_cmd.assign(1)
+                immediate.assign(immediate_S)
+            }; endbranch()
+
+            begbranch(opcode_OP_IMM)
+            run {
+                rs0_req.assign(1)
+                op0_source.assign(OP0_SRC_RS1)
+                op1_source.assign(OP1_SRC_IMM)
+                rd_req.assign(1)
+                immediate.assign(immediate_I)
+                alu_req.assign(1)
+
+                begcase(funct3)
+                run {
+                    // ADDI
+                    begbranch(0x0)
+                    run {
+                        alu_opcode.assign(aluop_ADD)
+                        rd_source.assign(RD_ALU)
+                    }; endbranch()
+
+                    // SLLI
+                    begbranch(0x1)
+                    run {
+                        alu_opcode.assign(aluop_SLL)
+                        rd_source.assign(RD_ALU)
+                        immediate.assign(zeroext(instr_code[24, 20], 32))
+                    }; endbranch()
+
+                    // SLTI
+                    begbranch(0x2)
+                    run {
+                        alu_opcode.assign(aluop_SLT)
+                        rd_source.assign(RD_CF_COND)
+                    }; endbranch()
+
+                    // SLTIU
+                    begbranch(0x3)
+                    run {
+                        alu_opcode.assign(aluop_SLT)
+                        alu_unsigned.assign(1)
+                        rd_source.assign(RD_CF_COND)
+                    }; endbranch()
+
+                    // XORI
+                    begbranch(0x4)
+                    run {
+                        alu_opcode.assign(aluop_XOR)
+                        rd_source.assign(RD_ALU)
+                    }; endbranch()
+
+                    // SRLI, SRAI
+                    begbranch(0x5)
+                    run {
+                        // SRAI
+                        begif(instr_code[30])
+                        run {
+                            alu_opcode.assign(aluop_SRA)
+                        }; endif()
+
+                        // SRLI
+                        begelse()
+                        run {
+                            alu_opcode.assign(aluop_SRL)
+                        }; endif()
+
+                        rd_source.assign(RD_ALU)
+                        immediate.assign(zeroext(instr_code[24, 20], 32))
+                    }; endbranch()
+
+                    // ORI
+                    begbranch(0x6)
+                    run {
+                        alu_opcode.assign(aluop_OR)
+                        rd_source.assign(RD_ALU)
+                    }; endbranch()
+
+                    // ANDI
+                    begbranch(0x7)
+                    run {
+                        alu_opcode.assign(aluop_AND)
+                        rd_source.assign(RD_ALU)
+                    }; endbranch()
+
+                }; endcase()
+            }; endbranch()
+
+            begbranch(opcode_OP)
+            run {
+                rs0_req.assign(1)
+                rs1_req.assign(1)
+                op0_source.assign(OP0_SRC_RS1)
+                op1_source.assign(OP1_SRC_RS2)
+                rd_req.assign(1)
+                rd_source.assign(RD_ALU)
+                alu_req.assign(1)
+
+                begcase(funct3)
+                run {
+                    // ADD/SUB
+                    begbranch(0x0)
+                    run {
+                        // SUB
+                        begif(instr_code[30])
+                        run {
+                            alu_opcode.assign(aluop_SUB)
+                        }; endif()
+
+                        // ADD
+                        begelse()
+                        run {
+                            alu_opcode.assign(aluop_ADD)
+                        }; endif()
+                        rd_source.assign(RD_ALU)
+                    }; endbranch()
+
+                    // SLL
+                    begbranch(0x1)
+                    run {
+                        alu_opcode.assign(aluop_SLL)
+                        rd_source.assign(RD_ALU)
+                    }; endbranch()
+
+                    // SLT
+                    begbranch(0x2)
+                    run {
+                        alu_opcode.assign(aluop_SLT)
+                        rd_source.assign(RD_CF_COND)
+                    }; endbranch()
+
+                    // SLTU
+                    begbranch(0x3)
+                    run {
+                        alu_opcode.assign(aluop_SLT)
+                        alu_unsigned.assign(1)
+                        rd_source.assign(RD_CF_COND)
+                    }; endbranch()
+
+                    // XORI
+                    begbranch(0x4)
+                    run {
+                        alu_opcode.assign(aluop_XOR)
+                        rd_source.assign(RD_ALU)
+                    }; endbranch()
+
+                    // SRL/SRA
+                    begbranch(0x5)
+                    run {
+                        // SRA
+                        begif(instr_code[30])
+                        run {
+                            alu_opcode.assign(aluop_SRA)
+                        }; endif()
+                        // SRL
+                        begelse()
+                        run {
+                            alu_opcode.assign(aluop_SRL)
+                        }; endif()
+                        rd_source.assign(RD_ALU)
+                    }; endbranch()
+
+                    // OR
+                    begbranch(0x6)
+                    run {
+                        alu_opcode.assign(aluop_OR)
+                        rd_source.assign(RD_ALU)
+                    }; endbranch()
+
+                    // AND
+                    begbranch(0x7)
+                    run {
+                        alu_opcode.assign(aluop_AND)
+                        rd_source.assign(RD_ALU)
+                    }; endbranch()
+
+                }; endcase()
+            }; endbranch()
+
+            begbranch(opcode_MISC_MEM)
+            run {
+                fencereq.assign(1)
+            }; endbranch()
+
+            begbranch(opcode_SYSTEM)
+            run {
+                begcase(funct3)
+                run {
+                    // EBREAK/ECALL
+                    begbranch(0x0)
+                    run {
+                        // EBREAK
+                        begif(instr_code[20])
+                        run {
+                            ebreakreq.assign(1)
+                        }; endif()
+                        // ECALL
+                        begelse()
+                        run {
+                            ecallreq.assign(1)
+                        }; endif()
+                    }; endbranch()
+
+                    //CSRRW
+                    begbranch(0x1)
+                    run {
+                        csrreq.assign(1)
+                        rs0_req.assign(1)
+                        rd_req.assign(1)
+                        rd_source.assign(RD_CSR)
+                        op0_source.assign(OP0_SRC_RS1)
+                        op1_source.assign(OP1_SRC_CSR)
+                    }; endbranch()
+
+                    // CSRRS
+                    begbranch(0x2)
+                    run {
+                        csrreq.assign(1)
+                        rs0_req.assign(1)
+                        rd_req.assign(1)
+                        rd_source.assign(RD_CSR)
+                        alu_req.assign(1)
+                        alu_opcode.assign(aluop_OR)
+                        op0_source.assign(OP0_SRC_RS1)
+                        op1_source.assign(OP1_SRC_CSR)
+                    }; endbranch()
+
+                    // CSRRC
+                    begbranch(0x3)
+                    run {
+                        csrreq.assign(1)
+                        rs0_req.assign(1)
+                        rd_req.assign(1)
+                        rd_source.assign(RD_CSR)
+                        alu_req.assign(1)
+                        alu_opcode.assign(aluop_CLRB)
+                        op0_source.assign(OP0_SRC_RS1)
+                        op1_source.assign(OP1_SRC_CSR)
+                    }; endbranch()
+
+                    // CSRRWI
+                    begbranch(0x5)
+                    run {
+                        csrreq.assign(1)
+                        rd_req.assign(1)
+                        op0_source.assign(OP0_SRC_IMM)
+                        op1_source.assign(OP1_SRC_CSR)
+                        immediate.assign(zeroext(zimm, 32))
+                    }; endbranch()
+
+                    // CSRRSI
+                    begbranch(0x6)
+                    run {
+                        csrreq.assign(1)
+                        rd_req.assign(1)
+                        rd_source.assign(RD_CSR)
+                        alu_req.assign(1)
+                        alu_opcode.assign(aluop_CLRB)
+                        op0_source.assign(OP0_SRC_IMM)
+                        op1_source.assign(OP1_SRC_CSR)
+                        immediate.assign(zeroext(zimm, 32))
+                    }; endbranch()
+
+                    // CSRRSI
+                    begbranch(0x7)
+                    run {
+                        csrreq.assign(1)
+                        rd_req.assign(1)
+                        rd_source.assign(RD_CSR)
+                        alu_req.assign(1)
+                        alu_opcode.assign(aluop_CLRB)
+                        op0_source.assign(OP0_SRC_IMM)
+                        op1_source.assign(OP1_SRC_CSR)
+                        immediate.assign(zeroext(zimm, 32))
+                    }; endbranch()
+                }; endcase()
+            }; endbranch()
+
+        }; endcase()
+
+        curinstraddr_imm.assign(curinstr_addr + immediate)
+
+        begif(mem_req)
+        run {
+            begcase(funct3)
+            run {
+                begbranch(0x0)
+                run {
+                    mem_be.assign(0x1)
+                    load_signext.assign(1)
+                }; endbranch()
+
+                begbranch(0x1)
+                run {
+                    mem_be.assign(0x3)
+                    load_signext.assign(1)
+                }; endbranch()
+
+                begbranch(0x2)
+                run {
+                    mem_be.assign(0xf)
+                }; endbranch()
+
+                begbranch(0x4)
+                run {
+                    mem_be.assign(0x1)
+                }; endbranch()
+
+                begbranch(0x5)
+                run {
+                    mem_be.assign(0x3)
+                }; endbranch()
+            }; endcase()
+        }; endif()
+
+        begif(eq2(instr_code, instrcode_MRET))
+        run {
+            mret_req.assign(1)
+            jump_req.assign(1)
+            jump_req_cond.assign(0)
+            jump_src.assign(JMP_SRC_IMM)
+            immediate.assign(MRETADDR)
+        }; endif()
+
+        begif(eq2(rd_addr, 0))
+        run {
+            rd_req.assign(0)
+        }; endif()
+
+    }
+}
+
 data class Exu_CFG(val ExecUnit : Exu,
                    val exu_num : Int,
                    val iq_length : Int,
@@ -96,6 +731,8 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val io_iq
             ERROR("Exu addition error!")
         }
     }
+
+    var RISCDecode = RISCDecodeLogic(MultiExu_CFG)
 
     fun reconstruct_expression(DEBUG_FLAG : Boolean,
                                cyclix_gen : hw_astc,
@@ -214,7 +851,7 @@ open class MultiExu(val name : String, val MultiExu_CFG : Reordex_CFG, val io_iq
         var instr_fetch = (rob as hw_stage)
         var instr_req = hw_imm(0)
         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-            instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", 1, MultiExu_CFG, global_structures)
+            instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", 1, this, MultiExu_CFG, global_structures)
             instr_req = instr_req_stage(name, cyclix_gen, instr_fetch)
         }
 
