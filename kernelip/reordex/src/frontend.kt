@@ -58,7 +58,7 @@ class instr_fetch_buffer(name: String,
                          cyclix_gen : cyclix.Generic,
                          name_prefix : String,
                          TRX_BUF_SIZE : Int,
-                         val MultiExu_inst : MultiExu,
+                         val MultiExu_inst : MultiExuRISC,
                          MultiExu_CFG : Reordex_CFG,
                          val global_structures: __global_structures) : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG) {
 
@@ -75,8 +75,6 @@ class instr_fetch_buffer(name: String,
     var var_dict = mutableMapOf<hw_var, hw_var>()
     init {
         for (genvar in MultiExu_inst.RISCDecode[0].genvars) {
-            cyclix_gen.MSG_COMMENT("DECODE genvars:")
-            cyclix_gen.MSG_COMMENT("genvar: " + genvar.name)
             var_dict.put(genvar, AddLocal(genvar.name, genvar.vartype, genvar.defimm))
         }
     }
@@ -134,12 +132,9 @@ class instr_fetch_buffer(name: String,
                 TranslateVar(MultiExu_inst.RISCDecode.rs0_rdy).assign(1)
                 cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rs0_req))
                 run {
-                    cyclix_gen.begif(cyclix_gen.neq2(TranslateVar(MultiExu_inst.RISCDecode.rs0_addr), 0))
-                    run {
-                        TranslateVar(MultiExu_inst.RISCDecode.rs0_tag).assign(global_structures.RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rs0_addr)))
-                        global_structures.FetchRs(TranslateVar(MultiExu_inst.RISCDecode.rs0_rdata), TranslateVar(MultiExu_inst.RISCDecode.rs0_tag))
-                        TranslateVar(MultiExu_inst.RISCDecode.rs0_rdy).assign(global_structures.FetchRsRdy(TranslateVar(MultiExu_inst.RISCDecode.rs0_tag)))
-                    }; cyclix_gen.endif()
+                    TranslateVar(MultiExu_inst.RISCDecode.rs0_tag).assign(global_structures.RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rs0_addr)))
+                    global_structures.FetchRs(TranslateVar(MultiExu_inst.RISCDecode.rs0_rdata), TranslateVar(MultiExu_inst.RISCDecode.rs0_tag))
+                    TranslateVar(MultiExu_inst.RISCDecode.rs0_rdy).assign(global_structures.FetchRsRdy(TranslateVar(MultiExu_inst.RISCDecode.rs0_tag)))
                 }; cyclix_gen.endif()
 
                 //// TODO: cleanup
@@ -157,12 +152,9 @@ class instr_fetch_buffer(name: String,
                 TranslateVar(MultiExu_inst.RISCDecode.rs1_rdy).assign(1)
                 cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rs1_req))
                 run {
-                    cyclix_gen.begif(cyclix_gen.neq2(TranslateVar(MultiExu_inst.RISCDecode.rs1_addr), 0))
-                    run {
-                        TranslateVar(MultiExu_inst.RISCDecode.rs1_tag).assign(global_structures.RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rs1_addr)))
-                        global_structures.FetchRs(TranslateVar(MultiExu_inst.RISCDecode.rs1_rdata), global_structures.RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rs1_addr)))
-                        TranslateVar(MultiExu_inst.RISCDecode.rs1_rdy).assign(global_structures.FetchRsRdy(TranslateVar(MultiExu_inst.RISCDecode.rs1_tag)))
-                    }; cyclix_gen.endif()
+                    TranslateVar(MultiExu_inst.RISCDecode.rs1_tag).assign(global_structures.RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rs1_addr)))
+                    global_structures.FetchRs(TranslateVar(MultiExu_inst.RISCDecode.rs1_rdata), global_structures.RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rs1_addr)))
+                    TranslateVar(MultiExu_inst.RISCDecode.rs1_rdy).assign(global_structures.FetchRsRdy(TranslateVar(MultiExu_inst.RISCDecode.rs1_tag)))
                 }; cyclix_gen.endif()
 
                 cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.csrreq))
