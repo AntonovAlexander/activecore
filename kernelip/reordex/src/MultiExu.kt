@@ -62,7 +62,7 @@ open class Reordex_CFG(val RF_width : Int,
     var srcs = ArrayList<hw_var>()
     fun AddSrc() : hw_var {
         var new_src = hw_var("src" + srcs.size, RF_width-1, 0, "0")
-        req_struct.addu("rs" + srcs.size + "_rdata", RF_width-1, 0, "0")
+        req_struct.addu("src" + srcs.size + "_data", RF_width-1, 0, "0")
         srcs.add(new_src)
         return new_src
     }
@@ -179,7 +179,6 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var alu_op1_wide    = ugenvar("alu_op1_wide", 32, 0, "0")
     var alu_op2_wide    = ugenvar("alu_op2_wide", 32, 0, "0")
     var alu_opcode      = ugenvar("alu_opcode", 3, 0, "0")
-    var alu_unsigned    = ugenvar("alu_unsigned", 0, 0, "0")
 
     var alu_result_wide = ugenvar("alu_result_wide", 32, 0, "0")
     var alu_result      = ugenvar("alu_result", 31, 0, "0")
@@ -345,7 +344,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         var instr_fetch = (rob as hw_stage)
         var instr_req = hw_imm(0)
         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-            instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", 1, (this as MultiExuRISC), MultiExu_CFG, global_structures)
+            instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", 1, (this as MultiExuRISC), MultiExu_CFG, global_structures, CDB_NUM)
             instr_req = instr_req_stage(name, cyclix_gen, instr_fetch)
         }
 
@@ -398,7 +397,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                 exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.src_imms[imm_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), MultiExu_CFG.src_imms[imm_num].name))
             }
             for (rs_num in 0 until MultiExu_CFG.srcs.size) {
-                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.rss[rs_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), "rs" + rs_num + "_rdata"))
+                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.rss[rs_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), "src" + rs_num + "_data"))
             }
 
             for (expr in ExUnit.value.ExecUnit[0].expressions) {
@@ -554,17 +553,17 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                     var renamed_uop_buf_entry = renamed_uop_buf.TRX_BUF.GetFracRef(renamed_uop_buf_idx)
                     for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
 
-                        var rs_rdy      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_rdy")
-                        var rs_tag      = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_tag")
-                        var rs_rdata    = renamed_uop_buf_entry.GetFracRef("rs" + RF_rs_idx + "_rdata")
+                        var src_rdy      = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_rdy")
+                        var src_tag      = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_tag")
+                        var src_data    = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_data")
 
-                        cyclix_gen.begif(!rs_rdy)
+                        cyclix_gen.begif(!src_rdy)
                         run {
-                            cyclix_gen.begif(cyclix_gen.eq2(rs_tag, exu_cdb_inst_tag))
+                            cyclix_gen.begif(cyclix_gen.eq2(src_tag, exu_cdb_inst_tag))
                             run {
                                 // setting IQ entry ready
-                                cyclix_gen.assign(rs_rdata, exu_cdb_inst_wdata)
-                                cyclix_gen.assign(rs_rdy, 1)
+                                cyclix_gen.assign(src_data, exu_cdb_inst_wdata)
+                                cyclix_gen.assign(src_rdy, 1)
                             }; cyclix_gen.endif()
                         }; cyclix_gen.endif()
                     }
@@ -572,7 +571,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                     //// setting rdy for io_req if data generated ////
                     cyclix_gen.begif(renamed_uop_buf_entry.GetFracRef("io_req"))
                     run {
-                        cyclix_gen.assign(renamed_uop_buf_entry.GetFracRef("rdy"), renamed_uop_buf_entry.GetFracRef("rs0_rdy"))
+                        cyclix_gen.assign(renamed_uop_buf_entry.GetFracRef("rdy"), renamed_uop_buf_entry.GetFracRef("src0_rdy"))
                     }; cyclix_gen.endif()
                 }
 

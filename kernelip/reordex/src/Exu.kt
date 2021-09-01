@@ -10,7 +10,7 @@ package reordex
 
 import hwast.*
 
-val OP_EXU = hwast.hw_opcode("exec_unit")
+val OP_EXU = hw_opcode("exec_unit")
 
 open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
 
@@ -263,12 +263,4 @@ open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
         add_global(ret_var)
         return ret_var
     }
-}
-
-fun exec_load(tgt: hw_var, addr: hw_param) {
-    // TODO
-}
-
-fun exec_store(addr: hw_param, wdata: hw_param) {
-    // TODO
 }

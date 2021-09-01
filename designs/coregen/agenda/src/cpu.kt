@@ -80,7 +80,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
     init {
         //// instruction decoding ////
         opcode.assign(instr_code[6, 0])
-        alu_unsigned.assign(0)
+        assign(CPU_CFG_inst.alu_unsigned, 0)
 
         rs0_addr.assign(instr_code[19, 15])
         rs1_addr.assign(instr_code[24, 20])
@@ -183,7 +183,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
 
                 begif(bor(eq2(funct3, 0x6), eq2(funct3, 0x7)))
                 run {
-                    alu_unsigned.assign(1)
+                    assign(CPU_CFG_inst.alu_unsigned, 1)
                 }; endif()
             }; endbranch()
 
@@ -249,7 +249,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                     begbranch(0x3)
                     run {
                         alu_opcode.assign(aluop_SLT)
-                        alu_unsigned.assign(1)
+                        assign(CPU_CFG_inst.alu_unsigned, 1)
                         rd_source.assign(RD_CF_COND)
                     }; endbranch()
 
@@ -343,7 +343,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                     begbranch(0x3)
                     run {
                         alu_opcode.assign(aluop_SLT)
-                        alu_unsigned.assign(1)
+                        assign(CPU_CFG_inst.alu_unsigned, 1)
                         rd_source.assign(RD_CF_COND)
                     }; endbranch()
 
@@ -726,37 +726,6 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CPU_CFG_inst) {
         alu_result.assign(alu_result_wide[31, 0])
 
         rd0.assign(alu_result)
-    }
-}
-
-class EXU_LSU() : reordex.Exu("LSU", CPU_CFG_inst) {
-
-    // ALU opcodes
-    val op_LD		= 0
-    val op_ST		= 1
-
-    var mem_addr        = ulocal("mem_addr", 31, 0, "0")
-    var mem_wdata       = ulocal("mem_wdata", 31, 0, "0")
-    var mem_rdata       = ulocal("mem_rdata", 3, 0, "0")
-    var mem_opcode      = ulocal("mem_opcode", 3, 0, "0")
-
-    init {
-        mem_addr.assign(subStruct(req_data, "rs0_rdata"))
-        mem_wdata.assign(subStruct(req_data, "rs1_rdata"))
-        mem_opcode.assign(subStruct(req_data, "exu_opcode"))
-
-        begcase(CPU_CFG_inst.exu_opcode)
-        run {
-            begbranch(op_LD)
-            run {
-                exec_load(mem_rdata, mem_addr)
-            }; endbranch()
-
-            begbranch(op_ST)
-            run {
-                exec_store(mem_addr, mem_wdata)
-            }; endbranch()
-        }; endcase()
     }
 }
 

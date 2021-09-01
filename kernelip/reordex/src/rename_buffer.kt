@@ -39,8 +39,8 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
             run {
 
                 var num_rs = 0
-                for (rs_rsrv in rs_rsrv) {
-                    cyclix_gen.assign(TRX_BUF_head_ref.GetFracRef("rs" + num_rs + "_src"), PRF_src.GetFracRef(rs_rsrv.rs_tag))      // TODO: stage context cleanup
+                for (rs_rsrv in src_rsrv) {
+                    cyclix_gen.assign(TRX_BUF_head_ref.GetFracRef("src" + num_rs + "_src"), PRF_src.GetFracRef(rs_rsrv.src_tag))      // TODO: stage context cleanup
                     num_rs++
                 }
 
