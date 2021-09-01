@@ -59,7 +59,7 @@ class instr_fetch_buffer(name: String,
                          name_prefix : String,
                          TRX_BUF_SIZE : Int,
                          val MultiExu_inst : MultiExuRISC,
-                         MultiExu_CFG : Reordex_CFG,
+                         val MultiExu_CFG : Reordex_CFG,
                          val global_structures: __global_structures,
                          cdb_num : Int) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, cdb_num) {
 
@@ -84,13 +84,29 @@ class instr_fetch_buffer(name: String,
     fun TranslateVar(var_totran : hw_var) : hw_var {
         return TranslateVar(var_totran, var_dict)
     }
+    fun TranslateParam(param_totran : hw_param) : hw_param {
+        return TranslateParam(param_totran, var_dict)
+    }
 
     fun reconstruct_expression(DEBUG_FLAG : Boolean,
                                cyclix_gen : hw_astc,
                                expr : hw_exec,
                                context : import_expr_context) {
 
-        cyclix_gen.import_expr(DEBUG_FLAG, expr, context, ::reconstruct_expression)
+        if (expr is hw_exec_src_set_imm) {
+            var num = MultiExu_CFG.srcs.indexOf(expr.src)
+            src_rsrv[num].src_rdy.assign(1)
+            src_rsrv[num].src_data.assign(TranslateParam(expr.imm))
+
+        } else if (expr is hw_exec_src_rd_reg) {
+            var num = MultiExu_CFG.srcs.indexOf(expr.src)
+            src_rsrv[num].src_tag.assign(global_structures.RenameReg(TranslateParam(expr.raddr)))
+            global_structures.FetchRs(src_rsrv[num].src_data, src_rsrv[num].src_tag)
+            src_rsrv[num].src_rdy.assign(global_structures.FetchRsRdy(src_rsrv[num].src_tag))
+
+        } else {
+            cyclix_gen.import_expr(DEBUG_FLAG, expr, context, ::reconstruct_expression)
+        }
     }
 
     fun Process(renamed_uop_buf : rename_buffer, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
@@ -118,6 +134,10 @@ class instr_fetch_buffer(name: String,
                 cyclix_gen.assign(TranslateVar(MultiExu_inst.RISCDecode.curinstr_addr), curinstr_addr)
                 cyclix_gen.assign(TranslateVar(MultiExu_inst.RISCDecode.MRETADDR), MRETADDR)
 
+                for (src in src_rsrv) {
+                    cyclix_gen.assign(src.src_rdy, 1)
+                }
+
                 cyclix_gen.MSG_COMMENT("Generating payload")
                 for (expr in MultiExu_inst.RISCDecode[0].expressions) {
                     reconstruct_expression(true,
@@ -127,64 +147,10 @@ class instr_fetch_buffer(name: String,
                     )
                 }
 
-                ////////////////////////
+                TranslateVar(MultiExu_inst.RISCDecode.opcode).assign(TranslateVar(MultiExu_inst.RISCDecode.alu_opcode))
 
                 var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
                 var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
-
-                TranslateVar(MultiExu_inst.RISCDecode.rs0_rdy).assign(1)
-                cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rs0_req))
-                run {
-                    TranslateVar(MultiExu_inst.RISCDecode.rs0_tag).assign(global_structures.RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rs0_addr)))
-                    global_structures.FetchRs(TranslateVar(MultiExu_inst.RISCDecode.rs0_rdata), TranslateVar(MultiExu_inst.RISCDecode.rs0_tag))
-                    TranslateVar(MultiExu_inst.RISCDecode.rs0_rdy).assign(global_structures.FetchRsRdy(TranslateVar(MultiExu_inst.RISCDecode.rs0_tag)))
-                }; cyclix_gen.endif()
-
-                //// TODO: cleanup
-                cyclix_gen.begif(cyclix_gen.eq2(TranslateVar(MultiExu_inst.RISCDecode.op0_source), MultiExu_inst.RISCDecode.OP0_SRC_IMM))
-                run {
-                    TranslateVar(MultiExu_inst.RISCDecode.rs0_rdata).assign(TranslateVar(MultiExu_inst.RISCDecode.immediate))
-                }; cyclix_gen.endif()
-
-                cyclix_gen.begif(cyclix_gen.eq2(TranslateVar(MultiExu_inst.RISCDecode.op0_source), MultiExu_inst.RISCDecode.OP0_SRC_PC))
-                run {
-                    TranslateVar(MultiExu_inst.RISCDecode.rs0_rdata).assign(TranslateVar(MultiExu_inst.RISCDecode.curinstr_addr))
-                }; cyclix_gen.endif()
-                ////
-
-                TranslateVar(MultiExu_inst.RISCDecode.rs1_rdy).assign(1)
-                cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rs1_req))
-                run {
-                    TranslateVar(MultiExu_inst.RISCDecode.rs1_tag).assign(global_structures.RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rs1_addr)))
-                    global_structures.FetchRs(TranslateVar(MultiExu_inst.RISCDecode.rs1_rdata), global_structures.RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rs1_addr)))
-                    TranslateVar(MultiExu_inst.RISCDecode.rs1_rdy).assign(global_structures.FetchRsRdy(TranslateVar(MultiExu_inst.RISCDecode.rs1_tag)))
-                }; cyclix_gen.endif()
-
-                cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.csrreq))
-                run {
-                    TranslateVar(MultiExu_inst.RISCDecode.csr_rdata).assign(CSR_MCAUSE)
-                }; cyclix_gen.endif()
-
-                cyclix_gen.begif(!TranslateVar(MultiExu_inst.RISCDecode.mem_req))
-                run {
-
-                    cyclix_gen.begif(cyclix_gen.eq2(TranslateVar(MultiExu_inst.RISCDecode.op1_source), MultiExu_inst.RISCDecode.OP1_SRC_IMM))
-                    run {
-                        TranslateVar(MultiExu_inst.RISCDecode.rs1_rdata).assign(TranslateVar(MultiExu_inst.RISCDecode.immediate))
-                        TranslateVar(MultiExu_inst.RISCDecode.rs1_rdy).assign(1)
-                    }; cyclix_gen.endif()
-
-                    cyclix_gen.begif(cyclix_gen.eq2(TranslateVar(MultiExu_inst.RISCDecode.op1_source), MultiExu_inst.RISCDecode.OP1_SRC_CSR))
-                    run {
-                        TranslateVar(MultiExu_inst.RISCDecode.rs1_rdata).assign(TranslateVar(MultiExu_inst.RISCDecode.csr_rdata))
-                        TranslateVar(MultiExu_inst.RISCDecode.rs1_rdy).assign(1)
-                    }; cyclix_gen.endif()
-
-                }; cyclix_gen.endif()
-
-                // TODO: CSR
-
-                TranslateVar(MultiExu_inst.RISCDecode.opcode).assign(TranslateVar(MultiExu_inst.RISCDecode.alu_opcode))
 
                 cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rd_req))
                 run {
@@ -195,12 +161,6 @@ class instr_fetch_buffer(name: String,
                     cyclix_gen.assign(TranslateVar(MultiExu_inst.RISCDecode.rd_tag), alloc_rd_tag.position)
                     global_structures.ReserveRd(TranslateVar(MultiExu_inst.RISCDecode.rd_addr), TranslateVar(MultiExu_inst.RISCDecode.rd_tag))      // TODO: "free not found" processing
                 }; cyclix_gen.endif()
-
-                for (src_index in 0 until src_rsrv.size) {
-                    cyclix_gen.assign(src_rsrv[src_index].src_rdy, TRX_LOCAL.GetFracRef("rs" + src_index + "_rdy"))
-                    cyclix_gen.assign(src_rsrv[src_index].src_tag, TRX_LOCAL.GetFracRef("rs" + src_index + "_tag"))
-                    cyclix_gen.assign(src_rsrv[src_index].src_data, TRX_LOCAL.GetFracRef("rs" + src_index + "_rdata"))
-                }
 
                 cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
                 cyclix_gen.assign(new_renamed_uop.GetFracRef("exu_opcode"), TranslateVar(MultiExu_inst.RISCDecode.alu_opcode, var_dict))

@@ -31,6 +31,8 @@ open class trx_buffer(cyclix_gen : cyclix.Generic,
 
 }
 
+class Src(name : String, msb : Int, lsb : Int, defval : String) : hw_var(name, msb, lsb, defval)
+
 data class __src_handle(val src_rdy : hw_var,
                         val src_tag : hw_var,
                         val src_src : hw_var,
@@ -53,7 +55,7 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
         }
         for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
             src_rsrv.add(__src_handle(
-                AdduStageVar("src" + RF_rs_idx + "_rdy", 0, 0, "0"),
+                AdduStageVar("src" + RF_rs_idx + "_rdy", 0, 0, "1"),
                 AdduStageVar("src" + RF_rs_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0"),
                 AdduStageVar("src" + RF_rs_idx + "_src", GetWidthToContain(cdb_num)-1, 0, "0"),
                 AdduStageVar("src" + RF_rs_idx + "_data",MultiExu_CFG.RF_width-1, 0, "0")

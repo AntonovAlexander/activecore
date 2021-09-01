@@ -16,8 +16,6 @@ enum class REORDEX_MODE {
     RISC
 }
 
-class src_handle()
-
 open class Reordex_CFG(val RF_width : Int,
                        val ARF_depth : Int,
                        val rename_RF: Boolean,
@@ -60,8 +58,8 @@ open class Reordex_CFG(val RF_width : Int,
     }
 
     var srcs = ArrayList<hw_var>()
-    fun AddSrc() : hw_var {
-        var new_src = hw_var("src" + srcs.size, RF_width-1, 0, "0")
+    fun AddSrc() : Src {
+        var new_src = Src("src" + srcs.size, RF_width-1, 0, "0")
         req_struct.addu("src" + srcs.size + "_data", RF_width-1, 0, "0")
         srcs.add(new_src)
         return new_src
@@ -83,6 +81,12 @@ open class Reordex_CFG(val RF_width : Int,
     }
 }
 
+val OP_SRC_SET_IMM = hw_opcode("src_set_imm")
+class hw_exec_src_set_imm(val src : Src, val imm : hw_param) : hw_exec(OP_SRC_SET_IMM)
+
+val OP_SRC_RD_REG = hw_opcode("src_rd_reg")
+class hw_exec_src_rd_reg(val src : Src, val raddr : hw_param) : hw_exec(OP_SRC_RD_REG)
+
 open class RISCDecodeContainer (MultiExu_CFG : Reordex_CFG) : hw_astc_stdif() {
 
     var RootExec = hw_exec(hw_opcode("TEST"))
@@ -97,11 +101,11 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var instr_code = ugenvar("instr_code", 31, 0, "0")
 
     // op1 sources
-    val OP0_SRC_RS1     = 0
+    val OP0_SRC_RS      = 0
     val OP0_SRC_IMM     = 1
     val OP0_SRC_PC 	    = 2
     // op2 sources
-    val OP1_SRC_RS2     = 0
+    val OP1_SRC_RS      = 0
     val OP1_SRC_IMM     = 1
     val OP1_SRC_CSR     = 2
 
@@ -169,8 +173,8 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var csrnum          = ugenvar("csrnum", 11, 0, "0")
     var zimm            = ugenvar("zimm", 4, 0, "0")
 
-    var op0_source      = ugenvar("op0_source", 1, 0, OP0_SRC_RS1.toString())
-    var op1_source      = ugenvar("op1_source", 1, 0, OP1_SRC_RS2.toString())
+    var op0_source      = ugenvar("op0_source", 1, 0, OP0_SRC_RS.toString())
+    var op1_source      = ugenvar("op1_source", 1, 0, OP1_SRC_RS.toString())
 
     // ALU control
     var alu_req         = ugenvar("alu_req", 0, 0, "0")
@@ -209,6 +213,16 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var rs1_tag         = ugenvar("rs1_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
 
     var rd_tag          = ugenvar("rd0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+
+    var CSR_MCAUSE      = hw_var("CSR_MCAUSE", 7, 0, "0")
+
+    fun SrcSetImm(src : Src, imm : hw_param) {
+        AddExpr(hw_exec_src_set_imm(src, imm))
+    }
+
+    fun SrcReadReg(src : Src, raddr : hw_param) {
+        AddExpr(hw_exec_src_rd_reg(src, raddr))
+    }
 
 }
 
@@ -335,7 +349,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             else cyclix_gen.uglobal("MRETADDR", 31, 0, "0")
 
         // CSRs
-        var CSR_MCAUSE =
+        var cyclix_CSR_MCAUSE =
             if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) DUMMY_VAR
             else cyclix_gen.uglobal("CSR_MCAUSE", 7, 0, "0")
 
@@ -345,6 +359,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         var instr_req = hw_imm(0)
         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
             instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", 1, (this as MultiExuRISC), MultiExu_CFG, global_structures, CDB_NUM)
+            instr_fetch.var_dict.put(this.RISCDecode.CSR_MCAUSE, cyclix_CSR_MCAUSE)
             instr_req = instr_req_stage(name, cyclix_gen, instr_fetch)
         }
 
@@ -496,7 +511,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             for (IQ_inst in IQ_insts) bufs_to_reset.add(IQ_inst)
             bufs_to_reset.add(renamed_uop_buf)
             bufs_to_reset.add(instr_fetch)
-            (rob as rob_risc).Commit(global_structures, (instr_req as instr_req_stage).pc, bufs_to_reset, cdb.GetFracRef(CDB_RISC_COMMIT_POS), MRETADDR, CSR_MCAUSE)
+            (rob as rob_risc).Commit(global_structures, (instr_req as instr_req_stage).pc, bufs_to_reset, cdb.GetFracRef(CDB_RISC_COMMIT_POS), MRETADDR, cyclix_CSR_MCAUSE)
         }
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 
@@ -592,7 +607,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             frontend.Send_toRenameBuf(renamed_uop_buf)
 
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
-            (instr_fetch as instr_fetch_buffer).Process(renamed_uop_buf, MRETADDR, CSR_MCAUSE)
+            (instr_fetch as instr_fetch_buffer).Process(renamed_uop_buf, MRETADDR, (this as MultiExuRISC).RISCDecode.CSR_MCAUSE)
             (instr_req as instr_req_stage).Process(instr_fetch)
         }
 
