@@ -23,7 +23,8 @@ open class Generic(name_in : String) : hw_astc_stdif() {
     var globals = ArrayList<hw_var>()
     var locals = ArrayList<hw_var>()
 
-    var Subprocs  = mutableMapOf<String, hw_subproc>()
+    var __global_buf_assocs = mutableMapOf<hw_var, hw_var>()
+    var Subprocs            = mutableMapOf<String, hw_subproc>()
 
     var proc = hw_exec(OP_CYCPROC)
 
@@ -257,6 +258,18 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         var new_inst = hw_subproc(inst_name, subproc_inst, this)
         Subprocs.put(inst_name, new_inst)
         return new_inst
+    }
+
+    fun readPrev(rdata : hw_var) : hw_var {
+        var ret_var = DUMMY_VAR
+        if (__global_buf_assocs.containsKey(rdata)) {
+            ret_var = __global_buf_assocs[rdata]!!
+        } else {
+            ret_var = hw_var(GetGenName("readPrev"), rdata.vartype, rdata.defimm)
+            AddGenVar(ret_var)
+            __global_buf_assocs.put(rdata, ret_var)
+        }
+        return ret_var
     }
 
     fun fifo_internal_wr_unblk(subproc : hw_subproc, fifo_name : String, wdata : hw_param) : hw_var {

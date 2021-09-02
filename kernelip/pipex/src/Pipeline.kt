@@ -491,9 +491,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         accum(tgt, hw_imm(src))
     }
 
-    fun readprev(src : hw_pipex_var) : hw_pipex_var {
+    fun readPrev(src : hw_pipex_var) : hw_pipex_var {
         var new_expr = hw_exec(OP_RD_PREV)
-        var genvar = hw_pipex_var(GetGenName("readprev"), src.vartype, src.defimm)
+        var genvar = hw_pipex_var(GetGenName("readPrev"), src.vartype, src.defimm)
         genvar.default_astc = this
         new_expr.AddRdVar(src)
         new_expr.AddGenVar(genvar)
@@ -668,7 +668,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             context.curStageInfo.pflush_cmd_internal(cyclix_gen)
 
         } else if (expr.opcode == OP_RD_PREV) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), context.TranslateInfo.__global_assocs[expr.rdvars[0]]!!.cyclix_global_buf)
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.tgts[0]), cyclix_gen.readPrev(context.curStageInfo.TranslateVar(expr.rdvars[0])))
 
         } else if (expr.opcode == OP_ACCUM) {
             context.curStageInfo.accum(context.curStageInfo.TranslateVar(expr.tgts[0]), context.curStageInfo.TranslateParam(expr.params[0]))
@@ -877,8 +877,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         MSG(DEBUG_FLAG, "Processing globals")
         for (global in globals) {
             var new_global = cyclix_gen.global(("genpsticky_glbl_" + global.name), global.vartype, global.defimm)
-            var new_global_buf = cyclix_gen.local(("genpsticky_glbl_" + global.name + "_buf"), global.vartype, global.defimm)
-            TranslateInfo.__global_assocs.put(global, __global_info(new_global, new_global_buf))
+            TranslateInfo.__global_assocs.put(global, new_global)
         }
 
         // Processing FIFOs
@@ -1168,7 +1167,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 curStageInfo.var_dict.put(pContext_local_dict_entry.key, pContext_local_dict_entry.value)
             }
             for (global_assoc in TranslateInfo.__global_assocs) {
-                curStageInfo.var_dict.put(global_assoc.key, global_assoc.value.cyclix_global)
+                curStageInfo.var_dict.put(global_assoc.key, global_assoc.value)
             }
         }
         MSG("Generating resources: done")
@@ -1183,11 +1182,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             // forming mcopipe ptr next values
             cyclix_gen.add_gen(mcopipe_if.value.wr_ptr_next, mcopipe_if.value.wr_ptr, 1)
             cyclix_gen.add_gen(mcopipe_if.value.rd_ptr_next, mcopipe_if.value.rd_ptr, 1)
-        }
-
-        cyclix_gen.MSG_COMMENT("rdbuf logic")
-        for (global in TranslateInfo.__global_assocs) {
-            cyclix_gen.assign(global.value.cyclix_global_buf, global.value.cyclix_global)
         }
 
         cyclix_gen.MSG_COMMENT("logic of stages")

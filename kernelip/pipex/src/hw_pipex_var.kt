@@ -25,8 +25,8 @@ open class hw_pipex_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_
         else ERROR("assign_succ cmd is out of place!")
     }
 
-    fun readprev() : hw_pipex_var {
-        if (default_astc is Pipeline) return (default_astc as Pipeline).readprev(this)
+    fun readPrev() : hw_pipex_var {
+        if (default_astc is Pipeline) return (default_astc as Pipeline).readPrev(this)
         else ERROR("readprev cmd is out of place!")
         return this
     }

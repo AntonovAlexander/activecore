@@ -534,6 +534,15 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         wrFileModule.write("\n\t} else {\n")
         tab_Counter = 2
 
+        // buffering globals
+        for (global_assoc in cyclix_module.__global_buf_assocs) {
+            wrFileModule.write(
+                GetParamString(global_assoc.value) +
+                    " = " +
+                    GetParamString(global_assoc.key) +
+                    ";\n")
+        }
+
         // Reading streaming input data
         if (cyclix_module is Streaming) {
             wrFileModule.write("\t\t" + (cyclix_module as Streaming).stream_req_var.name + " = " + (cyclix_module as Streaming).stream_req_bus.name + ".read();\n")

@@ -706,13 +706,9 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     // data fetching - reading regfile ##
     fun Pipe_RegFetch () {
 
-        // unoptimized
-        // rs1_rdata.assign(regfile[rs1_addr])
-        // rs2_rdata.assign(regfile[rs2_addr])
-
         // optimized for synthesis
-        rs1_rdata.assign(regfile.readprev()[rs1_addr])
-        rs2_rdata.assign(regfile.readprev()[rs2_addr])
+        rs1_rdata.assign(regfile.readPrev()[rs1_addr])
+        rs2_rdata.assign(regfile.readPrev()[rs2_addr])
 
         begif(eq2(rs1_addr, 0))
         run {

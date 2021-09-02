@@ -13,9 +13,6 @@ import cyclix.*
 
 val COPIPE_TRX_ID_WIDTH = 4
 
-data class __global_info(val cyclix_global : hw_var,
-                         val cyclix_global_buf : hw_var)
-
 data class __mcopipe_if_info(   val wr_done : hw_var,
                                 val rd_done : hw_var,
                                 val full_flag : hw_var,
@@ -84,7 +81,7 @@ class __pstage_info(cyclix_gen : cyclix.Generic,
 }
 
 class __TranslateInfo(var pipeline : Pipeline) {
-    var __global_assocs = mutableMapOf<hw_var, __global_info>()
+    var __global_assocs = mutableMapOf<hw_var, hw_var>()
 
     var __fifo_wr_assocs = mutableMapOf<hw_fifo_out, hw_fifo_out>()
     var __fifo_rd_assocs = mutableMapOf<hw_fifo_in, hw_fifo_in>()
