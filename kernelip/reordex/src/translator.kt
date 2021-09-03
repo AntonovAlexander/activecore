@@ -90,6 +90,12 @@ class __global_structures(val cyclix_gen : cyclix.Generic,
         return PRF_rdy.GetFracRef(src_prf_index)
     }
 
+    fun FillReadRs(fetch_tag : hw_var, fetch_rdy : hw_var, fetch_data : hw_var, raddr : hw_param) {
+        fetch_tag.assign(RenameReg(raddr))
+        fetch_rdy.assign(FetchRsRdy(fetch_tag))
+        fetch_data.assign(FetchRs(fetch_tag))
+    }
+
     fun GetFreePRF() : hwast.hw_astc.bit_position {
         return cyclix_gen.min0(PRF_mapped)
     }
