@@ -68,12 +68,12 @@ class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : 
 
 class __global_structures(val cyclix_gen : cyclix.Generic,
                           val MultiExu_CFG : Reordex_CFG,
-                          val PRF : hw_var,
-                          val PRF_mapped : hw_var,
-                          val PRF_rdy : hw_var,
-                          val ARF_map : hw_var,
+                          val PRF : cyclix.hw_global,
+                          val PRF_mapped : cyclix.hw_global,
+                          val PRF_rdy : cyclix.hw_global,
+                          val ARF_map : cyclix.hw_global,
                           val ARF_map_default : hw_imm_arr,
-                          val PRF_src : hw_var,
+                          val PRF_src : cyclix.hw_global,
                           val ExecUnits : MutableMap<String, Exu_CFG>,
                           val exu_descrs : MutableMap<String, __exu_descr>,
                           val exu_rst : hw_var) {
@@ -91,6 +91,7 @@ class __global_structures(val cyclix_gen : cyclix.Generic,
     }
 
     fun FillReadRs(fetch_tag : hw_var, fetch_rdy : hw_var, fetch_data : hw_var, raddr : hw_param) {
+        cyclix_gen.MSG_COMMENT("Fetching data from physical registers")
         fetch_tag.assign(RenameReg(raddr))
         fetch_rdy.assign(FetchRsRdy(fetch_tag))
         fetch_data.assign(FetchRs(fetch_tag))
