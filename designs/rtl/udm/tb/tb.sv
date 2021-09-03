@@ -95,7 +95,7 @@ initial
 	udm.hreset();
 	WAIT(100);
 	
-	// test data initialization
+	// memory initialization
 	udm.wr32(32'h10000000, 32'h112233cc);
 	udm.wr32(32'h10000004, 32'h55aa55aa);
 	udm.wr32(32'h10000008, 32'h01010202);
@@ -115,9 +115,11 @@ initial
 	
 	WAIT(100);
 	
-	// fetching results
-	udm.rd32(32'h20000000);
-	udm.rd32(32'h20000004);
+	// writing to LED
+	udm.wr32(32'h00000000, 32'h5a5a5a5a);
+	
+	// reading SW
+	udm.rd32(32'h00000004);
 	
 	WAIT(1000);
 
