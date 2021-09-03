@@ -44,98 +44,98 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         new_local.default_astc = this
     }
 
-    fun local(name : String, vartype : hw_type, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, vartype, defimm)
+    fun local(name : String, vartype : hw_type, defimm : hw_imm) : hw_local {
+        var ret_var = hw_local(name, vartype, defimm)
         add_local(ret_var)
         return ret_var
     }
 
-    fun local(name : String, vartype : hw_type, defval : String) : hw_var {
-        var ret_var = hw_var(name, vartype, defval)
+    fun local(name : String, vartype : hw_type, defval : String) : hw_local {
+        var ret_var = hw_local(name, vartype, defval)
         add_local(ret_var)
         return ret_var
     }
 
-    fun local(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_var {
-        var ret_var = hw_var(name, src_struct_in, dimensions)
+    fun local(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_local {
+        var ret_var = hw_local(name, src_struct_in, dimensions)
         add_local(ret_var)
         return ret_var
     }
 
-    fun local(name : String, src_struct_in : hw_struct) : hw_var {
-        var ret_var = hw_var(name, src_struct_in)
+    fun local(name : String, src_struct_in : hw_struct) : hw_local {
+        var ret_var = hw_local(name, src_struct_in)
         add_local(ret_var)
         return ret_var
     }
 
-    fun ulocal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, dimensions, defimm)
+    fun ulocal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_UNSIGNED, dimensions, defimm)
         add_local(ret_var)
         return ret_var
     }
 
-    fun ulocal(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, dimensions, defval)
+    fun ulocal(name : String, dimensions : hw_dim_static, defval : String) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_UNSIGNED, dimensions, defval)
         add_local(ret_var)
         return ret_var
     }
 
-    fun ulocal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defimm)
+    fun ulocal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defimm)
         add_local(ret_var)
         return ret_var
     }
 
-    fun ulocal(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defval)
+    fun ulocal(name : String, msb: Int, lsb: Int, defval : String) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defval)
         add_local(ret_var)
         return ret_var
     }
 
-    fun ulocal(name : String, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, defimm)
+    fun ulocal(name : String, defimm : hw_imm) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_UNSIGNED, defimm)
         add_local(ret_var)
         return ret_var
     }
 
-    fun ulocal(name : String, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, defval)
+    fun ulocal(name : String, defval : String) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_UNSIGNED, defval)
         add_local(ret_var)
         return ret_var
     }
 
-    fun slocal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, dimensions, defimm)
+    fun slocal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_SIGNED, dimensions, defimm)
         add_local(ret_var)
         return ret_var
     }
 
-    fun slocal(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, dimensions, defval)
+    fun slocal(name : String, dimensions : hw_dim_static, defval : String) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_SIGNED, dimensions, defval)
         add_local(ret_var)
         return ret_var
     }
 
-    fun slocal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, msb, lsb, defimm)
+    fun slocal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_SIGNED, msb, lsb, defimm)
         add_local(ret_var)
         return ret_var
     }
 
-    fun slocal(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, msb, lsb, defval)
+    fun slocal(name : String, msb: Int, lsb: Int, defval : String) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_SIGNED, msb, lsb, defval)
         add_local(ret_var)
         return ret_var
     }
 
-    fun slocal(name : String, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, defimm)
+    fun slocal(name : String, defimm : hw_imm) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_SIGNED, defimm)
         add_local(ret_var)
         return ret_var
     }
 
-    fun slocal(name : String, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, defval)
+    fun slocal(name : String, defval : String) : hw_local {
+        var ret_var = hw_local(name, DATA_TYPE.BV_SIGNED, defval)
         add_local(ret_var)
         return ret_var
     }
@@ -152,104 +152,104 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         new_global.default_astc = this
     }
 
-    fun global(name : String, vartype : hw_type, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, vartype, defimm)
+    fun global(name : String, vartype : hw_type, defimm : hw_imm) : hw_global {
+        var ret_var = hw_global(name, vartype, defimm)
         add_global(ret_var)
         return ret_var
     }
 
-    fun global(name : String, vartype : hw_type, defval : String) : hw_var {
-        var ret_var = hw_var(name, vartype, defval)
+    fun global(name : String, vartype : hw_type, defval : String) : hw_global {
+        var ret_var = hw_global(name, vartype, defval)
         add_global(ret_var)
         return ret_var
     }
 
-    fun global(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_var {
-        var ret_var = hw_var(name, src_struct_in, dimensions)
+    fun global(name : String, src_struct_in : hw_struct, dimensions : hw_dim_static) : hw_global {
+        var ret_var = hw_global(name, src_struct_in, dimensions)
         add_global(ret_var)
         return ret_var
     }
 
-    fun global(name : String, src_struct_in : hw_struct, msb: Int, lsb: Int) : hw_var {
-        var ret_var = hw_var(name, src_struct_in, msb, lsb)
+    fun global(name : String, src_struct_in : hw_struct, msb: Int, lsb: Int) : hw_global {
+        var ret_var = hw_global(name, src_struct_in, msb, lsb)
         add_global(ret_var)
         return ret_var
     }
 
-    fun global(name : String, src_struct_in : hw_struct) : hw_var {
-        var ret_var = hw_var(name, src_struct_in)
+    fun global(name : String, src_struct_in : hw_struct) : hw_global {
+        var ret_var = hw_global(name, src_struct_in)
         add_global(ret_var)
         return ret_var
     }
 
-    fun uglobal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, dimensions, defimm)
+    fun uglobal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_UNSIGNED, dimensions, defimm)
         add_global(ret_var)
         return ret_var
     }
 
-    fun uglobal(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, dimensions, defval)
+    fun uglobal(name : String, dimensions : hw_dim_static, defval : String) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_UNSIGNED, dimensions, defval)
         add_global(ret_var)
         return ret_var
     }
 
-    fun uglobal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defimm)
+    fun uglobal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defimm)
         add_global(ret_var)
         return ret_var
     }
 
-    fun uglobal(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defval)
+    fun uglobal(name : String, msb: Int, lsb: Int, defval : String) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_UNSIGNED, msb, lsb, defval)
         add_global(ret_var)
         return ret_var
     }
 
-    fun uglobal(name : String, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, defimm)
+    fun uglobal(name : String, defimm : hw_imm) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_UNSIGNED, defimm)
         add_global(ret_var)
         return ret_var
     }
 
-    fun uglobal(name : String, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_UNSIGNED, defval)
+    fun uglobal(name : String, defval : String) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_UNSIGNED, defval)
         add_global(ret_var)
         return ret_var
     }
 
-    fun sglobal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, dimensions, defimm)
+    fun sglobal(name : String, dimensions : hw_dim_static, defimm : hw_imm) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_SIGNED, dimensions, defimm)
         add_global(ret_var)
         return ret_var
     }
 
-    fun sglobal(name : String, dimensions : hw_dim_static, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, dimensions, defval)
+    fun sglobal(name : String, dimensions : hw_dim_static, defval : String) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_SIGNED, dimensions, defval)
         add_global(ret_var)
         return ret_var
     }
 
-    fun sglobal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, msb, lsb, defimm)
+    fun sglobal(name : String, msb: Int, lsb: Int, defimm : hw_imm) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_SIGNED, msb, lsb, defimm)
         add_global(ret_var)
         return ret_var
     }
 
-    fun sglobal(name : String, msb: Int, lsb: Int, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, msb, lsb, defval)
+    fun sglobal(name : String, msb: Int, lsb: Int, defval : String) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_SIGNED, msb, lsb, defval)
         add_global(ret_var)
         return ret_var
     }
 
-    fun sglobal(name : String, defimm : hw_imm) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, defimm)
+    fun sglobal(name : String, defimm : hw_imm) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_SIGNED, defimm)
         add_global(ret_var)
         return ret_var
     }
 
-    fun sglobal(name : String, defval : String) : hw_var {
-        var ret_var = hw_var(name, DATA_TYPE.BV_SIGNED, defval)
+    fun sglobal(name : String, defval : String) : hw_global {
+        var ret_var = hw_global(name, DATA_TYPE.BV_SIGNED, defval)
         add_global(ret_var)
         return ret_var
     }
@@ -260,16 +260,16 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         return new_inst
     }
 
-    fun readPrev(rdata : hw_var) : hw_var {
+    fun readPrev(rdata : hw_var) : hw_local {
         var ret_var = DUMMY_VAR
         if (__global_buf_assocs.containsKey(rdata)) {
             ret_var = __global_buf_assocs[rdata]!!
         } else {
-            ret_var = hw_var(GetGenName("readPrev"), rdata.vartype, rdata.defimm)
+            ret_var = hw_local(GetGenName("readPrev"), rdata.vartype, rdata.defimm)
             AddGenVar(ret_var)
             __global_buf_assocs.put(rdata, ret_var)
         }
-        return ret_var
+        return (ret_var as hw_local)
     }
 
     fun fifo_internal_wr_unblk(subproc : hw_subproc, fifo_name : String, wdata : hw_param) : hw_var {
