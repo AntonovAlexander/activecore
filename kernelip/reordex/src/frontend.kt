@@ -101,7 +101,7 @@ class instr_fetch_buffer(name: String,
         } else if (expr is hw_exec_src_rd_reg) {
             var num = MultiExu_CFG.srcs.indexOf(expr.src)
             src_rsrv[num].src_tag.assign(global_structures.RenameReg(TranslateParam(expr.raddr)))
-            global_structures.FetchRs(src_rsrv[num].src_data, src_rsrv[num].src_tag)
+            src_rsrv[num].src_data.assign(global_structures.FetchRs(src_rsrv[num].src_tag))
             src_rsrv[num].src_rdy.assign(global_structures.FetchRsRdy(src_rsrv[num].src_tag))
 
         } else {
@@ -260,7 +260,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
 
                 for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
                     cyclix_gen.assign(new_renamed_uop.GetFracRef("src" + RF_rs_idx + "_tag"), rss_tags[RF_rs_idx])
-                    global_structures.FetchRs(new_renamed_uop.GetFracRef("src" + RF_rs_idx + "_data"), new_renamed_uop.GetFracRef("src" + RF_rs_idx + "_tag"))
+                    cyclix_gen.assign(new_renamed_uop.GetFracRef("src" + RF_rs_idx + "_data"), global_structures.FetchRs(new_renamed_uop.GetFracRef("src" + RF_rs_idx + "_tag")))
                 }
 
                 var alloc_rd_tag = global_structures.GetFreePRF()

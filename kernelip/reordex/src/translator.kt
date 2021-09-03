@@ -82,10 +82,8 @@ class __global_structures(val cyclix_gen : cyclix.Generic,
         return ARF_map.GetFracRef(src_addr)
     }
 
-    fun FetchRs(tgt_rdata : hw_var, src_tag : hw_param) {
-        cyclix_gen.assign(
-            tgt_rdata,
-            PRF.GetFracRef(src_tag))
+    fun FetchRs(src_tag : hw_param) : hw_var {
+        return PRF.GetFracRef(src_tag)
     }
 
     fun FetchRsRdy(src_prf_index : hw_param) : hw_var {
