@@ -95,8 +95,8 @@ module ram_dual_memsplit
             else if (bus0_addr_buf[1:0] == 2'd1)
                 begin
                 if (bus0_be_buf[0]) bus0_wdata[15:8] = bus0_wdata_buf[7:0];
-                //if (bus0_be_buf[1]) bus0_wdata[23:16] = bus0_wdata_buf[15:8];
-                //if (bus0_be_buf[2]) bus0_wdata[31:24] = bus0_wdata_buf[23:16];
+                if (bus0_be_buf[1]) bus0_wdata[23:16] = bus0_wdata_buf[15:8];
+                if (bus0_be_buf[2]) bus0_wdata[31:24] = bus0_wdata_buf[23:16];
                 end
             else if (bus0_addr_buf[1:0] == 2'd2)
                 begin
@@ -129,8 +129,8 @@ module ram_dual_memsplit
             else if (bus1_addr_buf[1:0] == 2'd1)
                 begin
                 if (bus1_be_buf[0]) bus1_wdata[15:8] = bus1_wdata_buf[7:0];
-                //if (bus1_be_buf[1]) bus1_wdata[23:16] = bus1_wdata_buf[15:8];
-                //if (bus1_be_buf[2]) bus1_wdata[31:24] = bus1_wdata_buf[23:16];
+                if (bus1_be_buf[1]) bus1_wdata[23:16] = bus1_wdata_buf[15:8];
+                if (bus1_be_buf[2]) bus1_wdata[31:24] = bus1_wdata_buf[23:16];
                 end
             else if (bus1_addr_buf[1:0] == 2'd2)
                 begin
