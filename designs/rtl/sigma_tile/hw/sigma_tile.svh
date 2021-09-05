@@ -22,6 +22,7 @@
 
     modport Master  (output req, input ack, output addr, output we, output wdata, output be, input resp, input rdata);
     modport Slave   (input req, output ack, input addr, input we, input wdata, input be, output resp, output rdata);
+    modport Monitor (input req, input ack, input addr, input we, input wdata, input be, input resp, input rdata);
   endinterface
 
 `endif    // __SIGMA_TILE_H
