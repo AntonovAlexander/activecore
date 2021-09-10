@@ -201,7 +201,6 @@ class RtlGenerator(var cyclix_module : Generic) {
         }
         MSG("Generating combinationals: done")
 
-        // Generating globals
         MSG("Generating globals...")
         for (global in cyclix_module.globals) {
             var new_sticky = rtl_gen.sticky(global.name, global.vartype, global.defimm, clk)
@@ -212,6 +211,15 @@ class RtlGenerator(var cyclix_module : Generic) {
             var_dict.put(global, new_sticky)
         }
         MSG("Generating globals: done")
+
+        MSG("Generating genvars...")
+        for (genvar in cyclix_module.proc.genvars) {
+            var new_genvar = rtl_gen.comb(cyclix_module.GetGenName("genvar"), genvar.vartype, genvar.defimm)
+            new_genvar.write_done = true
+            new_genvar.read_done = true
+            var_dict.put(genvar, new_genvar)
+        }
+        MSG("Generating genvars: done")
 
         MSG("Generating fifo interfaces...")
         // fifo_outs
@@ -380,7 +388,7 @@ class RtlGenerator(var cyclix_module : Generic) {
                 }; rtl_gen.endif()
 
             } else {
-                // Generating payload
+                rtl_gen.MSG_COMMENT("Payload logic")
                 for (expr in cyclix_module.proc.expressions) {
                     export_expr(false, rtl_gen, expr, import_expr_context(var_dict))
                 }
