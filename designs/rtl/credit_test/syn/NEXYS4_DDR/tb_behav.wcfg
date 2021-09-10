@@ -11,15 +11,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="16913000fs"></ZoomStartTime>
-      <ZoomEndTime time="17375001fs"></ZoomEndTime>
-      <Cursor1Time time="17099000fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="765000001fs"></ZoomEndTime>
+      <Cursor1Time time="492500000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="379"></NameColumnWidth>
-      <ValueColumnWidth column_width="103"></ValueColumnWidth>
+      <NameColumnWidth column_width="653"></NameColumnWidth>
+      <ValueColumnWidth column_width="116"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="17" />
+   <WVObjectSize size="15" />
    <wvobject fp_name="/credit_tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -79,45 +79,37 @@
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
-   <wvobject fp_name="/credit_tb/taylor_inst/gencredit_counter" type="array">
-      <obj_property name="ElementShortName">gencredit_counter[2:0]</obj_property>
-      <obj_property name="ObjectShortName">gencredit_counter[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/credit_tb/taylor_inst/gensticky_gencredit_counter" type="array">
-      <obj_property name="ElementShortName">gensticky_gencredit_counter[2:0]</obj_property>
-      <obj_property name="ObjectShortName">gensticky_gencredit_counter[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_ACQ_POW2_genpctrl_succ" type="array">
-      <obj_property name="ElementShortName">genpstage_ST_ACQ_POW2_genpctrl_succ[0:0]</obj_property>
-      <obj_property name="ObjectShortName">genpstage_ST_ACQ_POW2_genpctrl_succ[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_POW3_genpctrl_succ" type="array">
-      <obj_property name="ElementShortName">genpstage_ST_POW3_genpctrl_succ[0:0]</obj_property>
-      <obj_property name="ObjectShortName">genpstage_ST_POW3_genpctrl_succ[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_TERM1_POW5_genpctrl_succ" type="array">
-      <obj_property name="ElementShortName">genpstage_ST_TERM1_POW5_genpctrl_succ[0:0]</obj_property>
-      <obj_property name="ObjectShortName">genpstage_ST_TERM1_POW5_genpctrl_succ[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_TERM2_genpctrl_succ" type="array">
-      <obj_property name="ElementShortName">genpstage_ST_TERM2_genpctrl_succ[0:0]</obj_property>
-      <obj_property name="ObjectShortName">genpstage_ST_TERM2_genpctrl_succ[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_GENRESULT_genpctrl_succ" type="array">
-      <obj_property name="ElementShortName">genpstage_ST_GENRESULT_genpctrl_succ[0:0]</obj_property>
-      <obj_property name="ObjectShortName">genpstage_ST_GENRESULT_genpctrl_succ[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_SENDRESULT_genpctrl_succ" type="array">
-      <obj_property name="ElementShortName">genpstage_ST_SENDRESULT_genpctrl_succ[0:0]</obj_property>
-      <obj_property name="ObjectShortName">genpstage_ST_SENDRESULT_genpctrl_succ[0:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_SENDRESULT_TRX_BUF" type="array">
-      <obj_property name="ElementShortName">genpstage_ST_SENDRESULT_TRX_BUF[4:0]</obj_property>
-      <obj_property name="ObjectShortName">genpstage_ST_SENDRESULT_TRX_BUF[4:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+      <obj_property name="ElementShortName">genpstage_ST_SENDRESULT_TRX_BUF[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_SENDRESULT_TRX_BUF[0:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_SENDRESULT_TRX_BUF_COUNTER" type="array">
-      <obj_property name="ElementShortName">genpstage_ST_SENDRESULT_TRX_BUF_COUNTER[2:0]</obj_property>
-      <obj_property name="ObjectShortName">genpstage_ST_SENDRESULT_TRX_BUF_COUNTER[2:0]</obj_property>
+      <obj_property name="ElementShortName">genpstage_ST_SENDRESULT_TRX_BUF_COUNTER[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_SENDRESULT_TRX_BUF_COUNTER[0:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_ACQ_POW2_genctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_ACQ_POW2_genctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_ACQ_POW2_genctrl_succ[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_POW3_genctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_POW3_genctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_POW3_genctrl_succ[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_TERM1_POW5_genctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_TERM1_POW5_genctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_TERM1_POW5_genctrl_succ[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_TERM2_genctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_TERM2_genctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_TERM2_genctrl_succ[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_GENRESULT_genctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_GENRESULT_genctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_GENRESULT_genctrl_succ[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/credit_tb/taylor_inst/genpstage_ST_SENDRESULT_genctrl_succ" type="array">
+      <obj_property name="ElementShortName">genpstage_ST_SENDRESULT_genctrl_succ[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genpstage_ST_SENDRESULT_genctrl_succ[0:0]</obj_property>
    </wvobject>
 </wave_config>
