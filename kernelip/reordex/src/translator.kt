@@ -66,17 +66,17 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
 
 class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>)
 
-class __global_structures(val cyclix_gen : cyclix.Generic,
-                          val MultiExu_CFG : Reordex_CFG,
-                          val PRF : cyclix.hw_global,
-                          val PRF_mapped : cyclix.hw_global,
-                          val PRF_rdy : cyclix.hw_global,
-                          val ARF_map : cyclix.hw_global,
-                          val ARF_map_default : hw_imm_arr,
-                          val PRF_src : cyclix.hw_global,
-                          val ExecUnits : MutableMap<String, Exu_CFG>,
-                          val exu_descrs : MutableMap<String, __exu_descr>,
-                          val exu_rst : hw_var) {
+class __control_structures(val cyclix_gen : cyclix.Generic,
+                           val MultiExu_CFG : Reordex_CFG,
+                           val PRF : cyclix.hw_global,
+                           val PRF_mapped : cyclix.hw_global,
+                           val PRF_rdy : cyclix.hw_global,
+                           val ARF_map : cyclix.hw_global,
+                           val ARF_map_default : hw_imm_arr,
+                           val PRF_src : cyclix.hw_global,
+                           val ExecUnits : MutableMap<String, Exu_CFG>,
+                           val exu_descrs : MutableMap<String, __exu_descr>,
+                           val exu_rst : hw_var) {
 
     fun RenameReg(src_addr : hw_param) : hw_var {
         return ARF_map.GetFracRef(src_addr)

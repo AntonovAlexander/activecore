@@ -271,6 +271,11 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         var CDB_RISC_COMMIT_POS = 0
         var RRB_RISC_LSU_POS = 0
 
+        var IREQ_BUF_SIZE = 1
+        var FETCH_BUF_SIZE = 2
+        var RENAME_BUF_SIZE = 2
+        var INSTR_IO_ID_WIDTH = GetWidthToContain(FETCH_BUF_SIZE + IREQ_BUF_SIZE)
+
         for (ExUnit in ExecUnits) EXU_NUM += ExUnit.value.exu_num
         CDB_NUM = EXU_NUM
         RRB_NUM = EXU_NUM
@@ -314,7 +319,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         var exu_descrs = mutableMapOf<String, __exu_descr>()
         var exu_rst = cyclix_gen.ulocal("genexu_rst", 0, 0, "0")
-        var global_structures = __global_structures(cyclix_gen, MultiExu_CFG, PRF, PRF_mapped, PRF_rdy, ARF_map, ARF_map_default, PRF_src, ExecUnits, exu_descrs, exu_rst)
+        var control_structures = __control_structures(cyclix_gen, MultiExu_CFG, PRF, PRF_mapped, PRF_rdy, ARF_map, ARF_map_default, PRF_src, ExecUnits, exu_descrs, exu_rst)
 
         MSG("generating control structures: done")
 
@@ -358,9 +363,9 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         var instr_fetch = (rob as hw_stage)
         var instr_req = hw_imm(0)
         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-            instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", 1, (this as MultiExuRISC), MultiExu_CFG, global_structures, CDB_NUM)
+            instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", FETCH_BUF_SIZE, (this as MultiExuRISC), MultiExu_CFG, control_structures, CDB_NUM, INSTR_IO_ID_WIDTH)
             instr_fetch.var_dict.put(this.RISCDecode.CSR_MCAUSE, cyclix_CSR_MCAUSE)
-            instr_req = instr_req_stage(name, cyclix_gen, instr_fetch)
+            instr_req = instr_req_stage(name, cyclix_gen, instr_fetch, INSTR_IO_ID_WIDTH)
         }
 
         var ExUnit_idx = 0
@@ -501,23 +506,23 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         var renamed_uop_buf =
             if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rename_buffer(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM)
-            else rename_buffer_risc(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM)
+            else rename_buffer_risc(cyclix_gen, "genrenamed_uop_buf", RENAME_BUF_SIZE, MultiExu_CFG, ExecUnits.size, CDB_NUM)
 
         cyclix_gen.MSG_COMMENT("ROB committing...")
-        if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob.Commit(global_structures)
+        if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob.Commit(control_structures)
         else {
             var bufs_to_reset = ArrayList<hw_stage>()
             bufs_to_reset.add(rob)
             for (IQ_inst in IQ_insts) bufs_to_reset.add(IQ_inst)
             bufs_to_reset.add(renamed_uop_buf)
             bufs_to_reset.add(instr_fetch)
-            (rob as rob_risc).Commit(global_structures, (instr_req as instr_req_stage).pc, bufs_to_reset, cdb.GetFracRef(CDB_RISC_COMMIT_POS), MRETADDR, cyclix_CSR_MCAUSE)
+            (rob as rob_risc).Commit(control_structures, (instr_req as instr_req_stage).pc, bufs_to_reset, (IQ_insts as ArrayList<hw_stage>), cdb.GetFracRef(CDB_RISC_COMMIT_POS), MRETADDR, cyclix_CSR_MCAUSE)
         }
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 
         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
             cyclix_gen.MSG_COMMENT("Deactivating CDB in case of backoff...")
-            cyclix_gen.begif(global_structures.exu_rst)
+            cyclix_gen.begif(control_structures.exu_rst)
             run {
                 for (cdb_idx in 0 until cdb.GetWidth()) {
                     cyclix_gen.assign(cdb.GetFracRef(cdb_idx).GetFracRef("enb"), 0)
@@ -561,15 +566,15 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             cyclix_gen.begif(exu_cdb_inst_enb)
             run {
 
-                global_structures.WritePRF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
+                control_structures.WritePRF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
 
                 // broadcasting FU results to renamed buffer
                 for (renamed_uop_buf_idx in 0 until renamed_uop_buf.TRX_BUF_SIZE) {
                     var renamed_uop_buf_entry = renamed_uop_buf.TRX_BUF.GetFracRef(renamed_uop_buf_idx)
                     for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
 
-                        var src_rdy      = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_rdy")
-                        var src_tag      = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_tag")
+                        var src_rdy     = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_rdy")
+                        var src_tag     = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_tag")
                         var src_data    = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_data")
 
                         cyclix_gen.begif(!src_rdy)
@@ -603,7 +608,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         cyclix_gen.MSG_COMMENT("renaming...")
 
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
-            var frontend = coproc_frontend(name, cyclix_gen, MultiExu_CFG, global_structures)
+            var frontend = coproc_frontend(name, cyclix_gen, MultiExu_CFG, control_structures)
             frontend.Send_toRenameBuf(renamed_uop_buf)
 
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC

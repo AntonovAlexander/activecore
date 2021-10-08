@@ -50,7 +50,7 @@ open class rob(cyclix_gen : cyclix.Generic,
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
     }
 
-    open fun Commit(global_structures: __global_structures) {
+    open fun Commit(global_structures: __control_structures) {
         preinit_ctrls()
         init_locals()
 
@@ -168,7 +168,7 @@ class rob_risc(name: String,
         rf_dim.add(31, 0)
     }
 
-    fun Commit(global_structures: __global_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, commit_cdb : hw_var, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
+    fun Commit(global_structures: __control_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, commit_cdb : hw_var, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
 
         var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
         var mem_data_wdata      = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
@@ -294,6 +294,11 @@ class rob_risc(name: String,
             cyclix_gen.assign(pc, expected_instraddr)
             for (buf_to_rollback in bufs_to_rollback) {
                 buf_to_rollback.Reset()
+            }
+            for (buf_to_clr in bufs_to_clr) {
+                for (elem_index in 0 until buf_to_clr.TRX_BUF_SIZE) {
+                    cyclix_gen.assign(buf_to_clr.TRX_BUF[elem_index].GetFracRef("enb"), 0)
+                }
             }
             global_structures.RollBack(Backoff_ARF)
         }; cyclix_gen.endif()
