@@ -55,12 +55,12 @@ class RtlGenerator(var cyclix_module : Generic) {
         return ret_var!!
     }
 
-    fun export_expr(DEBUG_FLAG : Boolean,
+    fun export_expr(debug_lvl : DEBUG_LEVEL,
                     rtl_gen : hw_astc,
                     expr : hw_exec,
                     context : import_expr_context) {
 
-        MSG(DEBUG_FLAG, "#### Cyclix: exporting expression: " + expr.opcode.default_string)
+        MSG(debug_lvl, "#### Cyclix: exporting expression: " + expr.opcode.default_string)
         // for (param in expr.params) MSG("param: " + param.GetString())
         // for (wrvar in expr.tgts) MSG("wrvar: " + wrvar.name)
 
@@ -121,12 +121,12 @@ class RtlGenerator(var cyclix_module : Generic) {
             var fifo_rdy = TranslateVar(expr.tgts[0], var_dict)
 
             for (i in submod_insts_fifos_in) {
-                MSG(DEBUG_FLAG, "-- subproc: " + i.key)
+                MSG(debug_lvl, "-- subproc: " + i.key)
                 for (j in i.value) {
-                    MSG(DEBUG_FLAG, "---- fifo_name: " + j.key)
+                    MSG(debug_lvl, "---- fifo_name: " + j.key)
                 }
             }
-            MSG(DEBUG_FLAG, submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_req.name)
+            MSG(debug_lvl, submod_insts_fifos_in[subproc]!![fifo_name]!!.ext_req.name)
 
             rtl_gen.begif(rtl_gen.lnot((rtl_gen as hw_astc_stdif).getPortByName("rst_i")))
             run {
@@ -173,12 +173,12 @@ class RtlGenerator(var cyclix_module : Generic) {
                 }; rtl_gen.endif()
             }; rtl_gen.endif()
 
-        } else rtl_gen.import_expr(false, expr, import_expr_context(var_dict), ::export_expr)
+        } else rtl_gen.import_expr(debug_lvl, expr, import_expr_context(var_dict), ::export_expr)
 
         // MSG("#### Cyclix: exporting expression complete!")
     }
 
-    fun generate(DEBUG_FLAG : Boolean) : rtl.module {
+    fun generate(debug_lvl : DEBUG_LEVEL) : rtl.module {
 
         // TODO: pre-validation
 
@@ -260,8 +260,8 @@ class RtlGenerator(var cyclix_module : Generic) {
             var submod_rtl_gen = rtl.DUMMY_MODULE
             var rtl_submodule_inst = rtl.DUMMY_SUBMODULE
 
-            if (HLS_bb) submod_rtl_gen = (subproc.value.src_module as Streaming).export_rtl_wrapper(DEBUG_FLAG)
-            else submod_rtl_gen = subproc.value.src_module.export_to_rtl(DEBUG_FLAG)
+            if (HLS_bb) submod_rtl_gen = (subproc.value.src_module as Streaming).export_rtl_wrapper(debug_lvl)
+            else submod_rtl_gen = subproc.value.src_module.export_to_rtl(debug_lvl)
 
             rtl_submodule_inst = rtl_gen.submodule(subproc.value.inst_name, submod_rtl_gen)
 
@@ -379,7 +379,7 @@ class RtlGenerator(var cyclix_module : Generic) {
 
                         // Generating payload
                         for (expr in cyclix_module.proc.expressions) {
-                            export_expr(false, rtl_gen, expr, import_expr_context(var_dict))
+                            export_expr(debug_lvl, rtl_gen, expr, import_expr_context(var_dict))
                         }
 
                         rtl_gen.assign(streambuf_enb, 1)
@@ -390,7 +390,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             } else {
                 rtl_gen.MSG_COMMENT("Payload logic")
                 for (expr in cyclix_module.proc.expressions) {
-                    export_expr(false, rtl_gen, expr, import_expr_context(var_dict))
+                    export_expr(debug_lvl, rtl_gen, expr, import_expr_context(var_dict))
                 }
             }
 

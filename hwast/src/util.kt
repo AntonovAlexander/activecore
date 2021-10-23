@@ -1,5 +1,5 @@
 /*
- * glbl.kt
+ * util.kt
  *
  *  Created on: 05.06.2019
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
@@ -17,6 +17,12 @@ import java.io.FileOutputStream
 import java.net.InetAddress
 
 val FRAMEWORK_NAME = "ActiveCore"
+
+enum class DEBUG_LEVEL(val level: Int) {
+    FULL(2),
+    PARTIAL(1),
+    SILENT(0)
+}
 
 var LogFile = FileOutputStream("log.txt", false).writer()
 var LogFile_header_written = false
@@ -50,8 +56,8 @@ fun MSG(msg_string : String) {
     LogFile.close()
 }
 
-fun MSG(DEBUG_FLAG : Boolean, msg_string : String) {
-    if (DEBUG_FLAG) MSG(msg_string)
+fun MSG(debug_lvl : DEBUG_LEVEL, msg_string : String) {
+    if (debug_lvl.level > 0) MSG(msg_string)
 }
 
 fun WARNING(err_string : String) {

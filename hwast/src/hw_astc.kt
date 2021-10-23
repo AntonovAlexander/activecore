@@ -35,8 +35,8 @@ open class hw_astc() : ArrayList<hw_exec>() {
         LogFile.close()
     }
 
-    fun MSG(DEBUG_FLAG : Boolean, msg_string : String) {
-        if (DEBUG_FLAG) MSG(msg_string)
+    fun MSG(debug_lvl : DEBUG_LEVEL, msg_string : String) {
+        if (debug_lvl.level > 0) MSG(msg_string)
     }
 
     fun WARNING(err_string : String) {
@@ -1612,7 +1612,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return bit_position(found, position)
     }
 
-    fun import_expr(DEBUG_FLAG : Boolean, expr : hw_exec, context : import_expr_context, process_subexpr : (DEBUG_FLAG : Boolean, astc_gen : hw_astc, expr : hw_exec, context : import_expr_context) -> Unit) {
+    fun import_expr(debug_lvl : DEBUG_LEVEL, expr : hw_exec, context : import_expr_context, process_subexpr : (debug_lvl : DEBUG_LEVEL, astc_gen : hw_astc, expr : hw_exec, context : import_expr_context) -> Unit) {
 
         if ((expr.opcode == OP_COMMENT)) {
             COMMENT(expr.comment)
@@ -1676,7 +1676,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             begif(TranslateParam(expr.params[0], context.var_dict))
             run {
                 for (child_expr in expr.expressions) {
-                    process_subexpr(DEBUG_FLAG, this, child_expr, context)
+                    process_subexpr(debug_lvl, this, child_expr, context)
                 }
             }; endif()
 
@@ -1688,7 +1688,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     if (casebranch.opcode != OP1_CASEBRANCH) ERROR("non-branch op in case")
                     begbranch(TranslateParam(casebranch.params[0], context.var_dict))
                     for (subexpr in casebranch.expressions) {
-                        process_subexpr(DEBUG_FLAG, this, subexpr, context)
+                        process_subexpr(debug_lvl, this, subexpr, context)
                     }
                     endbranch()
                 }
@@ -1699,7 +1699,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             begwhile(TranslateParam(expr.params[0], context.var_dict))
             run {
                 for (child_expr in expr.expressions) {
-                    process_subexpr(DEBUG_FLAG, this, child_expr, context)
+                    process_subexpr(debug_lvl, this, child_expr, context)
                 }
             }; endloop()
 

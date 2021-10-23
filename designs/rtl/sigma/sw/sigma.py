@@ -26,39 +26,39 @@ sys.path.append('riscv-compliance')
 import hw_test_riscv_compliance
 from hw_test_riscv_compliance import *
 
-sys.path.append('benchmarks/mul_sw')
+sys.path.append('apps/mul_sw')
 import hw_test_mul_sw
 from hw_test_mul_sw import *
 
-sys.path.append('benchmarks/median')
+sys.path.append('apps/median')
 import hw_test_median
 from hw_test_median import *
 
-sys.path.append('benchmarks/qsort')
+sys.path.append('apps/qsort')
 import hw_test_qsort
 from hw_test_qsort import *
 
-sys.path.append('benchmarks/rsort')
+sys.path.append('apps/rsort')
 import hw_test_rsort
 from hw_test_rsort import *
 
-sys.path.append('benchmarks/crc32')
+sys.path.append('apps/crc32')
 import hw_test_crc32
 from hw_test_crc32 import *
 
-sys.path.append('benchmarks/md5')
+sys.path.append('apps/md5')
 import hw_test_md5
 from hw_test_md5 import *
 
-sys.path.append('benchmarks/bootloader')
+sys.path.append('apps/bootloader')
 import hw_test_bootloader
 from hw_test_bootloader import *
 
-sys.path.append('benchmarks/irq_counter')
+sys.path.append('apps/irq_counter')
 import hw_test_irq_counter
 from hw_test_irq_counter import *
 
-sys.path.append('benchmarks/dhrystone')
+sys.path.append('apps/dhrystone')
 import hw_test_dhrystone
 from hw_test_dhrystone import *
 
@@ -124,47 +124,47 @@ class sigma:
         test_succ_counter = 0
         test_fail_counter = 0
         
-        if (hw_test_dhrystone(self, 'benchmarks/dhrystone.riscv') == 1):
+        if (hw_test_dhrystone(self, 'apps/dhrystone.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
         
-        if (hw_test_mul_sw(self, 'benchmarks/mul_sw.riscv') == 1):
+        if (hw_test_mul_sw(self, 'apps/mul_sw.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
         
-        if (hw_test_median(self, 'benchmarks/median.riscv') == 1):
+        if (hw_test_median(self, 'apps/median.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
         
-        if (hw_test_qsort(self, 'benchmarks/qsort.riscv') == 1):
+        if (hw_test_qsort(self, 'apps/qsort.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
         
-        if (hw_test_rsort(self, 'benchmarks/rsort.riscv') == 1):
+        if (hw_test_rsort(self, 'apps/rsort.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
         
-        if (hw_test_crc32(self, 'benchmarks/crc32.riscv') == 1):
+        if (hw_test_crc32(self, 'apps/crc32.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
         
-        if (hw_test_md5(self, 'benchmarks/md5.riscv') == 1):
+        if (hw_test_md5(self, 'apps/md5.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
         
-        if (hw_test_bootloader(self, 'benchmarks/bootloader.riscv', 'benchmarks/bootloader_testapp.riscv') == 1):
+        if (hw_test_bootloader(self, 'apps/bootloader.riscv', 'apps/bootloader_testapp.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
         
-        if (hw_test_irq_counter(self, 'benchmarks/irq_counter.riscv') == 1):
+        if (hw_test_irq_counter(self, 'apps/irq_counter.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1

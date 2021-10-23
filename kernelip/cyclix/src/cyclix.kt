@@ -339,7 +339,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         freeze()
     }
 
-    fun export_to_rtl(DEBUG_FLAG : Boolean) : rtl.module {
+    fun export_to_rtl(debug_lvl : DEBUG_LEVEL) : rtl.module {
 
         NEWLINE()
         MSG("###########################################")
@@ -350,7 +350,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         validate()
 
         var rtl_generator = RtlGenerator(this)
-        var rtl_gen = rtl_generator.generate(DEBUG_FLAG)
+        var rtl_gen = rtl_generator.generate(debug_lvl)
 
         MSG("############################################")
         MSG("#### Cyclix-to-RTL generation complete! ####")
@@ -360,7 +360,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         return rtl_gen
     }
 
-    fun export_to_vivado_cpp(pathname : String, DEBUG_FLAG : Boolean) {
+    fun export_to_vivado_cpp(pathname : String, debug_lvl : DEBUG_LEVEL) {
 
         NEWLINE()
         MSG("############################################")
@@ -372,7 +372,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         freeze()
 
         var writer = VivadoCppWriter(this)
-        writer.write(pathname, DEBUG_FLAG)
+        writer.write(pathname, debug_lvl)
 
         NEWLINE()
         MSG("#############################################")
@@ -405,7 +405,7 @@ open class Streaming (name : String, fifo_in_struct: hw_struct, fifo_out_struct:
         stream_resp_var.read_done = true
     }
 
-    fun export_rtl_wrapper(DEBUG_FLAG : Boolean) : rtl.module {
+    fun export_rtl_wrapper(debug_lvl : DEBUG_LEVEL) : rtl.module {
 
         NEWLINE()
         MSG("#################################################")

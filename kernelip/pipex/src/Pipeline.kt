@@ -618,7 +618,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
     }
 
-    fun reconstruct_expression(DEBUG_FLAG : Boolean,
+    fun reconstruct_expression(debug_lvl : DEBUG_LEVEL,
                                cyclix_gen : hw_astc,
                                expr : hw_exec,
                                context : import_expr_context) {
@@ -626,11 +626,11 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         cyclix_gen as cyclix.Generic
         context as pipex_import_expr_context
 
-        MSG(DEBUG_FLAG, "Reconstructing expression: " + expr.opcode.default_string)
-        for (param in expr.params)  MSG(DEBUG_FLAG, "\t\tparam: "   + param.GetString())
-        for (tgt in expr.tgts)      MSG(DEBUG_FLAG, "\t\ttgt: "     + tgt.GetString())
-        for (rdvar in expr.rdvars)  MSG(DEBUG_FLAG, "\t\trdvar: "   + rdvar.GetString())
-        for (wrvar in expr.wrvars)  MSG(DEBUG_FLAG, "\t\twrvar: "   + wrvar.GetString())
+        MSG(debug_lvl, "Reconstructing expression: " + expr.opcode.default_string)
+        for (param in expr.params)  MSG(debug_lvl, "\t\tparam: "   + param.GetString())
+        for (tgt in expr.tgts)      MSG(debug_lvl, "\t\ttgt: "     + tgt.GetString())
+        for (rdvar in expr.rdvars)  MSG(debug_lvl, "\t\trdvar: "   + rdvar.GetString())
+        for (wrvar in expr.wrvars)  MSG(debug_lvl, "\t\twrvar: "   + wrvar.GetString())
 
         if ((expr.opcode == OP1_ASSIGN)) {
 
@@ -849,7 +849,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 }
             }; cyclix_gen.endif()
 
-        } else cyclix_gen.import_expr(DEBUG_FLAG, expr, context, ::reconstruct_expression)
+        } else cyclix_gen.import_expr(debug_lvl, expr, context, ::reconstruct_expression)
     }
 
     fun check_bufsize(stage : hw_pipex_stage, actual_bufsize: Int) {
@@ -859,7 +859,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
     }
 
-    fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
+    fun translate_to_cyclix(debug_lvl : DEBUG_LEVEL) : cyclix.Generic {
 
         NEWLINE()
         MSG("##############################################")
@@ -874,7 +874,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
         MSG("Generating resources...")
 
-        MSG(DEBUG_FLAG, "Processing globals")
+        MSG(debug_lvl, "Processing globals")
         for (global in globals) {
             var new_global = cyclix_gen.global(("genpsticky_glbl_" + global.name), global.vartype, global.defimm)
             TranslateInfo.__global_assocs.put(global, new_global)
@@ -891,7 +891,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
 
         // Generating mcopipes' resources //
-        MSG(DEBUG_FLAG, "Generating mcopipes if resources")
+        MSG(debug_lvl, "Generating mcopipes if resources")
         for (mcopipe_if in mcopipe_ifs) {
             val mcopipe_name_prefix = "genmcopipe_" + mcopipe_if.name + "_"
 
@@ -925,7 +925,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
 
         // Generating mcopipe handles' resources //
-        MSG(DEBUG_FLAG, "Generating mcopipe handles' resources")
+        MSG(debug_lvl, "Generating mcopipe handles' resources")
         for (mcopipe_handle in mcopipe_handles) {
             TranslateInfo.__mcopipe_handle_reqdict.put(mcopipe_handle, ArrayList<hw_mcopipe_if>())
         }
@@ -949,7 +949,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
 
         // Generating scopipes' resources //
-        MSG(DEBUG_FLAG, "Generating scopipes' resources")
+        MSG(debug_lvl, "Generating scopipes' resources")
         for (scopipe_if in scopipe_ifs) {
             val scopipe_name_prefix = "genscopipe_" + scopipe_if.name + "_"
 
@@ -966,7 +966,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
 
         // Generating scopipe handles' resources //
-        MSG(DEBUG_FLAG, "Generating scopipe handles' resources")
+        MSG(debug_lvl, "Generating scopipe handles' resources")
         for (scopipe_handle in scopipe_handles) {
             TranslateInfo.__scopipe_handle_reqdict.put(scopipe_handle, ArrayList<hw_scopipe_if>())
         }
@@ -992,7 +992,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         for (stage in Stages) TranslateInfo.StageList.add(stage.value)
 
         // Analyzing sync operations //
-        MSG(DEBUG_FLAG, "Distributing synchronization primitives by pstages")
+        MSG(debug_lvl, "Distributing synchronization primitives by pstages")
 
         for (CUR_STAGE_INDEX in 0 until TranslateInfo.StageList.size) {
             val stage = TranslateInfo.StageList[CUR_STAGE_INDEX]
@@ -1039,12 +1039,12 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         if (pipeline_fc_mode == PIPELINE_FC_MODE.CREDIT_BASED) TranslateInfo.gencredit_counter = cyclix_gen.uglobal("gencredit_counter", GetWidthToContain(Stages.size)-1, 0, "0")
 
         // Generating resources //
-        MSG(DEBUG_FLAG, "Generating resources")
+        MSG(debug_lvl, "Generating resources")
 
         // Put stages info in ArrayLists
         for (stageAssoc in TranslateInfo.__stage_assocs) TranslateInfo.StageInfoList.add(stageAssoc.value)
 
-        MSG(DEBUG_FLAG, "Processing genvars")
+        MSG(debug_lvl, "Processing genvars")
         for (CUR_STAGE_INDEX in 0 until TranslateInfo.StageList.size) {
             for (genvar in TranslateInfo.StageList[CUR_STAGE_INDEX].genvars) {
                 var genvar_local = cyclix_gen.local(GetGenName("var"), genvar.vartype, genvar.defimm)
@@ -1196,7 +1196,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             cyclix_gen.assign(curStageInfo.pctrl_flushreq, 0)
 
             // Forming mcopipe_handles_last list
-            MSG(DEBUG_FLAG ,"Detecting last mcopipe handles")
+            MSG(debug_lvl ,"Detecting last mcopipe handles")
             for (mcopipe_handle in curStageInfo.mcopipe_handles) {
                 if (CUR_STAGE_INDEX == TranslateInfo.StageList.lastIndex) {
                     curStageInfo.mcopipe_handles_last.add(mcopipe_handle)
@@ -1295,7 +1295,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
             cyclix_gen.MSG_COMMENT("Generating payload")
             for (expr in curStage.expressions) {
-                reconstruct_expression(DEBUG_FLAG,
+                reconstruct_expression(debug_lvl,
                     cyclix_gen,
                     expr,
                     pipex_import_expr_context(curStageInfo.var_dict, curStage, TranslateInfo, curStageInfo)

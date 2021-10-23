@@ -560,7 +560,7 @@ open class module(val name : String) : hw_astc_stdif() {
         freeze()
     }
 
-    fun export_to_sv(pathname : String, DEBUG_FLAG : Boolean) {
+    fun export_to_sv(pathname : String, debug_lvl : DEBUG_LEVEL) {
 
         NEWLINE()
         MSG("#################################")
@@ -571,7 +571,7 @@ open class module(val name : String) : hw_astc_stdif() {
         validate()
 
         var writer = SvWriter(this)
-        writer.write(pathname, DEBUG_FLAG)
+        writer.write(pathname, debug_lvl)
 
         MSG("##################################")
         MSG("#### RTL generation complete! ####")

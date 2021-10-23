@@ -241,17 +241,17 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         }
     }
 
-    fun reconstruct_expression(DEBUG_FLAG : Boolean,
+    fun reconstruct_expression(debug_lvl : DEBUG_LEVEL,
                                cyclix_gen : hw_astc,
                                expr : hw_exec,
                                context : import_expr_context) {
 
         cyclix_gen as cyclix.Streaming
 
-        cyclix_gen.import_expr(DEBUG_FLAG, expr, context, ::reconstruct_expression)
+        cyclix_gen.import_expr(debug_lvl, expr, context, ::reconstruct_expression)
     }
 
-    fun translate_to_cyclix(DEBUG_FLAG : Boolean) : cyclix.Generic {
+    fun translate_to_cyclix(debug_lvl : DEBUG_LEVEL) : cyclix.Generic {
 
         NEWLINE()
         MSG("################################################")
@@ -421,7 +421,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             }
 
             for (expr in ExUnit.value.ExecUnit[0].expressions) {
-                reconstruct_expression(false,
+                reconstruct_expression(debug_lvl,
                     exu_cyclix_gen,
                     expr,
                     import_expr_context(new_exu_descr.var_dict))

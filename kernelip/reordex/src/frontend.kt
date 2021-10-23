@@ -103,7 +103,7 @@ class instr_fetch_buffer(name: String,
         return TranslateParam(param_totran, var_dict)
     }
 
-    fun reconstruct_expression(DEBUG_FLAG : Boolean,
+    fun reconstruct_expression(debug_lvl : DEBUG_LEVEL,
                                cyclix_gen : hw_astc,
                                expr : hw_exec,
                                context : import_expr_context) {
@@ -118,7 +118,7 @@ class instr_fetch_buffer(name: String,
             global_structures.FillReadRs(src_rsrv[num].src_tag, src_rsrv[num].src_rdy, src_rsrv[num].src_data, TranslateParam(expr.raddr))
 
         } else {
-            cyclix_gen.import_expr(DEBUG_FLAG, expr, context, ::reconstruct_expression)
+            cyclix_gen.import_expr(debug_lvl, expr, context, ::reconstruct_expression)
         }
     }
 
@@ -164,7 +164,7 @@ class instr_fetch_buffer(name: String,
 
                 cyclix_gen.MSG_COMMENT("Generating payload")
                 for (expr in MultiExu_inst.RISCDecode[0].expressions) {
-                    reconstruct_expression(true,
+                    reconstruct_expression(DEBUG_LEVEL.FULL,
                         cyclix_gen,
                         expr,
                         import_expr_context(var_dict)
