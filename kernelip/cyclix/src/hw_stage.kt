@@ -294,7 +294,6 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
     }
 
     override fun pop_trx() {
-        cyclix_gen.assign(ctrl_active, 0)
         super.pop_trx()
     }
 

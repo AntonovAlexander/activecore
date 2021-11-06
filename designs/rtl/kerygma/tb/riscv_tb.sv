@@ -30,7 +30,10 @@ kerygma
 	
 	, .mem_init("YES")
 	, .mem_type("elf")
-	, .mem_data("D:/PROJECTS/PERSONAL/activecore/activecore/designs/rtl/sigma/sw/benchmarks/findmaxval.riscv")
+	, .mem_data("C:/Users/anton/PROJECTS/PERSONAL/activecore/designs/rtl/sigma/sw/apps/heartbeat_variable.riscv")
+	//, .mem_data("C:/Users/anton/PROJECTS/PERSONAL/activecore/designs/rtl/sigma/sw/riscv-compliance/I-ADDI-01.riscv")
+	//, .mem_data("C:/Users/anton/PROJECTS/PERSONAL/activecore/designs/rtl/sigma/sw/riscv-compliance/I-SW-01.riscv")
+	//, .mem_data("C:/Users/anton/PROJECTS/PERSONAL/activecore/designs/rtl/sigma/sw/apps/qsort.riscv")
 	, .mem_size(8192)
 ) kerygma (
 	.clk_i(CLK_100MHZ)

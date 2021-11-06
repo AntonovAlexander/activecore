@@ -18,6 +18,7 @@ enum class REORDEX_MODE {
 
 open class Reordex_CFG(val RF_width : Int,
                        val ARF_depth : Int,
+                       val FrontEnd_width : Int,
                        val rename_RF: Boolean,
                        val PRF_depth : Int,
                        val trx_inflight_num : Int,
@@ -361,11 +362,13 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         MSG("generating internal structures: done")
 
         var instr_fetch = (rob as hw_stage)
-        var instr_req = hw_imm(0)
+        var instr_req = (rob as hw_stage)
+        var instr_iaddr = (rob as hw_stage)
         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-            instr_fetch = instr_fetch_buffer(name, cyclix_gen, "instr_fetch", FETCH_BUF_SIZE, (this as MultiExuRISC), MultiExu_CFG, control_structures, CDB_NUM, INSTR_IO_ID_WIDTH)
+            instr_fetch = instr_fetch_buffer(name, cyclix_gen, FETCH_BUF_SIZE, (this as MultiExuRISC), MultiExu_CFG, control_structures, CDB_NUM, INSTR_IO_ID_WIDTH)
             instr_fetch.var_dict.put(this.RISCDecode.CSR_MCAUSE, cyclix_CSR_MCAUSE)
-            instr_req = instr_req_stage(name, cyclix_gen, instr_fetch, INSTR_IO_ID_WIDTH)
+            instr_req = instr_req_stage(name, cyclix_gen, INSTR_IO_ID_WIDTH, MultiExu_CFG)
+            instr_iaddr = instr_iaddr_stage(name, cyclix_gen, MultiExu_CFG)
         }
 
         var ExUnit_idx = 0
@@ -516,7 +519,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             for (IQ_inst in IQ_insts) bufs_to_reset.add(IQ_inst)
             bufs_to_reset.add(renamed_uop_buf)
             bufs_to_reset.add(instr_fetch)
-            (rob as rob_risc).Commit(control_structures, (instr_req as instr_req_stage).pc, bufs_to_reset, (IQ_insts as ArrayList<hw_stage>), cdb.GetFracRef(CDB_RISC_COMMIT_POS), MRETADDR, cyclix_CSR_MCAUSE)
+            bufs_to_reset.add(instr_req)
+            (rob as rob_risc).Commit(control_structures, (instr_iaddr as instr_iaddr_stage).pc, bufs_to_reset, (IQ_insts as ArrayList<hw_stage>), cdb.GetFracRef(CDB_RISC_COMMIT_POS), MRETADDR, cyclix_CSR_MCAUSE)
         }
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 
@@ -614,6 +618,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
             (instr_fetch as instr_fetch_buffer).Process(renamed_uop_buf, MRETADDR, (this as MultiExuRISC).RISCDecode.CSR_MCAUSE)
             (instr_req as instr_req_stage).Process(instr_fetch)
+            (instr_iaddr as instr_iaddr_stage).Process(instr_req)
         }
 
         cyclix_gen.MSG_COMMENT("renaming: done")

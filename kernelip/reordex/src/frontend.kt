@@ -10,9 +10,33 @@ package reordex
 
 import hwast.*
 
-class instr_req_stage(val name : String, val cyclix_gen : cyclix.Generic, val instr_fetch : instr_fetch_buffer, INSTR_IO_ID_WIDTH : Int) : hw_imm(0) {
+class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic, MultiExu_CFG : Reordex_CFG) : trx_buffer(cyclix_gen, "geninstr_iaddr", 1, MultiExu_CFG) {
 
     var pc = cyclix_gen.uglobal("pc", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
+    val curinstr_addr  = AdduLocal("curinstr_addr", 31, 0, "0")
+    val nextinstr_addr = AdduLocal("nextinstr_addr", 31, 0, "0")
+
+    fun Process(instr_req : instr_req_stage) {
+
+        var new_req_buf = instr_req.GetPushTrx()
+
+        cyclix_gen.assign(curinstr_addr, pc)
+        cyclix_gen.add_gen(nextinstr_addr, pc, 4)
+        cyclix_gen.assign(TRX_LOCAL.GetFracRef("enb"), 1)
+        cyclix_gen.assign_subStructs(new_req_buf, TRX_LOCAL)
+
+        cyclix_gen.begif(instr_req.ctrl_rdy)
+        run {
+            cyclix_gen.assign(pc, nextinstr_addr)
+            instr_req.push_trx(new_req_buf)
+        }; cyclix_gen.endif()
+    }
+}
+
+class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_ID_WIDTH : Int, MultiExu_CFG : Reordex_CFG) : trx_buffer(cyclix_gen, "geninstr_req", 2, MultiExu_CFG) {
+
+    val curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")
+    val nextinstr_addr = AdduStageVar("nextinstr_addr", 31, 0, "0")
 
     var busreq_mem_struct = hw_struct(name + "_busreq_mem_struct")
     val instr_name_prefix = "genmcopipe_instr_mem_"
@@ -22,41 +46,48 @@ class instr_req_stage(val name : String, val cyclix_gen : cyclix.Generic, val in
 
     var instr_io_wr_ptr = cyclix_gen.uglobal("geninstr_io_wr_ptr", INSTR_IO_ID_WIDTH-1, 0, "0")
 
-    fun Process(instr_fetch : instr_fetch_buffer) {
-
-        var new_fetch_buf = instr_fetch.GetPushTrx()
-        var instr_data_wdata = cyclix_gen.local("instr_data_wdata", instr_req_fifo.vartype, "0")
-
+    init {
         busreq_mem_struct.addu("addr",     31, 0, "0")
         busreq_mem_struct.addu("be",       3,  0, "0")
         busreq_mem_struct.addu("wdata",    31, 0, "0")
 
         wr_struct.addu("we", 0, 0, "0")
         wr_struct.add("wdata", hw_type(busreq_mem_struct), "0")
+    }
 
-        cyclix_gen.assign(new_fetch_buf.GetFracRef("curinstr_addr"), pc)
+    fun Process(instr_fetch : instr_fetch_buffer) {
 
-        cyclix_gen.begif(instr_fetch.ctrl_rdy)
+        preinit_ctrls()
+        init_locals()
+
+        var new_fetch_buf = instr_fetch.GetPushTrx()
+        var instr_data_wdata = cyclix_gen.local("instr_data_wdata", instr_req_fifo.vartype, "0")
+
+        cyclix_gen.begif(ctrl_active)
         run {
-            cyclix_gen.assign(instr_data_wdata.GetFracRef("we"), 0)
-            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("addr"), pc)
-            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("be"), 15)
-            cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), 0)
 
-            cyclix_gen.assign(new_fetch_buf.GetFracRef("geninstr_io_id"), instr_io_wr_ptr)
-            cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(instr_req_fifo, instr_data_wdata))
+            cyclix_gen.begif(instr_fetch.ctrl_rdy)
             run {
-                cyclix_gen.assign(instr_fetch.push, 1)
-                cyclix_gen.add_gen(instr_io_wr_ptr, instr_io_wr_ptr, 1)
-                cyclix_gen.add_gen(pc, pc, 4)
-            }; cyclix_gen.endif()
+                cyclix_gen.assign(instr_data_wdata.GetFracRef("we"), 0)
+                cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("addr"), curinstr_addr)
+                cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("be"), 15)
+                cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), 0)
 
-            cyclix_gen.assign(new_fetch_buf.GetFracRef("enb"), 1)
-            cyclix_gen.assign(new_fetch_buf.GetFracRef("nextinstr_addr"), pc)
+                cyclix_gen.assign(new_fetch_buf.GetFracRef("geninstr_io_id"), instr_io_wr_ptr)
+                cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(instr_req_fifo, instr_data_wdata))
+                run {
+                    cyclix_gen.assign(instr_fetch.push, 1)
+                    cyclix_gen.add_gen(instr_io_wr_ptr, instr_io_wr_ptr, 1)
+                }; cyclix_gen.endif()
 
-            cyclix_gen.begif(instr_fetch.push)
-            run {
-                instr_fetch.push_trx(new_fetch_buf)
+                cyclix_gen.assign_subStructs(new_fetch_buf, TRX_LOCAL)
+
+                cyclix_gen.begif(instr_fetch.push)
+                run {
+                    instr_fetch.push_trx(new_fetch_buf)
+                    pop_trx()
+                }; cyclix_gen.endif()
+
             }; cyclix_gen.endif()
 
         }; cyclix_gen.endif()
@@ -65,13 +96,12 @@ class instr_req_stage(val name : String, val cyclix_gen : cyclix.Generic, val in
 
 class instr_fetch_buffer(name: String,
                          cyclix_gen : cyclix.Generic,
-                         name_prefix : String,
                          TRX_BUF_SIZE : Int,
                          val MultiExu_inst : MultiExuRISC,
                          val MultiExu_CFG : Reordex_CFG,
                          val global_structures: __control_structures,
                          cdb_num : Int,
-                         INSTR_IO_ID_WIDTH : Int) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, cdb_num) {
+                         INSTR_IO_ID_WIDTH : Int) : uop_buffer(cyclix_gen, "geninstr_fetch", TRX_BUF_SIZE, MultiExu_CFG, cdb_num) {
 
     val curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")
     val nextinstr_addr = AdduStageVar("nextinstr_addr", 31, 0, "0")
