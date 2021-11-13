@@ -1,6 +1,6 @@
 module ram_dual_memsplit_2banks
   #(
-    parameter mem_init="YES", mem_type="hex", mem_data="data.hex", dat_width=32, adr_width=32, mem_size=1024, P0_FRAC="NO", P1_FRAC="NO"
+    parameter init_type="hex", init_data="data.hex", dat_width=32, adr_width=32, mem_size=1024, P0_FRAC="NO", P1_FRAC="NO"
   )
   (
 	input clk_i,
@@ -488,8 +488,8 @@ module ram_dual_memsplit_2banks
   ram_dual
   #(
 	.mem_init(mem_init),
-	.mem_type(mem_type),
-	.mem_data(mem_data),
+	.init_type(init_type),
+	.init_data(init_data),
 	.dat_width(dat_width),
 	.adr_width(adr_width-1),
 	.mem_size(mem_size >> 1)
@@ -511,8 +511,8 @@ module ram_dual_memsplit_2banks
   ram_dual
   #(
 	.mem_init(mem_init),
-	.mem_type(mem_type),
-	.mem_data(mem_data),
+	.init_type(init_type),
+	.init_data(init_data),
 	.dat_width(dat_width),
 	.adr_width(adr_width-1),
 	.mem_size(mem_size >> 1)
@@ -543,20 +543,20 @@ reg [8*8:0] e_machine_str;
 
 initial
 begin
-  if (mem_init == "YES")
+  if (init_type != "none")
     begin
-    if (mem_type == "elf")
+    if (init_type == "elf")
         begin
         
-        File_ID = $fopen(mem_data, "rb");
+        File_ID = $fopen(init_data, "rb");
         Rd_Status = $fread(File_Rdata, File_ID);
-        if (Rd_Status == 0) $fatal("File %s not found!", mem_data);
+        if (Rd_Status == 0) $fatal("File %s not found!", init_data);
         
         $display("\n##################################");
-        $display("#### Loading elf file: %s", mem_data);
+        $display("#### Loading elf file: %s", init_data);
         
         // parsing ELF header
-        if ((File_Rdata[0] != 8'h7f) || (File_Rdata[1] != 8'h45) || (File_Rdata[2] != 8'h4c) || (File_Rdata[3] != 8'h46)) $fatal("%s: elf format incorrect!", mem_data);
+        if ((File_Rdata[0] != 8'h7f) || (File_Rdata[1] != 8'h45) || (File_Rdata[2] != 8'h4c) || (File_Rdata[3] != 8'h46)) $fatal("%s: elf format incorrect!", init_data);
         e_machine = File_Rdata[18] + (File_Rdata[19] << 8);
         e_machine_str = "UNKNOWN";
         if (e_machine == 32'hF3) e_machine_str = "RISC-V";
@@ -620,7 +620,7 @@ begin
         $display("##################################\n");
         $fclose(File_ID);
         end
-    else $fatal("mem_type parameter incorrect!");
+    else $fatal("init_type parameter incorrect!");
     end
 end
 

@@ -27,9 +27,8 @@ assign pss_arst = !(CPU_RESETN & pll_locked);
 
 kerygma
 #(
-	.mem_init("YES")
-	, .mem_type("hex")
-	, .mem_data("../sigma/sw/apps/heartbeat_variable.riscv.hex")
+	.mem_init_type("hex")
+	, .mem_init_data("../sigma/sw/apps/heartbeat_variable.riscv.hex")
 	, .mem_size(8192)
 ) kerygma (
 	.clk_i(clk_gen)

@@ -13,9 +13,8 @@ module kerygma
 #(
 	parameter UDM_BUS_TIMEOUT = (1024*1024*100),
 	parameter UDM_RTX_EXTERNAL_OVERRIDE = "NO",
-	parameter mem_init="YES",
-	parameter mem_type="elf",
-	parameter mem_data = "data.hex",
+	parameter mem_init_type = "elf",
+	parameter mem_init_data = "data.hex",
 	parameter mem_size = 1024
 )
 (
@@ -54,9 +53,8 @@ MemSplit32 xif();
 
 kerygma_tile #(
 	.corenum(0)
-	, .mem_init(mem_init)
-	, .mem_type(mem_type)
-	, .mem_data(mem_data)
+	, .mem_init_type(mem_init_type)
+	, .mem_init_data(mem_init_data)
 	, .mem_size(mem_size)
 	, .PATH_THROUGH("YES")
 ) kerygma_tile (

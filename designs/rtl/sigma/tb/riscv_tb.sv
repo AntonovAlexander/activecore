@@ -36,9 +36,8 @@ sigma
 	, .UDM_RTX_EXTERNAL_OVERRIDE("YES")
 	, .delay_test_flag(0)
 	
-	, .mem_init("YES")
-	, .mem_type("elf")
-	, .mem_data("../../sw/apps/heartbeat_variable.riscv")
+	, .mem_init_type("elf")
+	, .mem_init_data("../../sw/apps/heartbeat_variable.riscv")
 	, .mem_size(8192)
 ) sigma
 (

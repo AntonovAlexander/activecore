@@ -1,6 +1,6 @@
 module ram_dual_memsplit
   #(
-    parameter mem_init="YES", mem_type="hex", mem_data="data.hex", dat_width=32, adr_width=32, mem_size=1024, P0_FRAC="NO", P1_FRAC="NO"
+    parameter init_type="hex", init_data="data.hex", dat_width=32, adr_width=32, mem_size=1024, P0_FRAC="NO", P1_FRAC="NO"
   )
   (
 	input clk_i,
@@ -223,9 +223,8 @@ module ram_dual_memsplit
   
   ram_dual
   #(
-	.mem_init(mem_init),
-	.mem_type(mem_type),
-	.mem_data(mem_data),
+	.init_type(init_type),
+	.init_data(init_data),
 	.dat_width(dat_width),
 	.adr_width(adr_width),
 	.mem_size(mem_size)
