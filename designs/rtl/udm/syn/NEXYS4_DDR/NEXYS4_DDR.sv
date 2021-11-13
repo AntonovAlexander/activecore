@@ -112,8 +112,8 @@ assign testmem_p1_addr = 0;
 assign testmem_p1_wdata = 0;
 
 ram_dual #(
-    .mem_init("NO")
-    , .mem_data("nodata.hex")
+    .init_type("none")
+    , .init_data("nodata.hex")
     , .dat_width(32)
     , .adr_width(TESTMEM_WSIZE_POW)
     , .mem_size(TESTMEM_WSIZE)
