@@ -43,30 +43,8 @@ module ram_dual_memsplit
     if ((P1_FRAC=="YES") && bus1_ack_o && bus1_we_i && (bus1_be_bi != 4'hf)) p1_wb_next = 1'b1;
     end
   
-  
-  always @(posedge clk_i)
-    begin
-    if (rst_i)
-        begin
-        p0_wb <= 1'b0;
-        end
-    else
-        begin
-        p0_wb <= p0_wb_next;
-        end
-    end
-
-  always @(posedge clk_i)
-    begin
-    if (rst_i)
-        begin
-        p1_wb <= 1'b0;
-        end
-    else
-        begin
-        p1_wb <= p1_wb_next;
-        end
-    end
+  always @(posedge clk_i) p0_wb <= rst_i ? 1'b0 : p0_wb_next;
+  always @(posedge clk_i) p1_wb <= rst_i ? 1'b0 : p1_wb_next;
   
   reg [31:0] bus0_addr, bus0_addr_buf;
   reg [3:0]  bus0_be_buf;

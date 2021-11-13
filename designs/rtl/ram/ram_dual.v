@@ -37,10 +37,11 @@ always @ (posedge clk)
 integer File_ID, Rd_Status;
 reg [7:0] File_Rdata [0 : (mem_size * (dat_width / 8)) - 1] ;
 integer File_ptr, header_idx;
-integer e_phnum, p_offset, p_vaddr, p_filesz, elf_param;
+integer e_machine, e_phnum, p_offset, p_vaddr, p_filesz, elf_param;
 integer bytes_in_word, load_byte_counter;
 integer ram_ptr, wrword_byte_counter;
 reg [dat_width-1:0] wrword;
+reg [8*8:0] e_machine_str;
 
 initial
 begin
@@ -59,6 +60,10 @@ begin
         
         // parsing ELF header
         if ((File_Rdata[0] != 8'h7f) || (File_Rdata[1] != 8'h45) || (File_Rdata[2] != 8'h4c) || (File_Rdata[3] != 8'h46)) $fatal("%s: elf format incorrect!", mem_data);
+        e_machine = File_Rdata[18] + (File_Rdata[19] << 8);
+        e_machine_str = "UNKNOWN";
+        if (e_machine == 32'hF3) e_machine_str = "RISC-V";
+        $display("e_machine: 0x%x (%s)", e_machine, e_machine_str);
         e_phnum = File_Rdata[44] + (File_Rdata[45] << 8);
         $display("e_phnum: 0x%x", e_phnum);
         
