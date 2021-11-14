@@ -172,7 +172,7 @@ module kerygma_tile
     endgenerate
     
 	
-	ram_dual_memsplit #(
+	ram_dual_memsplit_2banks #(
 		.init_type      (mem_init_type)
 		, .init_data    (mem_init_data)
 		, .dat_width	(32)
@@ -184,25 +184,41 @@ module kerygma_tile
 		.clk_i(clk_i)
 		, .rst_i(rst_i)
 
-		, .bus0_req_i	(cpu_instr.req)
-		, .bus0_we_i	(cpu_instr.we)
-		, .bus0_addr_bi	(cpu_instr.addr)
-		, .bus0_be_bi	(cpu_instr.be)
-		, .bus0_wdata_bi(cpu_instr.wdata)
-		, .bus0_ack_o	(cpu_instr.ack)
+		, .bus0_bank0_req_i		(cpu_instr.req)
+		, .bus0_bank0_we_i		(cpu_instr.we)
+		, .bus0_bank0_addr_bi	(cpu_instr.addr)
+		, .bus0_bank0_be_bi		(cpu_instr.be)
+		, .bus0_bank0_wdata_bi	(cpu_instr.wdata)
+		, .bus0_bank0_ack_o		(cpu_instr.ack)
+		, .bus0_bank0_resp_o	(cpu_instr.resp)
+		, .bus0_bank0_rdata_bo	(cpu_instr.rdata)
 
-		, .bus0_resp_o	(cpu_instr.resp)
-		, .bus0_rdata_bo(cpu_instr.rdata)
+		, .bus0_bank1_req_i		(1'b0)
+		, .bus0_bank1_we_i		(1'b0)
+		, .bus0_bank1_addr_bi	(0)
+		, .bus0_bank1_be_bi		(4'h0)
+		, .bus0_bank1_wdata_bi	(0)
+		//, .bus0_bank1_ack_o	()
+		//, .bus0_bank1_resp_o	()
+		//, .bus0_bank1_rdata_bo()
 
-		, .bus1_req_i	(dmem_if.req)
-		, .bus1_we_i	(dmem_if.we)
-		, .bus1_addr_bi	(dmem_if.addr)
-		, .bus1_be_bi	(dmem_if.be)
-		, .bus1_wdata_bi(dmem_if.wdata)
-		, .bus1_ack_o	(dmem_if.ack)
+		, .bus1_bank0_req_i		(dmem_if.req)
+		, .bus1_bank0_we_i		(dmem_if.we)
+		, .bus1_bank0_addr_bi	(dmem_if.addr)
+		, .bus1_bank0_be_bi		(dmem_if.be)
+		, .bus1_bank0_wdata_bi	(dmem_if.wdata)
+		, .bus1_bank0_ack_o		(dmem_if.ack)
+		, .bus1_bank0_resp_o	(dmem_if.resp)
+		, .bus1_bank0_rdata_bo	(dmem_if.rdata)
 
-		, .bus1_resp_o	(dmem_if.resp)
-		, .bus1_rdata_bo(dmem_if.rdata)
+		, .bus1_bank1_req_i		(1'b0)
+		, .bus1_bank1_we_i		(1'b0)
+		, .bus1_bank1_addr_bi	(0)
+		, .bus1_bank1_be_bi		(4'h0)
+		, .bus1_bank1_wdata_bi	(0)
+		//, .bus1_bank1_ack_o	(dmem_if.ack)
+		//, .bus1_bank1_resp_o	(dmem_if.resp)
+		//, .bus1_bank1_rdata_bo(dmem_if.rdata)
 	);
 	
     sfr #(
