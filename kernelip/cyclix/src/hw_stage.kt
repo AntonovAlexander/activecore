@@ -12,14 +12,27 @@ import hwast.*
 
 open class hw_fifo(val cyclix_gen : cyclix.Generic,
                    val name_prefix : String,
-                   val TRX_BUF_SIZE : Int) {
+                   val TRX_BUF_SIZE : Int,
+                   val TRX_BUF_DIM : Int) {
 
-    var TRX_BUF                 = cyclix_gen.global(name_prefix + "_TRX_BUF", hw_struct(name_prefix + "_TRX_BUF_STRUCT"), TRX_BUF_SIZE-1, 0)
+    constructor(cyclix_gen : cyclix.Generic,
+                name_prefix : String,
+                TRX_BUF_SIZE : Int) : this(cyclix_gen, name_prefix, TRX_BUF_SIZE, 1)
+
+    var TRX_BUF_dim             = hw_dim_static()
+    var TRX_BUF                 = cyclix_gen.global(name_prefix + "_TRX_BUF", hw_struct(name_prefix + "_TRX_BUF_STRUCT"), TRX_BUF_dim)
     var TRX_BUF_head_ref        = TRX_BUF.GetFracRef(0)
     var TRX_BUF_COUNTER         = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER", GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0")
     var TRX_BUF_COUNTER_NEMPTY  = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER_NEMPTY", 0, 0, "0")
     var TRX_BUF_COUNTER_FULL    = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER_FULL", 0, 0, "0")
-    var TRX_LOCAL               = cyclix_gen.local(name_prefix + "_TRX_LOCAL", hw_struct(name_prefix + "_TRX_LOCAL_STRUCT"))
+    var TRX_LOCAL_dim           = hw_dim_static()
+    var TRX_LOCAL               = cyclix_gen.local(name_prefix + "_TRX_LOCAL", hw_struct(name_prefix + "_TRX_LOCAL_STRUCT"), TRX_LOCAL_dim)
+
+    init {
+        if (TRX_BUF_DIM != 1) TRX_BUF_dim.add(TRX_BUF_DIM-1, 0)
+        TRX_BUF_dim.add(TRX_BUF_SIZE-1, 0)
+        if (TRX_BUF_DIM != 1) TRX_LOCAL_dim.add(TRX_BUF_DIM-1, 0)
+    }
 
     fun AddBuf(new_structvar : hw_structvar) {
         TRX_BUF.vartype.src_struct.add(new_structvar)

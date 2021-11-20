@@ -42,7 +42,8 @@ class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_I
     val instr_name_prefix = "genmcopipe_instr_mem_"
 
     var wr_struct = hw_struct("genpmodule_" + name + "_" + instr_name_prefix + "genstruct_fifo_wdata")
-    var instr_req_fifo = cyclix_gen.fifo_out((instr_name_prefix + "req"), wr_struct)
+
+    var instr_req_fifos = ArrayList<hw_fifo_out>()
 
     var instr_io_wr_ptr = cyclix_gen.uglobal("geninstr_io_wr_ptr", INSTR_IO_ID_WIDTH-1, 0, "0")
 
@@ -53,6 +54,10 @@ class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_I
 
         wr_struct.addu("we", 0, 0, "0")
         wr_struct.add("wdata", hw_type(busreq_mem_struct), "0")
+
+        for (i in 0 until MultiExu_CFG.FrontEnd_width) {
+            instr_req_fifos.add(cyclix_gen.fifo_out((instr_name_prefix + "req_" + i), wr_struct))
+        }
     }
 
     fun Process(instr_fetch : instr_fetch_buffer) {
@@ -61,7 +66,7 @@ class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_I
         init_locals()
 
         var new_fetch_buf = instr_fetch.GetPushTrx()
-        var instr_data_wdata = cyclix_gen.local("instr_data_wdata", instr_req_fifo.vartype, "0")
+        var instr_data_wdata = cyclix_gen.local("instr_data_wdata", instr_req_fifos[0].vartype, "0")
 
         cyclix_gen.begif(ctrl_active)
         run {
@@ -74,10 +79,16 @@ class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_I
                 cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), 0)
 
                 cyclix_gen.assign(new_fetch_buf.GetFracRef("geninstr_io_id"), instr_io_wr_ptr)
-                cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(instr_req_fifo, instr_data_wdata))
+                cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(instr_req_fifos[0], instr_data_wdata))
                 run {
                     cyclix_gen.assign(instr_fetch.push, 1)
                     cyclix_gen.add_gen(instr_io_wr_ptr, instr_io_wr_ptr, 1)
+                }; cyclix_gen.endif()
+
+                // TODO: default assignment workaround
+                cyclix_gen.begif(!ctrl_active)
+                run {
+                    cyclix_gen.fifo_wr_unblk(instr_req_fifos[1], instr_data_wdata)
                 }; cyclix_gen.endif()
 
                 cyclix_gen.assign_subStructs(new_fetch_buf, TRX_LOCAL)
@@ -107,15 +118,16 @@ class instr_fetch_buffer(name: String,
     val nextinstr_addr = AdduStageVar("nextinstr_addr", 31, 0, "0")
 
     val instr_name_prefix = "genmcopipe_instr_mem_"
-    var instr_resp_fifo = cyclix_gen.ufifo_in((instr_name_prefix + "resp"), 31, 0)
+
+    var instr_resp_fifos = ArrayList<hw_fifo_in>()
 
     var instr_io_rd_ptr = cyclix_gen.uglobal("geninstr_io_rd_ptr", INSTR_IO_ID_WIDTH-1, 0, "0")
 
     val instr_io_id     = AdduStageVar("geninstr_io_id", INSTR_IO_ID_WIDTH-1, 0, "0")
 
-    var instr_recv_code_buf = cyclix_gen.local("instr_recv_code_buf", instr_resp_fifo.vartype, "0")
+    var instr_recv_code_buf = cyclix_gen.ulocal("instr_recv_code_buf", 31, 0, "0")
     var instr_recv      = AdduStageVar("instr_recv", 0, 0, "0")
-    var instr_recv_code = AddStageVar("instr_recv_code", instr_resp_fifo.vartype, "0")
+    var instr_recv_code = AdduStageVar("instr_recv_code", 31, 0, "0")
 
     var var_dict = mutableMapOf<hw_var, hw_var>()
     init {
@@ -124,6 +136,9 @@ class instr_fetch_buffer(name: String,
         }
         for (genvar in MultiExu_inst.RISCDecode[0].genvars) {
             var_dict.put(genvar, AddLocal(genvar.name, genvar.vartype, genvar.defimm))
+        }
+        for (i in 0 until MultiExu_CFG.FrontEnd_width) {
+            instr_resp_fifos.add(cyclix_gen.ufifo_in((instr_name_prefix + "resp_" + i), 31, 0))
         }
     }
     fun TranslateVar(var_totran : hw_var) : hw_var {
@@ -157,7 +172,7 @@ class instr_fetch_buffer(name: String,
         var new_renamed_uop = renamed_uop_buf.GetPushTrx()
 
         cyclix_gen.COMMENT("fetching instruction code...")
-        cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifo, instr_recv_code_buf))
+        cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifos[0], instr_recv_code_buf))
         run {
             var fetch_iter = cyclix_gen.begforall_asc(TRX_BUF)
             run {
@@ -174,6 +189,12 @@ class instr_fetch_buffer(name: String,
             cyclix_gen.add_gen(instr_io_rd_ptr, instr_io_rd_ptr, 1)
         }; cyclix_gen.endif()
         cyclix_gen.COMMENT("fetching instruction code: done")
+
+        // TODO: default assignment workaround
+        cyclix_gen.begif(!ctrl_active)
+        run {
+            cyclix_gen.fifo_rd_unblk(instr_resp_fifos[1], instr_recv_code_buf)
+        }; cyclix_gen.endif()
 
         preinit_ctrls()
         init_locals()

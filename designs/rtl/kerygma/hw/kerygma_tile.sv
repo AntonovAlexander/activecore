@@ -35,7 +35,7 @@ module kerygma_tile
     localparam SFR_BITSEL  = 20;
 
     logic sw_reset;
-    MemSplit32 cpu_instr();
+    MemSplit32 cpu_instr_0(), cpu_instr_1();
     MemSplit32 cpu_data();
 
     logic [(2**IRQ_NUM_POW)-1:0] irq_en;
@@ -61,11 +61,17 @@ module kerygma_tile
     );
 	
     // Processor core
-    genpmodule_agenda_cpu_genmcopipe_instr_mem_genstruct_fifo_wdata instr_mem_struct_bus;
-    assign cpu_instr.we     = instr_mem_struct_bus.we;
-    assign cpu_instr.addr   = instr_mem_struct_bus.wdata.addr;
-    assign cpu_instr.be     = instr_mem_struct_bus.wdata.be;
-    assign cpu_instr.wdata  = instr_mem_struct_bus.wdata.wdata;
+    genpmodule_agenda_cpu_genmcopipe_instr_mem_genstruct_fifo_wdata instr_mem_struct_bus_0;
+    assign cpu_instr_0.we     = instr_mem_struct_bus_0.we;
+    assign cpu_instr_0.addr   = instr_mem_struct_bus_0.wdata.addr;
+    assign cpu_instr_0.be     = instr_mem_struct_bus_0.wdata.be;
+    assign cpu_instr_0.wdata  = instr_mem_struct_bus_0.wdata.wdata;
+    
+    genpmodule_agenda_cpu_genmcopipe_instr_mem_genstruct_fifo_wdata instr_mem_struct_bus_1;
+    assign cpu_instr_1.we     = instr_mem_struct_bus_1.we;
+    assign cpu_instr_1.addr   = instr_mem_struct_bus_1.wdata.addr;
+    assign cpu_instr_1.be     = instr_mem_struct_bus_1.wdata.be;
+    assign cpu_instr_1.wdata  = instr_mem_struct_bus_1.wdata.wdata;
 
     genpmodule_agenda_cpu_genmcopipe_data_mem_genstruct_fifo_wdata data_mem_struct_bus;
     assign cpu_data.we      = data_mem_struct_bus.we;
@@ -82,20 +88,30 @@ module kerygma_tile
         , .irq_fifo_genfifo_rdata_bi({0, cpu_irq_code})
         , .irq_fifo_genfifo_ack_o(cpu_irq_ack)
         
-        // instr req bus
-        , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
-        , .genmcopipe_instr_mem_req_genfifo_wdata_bo(instr_mem_struct_bus)
-        , .genmcopipe_instr_mem_req_genfifo_ack_i(cpu_instr.ack)
+        // instr req 0 bus
+        , .genmcopipe_instr_mem_req_0_genfifo_req_o(cpu_instr_0.req)
+        , .genmcopipe_instr_mem_req_0_genfifo_wdata_bo(instr_mem_struct_bus_0)
+        , .genmcopipe_instr_mem_req_0_genfifo_ack_i(cpu_instr_0.ack)
+        
+        // instr req 1 bus
+        , .genmcopipe_instr_mem_req_1_genfifo_req_o(cpu_instr_1.req)
+        , .genmcopipe_instr_mem_req_1_genfifo_wdata_bo(instr_mem_struct_bus_1)
+        , .genmcopipe_instr_mem_req_1_genfifo_ack_i(cpu_instr_1.ack)
 
         // data req bus
         , .genmcopipe_data_mem_req_genfifo_req_o(cpu_data.req)
         , .genmcopipe_data_mem_req_genfifo_wdata_bo(data_mem_struct_bus)
         , .genmcopipe_data_mem_req_genfifo_ack_i(cpu_data.ack)
 
-        // instr resp bus
-        , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
-        , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
-        // , .genmcopipe_instr_mem_resp_genfifo_ack_o
+        // instr resp 0 bus
+        , .genmcopipe_instr_mem_resp_0_genfifo_req_i(cpu_instr_0.resp)
+        , .genmcopipe_instr_mem_resp_0_genfifo_rdata_bi(cpu_instr_0.rdata)
+        // , .genmcopipe_instr_mem_resp_0_genfifo_ack_o
+        
+        // instr resp 1 bus
+        , .genmcopipe_instr_mem_resp_1_genfifo_req_i(cpu_instr_1.resp)
+        , .genmcopipe_instr_mem_resp_1_genfifo_rdata_bi(cpu_instr_1.rdata)
+        // , .genmcopipe_instr_mem_resp_1_genfifo_ack_o
 
         // data resp bus
         , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
@@ -184,23 +200,23 @@ module kerygma_tile
 		.clk_i(clk_i)
 		, .rst_i(rst_i)
 
-		, .bus0_bank0_req_i		(cpu_instr.req)
-		, .bus0_bank0_we_i		(cpu_instr.we)
-		, .bus0_bank0_addr_bi	(cpu_instr.addr)
-		, .bus0_bank0_be_bi		(cpu_instr.be)
-		, .bus0_bank0_wdata_bi	(cpu_instr.wdata)
-		, .bus0_bank0_ack_o		(cpu_instr.ack)
-		, .bus0_bank0_resp_o	(cpu_instr.resp)
-		, .bus0_bank0_rdata_bo	(cpu_instr.rdata)
+		, .bus0_bank0_req_i		(cpu_instr_0.req)
+		, .bus0_bank0_we_i		(cpu_instr_0.we)
+		, .bus0_bank0_addr_bi	(cpu_instr_0.addr)
+		, .bus0_bank0_be_bi		(cpu_instr_0.be)
+		, .bus0_bank0_wdata_bi	(cpu_instr_0.wdata)
+		, .bus0_bank0_ack_o		(cpu_instr_0.ack)
+		, .bus0_bank0_resp_o	(cpu_instr_0.resp)
+		, .bus0_bank0_rdata_bo	(cpu_instr_0.rdata)
 
-		, .bus0_bank1_req_i		(1'b0)
-		, .bus0_bank1_we_i		(1'b0)
-		, .bus0_bank1_addr_bi	(0)
-		, .bus0_bank1_be_bi		(4'h0)
-		, .bus0_bank1_wdata_bi	(0)
-		//, .bus0_bank1_ack_o	()
-		//, .bus0_bank1_resp_o	()
-		//, .bus0_bank1_rdata_bo()
+		, .bus0_bank1_req_i		(cpu_instr_1.req)
+		, .bus0_bank1_we_i		(cpu_instr_1.we)
+		, .bus0_bank1_addr_bi	(cpu_instr_1.addr)
+		, .bus0_bank1_be_bi		(cpu_instr_1.be)
+		, .bus0_bank1_wdata_bi	(cpu_instr_1.wdata)
+		, .bus0_bank1_ack_o		(cpu_instr_1.ack)
+		, .bus0_bank1_resp_o	(cpu_instr_1.resp)
+		, .bus0_bank1_rdata_bo	(cpu_instr_1.rdata)
 
 		, .bus1_bank0_req_i		(dmem_if.req)
 		, .bus1_bank0_we_i		(dmem_if.we)
