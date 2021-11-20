@@ -22,7 +22,13 @@ class __TranslateInfo() {
 open class trx_buffer(cyclix_gen : cyclix.Generic,
                       name_prefix : String,
                       TRX_BUF_SIZE : Int,
-                      MultiExu_CFG : Reordex_CFG) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE, STAGE_FC_MODE.BUFFERED, false) {
+                      TRX_DIM_SIZE : Int,
+                      MultiExu_CFG : Reordex_CFG) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE, TRX_DIM_SIZE, STAGE_FC_MODE.BUFFERED, false) {
+
+    constructor(cyclix_gen : cyclix.Generic,
+                name_prefix : String,
+                TRX_BUF_SIZE : Int,
+                MultiExu_CFG : Reordex_CFG) : this(cyclix_gen, name_prefix, TRX_BUF_SIZE, 1, MultiExu_CFG)
 
     var enb     = AddStageVar(hw_structvar("enb", DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
