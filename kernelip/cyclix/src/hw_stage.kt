@@ -13,11 +13,11 @@ import hwast.*
 open class hw_fifo(val cyclix_gen : cyclix.Generic,
                    val name_prefix : String,
                    val TRX_BUF_SIZE : Int,
-                   val TRX_BUF_DIM : Int) {
+                   val TRX_BUF_MULTIDIM : Int) {
 
     constructor(cyclix_gen : cyclix.Generic,
                 name_prefix : String,
-                TRX_BUF_SIZE : Int) : this(cyclix_gen, name_prefix, TRX_BUF_SIZE, 1)
+                TRX_BUF_SIZE : Int) : this(cyclix_gen, name_prefix, TRX_BUF_SIZE, 0)
 
     var TRX_BUF_dim             = hw_dim_static()
     var TRX_BUF                 = cyclix_gen.global(name_prefix + "_TRX_BUF", hw_struct(name_prefix + "_TRX_BUF_STRUCT"), TRX_BUF_dim)
@@ -29,9 +29,9 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
     var TRX_LOCAL               = cyclix_gen.local(name_prefix + "_TRX_LOCAL", hw_struct(name_prefix + "_TRX_LOCAL_STRUCT"), TRX_LOCAL_dim)
 
     init {
-        if (TRX_BUF_DIM != 1) TRX_BUF_dim.add(TRX_BUF_DIM-1, 0)
+        if (TRX_BUF_MULTIDIM != 0) TRX_BUF_dim.add(TRX_BUF_MULTIDIM-1, 0)
         TRX_BUF_dim.add(TRX_BUF_SIZE-1, 0)
-        if (TRX_BUF_DIM != 1) TRX_LOCAL_dim.add(TRX_BUF_DIM-1, 0)
+        if (TRX_BUF_MULTIDIM != 0) TRX_LOCAL_dim.add(TRX_BUF_MULTIDIM-1, 0)
     }
 
     fun AddBuf(new_structvar : hw_structvar) {
@@ -265,15 +265,15 @@ enum class STAGE_FC_MODE {
 open class hw_stage(cyclix_gen : cyclix.Generic,
                     name_prefix : String,
                     TRX_BUF_SIZE : Int,
-                    TRX_DIM_SIZE : Int,
+                    TRX_MULTIDIM_SIZE : Int,
                     val fc_mode : STAGE_FC_MODE,
-                    val AUTO_FIRED : Boolean) : hw_fifo(cyclix_gen, name_prefix, TRX_BUF_SIZE) {
+                    val AUTO_FIRED : Boolean) : hw_fifo(cyclix_gen, name_prefix, TRX_BUF_SIZE, TRX_MULTIDIM_SIZE) {
 
     constructor(cyclix_gen : cyclix.Generic,
                 name_prefix : String,
                 TRX_BUF_SIZE : Int,
                 fc_mode : STAGE_FC_MODE,
-                AUTO_FIRED : Boolean) : this(cyclix_gen, name_prefix, TRX_BUF_SIZE, 1, fc_mode, AUTO_FIRED)
+                AUTO_FIRED : Boolean) : this(cyclix_gen, name_prefix, TRX_BUF_SIZE, 0, fc_mode, AUTO_FIRED)
 
     val ctrl_active        = cyclix_gen.ulocal((name_prefix + "_genctrl_active"), 0, 0, "0")
     val ctrl_working       = cyclix_gen.ulocal((name_prefix + "_genctrl_working"), 0, 0, "0")
