@@ -193,7 +193,7 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
 
             } else {
                 // println("dimensioned var")
-                if (depow_fraction is hw_frac_SubStruct) ERROR("Depower index generation incorrect, accessing substruct in multidimensional variable")
+                if (depow_fraction is hw_frac_SubStruct) ERROR("Depower index generation incorrect, accessing substruct \"" +  depow_fraction.substruct_name + "\" in multidimensional variable " + name)
                 else {
                     if ((depow_fraction is hw_frac_C) || (depow_fraction is hw_frac_V)) {
                         // taking indexed variable - detachment of last dimensions

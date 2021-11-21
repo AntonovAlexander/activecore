@@ -75,8 +75,8 @@ class SvWriter(var mod : module) {
         var dimstring = ""
         if (structvar.vartype.DataType == DATA_TYPE.STRUCTURED) {
             if (!structvar.vartype.dimensions.isEmpty()) {
-                for (dim in structvar.vartype.dimensions) {
-                    dimstring += (" " + getDimString(dim))
+                for (DIM_INDEX in structvar.vartype.dimensions.size-1 downTo 0) {
+                    dimstring += (" " + getDimString(structvar.vartype.dimensions[DIM_INDEX]))
                 }
             }
             wrFile.write(preambule_uncond
@@ -92,7 +92,7 @@ class SvWriter(var mod : module) {
                 msb = structvar.vartype.dimensions[0].msb
                 lsb = structvar.vartype.dimensions[0].lsb
             }
-            for (DIM_INDEX in 1 until structvar.vartype.dimensions.size) {
+            for (DIM_INDEX in structvar.vartype.dimensions.size-1 downTo 1) {
                 dimstring += (" [" + structvar.vartype.dimensions[DIM_INDEX].msb + ":" + structvar.vartype.dimensions[DIM_INDEX].lsb + "]")
             }
             var sign_string = ""
