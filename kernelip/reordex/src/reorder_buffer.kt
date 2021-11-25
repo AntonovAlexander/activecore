@@ -174,6 +174,10 @@ class rob_risc(name: String,
 
     fun Commit(global_structures: __control_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, commit_cdb : hw_var, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
 
+        var entry_mask          = cyclix_gen.uglobal("entry_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
+        var single_entry_ptr    = cyclix_gen.ulocal("single_entry_ptr", GetWidthToContain(TRX_BUF_MULTIDIM)-1, 0, "0")
+        var commit_active       = cyclix_gen.ulocal("commit_active", 0, 0, "1")
+
         var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
         var mem_data_wdata      = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
         var mem_data_rdata      = cyclix_gen.local("mem_data_rdata", data_resp_fifo.vartype, "0")
@@ -185,114 +189,282 @@ class rob_risc(name: String,
 
         preinit_ctrls()
         init_locals()
-        init_single_entry_locals(0)
 
-        cyclix_gen.begif(mem_rd_inprogress)
+        var single_entry = cyclix_gen.begforall_asc(TRX_LOCAL_PARALLEL)
         run {
-            cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, mem_data_rdata))
+            cyclix_gen.MSG_COMMENT("-- Processing entry --")
+            cyclix_gen.begif(cyclix_gen.band(commit_active, entry_mask.GetFracRef(single_entry.iter_num)))
             run {
-
-                cyclix_gen.begif(cyclix_gen.eq2(mem_be, 0x1))
+                cyclix_gen.begif(TRX_LOCAL_PARALLEL.GetFracRef(single_entry.iter_num).GetFracRef("enb"))
                 run {
-                    cyclix_gen.begif(load_signext)
+
+                    init_single_entry_locals(single_entry.iter_num)
+
+                    cyclix_gen.begif(mem_rd_inprogress)
                     run {
-                        mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[7, 0], 32))
-                    }; cyclix_gen.endif()
-                    cyclix_gen.begelse()
-                    run {
-                        mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[7, 0], 32))
-                    }; cyclix_gen.endif()
-                }; cyclix_gen.endif()
-
-                cyclix_gen.begif(cyclix_gen.eq2(mem_be, 0x3))
-                run {
-                    cyclix_gen.begif(load_signext)
-                    run {
-                        mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[15, 0], 32))
-                    }; cyclix_gen.endif()
-                    cyclix_gen.begelse()
-                    run {
-                        mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[15, 0], 32))
-                    }; cyclix_gen.endif()
-                }; cyclix_gen.endif()
-
-                var exu_cdb_inst_enb    = commit_cdb_buf.GetFracRef("enb")
-                var exu_cdb_inst_data   = commit_cdb_buf.GetFracRef("data")
-                var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
-                var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
-                cyclix_gen.assign(exu_cdb_inst_enb, 1)
-                cyclix_gen.assign(exu_cdb_inst_tag, rd_tag)
-                cyclix_gen.assign(exu_cdb_inst_wdata, mem_data_rdata)
-
-                cyclix_gen.assign(rd_wdata, mem_data_rdata)
-                cyclix_gen.assign(mem_rd_inprogress, 0)
-                cyclix_gen.assign(pop, 1)
-
-            }; cyclix_gen.endif()
-        }; cyclix_gen.endif()
-
-        cyclix_gen.begelse()
-        run {
-
-            cyclix_gen.begif(MIRQEN)             // checking for interrupts
-            run {
-                cyclix_gen.assign(irq_recv, cyclix_gen.fifo_rd_unblk(irq_fifo, irq_mcause))
-                cyclix_gen.begif(irq_recv)
-                run {
-                    MIRQEN.assign(0)
-                    CSR_MCAUSE.assign(irq_mcause)
-                    MRETADDR.assign(expected_instraddr)
-                    cyclix_gen.assign(backoff_cmd, 1)
-                    cyclix_gen.assign(expected_instraddr, hw_imm(IRQ_ADDR))
-                }; cyclix_gen.endif()
-            }; cyclix_gen.endif()
-
-            cyclix_gen.begif(!irq_recv)
-            run {
-                cyclix_gen.begif(ctrl_active)
-                run {
-                    cyclix_gen.begif(rdy)
-                    run {
-
-                        cyclix_gen.begif(cyclix_gen.eq2(expected_instraddr, curinstr_addr))      // instruction flow fine
+                        cyclix_gen.assign(commit_active, cyclix_gen.fifo_rd_unblk(data_resp_fifo, mem_data_rdata))
+                        cyclix_gen.begif(commit_active)
                         run {
-                            cyclix_gen.assign(pop, 1)
 
-                            cyclix_gen.begif(mem_req)
+                            cyclix_gen.begif(cyclix_gen.eq2(mem_be, 0x1))
                             run {
-
-                                cyclix_gen.assign(mem_addr, alu_result)
-
-                                cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
-                                cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
-                                cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
-                                cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
-                                cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata)
-
-                                cyclix_gen.begif(!mem_cmd)
+                                cyclix_gen.begif(load_signext)
                                 run {
-                                    cyclix_gen.assign(mem_rd_inprogress, 1)
-                                    cyclix_gen.assign(pop, 0)
+                                    mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[7, 0], 32))
+                                }; cyclix_gen.endif()
+                                cyclix_gen.begelse()
+                                run {
+                                    mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[7, 0], 32))
                                 }; cyclix_gen.endif()
                             }; cyclix_gen.endif()
 
-                            cyclix_gen.begif(mret_req)
+                            cyclix_gen.begif(cyclix_gen.eq2(mem_be, 0x3))
                             run {
-                                MIRQEN.assign(1)
+                                cyclix_gen.begif(load_signext)
+                                run {
+                                    mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[15, 0], 32))
+                                }; cyclix_gen.endif()
+                                cyclix_gen.begelse()
+                                run {
+                                    mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[15, 0], 32))
+                                }; cyclix_gen.endif()
                             }; cyclix_gen.endif()
 
-                        }; cyclix_gen.endif()
+                            var exu_cdb_inst_enb    = commit_cdb_buf.GetFracRef("enb")
+                            var exu_cdb_inst_data   = commit_cdb_buf.GetFracRef("data")
+                            var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
+                            var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
+                            cyclix_gen.assign(exu_cdb_inst_enb, 1)
+                            cyclix_gen.assign(exu_cdb_inst_tag, rd_tag)
+                            cyclix_gen.assign(exu_cdb_inst_wdata, mem_data_rdata)
 
-                        cyclix_gen.begelse()                                                        // unpredicted branch
+                            cyclix_gen.assign(rd_wdata, mem_data_rdata)
+                            cyclix_gen.assign(mem_rd_inprogress, 0)
+
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endif()                   // mem_rd_inprogress
+
+                    cyclix_gen.begelse()
+                    run {
+
+                        cyclix_gen.begif(MIRQEN)             // checking for interrupts
                         run {
-                            cyclix_gen.assign(backoff_cmd, 1)
+                            cyclix_gen.assign(irq_recv, cyclix_gen.fifo_rd_unblk(irq_fifo, irq_mcause))
+                            cyclix_gen.begif(irq_recv)
+                            run {
+                                MIRQEN.assign(0)
+                                CSR_MCAUSE.assign(irq_mcause)
+                                MRETADDR.assign(expected_instraddr)
+                                cyclix_gen.assign(backoff_cmd, 1)
+                                cyclix_gen.assign(expected_instraddr, hw_imm(IRQ_ADDR))
+                            }; cyclix_gen.endif()
                         }; cyclix_gen.endif()
 
-                    }; cyclix_gen.endif()
-                }; cyclix_gen.endif()
-            }; cyclix_gen.endif()
+                        cyclix_gen.begif(!irq_recv)
+                        run {
+                            cyclix_gen.assign(commit_active, cyclix_gen.band(ctrl_active, rdy))
+                            cyclix_gen.begif(commit_active)
+                            run {
 
-        }; cyclix_gen.endif()
+                                cyclix_gen.assign(commit_active, cyclix_gen.eq2(expected_instraddr, curinstr_addr))
+                                cyclix_gen.begif(commit_active)      // instruction flow fine
+                                run {
+
+                                    cyclix_gen.begif(mem_req)
+                                    run {
+
+                                        cyclix_gen.assign(mem_addr, alu_result)
+
+                                        cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
+                                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
+                                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
+                                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
+                                        cyclix_gen.assign(commit_active, cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata))
+
+                                        cyclix_gen.begif(cyclix_gen.band(commit_active, !mem_cmd))
+                                        run {
+                                            cyclix_gen.assign(mem_rd_inprogress, 1)
+                                            cyclix_gen.assign(commit_active, 0)
+                                        }; cyclix_gen.endif()
+                                    }; cyclix_gen.endif()
+
+                                    cyclix_gen.begif(mret_req)
+                                    run {
+                                        MIRQEN.assign(1)
+                                    }; cyclix_gen.endif()
+
+                                }; cyclix_gen.endif()
+
+                                cyclix_gen.begelse()                          // mispredicted branch
+                                run {
+                                    cyclix_gen.assign(backoff_cmd, 1)
+                                }; cyclix_gen.endif()
+
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endif()
+
+                    }; cyclix_gen.endif()           // !mem_rd_inprogress
+
+                    cyclix_gen.begif(commit_active)
+                    run {
+
+                        cyclix_gen.COMMENT("committing RF...")
+
+                        // rd wdata processing
+                        cyclix_gen.begcase(rd_source)
+                        run {
+                            cyclix_gen.begbranch(RD_LUI)
+                            run {
+                                rd_wdata.assign(immediate)
+                                rd_rdy.assign(1)
+                            }; cyclix_gen.endbranch()
+
+                            cyclix_gen.begbranch(RD_ALU)
+                            run {
+                                rd_wdata.assign(alu_result)
+                                rd_rdy.assign(1)
+                            }; cyclix_gen.endbranch()
+
+                            cyclix_gen.begbranch(RD_CF_COND)
+                            run {
+                                rd_wdata.assign(alu_CF)
+                                rd_rdy.assign(1)
+                            }; cyclix_gen.endbranch()
+
+                            cyclix_gen.begbranch(RD_OF_COND)
+                            run {
+                                rd_wdata.assign(alu_OF)
+                                rd_rdy.assign(1)
+                            }; cyclix_gen.endbranch()
+
+                            cyclix_gen.begbranch(RD_PC_INC)
+                            run {
+                                rd_wdata.assign(nextinstr_addr)
+                                rd_rdy.assign(1)
+                            }; cyclix_gen.endbranch()
+
+                            cyclix_gen.begbranch(RD_CSR)
+                            run {
+                                rd_wdata.assign(csr_rdata)
+                                rd_rdy.assign(1)
+                            }; cyclix_gen.endbranch()
+
+                        }; cyclix_gen.endcase()
+
+                        cyclix_gen.begif(rd_tag_prev_clr)
+                        run {
+                            global_structures.FreePRF(rd_tag_prev)
+                            cyclix_gen.begif(rd_req)
+                            run {
+                                cyclix_gen.assign(Backoff_ARF.GetFracRef(rd_addr), rd_wdata)
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endif()
+                        cyclix_gen.COMMENT("committing RF: done")
+
+                        cyclix_gen.COMMENT("control transfer...")
+
+                        cyclix_gen.assign(expected_instraddr, nextinstr_addr)
+
+                        cyclix_gen.begcase(jump_src)
+                        run {
+                            cyclix_gen.begbranch(JMP_SRC_IMM)
+                            run {
+                                jump_vector.assign(immediate)
+                            }; cyclix_gen.endbranch()
+
+                            cyclix_gen.begbranch(JMP_SRC_ALU)
+                            run {
+                                jump_vector.assign(alu_result)
+                            }; cyclix_gen.endbranch()
+
+                        }; cyclix_gen.endcase()
+
+                        cyclix_gen.begif(jump_req_cond)
+                        run {
+
+                            cyclix_gen.begcase(funct3)
+                            run {
+                                // BEQ
+                                cyclix_gen.begbranch(0x0)
+                                run {
+                                    cyclix_gen.begif(alu_ZF)
+                                    run {
+                                        jump_req.assign(1)
+                                        jump_vector.assign(curinstraddr_imm)
+                                    }; cyclix_gen.endif()
+                                }; cyclix_gen.endbranch()
+
+                                // BNE
+                                cyclix_gen.begbranch(0x1)
+                                run {
+                                    cyclix_gen.begif(!alu_ZF)
+                                    run {
+                                        jump_req.assign(1)
+                                        jump_vector.assign(curinstraddr_imm)
+                                    }; cyclix_gen.endif()
+                                }; cyclix_gen.endbranch()
+
+                                // BLT
+                                cyclix_gen.begbranch(0x4)
+                                run {
+                                    cyclix_gen.begif(alu_CF)
+                                    run {
+                                        jump_req.assign(1)
+                                        jump_vector.assign(curinstraddr_imm)
+                                    }; cyclix_gen.endif()
+                                }; cyclix_gen.endbranch()
+
+                                // BGE
+                                cyclix_gen.begbranch(0x5)
+                                run {
+                                    cyclix_gen.begif(!alu_CF)
+                                    run {
+                                        jump_req.assign(1)
+                                        jump_vector.assign(curinstraddr_imm)
+                                    }; cyclix_gen.endif()
+                                }; cyclix_gen.endbranch()
+
+                                // BLTU
+                                cyclix_gen.begbranch(0x6)
+                                run {
+                                    cyclix_gen.begif(alu_CF)
+                                    run {
+                                        jump_req.assign(1)
+                                        jump_vector.assign(curinstraddr_imm)
+                                    }; cyclix_gen.endif()
+                                }; cyclix_gen.endbranch()
+
+                                // BGEU
+                                cyclix_gen.begbranch(0x7)
+                                run {
+                                    cyclix_gen.begif(!alu_CF)
+                                    run {
+                                        jump_req.assign(1)
+                                        jump_vector.assign(curinstraddr_imm)
+                                    }; cyclix_gen.endif()
+                                }; cyclix_gen.endbranch()
+
+                            }; cyclix_gen.endcase()
+
+                        }; cyclix_gen.endif()
+
+                        cyclix_gen.begif(jump_req)
+                        run {
+                            cyclix_gen.assign(expected_instraddr, jump_vector)
+                        }; cyclix_gen.endif()
+
+                        cyclix_gen.COMMENT("control transfer: done")
+
+                    }; cyclix_gen.endif()       // commit_active
+
+                }; cyclix_gen.endif()           // enb
+            }; cyclix_gen.endif()           // commit_active
+
+            cyclix_gen.begif(commit_active)     // instruction finished
+            run {
+                cyclix_gen.assign(entry_mask.GetFracRef(single_entry.iter_num), 0)
+            }; cyclix_gen.endif()
+        }; cyclix_gen.endloop()
 
         cyclix_gen.begif(backoff_cmd)
         run {
@@ -308,162 +480,14 @@ class rob_risc(name: String,
             global_structures.RollBack(Backoff_ARF)
         }; cyclix_gen.endif()
 
-        // uop completed successfully, popping
-        cyclix_gen.COMMENT("uop completion...")
-        cyclix_gen.begif(pop)
+        cyclix_gen.COMMENT("Vectored ROB entry completion...")
+        cyclix_gen.begif(commit_active)
         run {
-
-            cyclix_gen.COMMENT("committing RF...")
-
-            // rd wdata processing
-            cyclix_gen.begcase(rd_source)
-            run {
-                cyclix_gen.begbranch(RD_LUI)
-                run {
-                    rd_wdata.assign(immediate)
-                    rd_rdy.assign(1)
-                }; cyclix_gen.endbranch()
-
-                cyclix_gen.begbranch(RD_ALU)
-                run {
-                    rd_wdata.assign(alu_result)
-                    rd_rdy.assign(1)
-                }; cyclix_gen.endbranch()
-
-                cyclix_gen.begbranch(RD_CF_COND)
-                run {
-                    rd_wdata.assign(alu_CF)
-                    rd_rdy.assign(1)
-                }; cyclix_gen.endbranch()
-
-                cyclix_gen.begbranch(RD_OF_COND)
-                run {
-                    rd_wdata.assign(alu_OF)
-                    rd_rdy.assign(1)
-                }; cyclix_gen.endbranch()
-
-                cyclix_gen.begbranch(RD_PC_INC)
-                run {
-                    rd_wdata.assign(nextinstr_addr)
-                    rd_rdy.assign(1)
-                }; cyclix_gen.endbranch()
-
-                cyclix_gen.begbranch(RD_CSR)
-                run {
-                    rd_wdata.assign(csr_rdata)
-                    rd_rdy.assign(1)
-                }; cyclix_gen.endbranch()
-
-            }; cyclix_gen.endcase()
-
-            cyclix_gen.begif(rd_tag_prev_clr)
-            run {
-                global_structures.FreePRF(rd_tag_prev)
-                cyclix_gen.begif(rd_req)
-                run {
-                    cyclix_gen.assign(Backoff_ARF.GetFracRef(rd_addr), rd_wdata)
-                }; cyclix_gen.endif()
-            }; cyclix_gen.endif()
-            cyclix_gen.COMMENT("committing RF: done")
-
-            cyclix_gen.COMMENT("control transfer...")
-
-            cyclix_gen.assign(expected_instraddr, nextinstr_addr)
-
-            cyclix_gen.begcase(jump_src)
-            run {
-                cyclix_gen.begbranch(JMP_SRC_IMM)
-                run {
-                    jump_vector.assign(immediate)
-                }; cyclix_gen.endbranch()
-
-                cyclix_gen.begbranch(JMP_SRC_ALU)
-                run {
-                    jump_vector.assign(alu_result)
-                }; cyclix_gen.endbranch()
-
-            }; cyclix_gen.endcase()
-
-            cyclix_gen.begif(jump_req_cond)
-            run {
-
-                cyclix_gen.begcase(funct3)
-                run {
-                    // BEQ
-                    cyclix_gen.begbranch(0x0)
-                    run {
-                        cyclix_gen.begif(alu_ZF)
-                        run {
-                            jump_req.assign(1)
-                            jump_vector.assign(curinstraddr_imm)
-                        }; cyclix_gen.endif()
-                    }; cyclix_gen.endbranch()
-
-                    // BNE
-                    cyclix_gen.begbranch(0x1)
-                    run {
-                        cyclix_gen.begif(!alu_ZF)
-                        run {
-                            jump_req.assign(1)
-                            jump_vector.assign(curinstraddr_imm)
-                        }; cyclix_gen.endif()
-                    }; cyclix_gen.endbranch()
-
-                    // BLT
-                    cyclix_gen.begbranch(0x4)
-                    run {
-                        cyclix_gen.begif(alu_CF)
-                        run {
-                            jump_req.assign(1)
-                            jump_vector.assign(curinstraddr_imm)
-                        }; cyclix_gen.endif()
-                    }; cyclix_gen.endbranch()
-
-                    // BGE
-                    cyclix_gen.begbranch(0x5)
-                    run {
-                        cyclix_gen.begif(!alu_CF)
-                        run {
-                            jump_req.assign(1)
-                            jump_vector.assign(curinstraddr_imm)
-                        }; cyclix_gen.endif()
-                    }; cyclix_gen.endbranch()
-
-                    // BLTU
-                    cyclix_gen.begbranch(0x6)
-                    run {
-                        cyclix_gen.begif(alu_CF)
-                        run {
-                            jump_req.assign(1)
-                            jump_vector.assign(curinstraddr_imm)
-                        }; cyclix_gen.endif()
-                    }; cyclix_gen.endbranch()
-
-                    // BGEU
-                    cyclix_gen.begbranch(0x7)
-                    run {
-                        cyclix_gen.begif(!alu_CF)
-                        run {
-                            jump_req.assign(1)
-                            jump_vector.assign(curinstraddr_imm)
-                        }; cyclix_gen.endif()
-                    }; cyclix_gen.endbranch()
-
-                }; cyclix_gen.endcase()
-
-            }; cyclix_gen.endif()
-
-            cyclix_gen.begif(jump_req)
-            run {
-                cyclix_gen.assign(expected_instraddr, jump_vector)
-            }; cyclix_gen.endif()
-
-            cyclix_gen.COMMENT("control transfer: done")
-
+            cyclix_gen.assign(pop, 1)
             pop_trx()
-
+            cyclix_gen.assign(entry_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
         }; cyclix_gen.endif()
-        cyclix_gen.COMMENT("uop completion: done")
+        cyclix_gen.COMMENT("Vectored ROB entry completion: done")
 
         finalize_ctrls()
     }

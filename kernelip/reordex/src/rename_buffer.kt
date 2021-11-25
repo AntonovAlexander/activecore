@@ -28,8 +28,10 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
 
         cyclix_gen.MSG_COMMENT("sending new operations to IQs...")
 
-        var rob_push_trx = rob.GetPushTrx().GetFracRef(0)           // TODO :fix
+        var rob_push_trx_total = rob.GetPushTrx()
+        var rob_push_trx = rob_push_trx_total.GetFracRef(0)                                     // TODO :fix
         cyclix_gen.assign_subStructs(rob_push_trx, TRX_BUF_head_ref)
+        cyclix_gen.assign(rob_push_trx_total.GetFracRef(1).GetFracRef("enb"), 0)    // TODO :fix
         cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
 
         cyclix_gen.begif(rob.ctrl_rdy)
@@ -114,7 +116,7 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
                 cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
                 cyclix_gen.assign(rob_push_trx.GetFracRef("rdy"), 0)
                 cyclix_gen.assign(rob.TRX_ID_COUNTER, cyclix_gen.add(rob.TRX_ID_COUNTER, 1))
-                rob.push_trx(rob_push_trx)
+                rob.push_trx(rob_push_trx_total)
             }; cyclix_gen.endif()
             pop_trx()
         }; cyclix_gen.endif()

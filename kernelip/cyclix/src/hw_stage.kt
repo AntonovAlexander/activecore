@@ -231,7 +231,6 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         if (TRX_BUF_SIZE != 1) {
             fracs = hw_fracs(TRX_BUF_COUNTER)
         }
-        if (TRX_BUF_MULTIDIM != 0) fracs.add(0)                     // TODO: fix
         cyclix_gen.assign(TRX_BUF.GetFracRef(fracs), pushed_var)
         inc_trx_counter()
     }
@@ -310,13 +309,20 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
         if (TRX_BUF_MULTIDIM == 0) {
             cyclix_gen.assign_subStructsWithDefaultsIfAbsent(TRX_LOCAL, TRX_BUF_head_ref)
         } else {
-            for (PARALLEL_INDEX in 0 until TRX_BUF_head_ref.GetWidth()) {
+            for (PARALLEL_INDEX in 0 until TRX_BUF_MULTIDIM) {
                 cyclix_gen.assign_subStructsWithDefaultsIfAbsent(TRX_LOCAL_PARALLEL.GetFracRef(PARALLEL_INDEX), TRX_BUF_head_ref.GetFracRef(PARALLEL_INDEX))
             }
         }
     }
 
     fun init_single_entry_locals(INDEX_IN_TRX_PARALLEL : Int) {
+        if (TRX_BUF_MULTIDIM != 0) {
+            cyclix_gen.assign(TRX_LOCAL, TRX_LOCAL_PARALLEL.GetFracRef(INDEX_IN_TRX_PARALLEL))
+        }
+        else ERROR("Attempting to init_single_entry_locals for scalar hw_stage")
+    }
+
+    fun init_single_entry_locals(INDEX_IN_TRX_PARALLEL : hw_param) {
         if (TRX_BUF_MULTIDIM != 0) {
             cyclix_gen.assign(TRX_LOCAL, TRX_LOCAL_PARALLEL.GetFracRef(INDEX_IN_TRX_PARALLEL))
         }
