@@ -115,9 +115,9 @@ open class hw_astc() : ArrayList<hw_exec>() {
         last().cursor++
     }
 
-    protected fun AddExpr_op_gen(opcode: hw_opcode, tgt: hw_var, srcs: ArrayList<hw_param>) {
+    protected fun AddExpr_op_gen(opcode: hw_opcode, dst: hw_var, srcs: ArrayList<hw_param>) {
         var new_expr = hw_exec(opcode)
-        new_expr.AddTgt(tgt)
+        new_expr.AddDst(dst)
         for (new_src in srcs) {
             new_expr.AddParam(new_src)
         }
@@ -126,7 +126,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     protected fun AddExpr_op_gen_withgen(opcode: hw_opcode, target: hw_var, params: ArrayList<hw_param>) {
         var new_expr = hw_exec(opcode)
-        new_expr.AddTgt(target)
+        new_expr.AddDst(target)
         //MSG("opcode: " + opcode.default_string)
         //MSG("params: " + params.size)
         for (new_param in params) {
@@ -137,32 +137,32 @@ open class hw_astc() : ArrayList<hw_exec>() {
         AddExpr(new_expr)
     }
 
-    protected fun AddExpr_op1_gen(opcode: hw_opcode, tgt: hw_var, src: hw_param) {
+    protected fun AddExpr_op1_gen(opcode: hw_opcode, dst: hw_var, src: hw_param) {
         var srcs = ArrayList<hw_param>()
         srcs.add(src)
-        AddExpr_op_gen(opcode, tgt, srcs)
+        AddExpr_op_gen(opcode, dst, srcs)
     }
 
-    protected fun AddExpr_op2_gen(opcode: hw_opcode, tgt: hw_var, src0: hw_param, src1: hw_param) {
+    protected fun AddExpr_op2_gen(opcode: hw_opcode, dst: hw_var, src0: hw_param, src1: hw_param) {
         var srcs = ArrayList<hw_param>()
         srcs.add(src0)
         srcs.add(src1)
-        AddExpr_op_gen(opcode, tgt, srcs)
+        AddExpr_op_gen(opcode, dst, srcs)
     }
 
-    protected fun AddExpr_op2_gen(opcode: hw_opcode, tgt: hw_var, src0: hw_param, src1: Int) {
+    protected fun AddExpr_op2_gen(opcode: hw_opcode, dst: hw_var, src0: hw_param, src1: Int) {
         var srcs = ArrayList<hw_param>()
         srcs.add(src0)
         srcs.add(hw_imm(src1))
-        AddExpr_op_gen(opcode, tgt, srcs)
+        AddExpr_op_gen(opcode, dst, srcs)
     }
 
-    protected fun AddExpr_op3_gen(opcode: hw_opcode, tgt: hw_var, src0: hw_param, src1: hw_param, src2: hw_param) {
+    protected fun AddExpr_op3_gen(opcode: hw_opcode, dst: hw_var, src0: hw_param, src1: hw_param, src2: hw_param) {
         var srcs = ArrayList<hw_param>()
         srcs.add(src0)
         srcs.add(src1)
         srcs.add(src2)
-        AddExpr_op_gen(opcode, tgt, srcs)
+        AddExpr_op_gen(opcode, dst, srcs)
     }
 
     protected fun op2_gen_dimensions(opcode: hw_opcode, dim0: hw_dim_static, dim1: hw_dim_static): hw_dim_static {
@@ -427,65 +427,65 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op(opcode, srcs)
     }
 
-    private fun assign_gen(tgt: hw_var, src: hw_param) {
+    private fun assign_gen(dst: hw_var, src: hw_param) {
         var new_expr = hw_exec(OP1_ASSIGN)
         new_expr.AddParam(src)
-        new_expr.AddTgt(tgt)
+        new_expr.AddDst(dst)
         AddExpr(new_expr)
     }
 
-    fun assign(tgt: hw_var, src: hw_param) {
+    fun assign(dst: hw_var, src: hw_param) {
         //if (src is hw_var)
-        //    MSG("ASSIGNMENT! tgt: " + tgt.name + " (struct: " + tgt.vartype.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
+        //    MSG("ASSIGNMENT! dst: " + dst.name + " (struct: " + dst.vartype.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
 
-        var tgt_Power = tgt.GetDimensions().size
-        if (tgt_Power < 1) tgt_Power = 1                    // for 1-bit signals
+        var dst_Power = dst.GetDimensions().size
+        if (dst_Power < 1) dst_Power = 1                    // for 1-bit signals
 
         var src_Power = src.GetDimensions().size
         if (src_Power < 1) src_Power = 1                    // for 1-bit signals
 
         if (src is hw_var) {
-            if (tgt_Power != src_Power) ERROR("dimensions do not match for target " + tgt.name + " (tgt power: " + tgt_Power + "), src: " + src.GetString() + " (src power: " + src_Power + ")")
-            else if (tgt_Power == 1) {
+            if (dst_Power != src_Power) ERROR("dimensions do not match for target " + dst.name + " (dst power: " + dst_Power + "), src: " + src.GetString() + " (src power: " + src_Power + ")")
+            else if (dst_Power == 1) {
 
-                if (((src as hw_var).vartype.DataType == DATA_TYPE.STRUCTURED) && (tgt.vartype.DataType != DATA_TYPE.STRUCTURED)) {
-                    tgt.vartype.Print()
+                if (((src as hw_var).vartype.DataType == DATA_TYPE.STRUCTURED) && (dst.vartype.DataType != DATA_TYPE.STRUCTURED)) {
+                    dst.vartype.Print()
                     src.vartype.Print()
-                    ERROR("assignment to non-structured variable (" + tgt.name + ") of structured variable (" + src.name + ")")
-                } else if ((src.vartype.DataType != DATA_TYPE.STRUCTURED) && (tgt.vartype.DataType == DATA_TYPE.STRUCTURED)) {
-                    tgt.vartype.Print()
+                    ERROR("assignment to non-structured variable (" + dst.name + ") of structured variable (" + src.name + ")")
+                } else if ((src.vartype.DataType != DATA_TYPE.STRUCTURED) && (dst.vartype.DataType == DATA_TYPE.STRUCTURED)) {
+                    dst.vartype.Print()
                     src.vartype.Print()
-                    ERROR("assignment to structured variable (" + tgt.name + ") of non-structured variable (" + src.name + ")")
+                    ERROR("assignment to structured variable (" + dst.name + ") of non-structured variable (" + src.name + ")")
                 } else if (src.vartype.DataType == DATA_TYPE.STRUCTURED) {
                     // assignment of 1-bit structs
-                    if (src.vartype.src_struct != tgt.vartype.src_struct) {
+                    if (src.vartype.src_struct != dst.vartype.src_struct) {
                         // assignment of inequally structured variables
-                        MSG("Structure of tgt: " + tgt.name + ", struct name: " + tgt.vartype.src_struct.name)
-                        for (structvar in tgt.vartype.src_struct) {
+                        MSG("Structure of dst: " + dst.name + ", struct name: " + dst.vartype.src_struct.name)
+                        for (structvar in dst.vartype.src_struct) {
                             MSG("-- " + structvar.name)
                         }
-                        MSG("Structure of src: " + tgt.name + ", struct name: " + src.vartype.src_struct.name)
+                        MSG("Structure of src: " + dst.name + ", struct name: " + src.vartype.src_struct.name)
                         for (structvar in src.vartype.src_struct) {
                             MSG("-- " + structvar.name)
                         }
-                        ERROR("assignment of inequally structured variables! tgt: " + tgt.name + " (struct: " + tgt.vartype.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
+                        ERROR("assignment of inequally structured variables! dst: " + dst.name + " (struct: " + dst.vartype.src_struct.name + "), src: " + src.GetString() + "(struct: " + src.vartype.src_struct.name + ")")
                     }
                 }
-                assign_gen(tgt, src)
+                assign_gen(dst, src)
 
             } else {
-                for (i in 0 until tgt.vartype.dimensions.last().GetWidth()) {
-                    var src_ref = src.GetFracRef(hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
-                    var tgt_ref = tgt.GetFracRef(hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
-                    assign(tgt_ref, src_ref)
+                for (i in 0 until dst.vartype.dimensions.last().GetWidth()) {
+                    var src_ref = src.GetFracRef(hw_frac_C(i + dst.vartype.dimensions.last().lsb))
+                    var dst_ref = dst.GetFracRef(hw_frac_C(i + dst.vartype.dimensions.last().lsb))
+                    assign(dst_ref, src_ref)
                 }
             }
         } else if (src is hw_imm) {
-            if (tgt_Power == 1) assign_gen(tgt, src)
+            if (dst_Power == 1) assign_gen(dst, src)
             else {
-                for (i in 0 until tgt.vartype.dimensions.get(tgt_Power - 1).GetWidth()) {
-                    var tgt_ref = tgt.GetFracRef(hw_frac_C(i + tgt.vartype.dimensions.last().lsb))
-                    assign(tgt_ref, src)
+                for (i in 0 until dst.vartype.dimensions.get(dst_Power - 1).GetWidth()) {
+                    var dst_ref = dst.GetFracRef(hw_frac_C(i + dst.vartype.dimensions.last().lsb))
+                    assign(dst_ref, src)
                 }
             }
         }
@@ -502,24 +502,24 @@ open class hw_astc() : ArrayList<hw_exec>() {
         COMMENT(new_comment)
     }
 
-    fun assign(tgt: hw_var, src: Int) {
-        assign(tgt, hw_imm(src))
+    fun assign(dst: hw_var, src: Int) {
+        assign(dst, hw_imm(src))
     }
 
     private fun CheckIfBothStructured(var1 : hw_var, var2 : hw_var) {
         if ((var1.vartype.DataType != DATA_TYPE.STRUCTURED) || (var2.vartype.DataType != DATA_TYPE.STRUCTURED)) {
-            if (var1.vartype.DataType != DATA_TYPE.STRUCTURED) MSG_COMMENT("tgt: " + var1.name + ": not structured!")
+            if (var1.vartype.DataType != DATA_TYPE.STRUCTURED) MSG_COMMENT("dst: " + var1.name + ": not structured!")
             if (var2.vartype.DataType != DATA_TYPE.STRUCTURED) MSG_COMMENT("src: " + var2.name + ": not structured!")
             ERROR("Attempting to assign_subStructs non structured variables")
         }
     }
 
-    fun assign_subStructs(tgt: hw_var, src: hw_var) {
-        CheckIfBothStructured(tgt, src)
-        for (tgt_substruct in tgt.vartype.src_struct) {
+    fun assign_subStructs(dst: hw_var, src: hw_var) {
+        CheckIfBothStructured(dst, src)
+        for (dst_substruct in dst.vartype.src_struct) {
             for (src_substruct in src.vartype.src_struct) {
-                if (tgt_substruct.name == src_substruct.name)
-                    assign(tgt.GetFracRef(tgt_substruct.name), src.GetFracRef(src_substruct.name))
+                if (dst_substruct.name == src_substruct.name)
+                    assign(dst.GetFracRef(dst_substruct.name), src.GetFracRef(src_substruct.name))
             }
         }
     }
@@ -823,11 +823,11 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op3(OP3_RANGED, src, hw_imm(msb), hw_imm(lsb))
     }
 
-    fun subStruct_withgen(tgt: hw_var, src: hw_var, subStruct_name: String) {
+    fun subStruct_withgen(dst: hw_var, src: hw_var, subStruct_name: String) {
         var new_expr = hw_exec(OP2_SUBSTRUCT)
-        new_expr.AddTgt(tgt)
+        new_expr.AddDst(dst)
         new_expr.AddParam(src)
-        new_expr.AddGenVar(tgt)
+        new_expr.AddGenVar(dst)
         new_expr.subStructvar_name = subStruct_name
         AddExpr(new_expr)
     }
@@ -854,17 +854,17 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return hw_type(src.vartype.DataType, src.vartype.src_struct, src.vartype.dimensions)
     }
 
-    fun subStruct_gen(tgt: hw_var, src : hw_param, subStruct_name : String) {
+    fun subStruct_gen(dst: hw_var, src : hw_param, subStruct_name : String) {
         var new_expr = hw_exec(OP2_SUBSTRUCT)
-        new_expr.AddTgt(tgt)
+        new_expr.AddDst(dst)
         new_expr.AddParam(src)
         new_expr.subStructvar_name = subStruct_name
         AddExpr(new_expr)
     }
 
     fun subStruct(src : hw_var, subStruct_name : String) : hw_var {
-        var tgt_vartype = get_subStruct_type(src, subStruct_name)
-        var genvar = hw_var(GetGenName("var"), tgt_vartype, "0")
+        var dst_vartype = get_subStruct_type(src, subStruct_name)
+        var genvar = hw_var(GetGenName("var"), dst_vartype, "0")
         subStruct_withgen(genvar, src, subStruct_name)
         return genvar
     }
@@ -892,17 +892,17 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     ///////////////////////////////////
 
-    fun complement_gen(tgt : hw_var, src : hw_param) {
-        AddExpr_op1_gen(OP1_COMPLEMENT, tgt, src)
+    fun complement_gen(dst : hw_var, src : hw_param) {
+        AddExpr_op1_gen(OP1_COMPLEMENT, dst, src)
     }
 
     // implements adder tree
-    fun op_tree_gen(opcode : hw_opcode, tgt : hw_var, srcs : ArrayList<hw_param>) {
+    fun op_tree_gen(opcode : hw_opcode, dst : hw_var, srcs : ArrayList<hw_param>) {
         if (srcs.size == 0) return
         else if (srcs.size == 1) {
-            assign_gen(tgt, srcs[0])
+            assign_gen(dst, srcs[0])
         } else if (srcs.size == 2) {
-            AddExpr_op2_gen(opcode, tgt, srcs[0], srcs[1])
+            AddExpr_op2_gen(opcode, dst, srcs[0], srcs[1])
         } else {
             var sum_inters = ArrayList<hw_param>()
             for (src in srcs) {
@@ -918,333 +918,333 @@ open class hw_astc() : ArrayList<hw_exec>() {
                     }
                 }
             }
-            op_tree_gen(opcode, tgt, sum_inters)
+            op_tree_gen(opcode, dst, sum_inters)
         }
     }
 
-    fun add_gen(tgt : hw_var, srcs : ArrayList<hw_param>) {
-        op_tree_gen(OP2_ARITH_ADD, tgt, srcs)
+    fun add_gen(dst : hw_var, srcs : ArrayList<hw_param>) {
+        op_tree_gen(OP2_ARITH_ADD, dst, srcs)
     }
 
-    fun add_gen(tgt : hw_var, vararg srcs : hw_param) {
+    fun add_gen(dst : hw_var, vararg srcs : hw_param) {
         var srcsList = ArrayList<hw_param>()
         for (src in srcs) srcsList.add(src)
-        add_gen(tgt, srcsList)
+        add_gen(dst, srcsList)
     }
 
-    fun add_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_ARITH_ADD, tgt, src0, src1)
+    fun add_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_ARITH_ADD, dst, src0, src1)
     }
 
-    fun sub_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_ARITH_SUB, tgt, src0, src1)
+    fun sub_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_ARITH_SUB, dst, src0, src1)
     }
 
-    fun sub_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_ARITH_SUB, tgt, src0, src1)
+    fun sub_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_ARITH_SUB, dst, src0, src1)
     }
 
-    fun mul_gen(tgt : hw_var, srcs : ArrayList<hw_param>) {
-        op_tree_gen(OP2_ARITH_MUL, tgt, srcs)
+    fun mul_gen(dst : hw_var, srcs : ArrayList<hw_param>) {
+        op_tree_gen(OP2_ARITH_MUL, dst, srcs)
     }
 
-    fun mul_gen(tgt : hw_var, vararg srcs : hw_param) {
+    fun mul_gen(dst : hw_var, vararg srcs : hw_param) {
         var srcsList = ArrayList<hw_param>()
         for (src in srcs) srcsList.add(src)
-        mul_gen(tgt, srcsList)
+        mul_gen(dst, srcsList)
     }
 
-    fun mul_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_ARITH_MUL, tgt, src0, src1)
+    fun mul_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_ARITH_MUL, dst, src0, src1)
     }
 
-    fun div_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_ARITH_DIV, tgt, src0, src1)
+    fun div_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_ARITH_DIV, dst, src0, src1)
     }
 
-    fun div_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_ARITH_DIV, tgt, src0, src1)
+    fun div_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_ARITH_DIV, dst, src0, src1)
     }
 
-    fun mod_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_ARITH_MOD, tgt, src0, src1)
+    fun mod_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_ARITH_MOD, dst, src0, src1)
     }
 
-    fun mod_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_ARITH_MOD, tgt, src0, src1)
+    fun mod_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_ARITH_MOD, dst, src0, src1)
     }
 
-    fun sll_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_ARITH_SLL, tgt, src0, src1)
+    fun sll_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_ARITH_SLL, dst, src0, src1)
     }
 
-    fun sll_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_ARITH_SLL, tgt, src0, src1)
+    fun sll_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_ARITH_SLL, dst, src0, src1)
     }
 
-    fun srl_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_ARITH_SRL, tgt, src0, src1)
+    fun srl_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_ARITH_SRL, dst, src0, src1)
     }
 
-    fun srl_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_ARITH_SRL, tgt, src0, src1)
+    fun srl_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_ARITH_SRL, dst, src0, src1)
     }
 
-    fun sra_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_ARITH_SRA, tgt, src0, src1)
+    fun sra_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_ARITH_SRA, dst, src0, src1)
     }
 
-    fun sra_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_ARITH_SRA, tgt, src0, src1)
+    fun sra_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_ARITH_SRA, dst, src0, src1)
     }
 
-    fun lnot_gen(tgt : hw_var, src : hw_param) {
-        AddExpr_op1_gen(OP1_LOGICAL_NOT, tgt, src)
+    fun lnot_gen(dst : hw_var, src : hw_param) {
+        AddExpr_op1_gen(OP1_LOGICAL_NOT, dst, src)
     }
 
-    fun land_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_LOGICAL_AND, tgt, src0, src1)
+    fun land_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_LOGICAL_AND, dst, src0, src1)
     }
 
-    fun land_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_LOGICAL_AND, tgt, src0, src1)
+    fun land_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_LOGICAL_AND, dst, src0, src1)
     }
 
-    fun lor_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_LOGICAL_OR, tgt, src0, src1)
+    fun lor_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_LOGICAL_OR, dst, src0, src1)
     }
 
-    fun lor_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_LOGICAL_OR, tgt, src0, src1)
+    fun lor_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_LOGICAL_OR, dst, src0, src1)
     }
 
-    fun grt_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_LOGICAL_G, tgt, src0, src1)
+    fun grt_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_LOGICAL_G, dst, src0, src1)
     }
 
-    fun grt_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_LOGICAL_G, tgt, src0, src1)
+    fun grt_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_LOGICAL_G, dst, src0, src1)
     }
 
-    fun less_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_LOGICAL_L, tgt, src0, src1)
+    fun less_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_LOGICAL_L, dst, src0, src1)
     }
 
-    fun less_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_LOGICAL_L, tgt, src0, src1)
+    fun less_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_LOGICAL_L, dst, src0, src1)
     }
 
-    fun geq_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_LOGICAL_GEQ, tgt, src0, src1)
+    fun geq_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_LOGICAL_GEQ, dst, src0, src1)
     }
 
-    fun geq_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_LOGICAL_GEQ, tgt, src0, src1)
+    fun geq_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_LOGICAL_GEQ, dst, src0, src1)
     }
 
-    fun leq_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_LOGICAL_LEQ, tgt, src0, src1)
+    fun leq_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_LOGICAL_LEQ, dst, src0, src1)
     }
 
-    fun leq_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_LOGICAL_LEQ, tgt, src0, src1)
+    fun leq_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_LOGICAL_LEQ, dst, src0, src1)
     }
 
-    fun eq2_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_LOGICAL_EQ2, tgt, src0, src1)
+    fun eq2_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_LOGICAL_EQ2, dst, src0, src1)
     }
 
-    fun eq2_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_LOGICAL_EQ2, tgt, src0, src1)
+    fun eq2_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_LOGICAL_EQ2, dst, src0, src1)
     }
 
-    fun neq2_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_LOGICAL_NEQ2, tgt, src0, src1)
+    fun neq2_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_LOGICAL_NEQ2, dst, src0, src1)
     }
 
-    fun neq2_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_LOGICAL_NEQ2, tgt, src0, src1)
+    fun neq2_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_LOGICAL_NEQ2, dst, src0, src1)
     }
 
-    fun eq4_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_LOGICAL_EQ4, tgt, src0, src1)
+    fun eq4_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_LOGICAL_EQ4, dst, src0, src1)
     }
 
-    fun eq4_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_LOGICAL_EQ4, tgt, src0, src1)
+    fun eq4_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_LOGICAL_EQ4, dst, src0, src1)
     }
 
-    fun neq4_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_LOGICAL_NEQ4, tgt, src0, src1)
+    fun neq4_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_LOGICAL_NEQ4, dst, src0, src1)
     }
 
-    fun neq4_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_LOGICAL_NEQ4, tgt, src0, src1)
+    fun neq4_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_LOGICAL_NEQ4, dst, src0, src1)
     }
 
-    fun bnot_gen(tgt : hw_var, src : hw_param){
-        AddExpr_op1_gen(OP1_BITWISE_NOT, tgt, src)
+    fun bnot_gen(dst : hw_var, src : hw_param){
+        AddExpr_op1_gen(OP1_BITWISE_NOT, dst, src)
     }
 
-    fun band_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_BITWISE_AND, tgt, src0, src1)
+    fun band_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_BITWISE_AND, dst, src0, src1)
     }
 
-    fun band_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_BITWISE_AND, tgt, src0, src1)
+    fun band_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_BITWISE_AND, dst, src0, src1)
     }
 
-    fun bor_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_BITWISE_OR, tgt, src0, src1)
+    fun bor_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_BITWISE_OR, dst, src0, src1)
     }
 
-    fun bor_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_BITWISE_OR, tgt, src0, src1)
+    fun bor_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_BITWISE_OR, dst, src0, src1)
     }
 
-    fun bxor_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_BITWISE_XOR, tgt, src0, src1)
+    fun bxor_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_BITWISE_XOR, dst, src0, src1)
     }
 
-    fun bxor_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_BITWISE_XOR, tgt, src0, src1)
+    fun bxor_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_BITWISE_XOR, dst, src0, src1)
     }
 
-    fun bxnor_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP2_BITWISE_XNOR, tgt, src0, src1)
+    fun bxnor_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP2_BITWISE_XNOR, dst, src0, src1)
     }
 
-    fun bxnor_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP2_BITWISE_XNOR, tgt, src0, src1)
+    fun bxnor_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP2_BITWISE_XNOR, dst, src0, src1)
     }
 
-    fun rand_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP1_REDUCT_AND, tgt, src0, src1)
+    fun rand_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP1_REDUCT_AND, dst, src0, src1)
     }
 
-    fun rand_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP1_REDUCT_AND, tgt, src0, src1)
+    fun rand_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP1_REDUCT_AND, dst, src0, src1)
     }
 
-    fun rnand_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP1_REDUCT_NAND, tgt, src0, src1)
+    fun rnand_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP1_REDUCT_NAND, dst, src0, src1)
     }
 
-    fun rnand_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP1_REDUCT_NAND, tgt, src0, src1)
+    fun rnand_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP1_REDUCT_NAND, dst, src0, src1)
     }
 
-    fun ror_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP1_REDUCT_OR, tgt, src0, src1)
+    fun ror_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP1_REDUCT_OR, dst, src0, src1)
     }
 
-    fun ror_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP1_REDUCT_OR, tgt, src0, src1)
+    fun ror_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP1_REDUCT_OR, dst, src0, src1)
     }
 
-    fun rnor_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP1_REDUCT_NOR, tgt, src0, src1)
+    fun rnor_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP1_REDUCT_NOR, dst, src0, src1)
     }
 
-    fun rnor_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP1_REDUCT_NOR, tgt, src0, src1)
+    fun rnor_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP1_REDUCT_NOR, dst, src0, src1)
     }
 
-    fun rxor_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP1_REDUCT_XOR, tgt, src0, src1)
+    fun rxor_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP1_REDUCT_XOR, dst, src0, src1)
     }
 
-    fun rxor_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP1_REDUCT_XOR, tgt, src0, src1)
+    fun rxor_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP1_REDUCT_XOR, dst, src0, src1)
     }
 
-    fun rxnor_gen(tgt : hw_var, src0 : hw_param, src1 : hw_param) {
-        AddExpr_op2_gen(OP1_REDUCT_XNOR, tgt, src0, src1)
+    fun rxnor_gen(dst : hw_var, src0 : hw_param, src1 : hw_param) {
+        AddExpr_op2_gen(OP1_REDUCT_XNOR, dst, src0, src1)
     }
 
-    fun rxnor_gen(tgt : hw_var, src0 : hw_param, src1 : Int) {
-        AddExpr_op2_gen(OP1_REDUCT_XNOR, tgt, src0, src1)
+    fun rxnor_gen(dst : hw_var, src0 : hw_param, src1 : Int) {
+        AddExpr_op2_gen(OP1_REDUCT_XNOR, dst, src0, src1)
     }
 
-    fun indexed_gen(tgt : hw_var, src : hw_param, index: hw_param) {
-        AddExpr_op2_gen(OP2_INDEXED, tgt, src, index)
+    fun indexed_gen(dst : hw_var, src : hw_param, index: hw_param) {
+        AddExpr_op2_gen(OP2_INDEXED, dst, src, index)
     }
 
-    fun indexed_gen(tgt : hw_var, src : hw_param, index: Int) {
-        AddExpr_op2_gen(OP2_INDEXED, tgt, src, index)
+    fun indexed_gen(dst : hw_var, src : hw_param, index: Int) {
+        AddExpr_op2_gen(OP2_INDEXED, dst, src, index)
     }
 
-    fun ranged_gen(tgt : hw_var, src : hw_param, msb: hw_param, lsb: hw_param) {
-        AddExpr_op3_gen(OP3_RANGED, tgt, src, msb, lsb)
+    fun ranged_gen(dst : hw_var, src : hw_param, msb: hw_param, lsb: hw_param) {
+        AddExpr_op3_gen(OP3_RANGED, dst, src, msb, lsb)
     }
 
-    fun ranged_gen(tgt : hw_var, src : hw_param, msb: Int, lsb: Int) {
-        AddExpr_op3_gen(OP3_RANGED, tgt, src, hw_imm(msb), hw_imm(lsb))
+    fun ranged_gen(dst : hw_var, src : hw_param, msb: Int, lsb: Int) {
+        AddExpr_op3_gen(OP3_RANGED, dst, src, hw_imm(msb), hw_imm(lsb))
     }
 
-    fun cnct_gen(tgt : hw_var, src : ArrayList<hw_param>) {
-        AddExpr_op_gen(OPS_CNCT, tgt, src)
+    fun cnct_gen(dst : hw_var, src : ArrayList<hw_param>) {
+        AddExpr_op_gen(OPS_CNCT, dst, src)
     }
 
-    fun zeroext(src : hw_param, tgt_width : Int): hw_var {
+    fun zeroext(src : hw_param, dst_width : Int): hw_var {
         if (src.vartype.dimensions.size > 1) ERROR("zeroext op dimensions error")
         val src_width = src.vartype.dimensions[0].GetWidth()
 
         var cnct_params = ArrayList<hw_param>()
-        if (tgt_width > src_width) {
-            val ext_imm = hw_imm(tgt_width - src_width, "0")
+        if (dst_width > src_width) {
+            val ext_imm = hw_imm(dst_width - src_width, "0")
             cnct_params.add(ext_imm)
             cnct_params.add(src)
             return AddExpr_op(OPS_CNCT, cnct_params)
         } else {
-            return AddExpr_op3(OP3_RANGED, src, hw_imm(tgt_width-1), hw_imm(0))
+            return AddExpr_op3(OP3_RANGED, src, hw_imm(dst_width-1), hw_imm(0))
         }
     }
 
-    fun mat_mul_gen(tgt: hw_var, src0: hw_var, src1: hw_var) {
+    fun mat_mul_gen(dst: hw_var, src0: hw_var, src1: hw_var) {
         if ((src0.vartype.dimensions.size != src1.vartype.dimensions.size) || (src0.vartype.dimensions.size != 3)) {
             ERROR("Dimensions error of matrix multiplication")
         }
-        for (tgt_row_num in 0 until tgt.vartype.dimensions[2].GetWidth()) {
-            var tgt_row = tgt.GetFracRef(tgt_row_num)
+        for (dst_row_num in 0 until dst.vartype.dimensions[2].GetWidth()) {
+            var dst_row = dst.GetFracRef(dst_row_num)
 
-            for (tgt_col_num in 0 until tgt.vartype.dimensions[1].GetWidth()) {
-                var tgt_elem = tgt_row.GetFracRef(tgt_col_num)
+            for (dst_col_num in 0 until dst.vartype.dimensions[1].GetWidth()) {
+                var dst_elem = dst_row.GetFracRef(dst_col_num)
 
                 var factors = ArrayList<hw_param>()
                 for (factor in 0 until src0.vartype.dimensions[1].GetWidth()) {
-                    var scr0_row = src0.GetFracRef(tgt_row_num)
+                    var scr0_row = src0.GetFracRef(dst_row_num)
                     var src0_elem = scr0_row.GetFracRef(factor)
 
                     var scr1_row = src1.GetFracRef(factor)
-                    var src1_elem = scr1_row.GetFracRef(tgt_col_num)
+                    var src1_elem = scr1_row.GetFracRef(dst_col_num)
 
                     factors.add(mul(src0_elem, src1_elem))
                 }
-                add_gen(tgt_elem, factors)
+                add_gen(dst_elem, factors)
             }
         }
     }
 
-    fun signext(src : hw_param, tgt_width : Int): hw_var {
+    fun signext(src : hw_param, dst_width : Int): hw_var {
         if (src.vartype.dimensions.size > 1) ERROR("signext op dimensions error")
         val src_width = src.vartype.dimensions[0].GetWidth()
 
         var cnct_params = ArrayList<hw_param>()
-        if (tgt_width > src_width) {
+        if (dst_width > src_width) {
             var src_var = src
             if (src is hw_var_frac) {           // hack against ranges sequence restriction in SV
                 src_var = genvar(GetGenName("gensignext"), src.vartype, src.defimm)
                 src_var.assign(src)
             }
             val sign_imm = indexed(src_var, src_var.vartype.dimensions[0].msb)
-            for (i in 0 until (tgt_width - src_width)) {
+            for (i in 0 until (dst_width - src_width)) {
                 cnct_params.add(sign_imm)
             }
             cnct_params.add(src)
             return AddExpr_op(OPS_CNCT, cnct_params)
         } else {
-            return AddExpr_op3(OP3_RANGED, src, hw_imm(tgt_width-1), hw_imm(0))
+            return AddExpr_op3(OP3_RANGED, src, hw_imm(dst_width-1), hw_imm(0))
         }
     }
 
@@ -1636,7 +1636,7 @@ open class hw_astc() : ArrayList<hw_exec>() {
             COMMENT(expr.comment)
 
         } else if ((expr.opcode == OP1_ASSIGN)) {
-            assign(TranslateVar(expr.tgts[0], context.var_dict), TranslateParam(expr.params[0], context.var_dict))
+            assign(TranslateVar(expr.dsts[0], context.var_dict), TranslateParam(expr.params[0], context.var_dict))
 
         } else if ((expr.opcode == OP2_ARITH_ADD)
                 || (expr.opcode == OP2_ARITH_SUB)
@@ -1680,11 +1680,11 @@ open class hw_astc() : ArrayList<hw_exec>() {
             for (param in expr.params) {
                 params.add(TranslateParam(param, context.var_dict))
             }
-            AddExpr_op_gen(expr.opcode, TranslateVar(expr.tgts[0], context.var_dict), params)
+            AddExpr_op_gen(expr.opcode, TranslateVar(expr.dsts[0], context.var_dict), params)
 
         } else if (expr.opcode == OP2_SUBSTRUCT) {
             subStruct_gen(
-                    TranslateVar(expr.tgts[0], context.var_dict),
+                    TranslateVar(expr.dsts[0], context.var_dict),
                     TranslateParam(expr.params[0], context.var_dict),
                     expr.subStructvar_name
             )
@@ -2242,7 +2242,7 @@ open class hw_astc_stdif() : hw_astc() {
         var new_expr = hw_exec_fifo_wr_unblk(fifo)
         var genvar = hw_var(GetGenName("fifo_rdy"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddParam(wdata)
-        new_expr.AddTgt(genvar)
+        new_expr.AddDst(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
@@ -2251,9 +2251,9 @@ open class hw_astc_stdif() : hw_astc() {
     fun fifo_rd_unblk(fifo : hw_fifo_in, rdata : hw_var) : hw_var {
         var new_expr = hw_exec_fifo_rd_unblk(fifo)
         var genvar = hw_var(GetGenName("fifo_rdy"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
-        new_expr.AddTgt(genvar)
+        new_expr.AddDst(genvar)
         new_expr.AddGenVar(genvar)
-        new_expr.AddTgt(rdata)
+        new_expr.AddDst(rdata)
         AddExpr(new_expr)
         return genvar
     }
@@ -2267,7 +2267,7 @@ open class hw_astc_stdif() : hw_astc() {
     fun fifo_rd_blk(fifo : hw_fifo_in) : hw_var {
         var new_expr = hw_exec_fifo_rd_blk(fifo)
         var genvar = hw_var(GetGenName("fifo_rdata"), fifo.vartype, fifo.defimm)
-        new_expr.AddTgt(genvar)
+        new_expr.AddDst(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar

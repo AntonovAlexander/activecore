@@ -185,15 +185,15 @@ class SvWriter(var mod : module) {
                 || (expr.opcode == OP1_REDUCT_XOR)
                 || (expr.opcode == OP1_REDUCT_XNOR))
         {
-            if ((expr.tgts[0].vartype.DataType == DATA_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
+            if ((expr.dsts[0].vartype.DataType == DATA_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
                 if (opstring == "") {
-                    wrFile.write(GetParamString(expr.tgts[0]) +
+                    wrFile.write(GetParamString(expr.dsts[0]) +
                             " = '{default:" +
                             GetParamString(expr.params[0]) +
                             "};\n")
                 } else ERROR("assignment error")
             } else {
-                wrFile.write(GetParamString(expr.tgts[0]) +
+                wrFile.write(GetParamString(expr.dsts[0]) +
                         " = " +
                         opstring +
                         GetParamString(expr.params[0]) +
@@ -223,7 +223,7 @@ class SvWriter(var mod : module) {
                 || (expr.opcode == OP2_BITWISE_OR)
                 || (expr.opcode == OP2_BITWISE_XOR)
                 || (expr.opcode == OP2_BITWISE_XNOR)) {
-            wrFile.write(GetParamString(expr.tgts[0]) +
+            wrFile.write(GetParamString(expr.dsts[0]) +
                     " = (" +
                     GetParamString(expr.params[0]) +
                     " " +
@@ -233,7 +233,7 @@ class SvWriter(var mod : module) {
                     ");\n")
 
         } else if (expr.opcode == OP2_INDEXED) {
-            wrFile.write(GetParamString(expr.tgts[0]) +
+            wrFile.write(GetParamString(expr.dsts[0]) +
                     " = " +
                     GetParamString(expr.params[0]) +
                     "[" +
@@ -241,7 +241,7 @@ class SvWriter(var mod : module) {
                     "];\n")
 
         } else if (expr.opcode == OP3_RANGED) {
-            wrFile.write(GetParamString(expr.tgts[0]) +
+            wrFile.write(GetParamString(expr.dsts[0]) +
                     " = " +
                     GetParamString(expr.params[0]) +
                     "[" +
@@ -251,7 +251,7 @@ class SvWriter(var mod : module) {
                     "];\n")
 
         } else if (expr.opcode == OP2_SUBSTRUCT) {
-            wrFile.write(GetParamString(expr.tgts[0]) +
+            wrFile.write(GetParamString(expr.dsts[0]) +
                     " = " +
                     GetParamString(expr.params[0]) +
                     "." +
@@ -265,7 +265,7 @@ class SvWriter(var mod : module) {
                 cnct_string += GetParamString(expr.params[i])
             }
             cnct_string += "}"
-            wrFile.write(GetParamString(expr.tgts[0]) +
+            wrFile.write(GetParamString(expr.dsts[0]) +
                     " = " +
                     cnct_string +
                     ";\n")

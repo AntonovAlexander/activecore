@@ -214,7 +214,7 @@ class VivadoCppWriter(var cyclix_module : Generic) {
                 || (expr.opcode == OP1_REDUCT_XOR)
                 || (expr.opcode == OP1_REDUCT_XNOR))
         {
-            if ((expr.tgts[0].vartype.DataType == DATA_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
+            if ((expr.dsts[0].vartype.DataType == DATA_TYPE.STRUCTURED) && (expr.params[0] is hw_imm)) {
                 if (opstring == "") {
                     wrFile.write(GetParamString(expr.wrvars[0]) +
                             " = '{default:" +

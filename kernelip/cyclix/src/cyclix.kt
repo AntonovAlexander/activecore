@@ -276,7 +276,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
         var new_expr = hw_exec_fifo_internal_wr_unblk(subproc, fifo_name, wdata)
         var genvar = hw_var(GetGenName("fifo_rdy"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
         new_expr.AddParam(wdata)
-        new_expr.AddTgt(genvar)
+        new_expr.AddDst(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
@@ -285,9 +285,9 @@ open class Generic(name_in : String) : hw_astc_stdif() {
     fun fifo_internal_rd_unblk(subproc : hw_subproc, fifo_name : String, rdata : hw_var) : hw_var {
         var new_expr = hw_exec_fifo_internal_rd_unblk(subproc, fifo_name, rdata)
         var genvar = hw_var(GetGenName("fifo_rdy"), DATA_TYPE.BV_UNSIGNED, 0, 0, "0")
-        new_expr.AddTgt(genvar)
+        new_expr.AddDst(genvar)
         new_expr.AddGenVar(genvar)
-        new_expr.AddTgt(rdata)
+        new_expr.AddDst(rdata)
         AddExpr(new_expr)
         return genvar
     }
@@ -300,7 +300,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
     fun fifo_internal_rd_blk(subproc : hw_subproc, fifo_name : String) : hw_var {
         var new_expr = hw_exec_fifo_internal_rd_blk(subproc, fifo_name)
         var genvar = hw_var(GetGenName("fifo_rdata"), subproc.getFifoByName(fifo_name).vartype, subproc.getFifoByName(fifo_name).defval)
-        new_expr.AddTgt(genvar)
+        new_expr.AddDst(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar

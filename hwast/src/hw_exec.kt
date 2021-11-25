@@ -69,7 +69,7 @@ open class hw_exec(val opcode : hw_opcode) {
     var while_trailer = WHILE_TRAILER.EMPTY
 
     var params      = ArrayList<hw_param>()
-    var tgts        = ArrayList<hw_var>()
+    var dsts        = ArrayList<hw_var>()
 
     var rdvars      = ArrayList<hw_var>()
     var wrvars      = ArrayList<hw_var>()
@@ -148,13 +148,13 @@ open class hw_exec(val opcode : hw_opcode) {
         for(new_param in new_params) AddParam(new_param)
     }
 
-    fun AddTgt(new_tgt : hw_var) {
-        tgts.add(new_tgt)
-        AddWrVar(new_tgt)
+    fun AddDst(new_dst : hw_var) {
+        dsts.add(new_dst)
+        AddWrVar(new_dst)
     }
 
-    fun AddTgts(new_tgts : ArrayList<hw_var>) {
-        for (new_tgt in new_tgts) AddTgt(new_tgt)
+    fun AddDsts(new_dsts : ArrayList<hw_var>) {
+        for (new_dst in new_dsts) AddDst(new_dst)
     }
 
     fun AddIfTargetVar(new_ifvar : hw_var) {

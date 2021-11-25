@@ -62,13 +62,13 @@ class RtlGenerator(var cyclix_module : Generic) {
 
         MSG(debug_lvl, "#### Cyclix: exporting expression: " + expr.opcode.default_string)
         // for (param in expr.params) MSG("param: " + param.GetString())
-        // for (wrvar in expr.tgts) MSG("wrvar: " + wrvar.name)
+        // for (wrvar in expr.dsts) MSG("wrvar: " + wrvar.name)
 
         if (expr.opcode == OP_FIFO_WR_UNBLK) {
 
             var fifo = TranslateFifoOut((expr as hw_exec_fifo_wr_unblk).fifo)
             var wdata_translated = TranslateParam(expr.params[0], var_dict)
-            var fifo_rdy = TranslateVar(expr.tgts[0], var_dict)
+            var fifo_rdy = TranslateVar(expr.dsts[0], var_dict)
 
             rtl_gen.begif(rtl_gen.lnot((rtl_gen as hw_astc_stdif).getPortByName("rst_i")))
             run {
@@ -90,8 +90,8 @@ class RtlGenerator(var cyclix_module : Generic) {
         } else if (expr.opcode == OP_FIFO_RD_UNBLK) {
 
             var fifo = TranslateFifoIn((expr as hw_exec_fifo_rd_unblk).fifo)
-            var fifo_rdy = TranslateVar(expr.tgts[0], var_dict)
-            var rdata_translated = TranslateVar(expr.tgts[1], var_dict)
+            var fifo_rdy = TranslateVar(expr.dsts[0], var_dict)
+            var rdata_translated = TranslateVar(expr.dsts[1], var_dict)
 
             rtl_gen.begif(rtl_gen.lnot((rtl_gen as hw_astc_stdif).getPortByName("rst_i")))
             run {
@@ -118,7 +118,7 @@ class RtlGenerator(var cyclix_module : Generic) {
             var subproc = (expr as hw_exec_fifo_internal_wr_unblk).subproc
             var fifo_name = expr.fifo_name
             var wdata_translated = TranslateParam(expr.params[0], var_dict)
-            var fifo_rdy = TranslateVar(expr.tgts[0], var_dict)
+            var fifo_rdy = TranslateVar(expr.dsts[0], var_dict)
 
             for (i in submod_insts_fifos_in) {
                 MSG(debug_lvl, "-- subproc: " + i.key)
@@ -150,8 +150,8 @@ class RtlGenerator(var cyclix_module : Generic) {
             var subproc = (expr as hw_exec_fifo_internal_rd_unblk).subproc
             var fifo_name = expr.fifo_name
 
-            var fifo_rdy = TranslateVar(expr.tgts[0], var_dict)
-            var rdata_translated = TranslateVar(expr.tgts[1], var_dict)
+            var fifo_rdy = TranslateVar(expr.dsts[0], var_dict)
+            var rdata_translated = TranslateVar(expr.dsts[1], var_dict)
 
             rtl_gen.begif(rtl_gen.lnot((rtl_gen as hw_astc_stdif).getPortByName("rst_i")))
             run {
