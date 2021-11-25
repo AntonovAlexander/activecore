@@ -29,24 +29,27 @@ open class rob(cyclix_gen : cyclix.Generic,
         cyclix_gen.MSG_COMMENT("Filling ROB with data from RRB...")
         var rob_iter = cyclix_gen.begforall_asc(TRX_BUF)
         run {
-            var rob_entry_single = rob_iter.iter_elem.GetFracRef(0)             // TODO: fix
-            var RRB_ref         = rrb.GetFracRef(rob_entry_single.GetFracRef("rrb_id"))
-            var RRB_ref_enb     = RRB_ref.GetFracRef("enb")
-            var RRB_ref_data    = RRB_ref.GetFracRef("data")
-            cyclix_gen.begif(RRB_ref_enb)
+            var rob_entry_single_iter = cyclix_gen.begforall_asc(rob_iter.iter_elem)
             run {
-                cyclix_gen.begif(cyclix_gen.eq2(rob_entry_single.GetFracRef("trx_id"), RRB_ref_data.GetFracRef("trx_id")))
+                var rob_entry_single = rob_entry_single_iter.iter_elem
+                var RRB_ref         = rrb.GetFracRef(rob_entry_single.GetFracRef("rrb_id"))
+                var RRB_ref_enb     = RRB_ref.GetFracRef("enb")
+                var RRB_ref_data    = RRB_ref.GetFracRef("data")
+                cyclix_gen.begif(RRB_ref_enb)
                 run {
-                    cyclix_gen.assign(rob_entry_single.GetFracRef("rdy"), 1)
-                    if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-                        cyclix_gen.assign(rob_entry_single.GetFracRef("alu_result"), RRB_ref_data.GetFracRef("wdata"))
-                        cyclix_gen.assign(rob_entry_single.GetFracRef("mem_wdata"), io_cdb_rs1_wdata_buf)
-                        for (dst_imm in MultiExu_CFG.dst_imms) {
-                            cyclix_gen.assign(rob_entry_single.GetFracRef(dst_imm.name), RRB_ref_data.GetFracRef(dst_imm.name))
+                    cyclix_gen.begif(cyclix_gen.eq2(rob_entry_single.GetFracRef("trx_id"), RRB_ref_data.GetFracRef("trx_id")))
+                    run {
+                        cyclix_gen.assign(rob_entry_single.GetFracRef("rdy"), 1)
+                        if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
+                            cyclix_gen.assign(rob_entry_single.GetFracRef("alu_result"), RRB_ref_data.GetFracRef("wdata"))
+                            cyclix_gen.assign(rob_entry_single.GetFracRef("mem_wdata"), io_cdb_rs1_wdata_buf)
+                            for (dst_imm in MultiExu_CFG.dst_imms) {
+                                cyclix_gen.assign(rob_entry_single.GetFracRef(dst_imm.name), RRB_ref_data.GetFracRef(dst_imm.name))
+                            }
                         }
-                    }
+                    }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
-            }; cyclix_gen.endif()
+            }; cyclix_gen.endloop()
         }; cyclix_gen.endloop()
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
     }
