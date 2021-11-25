@@ -190,9 +190,26 @@ class rob_risc(name: String,
         preinit_ctrls()
         init_locals()
 
+        cyclix_gen.MSG_COMMENT("Interrupt receive...")
+        cyclix_gen.begif(cyclix_gen.band(!mem_rd_inprogress, MIRQEN))
+        run {
+            cyclix_gen.assign(irq_recv, cyclix_gen.fifo_rd_unblk(irq_fifo, irq_mcause))
+            cyclix_gen.begif(irq_recv)
+            run {
+                MIRQEN.assign(0)
+                CSR_MCAUSE.assign(irq_mcause)
+                MRETADDR.assign(expected_instraddr)
+                cyclix_gen.assign(backoff_cmd, 1)
+                cyclix_gen.assign(expected_instraddr, hw_imm(IRQ_ADDR))
+                cyclix_gen.assign(commit_active, 0)
+                cyclix_gen.assign(entry_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
+            }; cyclix_gen.endif()
+        }; cyclix_gen.endif()
+        cyclix_gen.MSG_COMMENT("Interrupt receive: done")
+
         var single_entry = cyclix_gen.begforall_asc(TRX_LOCAL_PARALLEL)
         run {
-            cyclix_gen.MSG_COMMENT("-- Processing entry --")
+            cyclix_gen.MSG_COMMENT("Processing single entry...")
             cyclix_gen.begif(cyclix_gen.band(commit_active, entry_mask.GetFracRef(single_entry.iter_num)))
             run {
                 cyclix_gen.begif(TRX_LOCAL_PARALLEL.GetFracRef(single_entry.iter_num).GetFracRef("enb"))
@@ -244,63 +261,47 @@ class rob_risc(name: String,
                         }; cyclix_gen.endif()
                     }; cyclix_gen.endif()                   // mem_rd_inprogress
 
-                    cyclix_gen.begelse()
+                    cyclix_gen.begelse()                    // !mem_rd_inprogress
                     run {
 
-                        cyclix_gen.begif(MIRQEN)             // checking for interrupts
+                        cyclix_gen.assign(commit_active, cyclix_gen.band(ctrl_active, rdy))
+                        cyclix_gen.begif(commit_active)
                         run {
-                            cyclix_gen.assign(irq_recv, cyclix_gen.fifo_rd_unblk(irq_fifo, irq_mcause))
-                            cyclix_gen.begif(irq_recv)
+
+                            cyclix_gen.assign(commit_active, cyclix_gen.eq2(expected_instraddr, curinstr_addr))
+                            cyclix_gen.begif(commit_active)      // instruction flow fine
                             run {
-                                MIRQEN.assign(0)
-                                CSR_MCAUSE.assign(irq_mcause)
-                                MRETADDR.assign(expected_instraddr)
+
+                                cyclix_gen.begif(mem_req)
+                                run {
+
+                                    cyclix_gen.assign(mem_addr, alu_result)
+
+                                    cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
+                                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
+                                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
+                                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
+                                    cyclix_gen.assign(commit_active, cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata))
+
+                                    cyclix_gen.begif(cyclix_gen.band(commit_active, !mem_cmd))
+                                    run {
+                                        cyclix_gen.assign(mem_rd_inprogress, 1)
+                                        cyclix_gen.assign(commit_active, 0)
+                                    }; cyclix_gen.endif()
+                                }; cyclix_gen.endif()
+
+                                cyclix_gen.begif(mret_req)
+                                run {
+                                    MIRQEN.assign(1)
+                                }; cyclix_gen.endif()
+
+                            }; cyclix_gen.endif()
+
+                            cyclix_gen.begelse()                          // instruction flow broken
+                            run {
                                 cyclix_gen.assign(backoff_cmd, 1)
-                                cyclix_gen.assign(expected_instraddr, hw_imm(IRQ_ADDR))
                             }; cyclix_gen.endif()
-                        }; cyclix_gen.endif()
 
-                        cyclix_gen.begif(!irq_recv)
-                        run {
-                            cyclix_gen.assign(commit_active, cyclix_gen.band(ctrl_active, rdy))
-                            cyclix_gen.begif(commit_active)
-                            run {
-
-                                cyclix_gen.assign(commit_active, cyclix_gen.eq2(expected_instraddr, curinstr_addr))
-                                cyclix_gen.begif(commit_active)      // instruction flow fine
-                                run {
-
-                                    cyclix_gen.begif(mem_req)
-                                    run {
-
-                                        cyclix_gen.assign(mem_addr, alu_result)
-
-                                        cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
-                                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
-                                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
-                                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
-                                        cyclix_gen.assign(commit_active, cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata))
-
-                                        cyclix_gen.begif(cyclix_gen.band(commit_active, !mem_cmd))
-                                        run {
-                                            cyclix_gen.assign(mem_rd_inprogress, 1)
-                                            cyclix_gen.assign(commit_active, 0)
-                                        }; cyclix_gen.endif()
-                                    }; cyclix_gen.endif()
-
-                                    cyclix_gen.begif(mret_req)
-                                    run {
-                                        MIRQEN.assign(1)
-                                    }; cyclix_gen.endif()
-
-                                }; cyclix_gen.endif()
-
-                                cyclix_gen.begelse()                          // mispredicted branch
-                                run {
-                                    cyclix_gen.assign(backoff_cmd, 1)
-                                }; cyclix_gen.endif()
-
-                            }; cyclix_gen.endif()
                         }; cyclix_gen.endif()
 
                     }; cyclix_gen.endif()           // !mem_rd_inprogress
@@ -464,6 +465,8 @@ class rob_risc(name: String,
             run {
                 cyclix_gen.assign(entry_mask.GetFracRef(single_entry.iter_num), 0)
             }; cyclix_gen.endif()
+
+            cyclix_gen.MSG_COMMENT("Processing single entry: done")
         }; cyclix_gen.endloop()
 
         cyclix_gen.begif(backoff_cmd)
