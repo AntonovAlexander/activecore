@@ -306,26 +306,12 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
         if (fc_mode == STAGE_FC_MODE.BUFFERED) cyclix_gen.assign(ctrl_rdy, !TRX_BUF_COUNTER_FULL)
     }
 
-    private fun fill_locals(dst : hw_var, src : hw_var) {
-        for (dst_substruct in dst.vartype.src_struct) {
-            var drv_found = false
-            for (src_substruct in src.vartype.src_struct) {
-                if (dst_substruct.name == src_substruct.name) {
-                    cyclix_gen.assign(dst.GetFracRef(dst_substruct.name), src.GetFracRef(src_substruct.name))
-                    drv_found = true
-                    break
-                }
-            }
-            if (!drv_found) cyclix_gen.assign(dst.GetFracRef(dst_substruct.name), dst_substruct.defimm)
-        }
-    }
-
     fun init_locals() {
         if (TRX_BUF_MULTIDIM == 0) {
-            fill_locals(TRX_LOCAL, TRX_BUF_head_ref)
+            cyclix_gen.assign_subStructsWithDefaultsIfAbsent(TRX_LOCAL, TRX_BUF_head_ref)
         } else {
             for (PARALLEL_INDEX in 0 until TRX_BUF_head_ref.GetWidth()) {
-                fill_locals(TRX_LOCAL_PARALLEL.GetFracRef(PARALLEL_INDEX), TRX_BUF_head_ref.GetFracRef(PARALLEL_INDEX))
+                cyclix_gen.assign_subStructsWithDefaultsIfAbsent(TRX_LOCAL_PARALLEL.GetFracRef(PARALLEL_INDEX), TRX_BUF_head_ref.GetFracRef(PARALLEL_INDEX))
             }
         }
     }

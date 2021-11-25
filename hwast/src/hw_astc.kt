@@ -506,18 +506,36 @@ open class hw_astc() : ArrayList<hw_exec>() {
         assign(tgt, hw_imm(src))
     }
 
-    fun assign_subStructs(tgt: hw_var, src: hw_var) {
-
-        if (tgt.vartype.DataType != DATA_TYPE.STRUCTURED) MSG_COMMENT("tgt: " + tgt.name + ": not structured!")
-        if (src.vartype.DataType != DATA_TYPE.STRUCTURED) MSG_COMMENT("src: " + src.name + ": not structured!")
-        if ((tgt.vartype.DataType != DATA_TYPE.STRUCTURED) || (src.vartype.DataType != DATA_TYPE.STRUCTURED))
+    private fun CheckIfBothStructured(var1 : hw_var, var2 : hw_var) {
+        if ((var1.vartype.DataType != DATA_TYPE.STRUCTURED) || (var2.vartype.DataType != DATA_TYPE.STRUCTURED)) {
+            if (var1.vartype.DataType != DATA_TYPE.STRUCTURED) MSG_COMMENT("tgt: " + var1.name + ": not structured!")
+            if (var2.vartype.DataType != DATA_TYPE.STRUCTURED) MSG_COMMENT("src: " + var2.name + ": not structured!")
             ERROR("Attempting to assign_subStructs non structured variables")
+        }
+    }
 
+    fun assign_subStructs(tgt: hw_var, src: hw_var) {
+        CheckIfBothStructured(tgt, src)
         for (tgt_substruct in tgt.vartype.src_struct) {
             for (src_substruct in src.vartype.src_struct) {
                 if (tgt_substruct.name == src_substruct.name)
                     assign(tgt.GetFracRef(tgt_substruct.name), src.GetFracRef(src_substruct.name))
             }
+        }
+    }
+
+    fun assign_subStructsWithDefaultsIfAbsent(dst: hw_var, src: hw_var) {
+        CheckIfBothStructured(dst, src)
+        for (dst_substruct in dst.vartype.src_struct) {
+            var drv_found = false
+            for (src_substruct in src.vartype.src_struct) {
+                if (dst_substruct.name == src_substruct.name) {
+                    assign(dst.GetFracRef(dst_substruct.name), src.GetFracRef(src_substruct.name))
+                    drv_found = true
+                    break
+                }
+            }
+            if (!drv_found) assign(dst.GetFracRef(dst_substruct.name), dst_substruct.defimm)
         }
     }
 
