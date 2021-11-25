@@ -28,7 +28,7 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
 
         cyclix_gen.MSG_COMMENT("sending new operations to IQs...")
 
-        var rob_push_trx = rob.GetPushTrx()
+        var rob_push_trx = rob.GetPushTrx().GetFracRef(0)           // TODO :fix
         cyclix_gen.assign_subStructs(rob_push_trx, TRX_BUF_head_ref)
         cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
 

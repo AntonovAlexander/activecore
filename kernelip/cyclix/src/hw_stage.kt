@@ -187,7 +187,9 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
     }
 
     fun GetPushTrx(name: String) : hw_var {
-        return cyclix_gen.local(name, TRX_BUF.vartype.src_struct)
+        var push_trx_dimensions = hw_dim_static()
+        if (TRX_BUF_MULTIDIM != 0) push_trx_dimensions.add(TRX_BUF.vartype.dimensions[0])
+        return cyclix_gen.local(name, TRX_BUF.vartype.src_struct, push_trx_dimensions)
     }
 
     fun GetPushTrx() : hw_var {
