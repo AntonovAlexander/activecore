@@ -185,6 +185,7 @@ class rob_risc(name: String,
 
         preinit_ctrls()
         init_locals()
+        init_single_entry_locals(0)
 
         cyclix_gen.begif(mem_rd_inprogress)
         run {
