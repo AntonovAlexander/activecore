@@ -70,4 +70,4 @@ def hw_test_rsort(sigma, firmware_filename):
       2143324534, 2143343312, 2143968639, 2145930822
 	]
     
-    return sigma.hw_test_generic(sigma, "RSORT", firmware_filename, 1, verify_data)
+    return sigma.hw_test_generic(sigma, "RSORT", firmware_filename, 0.1, verify_data)

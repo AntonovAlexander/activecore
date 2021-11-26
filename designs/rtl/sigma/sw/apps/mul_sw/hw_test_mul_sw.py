@@ -17,7 +17,7 @@ def test_mul_sw(sigma, a, b):
     sigma.tile.udm.wr32(0x6000, a)
     sigma.tile.udm.wr32(0x6004, b)
     corr_result = a * b
-    time.sleep(0.3)
+    time.sleep(0.1)
     led_val = sigma.udm.rd32(0x80000000)
     if (led_val == corr_result):
         print("CORRECT: ", a, " * ", b, " = ", corr_result)

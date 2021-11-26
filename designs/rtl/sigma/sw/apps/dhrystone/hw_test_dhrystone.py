@@ -22,7 +22,7 @@ def hw_test_dhrystone(sigma, dhrystone_filename):
     print("Loading test program...")
     sigma.tile.loadelf(dhrystone_filename)
     print("Test program written!")
-    time.sleep(1)
+    time.sleep(0.1)
     
     rdarr = sigma.tile.udm.rdarr32(0x6000, 2)
     Microseconds = rdarr[0]

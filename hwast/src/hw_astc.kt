@@ -579,6 +579,18 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return op_tree(opcode, srcsList)
     }
 
+    fun count_ones(src: hw_var) : hw_var {
+        var srcsList = ArrayList<hw_param>()
+        for (src_bit in 0 until src.GetWidth()) {
+            srcsList.add(src.GetFracRef(src_bit))
+        }
+        return op_tree(OP2_ARITH_ADD, srcsList)
+    }
+
+    fun count_zeroes(src: hw_var) : hw_var {
+        return count_ones(bnot(src))
+    }
+
     fun add(srcs : ArrayList<hw_param>): hw_var {
         return op_tree(OP2_ARITH_ADD, srcs)
     }

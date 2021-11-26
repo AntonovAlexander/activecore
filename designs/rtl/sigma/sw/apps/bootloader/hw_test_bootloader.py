@@ -28,7 +28,7 @@ def hw_test_bootloader(sigma, firmware_filename, app_filename):
     print("Test written!")
     sigma.tile.sw_nrst()
     
-    time.sleep(1)
+    time.sleep(0.1)
     
     test_succ_flag = 0
     if (sigma.udm.rd32(0x80000000) == 0xaabb55aa):

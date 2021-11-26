@@ -20,4 +20,4 @@ def hw_test_md5(sigma, firmware_filename):
         0xed076287, 0x532e8636, 0x5e841e92, 0xbfc50d8c
     ]
     
-    return sigma.hw_test_generic(sigma, "MD5", firmware_filename, 1, verify_data)
+    return sigma.hw_test_generic(sigma, "MD5", firmware_filename, 0.1, verify_data)

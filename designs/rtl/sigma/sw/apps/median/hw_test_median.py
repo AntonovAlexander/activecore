@@ -38,4 +38,4 @@ def hw_test_median(sigma, firmware_filename):
       153, 381, 121, 651, 412, 825, 412, 356, 236, 148, 148, 148, 423, 140, 216, 216, 621, 621, 361,   0
     ]
     
-    return sigma.hw_test_generic(sigma, "MEDIAN", firmware_filename, 1, verify_data)
+    return sigma.hw_test_generic(sigma, "MEDIAN", firmware_filename, 0.1, verify_data)
