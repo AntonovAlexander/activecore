@@ -129,6 +129,8 @@ class instr_fetch_buffer(name: String,
     var instr_recv      = AdduStageVar("instr_recv", 0, 0, "0")
     var instr_recv_code = AdduStageVar("instr_recv_code", 31, 0, "0")
 
+    var rename_active     = cyclix_gen.ulocal("geninstr_recv_rename_active", 0, 0, "1")
+
     var var_dict = mutableMapOf<hw_var, hw_var>()
     init {
         for (src_imm in MultiExu_CFG.src_imms) {
@@ -226,7 +228,12 @@ class instr_fetch_buffer(name: String,
 
                 TranslateVar(MultiExu_inst.RISCDecode.opcode).assign(TranslateVar(MultiExu_inst.RISCDecode.alu_opcode))
 
-                cyclix_gen.begif(renamed_uop_buf.ctrl_rdy)
+                cyclix_gen.begif(cyclix_gen.band(TranslateVar(MultiExu_inst.RISCDecode.rd_req), cyclix_gen.rand(global_structures.PRF_mapped)))
+                run {
+                    cyclix_gen.assign(rename_active, 0)
+                }; cyclix_gen.endif()
+
+                cyclix_gen.begif(cyclix_gen.band(renamed_uop_buf.ctrl_rdy, rename_active))
                 run {
 
                     var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")

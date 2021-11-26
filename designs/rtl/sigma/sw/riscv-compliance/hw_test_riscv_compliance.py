@@ -26,7 +26,7 @@ def hw_test_riscv_compliance_template(sigma, instr_name):
     	else:
     		break
     
-    return sigma.hw_test_generic(sigma, instr_name, "riscv-compliance/I-" + instr_name + "-01.riscv", 1, verify_data)
+    return sigma.hw_test_generic(sigma, instr_name, "riscv-compliance/I-" + instr_name + "-01.riscv", 0.1, verify_data)
 
 
 def hw_test_riscv_compliance(sigma):
