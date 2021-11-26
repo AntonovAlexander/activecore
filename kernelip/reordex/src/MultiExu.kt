@@ -382,6 +382,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                 var iq_buf = iq_buffer(cyclix_gen, ExUnit.key, ExUnit_num, "geniq_" + ExUnit.key + "_" + ExUnit_num, ExUnit.value.iq_length, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), true, fu_num, CDB_NUM)
                 new_exu_descr.IQ_insts.add(iq_buf)
                 IQ_insts.add(iq_buf)
+                fu_num++
             }
 
             MSG("generating submodules...")
@@ -468,7 +469,6 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             exu_descrs.put(ExUnit.key, new_exu_descr)
 
             ExUnit_idx++
-            fu_num += ExUnit.value.exu_num
 
             MSG("generating execution unit " + ExUnit.value.ExecUnit.name + ": done")
         }
