@@ -124,50 +124,69 @@ class sigma:
         test_succ_counter = 0
         test_fail_counter = 0
         
+        TESTS_FAIL = []
+        
         if (hw_test_dhrystone(self, 'apps/dhrystone.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
+            TESTS_FAIL.append("Dhrystone")
+            
         
         if (hw_test_mul_sw(self, 'apps/mul_sw.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
+            TESTS_FAIL.append("MUL_SW")
         
         if (hw_test_median(self, 'apps/median.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
+            TESTS_FAIL.append("Median")
         
         if (hw_test_qsort(self, 'apps/qsort.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
+            TESTS_FAIL.append("QSort")
         
         if (hw_test_rsort(self, 'apps/rsort.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
+            TESTS_FAIL.append("RSort")
         
         if (hw_test_crc32(self, 'apps/crc32.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
+            TESTS_FAIL.append("CRC32")
         
         if (hw_test_md5(self, 'apps/md5.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
+            TESTS_FAIL.append("MD5")
         
         if (hw_test_bootloader(self, 'apps/bootloader.riscv', 'apps/bootloader_testapp.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
+            TESTS_FAIL.append("Bootloader")
         
         if (hw_test_irq_counter(self, 'apps/irq_counter.riscv') == 1):
             test_succ_counter = test_succ_counter + 1
         else:
             test_fail_counter = test_fail_counter + 1
+            TESTS_FAIL.append("IRQ_counter")
         
         print("Total tests PASSED: ", test_succ_counter, ", FAILED: ", test_fail_counter)
+        
+        TESTS_FAIL_STR = ""
+        for TEST in TESTS_FAIL:
+            TESTS_FAIL_STR = TESTS_FAIL_STR + "  " + TEST
+        if (len(TESTS_FAIL) > 0):
+            print("Failed tests:" + TESTS_FAIL_STR)
+            
         print("")

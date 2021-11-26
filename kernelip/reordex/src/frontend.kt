@@ -169,7 +169,9 @@ class instr_fetch_buffer(name: String,
 
     fun Process(renamed_uop_buf : rename_buffer, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
 
-        var new_renamed_uop = renamed_uop_buf.GetPushTrx()
+        var new_renamed_uop_total = renamed_uop_buf.GetPushTrx()
+        cyclix_gen.assign(new_renamed_uop_total.GetFracRef(1).GetFracRef("enb"), 0)    // TODO :fix
+        var new_renamed_uop = new_renamed_uop_total.GetFracRef(0)
 
         cyclix_gen.COMMENT("fetching instruction code...")
         cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifos[0], instr_recv_code_buf))
@@ -246,7 +248,7 @@ class instr_fetch_buffer(name: String,
                     cyclix_gen.assign(new_renamed_uop.GetFracRef("io_req"), TranslateVar(MultiExu_inst.RISCDecode.mem_req, var_dict))
 
                     cyclix_gen.assign(renamed_uop_buf.push, 1)
-                    renamed_uop_buf.push_trx(new_renamed_uop)
+                    renamed_uop_buf.push_trx(new_renamed_uop_total)
 
                     cyclix_gen.assign(pop, 1)
                     pop_trx()

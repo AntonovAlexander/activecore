@@ -26,7 +26,7 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
     var TRX_BUF_COUNTER_NEMPTY  = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER_NEMPTY", 0, 0, "0")
     var TRX_BUF_COUNTER_FULL    = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER_FULL", 0, 0, "0")
     var TRX_LOCAL_PARALLEL      = DUMMY_VAR
-    var TRX_LOCAL               = cyclix_gen.local(name_prefix + "_TRX_LOCAL", hw_struct(name_prefix + "_TRX_LOCAL_STRUCT"))
+    var TRX_LOCAL               = cyclix_gen.local(name_prefix + "_TRX_LOCAL", hw_struct(name_prefix + "_TRX_LOCAL_STRUCT")) as hw_var
 
     init {
         if (TRX_BUF_MULTIDIM != 0) TRX_BUF_dim.add(TRX_BUF_MULTIDIM-1, 0)
@@ -315,18 +315,20 @@ open class hw_stage(cyclix_gen : cyclix.Generic,
         }
     }
 
-    fun init_single_entry_locals(INDEX_IN_TRX_PARALLEL : Int) {
+    fun switch_to_local(INDEX_IN_TRX_PARALLEL : Int) {
         if (TRX_BUF_MULTIDIM != 0) {
             cyclix_gen.assign(TRX_LOCAL, TRX_LOCAL_PARALLEL.GetFracRef(INDEX_IN_TRX_PARALLEL))
+            //TRX_LOCAL = TRX_LOCAL_PARALLEL.GetFracRef(INDEX_IN_TRX_PARALLEL)
         }
-        else ERROR("Attempting to init_single_entry_locals for scalar hw_stage")
+        else ERROR("Attempting to switch_to_local for scalar hw_stage")
     }
 
-    fun init_single_entry_locals(INDEX_IN_TRX_PARALLEL : hw_param) {
+    fun switch_to_local(INDEX_IN_TRX_PARALLEL : hw_param) {
         if (TRX_BUF_MULTIDIM != 0) {
             cyclix_gen.assign(TRX_LOCAL, TRX_LOCAL_PARALLEL.GetFracRef(INDEX_IN_TRX_PARALLEL))
+            //TRX_LOCAL = TRX_LOCAL_PARALLEL.GetFracRef(INDEX_IN_TRX_PARALLEL)
         }
-        else ERROR("Attempting to init_single_entry_locals for scalar hw_stage")
+        else ERROR("Attempting to switch_to_local for scalar hw_stage")
     }
 
     override fun pop_trx() {

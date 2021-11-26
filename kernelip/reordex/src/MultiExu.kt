@@ -508,8 +508,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         cyclix_gen.MSG_COMMENT("Initializing CDB: done")
 
         var renamed_uop_buf =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rename_buffer(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM)
-            else rename_buffer_risc(cyclix_gen, "genrenamed_uop_buf", RENAME_BUF_SIZE, MultiExu_CFG, ExecUnits.size, CDB_NUM)
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rename_buffer(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
+            else rename_buffer_risc(cyclix_gen, "genrenamed_uop_buf", RENAME_BUF_SIZE, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
 
         cyclix_gen.MSG_COMMENT("ROB committing...")
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob.Commit(control_structures)
@@ -555,9 +555,6 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             fu_id++
         }
 
-        renamed_uop_buf.preinit_ctrls()
-        renamed_uop_buf.init_locals()
-
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer...")
         for (cdb_idx in 0 until CDB_NUM) {
 
@@ -574,29 +571,34 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
                 // broadcasting FU results to renamed buffer
                 for (renamed_uop_buf_idx in 0 until renamed_uop_buf.TRX_BUF_SIZE) {
-                    var renamed_uop_buf_entry = renamed_uop_buf.TRX_BUF.GetFracRef(renamed_uop_buf_idx)
-                    for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
+                    var renamed_uop_buf_entries = renamed_uop_buf.TRX_BUF.GetFracRef(renamed_uop_buf_idx)
 
-                        var src_rdy     = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_rdy")
-                        var src_tag     = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_tag")
-                        var src_data    = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_data")
+                    for (renamed_uop_buf_single_entry_idx in 0 until renamed_uop_buf_entries.GetWidth()) {
+                        var renamed_uop_buf_entry = renamed_uop_buf_entries.GetFracRef(renamed_uop_buf_single_entry_idx)
 
-                        cyclix_gen.begif(!src_rdy)
-                        run {
-                            cyclix_gen.begif(cyclix_gen.eq2(src_tag, exu_cdb_inst_tag))
+                        for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
+
+                            var src_rdy     = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_rdy")
+                            var src_tag     = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_tag")
+                            var src_data    = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_data")
+
+                            cyclix_gen.begif(!src_rdy)
                             run {
-                                // setting IQ entry ready
-                                cyclix_gen.assign(src_data, exu_cdb_inst_wdata)
-                                cyclix_gen.assign(src_rdy, 1)
+                                cyclix_gen.begif(cyclix_gen.eq2(src_tag, exu_cdb_inst_tag))
+                                run {
+                                    // setting IQ entry ready
+                                    cyclix_gen.assign(src_data, exu_cdb_inst_wdata)
+                                    cyclix_gen.assign(src_rdy, 1)
+                                }; cyclix_gen.endif()
                             }; cyclix_gen.endif()
+                        }
+
+                        //// setting rdy for io_req if data generated ////
+                        cyclix_gen.begif(renamed_uop_buf_entry.GetFracRef("io_req"))
+                        run {
+                            cyclix_gen.assign(renamed_uop_buf_entry.GetFracRef("rdy"), renamed_uop_buf_entry.GetFracRef("src0_rdy"))
                         }; cyclix_gen.endif()
                     }
-
-                    //// setting rdy for io_req if data generated ////
-                    cyclix_gen.begif(renamed_uop_buf_entry.GetFracRef("io_req"))
-                    run {
-                        cyclix_gen.assign(renamed_uop_buf_entry.GetFracRef("rdy"), renamed_uop_buf_entry.GetFracRef("src0_rdy"))
-                    }; cyclix_gen.endif()
                 }
 
             }; cyclix_gen.endif()
@@ -607,7 +609,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer: done")
 
-        renamed_uop_buf.Process(rob, PRF_src, io_iq, ExecUnits, IQ_insts, CDB_RISC_COMMIT_POS)
+        renamed_uop_buf.Process(rob, PRF_src, io_iq, ExecUnits, CDB_RISC_COMMIT_POS)
 
         cyclix_gen.MSG_COMMENT("renaming...")
 

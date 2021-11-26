@@ -174,9 +174,8 @@ class rob_risc(name: String,
 
     fun Commit(global_structures: __control_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, commit_cdb : hw_var, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
 
-        var entry_mask          = cyclix_gen.uglobal("entry_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
-        var single_entry_ptr    = cyclix_gen.ulocal("single_entry_ptr", GetWidthToContain(TRX_BUF_MULTIDIM)-1, 0, "0")
-        var commit_active       = cyclix_gen.ulocal("commit_active", 0, 0, "1")
+        var entry_mask          = cyclix_gen.uglobal("genrob_entry_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
+        var commit_active       = cyclix_gen.ulocal("genrob_commit_active", 0, 0, "1")
 
         var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
         var mem_data_wdata      = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
@@ -207,6 +206,7 @@ class rob_risc(name: String,
         }; cyclix_gen.endif()
         cyclix_gen.MSG_COMMENT("Interrupt receive: done")
 
+        cyclix_gen.MSG_COMMENT("Processing entries...")
         var single_entry = cyclix_gen.begforall_asc(TRX_LOCAL_PARALLEL)
         run {
             cyclix_gen.MSG_COMMENT("Processing single entry...")
@@ -215,7 +215,7 @@ class rob_risc(name: String,
                 cyclix_gen.begif(TRX_LOCAL_PARALLEL.GetFracRef(single_entry.iter_num).GetFracRef("enb"))
                 run {
 
-                    init_single_entry_locals(single_entry.iter_num)
+                    switch_to_local(single_entry.iter_num)
 
                     cyclix_gen.begif(mem_rd_inprogress)
                     run {
@@ -468,6 +468,7 @@ class rob_risc(name: String,
 
             cyclix_gen.MSG_COMMENT("Processing single entry: done")
         }; cyclix_gen.endloop()
+        cyclix_gen.MSG_COMMENT("Processing entries: done")
 
         cyclix_gen.begif(backoff_cmd)
         run {

@@ -47,8 +47,15 @@ data class __src_handle(val src_rdy : hw_var,
 open class uop_buffer(cyclix_gen : cyclix.Generic,
                       name_prefix : String,
                       TRX_BUF_SIZE : Int,
+                      TRX_DIM_SIZE : Int,
                       MultiExu_CFG : Reordex_CFG,
-                      val cdb_num : Int) : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG) {
+                      val cdb_num : Int) : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, TRX_DIM_SIZE, MultiExu_CFG) {
+
+    constructor(cyclix_gen : cyclix.Generic,
+                name_prefix : String,
+                TRX_BUF_SIZE : Int,
+                MultiExu_CFG : Reordex_CFG,
+                cdb_num : Int) : this(cyclix_gen, name_prefix, TRX_BUF_SIZE, 0, MultiExu_CFG, cdb_num)
 
     var fu_req      = AddStageVar(hw_structvar("fu_req", DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
     val imm_rsrv    = ArrayList<hw_var>()
