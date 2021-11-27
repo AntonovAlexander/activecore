@@ -175,31 +175,6 @@ class instr_fetch_buffer(name: String,
         cyclix_gen.assign(new_renamed_uop_total.GetFracRef(1).GetFracRef("enb"), 0)    // TODO :fix
         var new_renamed_uop = new_renamed_uop_total.GetFracRef(0)
 
-        cyclix_gen.COMMENT("fetching instruction code...")
-        cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifos[0], instr_recv_code_buf))
-        run {
-            var fetch_iter = cyclix_gen.begforall_asc(TRX_BUF)
-            run {
-                var instr_io_id_ref = fetch_iter.iter_elem.GetFracRef("geninstr_io_id")
-                var instr_recv      = fetch_iter.iter_elem.GetFracRef("instr_recv")
-                var instr_recv_code = fetch_iter.iter_elem.GetFracRef("instr_recv_code")
-
-                cyclix_gen.begif(cyclix_gen.eq2(instr_io_id_ref, instr_io_rd_ptr))
-                run {
-                    cyclix_gen.assign(instr_recv, 1)
-                    cyclix_gen.assign(instr_recv_code, instr_recv_code_buf)
-                }; cyclix_gen.endif()
-            }; cyclix_gen.endloop()
-            cyclix_gen.add_gen(instr_io_rd_ptr, instr_io_rd_ptr, 1)
-        }; cyclix_gen.endif()
-        cyclix_gen.COMMENT("fetching instruction code: done")
-
-        // TODO: default assignment workaround
-        cyclix_gen.begif(!ctrl_active)
-        run {
-            cyclix_gen.fifo_rd_unblk(instr_resp_fifos[1], instr_recv_code_buf)
-        }; cyclix_gen.endif()
-
         preinit_ctrls()
         init_locals()
 
@@ -264,6 +239,31 @@ class instr_fetch_buffer(name: String,
 
             }; cyclix_gen.endif()
 
+        }; cyclix_gen.endif()
+
+        cyclix_gen.COMMENT("fetching instruction code...")
+        cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifos[0], instr_recv_code_buf))
+        run {
+            var fetch_iter = cyclix_gen.begforall_asc(TRX_BUF)
+            run {
+                var instr_io_id_ref = fetch_iter.iter_elem.GetFracRef("geninstr_io_id")
+                var instr_recv      = fetch_iter.iter_elem.GetFracRef("instr_recv")
+                var instr_recv_code = fetch_iter.iter_elem.GetFracRef("instr_recv_code")
+
+                cyclix_gen.begif(cyclix_gen.eq2(instr_io_id_ref, instr_io_rd_ptr))
+                run {
+                    cyclix_gen.assign(instr_recv, 1)
+                    cyclix_gen.assign(instr_recv_code, instr_recv_code_buf)
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endloop()
+            cyclix_gen.add_gen(instr_io_rd_ptr, instr_io_rd_ptr, 1)
+        }; cyclix_gen.endif()
+        cyclix_gen.COMMENT("fetching instruction code: done")
+
+        // TODO: default assignment workaround
+        cyclix_gen.begif(!ctrl_active)
+        run {
+            cyclix_gen.fifo_rd_unblk(instr_resp_fifos[1], instr_recv_code_buf)
         }; cyclix_gen.endif()
     }
 }
