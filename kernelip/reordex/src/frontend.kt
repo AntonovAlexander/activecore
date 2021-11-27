@@ -50,6 +50,9 @@ class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_I
     var instr_io_wr_ptr_dim = hw_dim_static()
     var instr_io_wr_ptr = cyclix_gen.uglobal("geninstr_io_wr_ptr", instr_io_wr_ptr_dim, "0")
 
+    var ireq_active         = cyclix_gen.ulocal("genireq_active", 0, 0, "1")
+    var entry_toproc_mask   = cyclix_gen.uglobal("genireq_toproc_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
+
     init {
         busreq_mem_struct.addu("addr",     31, 0, "0")
         busreq_mem_struct.addu("be",       3,  0, "0")
@@ -88,27 +91,45 @@ class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_I
                     var new_fetch_buf = new_fetch_buf_total.GetFracRef(entry_num)
                     var instr_io_wr_ptr_ref = instr_io_wr_ptr.GetFracRef(entry_num)
 
-                    cyclix_gen.assign(instr_data_wdata.GetFracRef("we"), 0)
-                    cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("addr"), curinstr_addr)
-                    cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("be"), 15)
-                    cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), 0)
-
-                    cyclix_gen.assign(new_fetch_buf.GetFracRef("geninstr_io_id"), instr_io_wr_ptr_ref)
-                    cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(instr_req_fifos[entry_num], instr_data_wdata))
+                    cyclix_gen.begif(cyclix_gen.band(ireq_active, entry_toproc_mask.GetFracRef(entry_num), enb))
                     run {
-                        cyclix_gen.assign(instr_fetch.push, 1)
-                        cyclix_gen.add_gen(instr_io_wr_ptr_ref, instr_io_wr_ptr_ref, 1)
+                        cyclix_gen.assign(instr_data_wdata.GetFracRef("we"), 0)
+                        cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("addr"), curinstr_addr)
+                        cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("be"), 15)
+                        cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), 0)
+
+                        cyclix_gen.assign(new_fetch_buf.GetFracRef("geninstr_io_id"), instr_io_wr_ptr_ref)
+
+                        cyclix_gen.assign(ireq_active, cyclix_gen.fifo_wr_unblk(instr_req_fifos[entry_num], instr_data_wdata))
+                        cyclix_gen.begif(ireq_active)
+                        run {
+                            cyclix_gen.assign(entry_toproc_mask.GetFracRef(entry_num), 0)
+                            cyclix_gen.assign(instr_fetch.push, 1)
+                            cyclix_gen.add_gen(instr_io_wr_ptr_ref, instr_io_wr_ptr_ref, 1)
+                        }; cyclix_gen.endif()
+
+                        cyclix_gen.assign_subStructs(new_fetch_buf, TRX_LOCAL)
+
                     }; cyclix_gen.endif()
 
-                    cyclix_gen.assign_subStructs(new_fetch_buf, TRX_LOCAL)
-
                 }; cyclix_gen.endif()
+
+                cyclix_gen.begif(ireq_active)
+                run {
+                    cyclix_gen.assign(pop, 1)
+                }; cyclix_gen.endif()
+
             }
 
             cyclix_gen.begif(instr_fetch.push)
             run {
                 instr_fetch.push_trx(new_fetch_buf_total)
+            }; cyclix_gen.endif()
+
+            cyclix_gen.begif(pop)
+            run{
                 pop_trx()
+                cyclix_gen.assign(entry_toproc_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
             }; cyclix_gen.endif()
 
         }; cyclix_gen.endif()
@@ -259,6 +280,7 @@ class instr_fetch_buffer(name: String,
                                 cyclix_gen.assign(new_renamed_uop.GetFracRef("exu_opcode"), TranslateVar(MultiExu_inst.RISCDecode.alu_opcode, var_dict))
                                 cyclix_gen.assign(new_renamed_uop.GetFracRef("rdy"), !TranslateVar(MultiExu_inst.RISCDecode.alu_req, var_dict))
                                 cyclix_gen.assign(new_renamed_uop.GetFracRef("io_req"), TranslateVar(MultiExu_inst.RISCDecode.mem_req, var_dict))
+                                cyclix_gen.assign(entry_toproc_mask.GetFracRef(entry_num), 0)
                                 cyclix_gen.assign(dispatch_uop_buf.push, 1)
 
                             }; cyclix_gen.endif()
