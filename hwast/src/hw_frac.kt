@@ -157,27 +157,27 @@ class hw_fracs() : ArrayList<hw_frac>() {
         add(hw_frac_SubStruct(new_elem))
     }
 
-    fun FillSubStructs(tgt: hw_var) {
-        var tgt_struct_ptr = tgt.vartype.src_struct
+    fun FillSubStructs(dst: hw_var) {
+        var dst_struct_ptr = dst.vartype.src_struct
         for (fraction in this) {
             if (fraction is hw_frac_SubStruct) {
                 //println("Substruct found!")
-                if (tgt_struct_ptr != DUMMY_STRUCT) {
+                if (dst_struct_ptr != DUMMY_STRUCT) {
                     var substr_found = false
                     var SUBSTR_INDEX = 0
-                    for (structvar in tgt_struct_ptr) {
+                    for (structvar in dst_struct_ptr) {
                         //println("structvar: " + structvar.name)
                         if (structvar.name == fraction.substruct_name) {
 
-                            //println("src_struct: " + tgt_struct_ptr.name)
+                            //println("src_struct: " + dst_struct_ptr.name)
                             //println("subStructIndex: " + SUBSTR_INDEX)
-                            fraction.src_struct = tgt_struct_ptr
+                            fraction.src_struct = dst_struct_ptr
                             fraction.subStructIndex = SUBSTR_INDEX
 
                             if (structvar.vartype.DataType == DATA_TYPE.STRUCTURED) {
-                                tgt_struct_ptr = structvar.vartype.src_struct
+                                dst_struct_ptr = structvar.vartype.src_struct
                             } else {
-                                tgt_struct_ptr = DUMMY_STRUCT
+                                dst_struct_ptr = DUMMY_STRUCT
                             }
                             substr_found = true
                             break
@@ -185,11 +185,11 @@ class hw_fracs() : ArrayList<hw_frac>() {
                         SUBSTR_INDEX += 1
                     }
                     if (!substr_found){
-                        MSG("Available substructs in variable: " + tgt.name)
-                        for (structvar in tgt_struct_ptr) MSG("substruct: " + structvar.name)
+                        MSG("Available substructs in variable: " + dst.name)
+                        for (structvar in dst_struct_ptr) MSG("substruct: " + structvar.name)
                         ERROR("substruct " + (fraction as hw_frac_SubStruct).substruct_name + " not found!")
                     }
-                } else ERROR("substruct " + (fraction as hw_frac_SubStruct).substruct_name + " request for tgt " + tgt.name + " is inconsistent!")
+                } else ERROR("substruct " + (fraction as hw_frac_SubStruct).substruct_name + " request for dst " + dst.name + " is inconsistent!")
             }
         }
     }

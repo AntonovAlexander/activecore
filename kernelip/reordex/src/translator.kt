@@ -23,7 +23,7 @@ open class trx_buffer(cyclix_gen : cyclix.Generic,
                       name_prefix : String,
                       TRX_BUF_SIZE : Int,
                       TRX_DIM_SIZE : Int,
-                      MultiExu_CFG : Reordex_CFG) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE, TRX_DIM_SIZE, STAGE_FC_MODE.BUFFERED, false) {
+                      val MultiExu_CFG : Reordex_CFG) : hw_stage(cyclix_gen, name_prefix, TRX_BUF_SIZE, TRX_DIM_SIZE, STAGE_FC_MODE.BUFFERED, false) {
 
     constructor(cyclix_gen : cyclix.Generic,
                 name_prefix : String,

@@ -13,7 +13,7 @@ import hwast.*
 open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                          name_prefix : String,
                          TRX_BUF_SIZE : Int,
-                         val MultiExu_CFG : Reordex_CFG,
+                         MultiExu_CFG : Reordex_CFG,
                          ExecUnits_size : Int,
                          cdb_num : Int,
                          val IQ_insts : ArrayList<iq_buffer>) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.FrontEnd_width, MultiExu_CFG, cdb_num) {
