@@ -39,127 +39,123 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
 
         var rob_push_trx_total = rob.GetPushTrx()
 
-        cyclix_gen.begif(rob.ctrl_rdy)
+        cyclix_gen.begif(cyclix_gen.band(ctrl_active, rob.ctrl_rdy))
         run {
-            cyclix_gen.begif(ctrl_active)
-            run {
 
-                for (entry_num in 0 until MultiExu_CFG.FrontEnd_width) {
+            for (entry_num in 0 until MultiExu_CFG.FrontEnd_width) {
 
-                    cyclix_gen.begif(TRX_LOCAL_PARALLEL.GetFracRef(entry_num).GetFracRef("enb"))
+                cyclix_gen.begif(TRX_LOCAL_PARALLEL.GetFracRef(entry_num).GetFracRef("enb"))
+                run {
+
+                    switch_to_local(entry_num)
+                    var rob_push_trx = rob_push_trx_total.GetFracRef(entry_num)
+
+                    cyclix_gen.begif(cyclix_gen.band(dispatch_active, entry_tosched_mask.GetFracRef(entry_num), enb))
                     run {
 
-                        switch_to_local(entry_num)
+                        for (rsrv in src_rsrv) {
+                            cyclix_gen.assign(rsrv.src_src, PRF_src.GetFracRef(rsrv.src_tag))
+                        }
 
-                        var rob_push_trx = rob_push_trx_total.GetFracRef(entry_num)
+                        cyclix_gen.assign(dispatch_active, 0)
 
-                        cyclix_gen.begif(cyclix_gen.band(dispatch_active, entry_tosched_mask.GetFracRef(entry_num), enb))
+                        cyclix_gen.begif(io_req)
+                        run {
+                            cyclix_gen.begif(cyclix_gen.band(store_iq_free_mask, store_iq.ctrl_rdy))
+                            run {
+
+                                // pushing trx to IQ
+                                cyclix_gen.assign(store_iq.push, 1)
+                                var store_push_trx = store_iq.GetPushTrx()
+                                cyclix_gen.assign_subStructs(store_push_trx, TRX_LOCAL)
+                                cyclix_gen.assign(store_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
+                                store_iq.push_trx(store_push_trx)
+
+                                // marking rd src
+                                cyclix_gen.begif(!mem_cmd)
+                                run {
+                                    cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), CDB_RISC_COMMIT_POS)
+                                }; cyclix_gen.endif()
+
+                                // marking RRB for ROB
+                                cyclix_gen.assign(rob_push_trx.GetFracRef("rrb_id"), store_iq.RRB_index)
+
+                                // marking op as scheduled
+                                cyclix_gen.assign(entry_tosched_mask.GetFracRef(entry_num), 0)
+
+                                // marking IQ as busy
+                                cyclix_gen.assign(store_iq_free_mask, 0)
+
+                                // marking ready to schedule next trx
+                                cyclix_gen.assign(dispatch_active, 1)
+
+                            }; cyclix_gen.endif()
+                        }; cyclix_gen.endif()
+
+                        cyclix_gen.begelse()
                         run {
 
-                            for (rsrv in src_rsrv) {
-                                cyclix_gen.assign(rsrv.src_src, PRF_src.GetFracRef(rsrv.src_tag))
-                            }
+                            for (IQ_inst_idx in 0 until IQ_insts.size) {
+                                var IQ_inst = IQ_insts[IQ_inst_idx]
 
-                            cyclix_gen.assign(dispatch_active, 0)
-
-                            cyclix_gen.begif(io_req)
-                            run {
-                                cyclix_gen.begif(cyclix_gen.band(store_iq_free_mask, store_iq.ctrl_rdy))
+                                cyclix_gen.begif(cyclix_gen.band(entry_tosched_mask.GetFracRef(entry_num), iq_free_mask.GetFracRef(IQ_inst_idx)))
                                 run {
-
-                                    // pushing trx to IQ
-                                    cyclix_gen.assign(store_iq.push, 1)
-                                    var store_push_trx = store_iq.GetPushTrx()
-                                    cyclix_gen.assign_subStructs(store_push_trx, TRX_LOCAL)
-                                    cyclix_gen.assign(store_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
-                                    store_iq.push_trx(store_push_trx)
-
-                                    // marking rd src
-                                    cyclix_gen.begif(!mem_cmd)
+                                    cyclix_gen.begif(cyclix_gen.eq2(fu_id, IQ_inst.fu_id_num))
                                     run {
-                                        cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), CDB_RISC_COMMIT_POS)
-                                    }; cyclix_gen.endif()
-
-                                    // marking RRB for ROB
-                                    cyclix_gen.assign(rob_push_trx.GetFracRef("rrb_id"), store_iq.RRB_index)
-
-                                    // marking op as scheduled
-                                    cyclix_gen.assign(entry_tosched_mask.GetFracRef(entry_num), 0)
-
-                                    // marking IQ as busy
-                                    cyclix_gen.assign(store_iq_free_mask, 0)
-
-                                    // marking ready to schedule next trx
-                                    cyclix_gen.assign(dispatch_active, 1)
-
-                                }; cyclix_gen.endif()
-                            }; cyclix_gen.endif()
-
-                            cyclix_gen.begelse()
-                            run {
-
-                                for (IQ_inst_idx in 0 until IQ_insts.size) {
-                                    var IQ_inst = IQ_insts[IQ_inst_idx]
-
-                                    cyclix_gen.begif(cyclix_gen.band(entry_tosched_mask.GetFracRef(entry_num), iq_free_mask.GetFracRef(IQ_inst_idx)))
-                                    run {
-                                        cyclix_gen.begif(cyclix_gen.eq2(fu_id, IQ_inst.fu_id_num))
+                                        cyclix_gen.begif(IQ_inst.ctrl_rdy)
                                         run {
-                                            cyclix_gen.begif(IQ_inst.ctrl_rdy)
-                                            run {
 
-                                                // pushing trx to IQ
-                                                cyclix_gen.assign(IQ_inst.push, 1)
-                                                var iq_push_trx = IQ_inst.GetPushTrx()
-                                                cyclix_gen.assign_subStructs(iq_push_trx, TRX_LOCAL)
-                                                cyclix_gen.assign(iq_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
-                                                IQ_inst.push_trx(iq_push_trx)
+                                            // pushing trx to IQ
+                                            cyclix_gen.assign(IQ_inst.push, 1)
+                                            var iq_push_trx = IQ_inst.GetPushTrx()
+                                            cyclix_gen.assign_subStructs(iq_push_trx, TRX_LOCAL)
+                                            cyclix_gen.assign(iq_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
+                                            IQ_inst.push_trx(iq_push_trx)
 
-                                                // marking rd src
-                                                cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), IQ_inst.RRB_index)
+                                            // marking rd src
+                                            cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), IQ_inst.RRB_index)
 
-                                                // marking RRB for ROB
-                                                cyclix_gen.assign(rob_push_trx.GetFracRef("rrb_id"), IQ_inst.RRB_index)
+                                            // marking RRB for ROB
+                                            cyclix_gen.assign(rob_push_trx.GetFracRef("rrb_id"), IQ_inst.RRB_index)
 
-                                                // marking op as scheduled
-                                                cyclix_gen.assign(entry_tosched_mask.GetFracRef(entry_num), 0)
+                                            // marking op as scheduled
+                                            cyclix_gen.assign(entry_tosched_mask.GetFracRef(entry_num), 0)
 
-                                                // marking IQ as busy
-                                                cyclix_gen.assign(iq_free_mask.GetFracRef(IQ_inst_idx), 0)
+                                            // marking IQ as busy
+                                            cyclix_gen.assign(iq_free_mask.GetFracRef(IQ_inst_idx), 0)
 
-                                                // marking ready to schedule next trx
-                                                cyclix_gen.assign(dispatch_active, 1)
+                                            // marking ready to schedule next trx
+                                            cyclix_gen.assign(dispatch_active, 1)
 
-                                            }; cyclix_gen.endif()
                                         }; cyclix_gen.endif()
                                     }; cyclix_gen.endif()
-                                }
-
-                            }; cyclix_gen.endif()
-
-                            if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-                                cyclix_gen.begif(dispatch_active)
-                                run {
-                                    // pushing to ROB
-                                    cyclix_gen.assign_subStructs(rob_push_trx, TRX_LOCAL)
-                                    cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
-                                    cyclix_gen.assign(rob_push_trx.GetFracRef("rdy"), 0)
-                                    cyclix_gen.assign(rob.TRX_ID_COUNTER, cyclix_gen.add(rob.TRX_ID_COUNTER, 1))
-                                    cyclix_gen.assign(rob.push, 1)
                                 }; cyclix_gen.endif()
                             }
 
                         }; cyclix_gen.endif()
 
+                        if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
+                            cyclix_gen.begif(dispatch_active)
+                            run {
+                                // pushing to ROB
+                                cyclix_gen.assign_subStructs(rob_push_trx, TRX_LOCAL)
+                                cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
+                                cyclix_gen.assign(rob_push_trx.GetFracRef("rdy"), 0)
+                                cyclix_gen.assign(rob.TRX_ID_COUNTER, cyclix_gen.add(rob.TRX_ID_COUNTER, 1))
+                                cyclix_gen.assign(rob.push, 1)
+                            }; cyclix_gen.endif()
+                        }
+
                     }; cyclix_gen.endif()
-                }
 
-                cyclix_gen.begif(dispatch_active)
-                run {
-                    cyclix_gen.assign(pop, 1)
                 }; cyclix_gen.endif()
+            }
 
+            cyclix_gen.begif(dispatch_active)
+            run {
+                cyclix_gen.assign(pop, 1)
             }; cyclix_gen.endif()
+
         }; cyclix_gen.endif()
 
         cyclix_gen.begif(rob.push)

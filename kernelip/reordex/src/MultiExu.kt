@@ -611,8 +611,6 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         dispatch_uop_buf.Process(rob, PRF_src, io_iq, ExecUnits, CDB_RISC_COMMIT_POS)
 
-        cyclix_gen.MSG_COMMENT("renaming...")
-
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
             var frontend = coproc_frontend(name, cyclix_gen, MultiExu_CFG, control_structures)
             frontend.Send_toRenameBuf(dispatch_uop_buf)
@@ -622,8 +620,6 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             (instr_req as instr_req_stage).Process(instr_fetch)
             (instr_iaddr as instr_iaddr_stage).Process(instr_req)
         }
-
-        cyclix_gen.MSG_COMMENT("renaming: done")
 
         cyclix_gen.end()
 
