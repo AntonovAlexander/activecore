@@ -1,17 +1,16 @@
 /*
- * rename_buffer.kt
+ * dispatch_buffer.kt
  *
  *  Created on: 24.12.2020
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
  *     License: See LICENSE file for details
  */
 
-/*
 package reordex
 
 import hwast.*
 
-open class rename_buffer(cyclix_gen : cyclix.Generic,
+open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                          name_prefix : String,
                          TRX_BUF_SIZE : Int,
                          val MultiExu_CFG : Reordex_CFG,
@@ -26,10 +25,10 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
     val io_req          = AdduStageVar("io_req",            0, 0, "0")
     var mem_cmd         = AdduStageVar("mem_cmd",           0, 0, "1")
 
-    var dispatch_active     = cyclix_gen.ulocal("genrename_dispatch_active", 0, 0, "1")
-    var entry_tosched_mask  = cyclix_gen.uglobal("genrename_entry_tosched_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
-    var iq_free_mask        = cyclix_gen.ulocal("genrename_iq_free_mask", IQ_insts.size-1, 0, hw_imm_ones(IQ_insts.size))
-    var store_iq_free_mask  = cyclix_gen.ulocal("genrename_store_iq_free_mask", 0, 0, "1")
+    var dispatch_active     = cyclix_gen.ulocal("gendispatch_dispatch_active", 0, 0, "1")
+    var entry_tosched_mask  = cyclix_gen.uglobal("gendispatch_entry_tosched_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
+    var iq_free_mask        = cyclix_gen.ulocal("gendispatch_iq_free_mask", IQ_insts.size-1, 0, hw_imm_ones(IQ_insts.size))
+    var store_iq_free_mask  = cyclix_gen.ulocal("gendispatch_store_iq_free_mask", 0, 0, "1")
 
     fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, CDB_RISC_COMMIT_POS : Int) {
 
@@ -181,13 +180,13 @@ open class rename_buffer(cyclix_gen : cyclix.Generic,
     }
 }
 
-class rename_buffer_risc(cyclix_gen : cyclix.Generic,
+class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
                          name_prefix : String,
                          TRX_BUF_SIZE : Int,
                          MultiExu_CFG : Reordex_CFG,
                          ExecUnits_size : Int,
                          cdb_num : Int,
-                         IQ_insts : ArrayList<iq_buffer>) : rename_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, ExecUnits_size, cdb_num, IQ_insts) {
+                         IQ_insts : ArrayList<iq_buffer>) : dispatch_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, ExecUnits_size, cdb_num, IQ_insts) {
 
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
@@ -277,4 +276,3 @@ class rename_buffer_risc(cyclix_gen : cyclix.Generic,
 
     var mret_req        = AdduStageVar("mret_req", 0, 0, "0")
 }
- */

@@ -507,9 +507,9 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         cyclix_gen.MSG_COMMENT("Initializing CDB: done")
 
-        var renamed_uop_buf =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rename_buffer(cyclix_gen, "genrenamed_uop_buf", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
-            else rename_buffer_risc(cyclix_gen, "genrenamed_uop_buf", RENAME_BUF_SIZE, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
+        var dispatch_uop_buf =
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) dispatch_buffer(cyclix_gen, "gendispatch_uop_buf", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
+            else dispatch_buffer_risc(cyclix_gen, "gendispatch_uop_buf", RENAME_BUF_SIZE, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
 
         cyclix_gen.MSG_COMMENT("ROB committing...")
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob.Commit(control_structures)
@@ -517,7 +517,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             var bufs_to_reset = ArrayList<hw_stage>()
             bufs_to_reset.add(rob)
             for (IQ_inst in IQ_insts) bufs_to_reset.add(IQ_inst)
-            bufs_to_reset.add(renamed_uop_buf)
+            bufs_to_reset.add(dispatch_uop_buf)
             bufs_to_reset.add(instr_fetch)
             bufs_to_reset.add(instr_req)
             (rob as rob_risc).Commit(control_structures, (instr_iaddr as instr_iaddr_stage).pc, bufs_to_reset, (IQ_insts as ArrayList<hw_stage>), cdb.GetFracRef(CDB_RISC_COMMIT_POS), MRETADDR, cyclix_CSR_MCAUSE)
@@ -555,7 +555,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             fu_id++
         }
 
-        cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer...")
+        cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and dispatched buffer...")
         for (cdb_idx in 0 until CDB_NUM) {
 
             var exu_cdb_inst        = cdb.GetFracRef(cdb_idx)
@@ -569,18 +569,18 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
                 control_structures.WritePRF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
 
-                // broadcasting FU results to renamed buffer
-                for (renamed_uop_buf_idx in 0 until renamed_uop_buf.TRX_BUF_SIZE) {
-                    var renamed_uop_buf_entries = renamed_uop_buf.TRX_BUF.GetFracRef(renamed_uop_buf_idx)
+                // broadcasting FU results to dispatched buffer
+                for (dispatch_uop_buf_idx in 0 until dispatch_uop_buf.TRX_BUF_SIZE) {
+                    var dispatch_uop_buf_entries = dispatch_uop_buf.TRX_BUF.GetFracRef(dispatch_uop_buf_idx)
 
-                    for (renamed_uop_buf_single_entry_idx in 0 until renamed_uop_buf_entries.GetWidth()) {
-                        var renamed_uop_buf_entry = renamed_uop_buf_entries.GetFracRef(renamed_uop_buf_single_entry_idx)
+                    for (dispatch_uop_buf_single_entry_idx in 0 until dispatch_uop_buf_entries.GetWidth()) {
+                        var dispatch_uop_buf_entry = dispatch_uop_buf_entries.GetFracRef(dispatch_uop_buf_single_entry_idx)
 
                         for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
 
-                            var src_rdy     = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_rdy")
-                            var src_tag     = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_tag")
-                            var src_data    = renamed_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_data")
+                            var src_rdy     = dispatch_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_rdy")
+                            var src_tag     = dispatch_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_tag")
+                            var src_data    = dispatch_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_data")
 
                             cyclix_gen.begif(!src_rdy)
                             run {
@@ -594,9 +594,9 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                         }
 
                         //// setting rdy for io_req if data generated ////
-                        cyclix_gen.begif(renamed_uop_buf_entry.GetFracRef("io_req"))
+                        cyclix_gen.begif(dispatch_uop_buf_entry.GetFracRef("io_req"))
                         run {
-                            cyclix_gen.assign(renamed_uop_buf_entry.GetFracRef("rdy"), renamed_uop_buf_entry.GetFracRef("src0_rdy"))
+                            cyclix_gen.assign(dispatch_uop_buf_entry.GetFracRef("rdy"), dispatch_uop_buf_entry.GetFracRef("src0_rdy"))
                         }; cyclix_gen.endif()
                     }
                 }
@@ -607,18 +607,18 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         // broadcasting FU results to IQ
         for (IQ_inst in IQ_insts) IQ_inst.FillFromCDB(cdb)
 
-        cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and renamed buffer: done")
+        cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and dispatched buffer: done")
 
-        renamed_uop_buf.Process(rob, PRF_src, io_iq, ExecUnits, CDB_RISC_COMMIT_POS)
+        dispatch_uop_buf.Process(rob, PRF_src, io_iq, ExecUnits, CDB_RISC_COMMIT_POS)
 
         cyclix_gen.MSG_COMMENT("renaming...")
 
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
             var frontend = coproc_frontend(name, cyclix_gen, MultiExu_CFG, control_structures)
-            frontend.Send_toRenameBuf(renamed_uop_buf)
+            frontend.Send_toRenameBuf(dispatch_uop_buf)
 
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
-            (instr_fetch as instr_fetch_buffer).Process(renamed_uop_buf, MRETADDR, (this as MultiExuRISC).RISCDecode.CSR_MCAUSE)
+            (instr_fetch as instr_fetch_buffer).Process(dispatch_uop_buf, MRETADDR, (this as MultiExuRISC).RISCDecode.CSR_MCAUSE)
             (instr_req as instr_req_stage).Process(instr_fetch)
             (instr_iaddr as instr_iaddr_stage).Process(instr_req)
         }

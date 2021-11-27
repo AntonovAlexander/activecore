@@ -169,7 +169,7 @@ class instr_fetch_buffer(name: String,
         }
     }
 
-    fun Process(renamed_uop_buf : rename_buffer, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
+    fun Process(renamed_uop_buf : dispatch_buffer, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
 
         var new_renamed_uop_total = renamed_uop_buf.GetPushTrx()
         cyclix_gen.assign(new_renamed_uop_total.GetFracRef(1).GetFracRef("enb"), 0)    // TODO :fix
@@ -277,7 +277,7 @@ class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val Mu
     var cmd_req_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_req_data"), cmd_req_struct)
     var cmd_resp_data = cyclix_gen.local(cyclix_gen.GetGenName("cmd_resp_data"), hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(MultiExu_CFG.RF_width-1, 0)), "0")
 
-    fun Send_toRenameBuf(renamed_uop_buf : rename_buffer) {
+    fun Send_toRenameBuf(renamed_uop_buf : dispatch_buffer) {
 
         cmd_req_struct.addu("exec",     0, 0, "0")
         cmd_req_struct.addu("rf_we",       0,  0, "0")
