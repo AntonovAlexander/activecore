@@ -26,7 +26,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
     var mem_cmd         = AdduStageVar("mem_cmd",           0, 0, "1")
 
     var dispatch_active     = cyclix_gen.ulocal("gendispatch_dispatch_active", 0, 0, "1")
-    var entry_tosched_mask  = cyclix_gen.uglobal("gendispatch_entry_tosched_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
+    var entry_toproc_mask   = cyclix_gen.uglobal("gendispatch_entry_toproc_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
     var iq_free_mask        = cyclix_gen.ulocal("gendispatch_iq_free_mask", IQ_insts.size-1, 0, hw_imm_ones(IQ_insts.size))
     var store_iq_free_mask  = cyclix_gen.ulocal("gendispatch_store_iq_free_mask", 0, 0, "1")
 
@@ -50,7 +50,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                     switch_to_local(entry_num)
                     var rob_push_trx = rob_push_trx_total.GetFracRef(entry_num)
 
-                    cyclix_gen.begif(cyclix_gen.band(dispatch_active, entry_tosched_mask.GetFracRef(entry_num), enb))
+                    cyclix_gen.begif(cyclix_gen.band(dispatch_active, entry_toproc_mask.GetFracRef(entry_num), enb))
                     run {
 
                         for (rsrv in src_rsrv) {
@@ -81,7 +81,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                                 cyclix_gen.assign(rob_push_trx.GetFracRef("rrb_id"), store_iq.RRB_index)
 
                                 // marking op as scheduled
-                                cyclix_gen.assign(entry_tosched_mask.GetFracRef(entry_num), 0)
+                                cyclix_gen.assign(entry_toproc_mask.GetFracRef(entry_num), 0)
 
                                 // marking IQ as busy
                                 cyclix_gen.assign(store_iq_free_mask, 0)
@@ -98,7 +98,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                             for (IQ_inst_idx in 0 until IQ_insts.size) {
                                 var IQ_inst = IQ_insts[IQ_inst_idx]
 
-                                cyclix_gen.begif(cyclix_gen.band(entry_tosched_mask.GetFracRef(entry_num), iq_free_mask.GetFracRef(IQ_inst_idx)))
+                                cyclix_gen.begif(cyclix_gen.band(entry_toproc_mask.GetFracRef(entry_num), iq_free_mask.GetFracRef(IQ_inst_idx)))
                                 run {
                                     cyclix_gen.begif(cyclix_gen.eq2(fu_id, IQ_inst.fu_id_num))
                                     run {
@@ -119,7 +119,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                                             cyclix_gen.assign(rob_push_trx.GetFracRef("rrb_id"), IQ_inst.RRB_index)
 
                                             // marking op as scheduled
-                                            cyclix_gen.assign(entry_tosched_mask.GetFracRef(entry_num), 0)
+                                            cyclix_gen.assign(entry_toproc_mask.GetFracRef(entry_num), 0)
 
                                             // marking IQ as busy
                                             cyclix_gen.assign(iq_free_mask.GetFracRef(IQ_inst_idx), 0)
@@ -166,7 +166,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
         cyclix_gen.begif(pop)
         run {
             pop_trx()
-            cyclix_gen.assign(entry_tosched_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
+            cyclix_gen.assign(entry_toproc_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
             cyclix_gen.assign(iq_free_mask, hw_imm_ones(IQ_insts.size))
         }; cyclix_gen.endif()
 
