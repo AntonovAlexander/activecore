@@ -27,6 +27,8 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
     var TRX_BUF_COUNTER_FULL    = cyclix_gen.uglobal(name_prefix + "_TRX_BUF_COUNTER_FULL", 0, 0, "0")
     var TRX_LOCAL_PARALLEL      = DUMMY_VAR
     var TRX_LOCAL               = cyclix_gen.local(name_prefix + "_TRX_LOCAL", hw_struct(name_prefix + "_TRX_LOCAL_STRUCT")) as hw_var
+    var TRX_PUSHED_dim          = hw_dim_static()
+    var TRX_PUSHED              = cyclix_gen.local(name_prefix + "_TRX_PUSHED", TRX_BUF.vartype.src_struct, TRX_PUSHED_dim)
 
     init {
         if (TRX_BUF_MULTIDIM != 0) TRX_BUF_dim.add(TRX_BUF_MULTIDIM-1, 0)
@@ -36,6 +38,7 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
             TRX_LOCAL_PARALLEL_dim.add(TRX_BUF_MULTIDIM-1, 0)
             TRX_LOCAL_PARALLEL = cyclix_gen.local(name_prefix + "_TRX_LOCAL_PARALLEL", TRX_LOCAL.vartype.src_struct, TRX_LOCAL_PARALLEL_dim)
         }
+        if (TRX_BUF_MULTIDIM != 0) TRX_PUSHED_dim.add(TRX_BUF.vartype.dimensions[0])
     }
 
     fun AddBuf(new_structvar : hw_structvar) {
@@ -231,6 +234,7 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
         if (TRX_BUF_SIZE != 1) {
             fracs = hw_fracs(TRX_BUF_COUNTER)
         }
+        cyclix_gen.assign(TRX_PUSHED, pushed_var)
         cyclix_gen.assign(TRX_BUF.GetFracRef(fracs), pushed_var)
         inc_trx_counter()
     }

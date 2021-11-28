@@ -38,6 +38,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
         init_locals()
 
         var rob_push_trx_total = rob.GetPushTrx()
+        var store_push_trx = store_iq.GetPushTrx()
 
         cyclix_gen.begif(cyclix_gen.band(ctrl_active, rob.ctrl_rdy))
         run {
@@ -66,7 +67,6 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
 
                                 // pushing trx to IQ
                                 cyclix_gen.assign(store_iq.push, 1)
-                                var store_push_trx = store_iq.GetPushTrx()
                                 cyclix_gen.assign_subStructs(store_push_trx, TRX_LOCAL)
                                 cyclix_gen.assign(store_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
                                 store_iq.push_trx(store_push_trx)
@@ -95,7 +95,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                         cyclix_gen.begelse()
                         run {
 
-                            for (IQ_inst_idx in 0 until IQ_insts.size) {
+                            for (IQ_inst_idx in 0 until IQ_insts.size-1) {
                                 var IQ_inst = IQ_insts[IQ_inst_idx]
 
                                 cyclix_gen.begif(cyclix_gen.band(entry_toproc_mask.GetFracRef(entry_num), iq_free_mask.GetFracRef(IQ_inst_idx)))

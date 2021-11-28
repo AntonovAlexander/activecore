@@ -16,10 +16,39 @@ class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic, MultiExu
     val curinstr_addr  = AdduLocal("curinstr_addr", 31, 0, "0")
     val nextinstr_addr = AdduLocal("nextinstr_addr", 31, 0, "0")
 
+    fun ProcessMultiple(instr_req : instr_req_stage) {
+
+        cyclix_gen.MSG_COMMENT("Generating instruction addresses...")
+
+        var new_req_buf_total = instr_req.GetPushTrx()
+
+        cyclix_gen.begif(instr_req.ctrl_rdy)
+        run {
+            var inc_pc = 4
+            cyclix_gen.assign(nextinstr_addr, pc)
+            for (entry_num in 0 until MultiExu_CFG.FrontEnd_width) {
+                cyclix_gen.assign(curinstr_addr, nextinstr_addr)
+                cyclix_gen.add_gen(nextinstr_addr, pc , inc_pc)
+
+                var new_req_buf = new_req_buf_total.GetFracRef(entry_num)
+                cyclix_gen.assign(new_req_buf.GetFracRef("enb"), 1)
+                cyclix_gen.assign(new_req_buf.GetFracRef("curinstr_addr"), curinstr_addr)
+                cyclix_gen.assign(new_req_buf.GetFracRef("nextinstr_addr"), nextinstr_addr)
+                inc_pc += 4
+            }
+
+            cyclix_gen.assign(instr_req.push, 1)
+            instr_req.push_trx(new_req_buf_total)
+            cyclix_gen.assign(pc, nextinstr_addr)
+        }; cyclix_gen.endif()
+
+        cyclix_gen.MSG_COMMENT("Generating instruction addresses: done")
+    }
+
     fun Process(instr_req : instr_req_stage) {
 
         var new_req_buf_total = instr_req.GetPushTrx()
-        cyclix_gen.assign(new_req_buf_total.GetFracRef(1).GetFracRef("enb"), 0)    // TODO :fix
+        cyclix_gen.assign(new_req_buf_total.GetFracRef(1).GetFracRef("enb"), 0)
         var new_req_buf = new_req_buf_total.GetFracRef(0)
 
         cyclix_gen.assign(curinstr_addr, pc)
@@ -30,6 +59,7 @@ class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic, MultiExu
         cyclix_gen.begif(instr_req.ctrl_rdy)
         run {
             cyclix_gen.assign(pc, nextinstr_addr)
+            cyclix_gen.assign(instr_req.push, 1)
             instr_req.push_trx(new_req_buf_total)
         }; cyclix_gen.endif()
     }
