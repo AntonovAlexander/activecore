@@ -557,7 +557,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             fu_id++
         }
 
-        cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and dispatched buffer...")
+        cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and dispatch buffer...")
         for (cdb_idx in 0 until CDB_NUM) {
 
             var exu_cdb_inst        = cdb.GetFracRef(cdb_idx)
@@ -571,7 +571,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
                 control_structures.WritePRF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
 
-                // broadcasting FU results to dispatched buffer
+                // broadcasting FU results to dispatch buffer
                 for (dispatch_uop_buf_idx in 0 until dispatch_uop_buf.TRX_BUF_SIZE) {
                     var dispatch_uop_buf_entries = dispatch_uop_buf.TRX_BUF.GetFracRef(dispatch_uop_buf_idx)
 
@@ -609,7 +609,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         // broadcasting FU results to IQ
         for (IQ_inst in IQ_insts) IQ_inst.FillFromCDB(cdb)
 
-        cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and dispatched buffer: done")
+        cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and dispatch buffer: done")
 
         dispatch_uop_buf.Process(rob, PRF_src, io_iq, ExecUnits, CDB_RISC_COMMIT_POS)
 

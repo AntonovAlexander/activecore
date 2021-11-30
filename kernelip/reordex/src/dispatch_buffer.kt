@@ -141,7 +141,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                                 cyclix_gen.assign_subStructs(rob_push_trx, TRX_LOCAL)
                                 cyclix_gen.assign(rob_push_trx.GetFracRef("trx_id"), rob.TRX_ID_COUNTER)
                                 cyclix_gen.assign(rob_push_trx.GetFracRef("rdy"), 0)
-                                cyclix_gen.assign(rob.TRX_ID_COUNTER, cyclix_gen.add(rob.TRX_ID_COUNTER, 1))
+                                cyclix_gen.add_gen(rob.TRX_ID_COUNTER, rob.TRX_ID_COUNTER, 1)
                                 cyclix_gen.assign(rob.push, 1)
                             }; cyclix_gen.endif()
                         }

@@ -17,21 +17,23 @@ open class rob(cyclix_gen : cyclix.Generic,
                MultiExu_CFG : Reordex_CFG,
                rrb_num : Int) : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.FrontEnd_width, MultiExu_CFG) {
 
-    var trx_id          = AddStageVar(hw_structvar("trx_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(MultiExu_CFG.trx_inflight_num) -1, 0, "0"))
+    var trx_id          = AddStageVar(hw_structvar("trx_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(MultiExu_CFG.trx_inflight_num)-1, 0, "0"))
     var rd_tag_prev     = AddStageVar(hw_structvar("rd_tag_prev",       DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
     var rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
     var rrb_id          = AddStageVar(hw_structvar("rrb_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(rrb_num) -1, 0, "0"))
     val rdy             = AddStageVar(hw_structvar("rdy",               DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
-    var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", GetWidthToContain(TRX_BUF_SIZE) -1, 0, "0")
+    var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", MultiExu_CFG.trx_inflight_num-1, 0, "0")
 
     fun FillFromRRB(MultiExu_CFG : Reordex_CFG, rrb : hw_var, io_cdb_rs1_wdata_buf : hw_var) {
         cyclix_gen.MSG_COMMENT("Filling ROB with data from RRB...")
-        var rob_iter = cyclix_gen.begforall_asc(TRX_BUF)
-        run {
-            var rob_entry_single_iter = cyclix_gen.begforall_asc(rob_iter.iter_elem)
-            run {
-                var rob_entry_single = rob_entry_single_iter.iter_elem
+
+        for (rob_entry_idx in 0 until MultiExu_CFG.ROB_size) {
+            var rob_iter = TRX_BUF.GetFracRef(rob_entry_idx)
+
+            for (rob_entry_single_idx in 0 until TRX_BUF_MULTIDIM) {
+                var rob_entry_single = rob_iter.GetFracRef(rob_entry_single_idx)
+
                 var RRB_ref         = rrb.GetFracRef(rob_entry_single.GetFracRef("rrb_id"))
                 var RRB_ref_enb     = RRB_ref.GetFracRef("enb")
                 var RRB_ref_data    = RRB_ref.GetFracRef("data")
@@ -49,9 +51,9 @@ open class rob(cyclix_gen : cyclix.Generic,
                         }
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
-            }; cyclix_gen.endloop()
-        }; cyclix_gen.endloop()
-        cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
+            }
+        }
+        cyclix_gen.MSG_COMMENT("Filling ROB with data from RRB: done")
     }
 
     open fun Commit(global_structures: __control_structures) {
