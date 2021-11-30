@@ -482,6 +482,7 @@ class rob_risc(name: String,
                 }
             }
             global_structures.RollBack(Backoff_ARF)
+            cyclix_gen.assign(entry_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
         }; cyclix_gen.endif()
 
         cyclix_gen.COMMENT("Vectored ROB entry completion...")
