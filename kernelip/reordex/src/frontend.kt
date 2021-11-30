@@ -16,7 +16,7 @@ class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic, MultiExu
     val curinstr_addr  = AdduLocal("curinstr_addr", 31, 0, "0")
     val nextinstr_addr = AdduLocal("nextinstr_addr", 31, 0, "0")
 
-    fun ProcessMultiple(instr_req : instr_req_stage) {
+    fun Process(instr_req : instr_req_stage) {
 
         cyclix_gen.MSG_COMMENT("Generating instruction addresses...")
 
@@ -45,7 +45,7 @@ class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic, MultiExu
         cyclix_gen.MSG_COMMENT("Generating instruction addresses: done")
     }
 
-    fun Process(instr_req : instr_req_stage) {
+    fun ProcessSingle(instr_req : instr_req_stage) {
 
         var new_req_buf_total = instr_req.GetPushTrx()
         cyclix_gen.assign(new_req_buf_total.GetFracRef(1).GetFracRef("enb"), 0)
@@ -110,7 +110,7 @@ class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_I
 
         var instr_data_wdata = cyclix_gen.local("instr_data_wdata", instr_req_fifos[0].vartype, "0")
 
-        cyclix_gen.begif(cyclix_gen.band(ctrl_active, ctrl_rdy))
+        cyclix_gen.begif(cyclix_gen.band(ctrl_active, instr_fetch.ctrl_rdy))
         run {
 
             for (entry_num in 0 until MultiExu_CFG.FrontEnd_width) {

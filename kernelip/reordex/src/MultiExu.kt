@@ -273,7 +273,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         var RRB_RISC_LSU_POS = 0
 
         var IREQ_BUF_SIZE = 1
-        var FETCH_BUF_SIZE = 2
+        var FETCH_BUF_SIZE = 4
         var RENAME_BUF_SIZE = 2
         var INSTR_IO_ID_WIDTH = GetWidthToContain(FETCH_BUF_SIZE + IREQ_BUF_SIZE)
 
@@ -508,8 +508,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         cyclix_gen.MSG_COMMENT("Initializing CDB: done")
 
         var dispatch_uop_buf =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) dispatch_buffer(cyclix_gen, "gendispatch_uop_buf", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
-            else dispatch_buffer_risc(cyclix_gen, "gendispatch_uop_buf", RENAME_BUF_SIZE, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) dispatch_buffer(cyclix_gen, "gendispatch", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
+            else dispatch_buffer_risc(cyclix_gen, "gendispatch", RENAME_BUF_SIZE, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
 
         cyclix_gen.MSG_COMMENT("ROB committing...")
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob.Commit(control_structures)
@@ -618,7 +618,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
             (instr_fetch as instr_fetch_buffer).Process(dispatch_uop_buf, MRETADDR, (this as MultiExuRISC).RISCDecode.CSR_MCAUSE)
             (instr_req as instr_req_stage).Process(instr_fetch)
-            (instr_iaddr as instr_iaddr_stage).Process(instr_req)
+            //(instr_iaddr as instr_iaddr_stage).Process(instr_req)
+            (instr_iaddr as instr_iaddr_stage).ProcessSingle(instr_req)
         }
 
         cyclix_gen.end()
