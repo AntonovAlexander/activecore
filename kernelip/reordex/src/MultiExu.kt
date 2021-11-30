@@ -21,8 +21,10 @@ open class Reordex_CFG(val RF_width : Int,
                        val FrontEnd_width : Int,
                        val rename_RF: Boolean,
                        val PRF_depth : Int,
-                       val trx_inflight_num : Int,
+                       val ROB_size : Int,
                        val mode : REORDEX_MODE) {
+
+    val trx_inflight_num = ROB_size * FrontEnd_width;
 
     val ARF_addr_width = GetWidthToContain(ARF_depth)
     val PRF_addr_width = GetWidthToContain(PRF_depth)
@@ -339,8 +341,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             else cyclix_gen.uglobal("io_cdb_rs1_wdata_buf", MultiExu_CFG.RF_width-1, 0, "0")
 
         var rob =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob(cyclix_gen, "genrob", MultiExu_CFG.trx_inflight_num, MultiExu_CFG, RRB_NUM)
-            else rob_risc(name, cyclix_gen, "genrob", MultiExu_CFG.trx_inflight_num, MultiExu_CFG, RRB_NUM)
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob(cyclix_gen, "genrob", MultiExu_CFG.ROB_size, MultiExu_CFG, RRB_NUM)
+            else rob_risc(name, cyclix_gen, "genrob", MultiExu_CFG.ROB_size, MultiExu_CFG, RRB_NUM)
 
         var TranslateInfo = __TranslateInfo()
 
