@@ -198,6 +198,7 @@ class rob_risc(name: String,
                         cyclix_gen.assign(commit_active, 0)
                     }; cyclix_gen.endif()
 
+                    cyclix_gen.assign(genrob_instr_ptr, single_entry_idx)
                     cyclix_gen.band_gen(commit_active, commit_active, rdy)
 
                     cyclix_gen.begif(commit_active)         // instruction ready to retire
@@ -361,7 +362,6 @@ class rob_risc(name: String,
                         cyclix_gen.COMMENT("control transfer: done")
 
                         cyclix_gen.assign(entry_mask.GetFracRef(single_entry_idx), 0)
-                        cyclix_gen.assign(genrob_instr_ptr, (single_entry_idx + 1))
 
                     }; cyclix_gen.endif()       // instruction ready to retire
 
