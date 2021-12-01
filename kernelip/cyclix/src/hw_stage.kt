@@ -187,7 +187,7 @@ open class hw_fifo(val cyclix_gen : cyclix.Generic,
     }
     ////////////////////
 
-    fun Reset() {
+    open fun Reset() {
         cyclix_gen.assign(TRX_BUF_COUNTER, 0)
         cyclix_gen.assign(TRX_BUF_COUNTER_NEMPTY, 0)
         cyclix_gen.assign(TRX_BUF_COUNTER_FULL, 0)

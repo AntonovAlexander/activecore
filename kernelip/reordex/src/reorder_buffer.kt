@@ -178,51 +178,37 @@ class rob_risc(name: String,
         }; cyclix_gen.endif()
         cyclix_gen.MSG_COMMENT("Interrupt receive: done")
 
-        cyclix_gen.MSG_COMMENT("Regular processing of entries...")
-        var single_entry = cyclix_gen.begforall_asc(TRX_LOCAL_PARALLEL)
+        cyclix_gen.assign(commit_active, ctrl_active)
+        cyclix_gen.begif(commit_active)
         run {
-            cyclix_gen.MSG_COMMENT("Processing single entry...")
-            cyclix_gen.begif(cyclix_gen.band(commit_active, entry_mask.GetFracRef(single_entry.iter_num)))
-            run {
-                cyclix_gen.begif(TRX_LOCAL_PARALLEL.GetFracRef(single_entry.iter_num).GetFracRef("enb"))
+
+            cyclix_gen.MSG_COMMENT("Regular processing of entries...")
+            for (single_entry_idx in 0 until TRX_BUF_MULTIDIM)
+            {
+                switch_to_local(single_entry_idx)
+
+                cyclix_gen.MSG_COMMENT("Processing single entry...")
+
+                cyclix_gen.begif(cyclix_gen.band(commit_active, TRX_LOCAL_PARALLEL.GetFracRef(single_entry_idx).GetFracRef("enb"), entry_mask.GetFracRef(single_entry_idx)))
                 run {
 
-                    switch_to_local(single_entry.iter_num)
-
-                    cyclix_gen.begif(cyclix_gen.band(ctrl_active, commit_active))
+                    cyclix_gen.begif(cyclix_gen.neq2(expected_instraddr, curinstr_addr))    // instruction flow broken
                     run {
-                        cyclix_gen.begif(cyclix_gen.neq2(expected_instraddr, curinstr_addr))
-                        run {
-                            cyclix_gen.assign(backoff_cmd, 1)
-                        }; cyclix_gen.endif()
+                        cyclix_gen.assign(backoff_cmd, 1)
+                        cyclix_gen.assign(commit_active, 0)
                     }; cyclix_gen.endif()
 
-                    cyclix_gen.assign(commit_active, cyclix_gen.band(ctrl_active, rdy))
-                    cyclix_gen.begif(commit_active)
-                    run {
+                    cyclix_gen.band_gen(commit_active, commit_active, rdy)
 
-                        cyclix_gen.assign(commit_active, cyclix_gen.eq2(expected_instraddr, curinstr_addr))
-                        cyclix_gen.begif(commit_active)      // instruction flow fine
-                        run {
-
-                            cyclix_gen.begif(mret_req)
-                            run {
-                                MIRQEN.assign(1)
-                            }; cyclix_gen.endif()
-
-                        }; cyclix_gen.endif()
-
-                        cyclix_gen.begelse()                          // instruction flow broken
-                        run {
-                            cyclix_gen.assign(backoff_cmd, 1)
-                        }; cyclix_gen.endif()
-
-                    }; cyclix_gen.endif()
-
-                    cyclix_gen.begif(commit_active)
+                    cyclix_gen.begif(commit_active)         // instruction ready to retire
                     run {
 
                         cyclix_gen.COMMENT("committing RF...")
+
+                        cyclix_gen.begif(mret_req)
+                        run {
+                            MIRQEN.assign(1)
+                        }; cyclix_gen.endif()
 
                         // rd wdata processing
                         cyclix_gen.begcase(rd_source)
@@ -282,8 +268,6 @@ class rob_risc(name: String,
                         cyclix_gen.COMMENT("committing RF: done")
 
                         cyclix_gen.COMMENT("control transfer...")
-
-                        cyclix_gen.assign(expected_instraddr, nextinstr_addr)
 
                         cyclix_gen.begcase(jump_src)
                         run {
@@ -368,6 +352,7 @@ class rob_risc(name: String,
 
                         }; cyclix_gen.endif()
 
+                        cyclix_gen.assign(expected_instraddr, nextinstr_addr)
                         cyclix_gen.begif(jump_req)
                         run {
                             cyclix_gen.assign(expected_instraddr, jump_vector)
@@ -375,26 +360,28 @@ class rob_risc(name: String,
 
                         cyclix_gen.COMMENT("control transfer: done")
 
-                    }; cyclix_gen.endif()       // commit_active
+                        cyclix_gen.assign(entry_mask.GetFracRef(single_entry_idx), 0)
+                        cyclix_gen.assign(genrob_instr_ptr, (single_entry_idx + 1))
 
-                }; cyclix_gen.endif()           // enb
-            }; cyclix_gen.endif()           // commit_active
+                    }; cyclix_gen.endif()       // instruction ready to retire
 
-            cyclix_gen.begif(commit_active)     // instruction finished
-            run {
-                cyclix_gen.assign(entry_mask.GetFracRef(single_entry.iter_num), 0)
-                cyclix_gen.assign(genrob_instr_ptr, single_entry.iter_num_next)
-            }; cyclix_gen.endif()
+                }; cyclix_gen.endif()           // instruction should be processed
 
-            cyclix_gen.MSG_COMMENT("Processing single entry: done")
-        }; cyclix_gen.endloop()
-        cyclix_gen.MSG_COMMENT("Regular processing of entries: done")
+                cyclix_gen.MSG_COMMENT("Processing single entry: done")
+            }
+            cyclix_gen.MSG_COMMENT("Regular processing of entries: done")
+
+        }; cyclix_gen.endif()
 
         cyclix_gen.begif(backoff_cmd)
         run {
             cyclix_gen.assign(pc, expected_instraddr)
             for (buf_to_rollback in bufs_to_rollback) {
                 buf_to_rollback.Reset()
+                if (buf_to_rollback is io_buffer) {
+                    cyclix_gen.assign(buf_to_rollback.mem_rd_inprogress, 0)
+                    cyclix_gen.assign(buf_to_rollback.commit_cdb_buf, 0)
+                }
             }
             for (buf_to_clr in bufs_to_clr) {
                 for (elem_index in 0 until buf_to_clr.TRX_BUF_SIZE) {
@@ -407,7 +394,7 @@ class rob_risc(name: String,
         }; cyclix_gen.endif()
 
         cyclix_gen.COMMENT("Vectored ROB entry completion...")
-        cyclix_gen.begif(commit_active)
+        cyclix_gen.begelsif(commit_active)
         run {
             cyclix_gen.assign(pop, 1)
             pop_trx()

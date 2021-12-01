@@ -157,7 +157,8 @@ class io_buffer(cyclix_gen : cyclix.Generic,
                 iq_exu: Boolean,
                 CDB_index : Int,
                 cdb_num : Int,
-                var busreq_mem_struct : hw_struct) : iq_buffer(cyclix_gen, ExUnit_name, ExUnit_num, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, fu_id_num, iq_exu, CDB_index, cdb_num) {
+                var busreq_mem_struct : hw_struct,
+                var commit_cdb : hw_var) : iq_buffer(cyclix_gen, ExUnit_name, ExUnit_num, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, fu_id_num, iq_exu, CDB_index, cdb_num) {
 
     var mem_req         = AdduStageVar("mem_req", 0, 0, "0")
     var mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
@@ -177,19 +178,19 @@ class io_buffer(cyclix_gen : cyclix.Generic,
 
     var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
 
+    var commit_cdb_buf      = cyclix_gen.global("commit_cdb_buf", commit_cdb.vartype, "0")
+    var exu_cdb_inst_enb    = commit_cdb_buf.GetFracRef("enb")
+    var exu_cdb_inst_data   = commit_cdb_buf.GetFracRef("data")
+    var exu_cdb_inst_trx_id = exu_cdb_inst_data.GetFracRef("trx_id")
+    var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
+    var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
+
     init {
         rd_struct.addu("we", 0, 0, "0")
         rd_struct.add("wdata", hw_type(busreq_mem_struct), "0")
     }
 
-    fun ProcessIO(io_cdb_buf : hw_var, io_cdb_rs1_wdata_buf : hw_var, commit_cdb : hw_var, rob_buf : rob) {
-
-        var commit_cdb_buf      = cyclix_gen.global("commit_cdb_buf", commit_cdb.vartype, "0")
-        var exu_cdb_inst_enb    = commit_cdb_buf.GetFracRef("enb")
-        var exu_cdb_inst_data   = commit_cdb_buf.GetFracRef("data")
-        var exu_cdb_inst_trx_id = exu_cdb_inst_data.GetFracRef("trx_id")
-        var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
-        var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
+    fun ProcessIO(io_cdb_buf : hw_var, io_cdb_rs1_wdata_buf : hw_var, rob_buf : rob) {
 
         cyclix_gen.assign(commit_cdb, commit_cdb_buf)
         cyclix_gen.assign(commit_cdb_buf, 0)
