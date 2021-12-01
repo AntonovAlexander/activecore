@@ -20,13 +20,13 @@ open class rob(cyclix_gen : cyclix.Generic,
     var trx_id          = AddStageVar(hw_structvar("trx_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(MultiExu_CFG.trx_inflight_num)-1, 0, "0"))
     var rd_tag_prev     = AddStageVar(hw_structvar("rd_tag_prev",       DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
     var rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
-    var rrb_id          = AddStageVar(hw_structvar("rrb_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(rrb_num) -1, 0, "0"))
+    var cdb_id          = AddStageVar(hw_structvar("cdb_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(rrb_num) -1, 0, "0"))
     val rdy             = AddStageVar(hw_structvar("rdy",               DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
     var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", MultiExu_CFG.trx_inflight_num-1, 0, "0")
 
-    fun FillFromRRB(MultiExu_CFG : Reordex_CFG, rrb : hw_var, io_cdb_rs1_wdata_buf : hw_var) {
-        cyclix_gen.MSG_COMMENT("Filling ROB with data from RRB...")
+    fun FillFromCDB(MultiExu_CFG : Reordex_CFG, cdb : hw_var, io_cdb_rs1_wdata_buf : hw_var) {
+        cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB...")
 
         for (rob_entry_idx in 0 until MultiExu_CFG.ROB_size) {
             var rob_iter = TRX_BUF.GetFracRef(rob_entry_idx)
@@ -34,26 +34,25 @@ open class rob(cyclix_gen : cyclix.Generic,
             for (rob_entry_single_idx in 0 until TRX_BUF_MULTIDIM) {
                 var rob_entry_single = rob_iter.GetFracRef(rob_entry_single_idx)
 
-                var RRB_ref         = rrb.GetFracRef(rob_entry_single.GetFracRef("rrb_id"))
-                var RRB_ref_enb     = RRB_ref.GetFracRef("enb")
-                var RRB_ref_data    = RRB_ref.GetFracRef("data")
-                cyclix_gen.begif(RRB_ref_enb)
+                var CDB_ref         = cdb.GetFracRef(rob_entry_single.GetFracRef("cdb_id"))
+                var CDB_ref_enb     = CDB_ref.GetFracRef("enb")
+                var CDB_ref_data    = CDB_ref.GetFracRef("data")
+                cyclix_gen.begif(CDB_ref_enb)
                 run {
-                    cyclix_gen.begif(cyclix_gen.eq2(rob_entry_single.GetFracRef("trx_id"), RRB_ref_data.GetFracRef("trx_id")))
+                    cyclix_gen.begif(cyclix_gen.eq2(rob_entry_single.GetFracRef("trx_id"), CDB_ref_data.GetFracRef("trx_id")))
                     run {
                         cyclix_gen.assign(rob_entry_single.GetFracRef("rdy"), 1)
                         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-                            cyclix_gen.assign(rob_entry_single.GetFracRef("alu_result"), RRB_ref_data.GetFracRef("wdata"))
-                            cyclix_gen.assign(rob_entry_single.GetFracRef("mem_wdata"), io_cdb_rs1_wdata_buf)
+                            cyclix_gen.assign(rob_entry_single.GetFracRef("alu_result"), CDB_ref_data.GetFracRef("wdata"))
                             for (dst_imm in MultiExu_CFG.dst_imms) {
-                                cyclix_gen.assign(rob_entry_single.GetFracRef(dst_imm.name), RRB_ref_data.GetFracRef(dst_imm.name))
+                                cyclix_gen.assign(rob_entry_single.GetFracRef(dst_imm.name), CDB_ref_data.GetFracRef(dst_imm.name))
                             }
                         }
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
             }
         }
-        cyclix_gen.MSG_COMMENT("Filling ROB with data from RRB: done")
+        cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
     }
 
     open fun Commit(global_structures: __control_structures) {
@@ -108,13 +107,6 @@ class rob_risc(name: String,
     var alu_ZF          = AdduStageVar("alu_ZF", 0, 0, "0")
     var alu_OF          = AdduStageVar("alu_OF", 0, 0, "0")
 
-    var mem_req         = AdduStageVar("mem_req", 0, 0, "0")
-    var mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
-    var mem_addr        = AdduStageVar("mem_addr", 31, 0, "0")
-    var mem_wdata       = AdduStageVar("mem_wdata", 31, 0, "0")
-    var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
-    var load_signext    = AdduStageVar("load_signext", 0, 0, "0")
-
     var mret_req        = AdduStageVar("mret_req", 0, 0, "0")
 
     //// committing RF signals
@@ -141,13 +133,6 @@ class rob_risc(name: String,
     var jump_src        = AdduStageVar("jump_src", 0, 0, "0")
     var jump_vector     = AdduStageVar("jump_vector", 31, 0, "0")
 
-    var busreq_mem_struct = hw_struct(name + "_busreq_mem_struct")
-    val data_name_prefix = "genmcopipe_data_mem_"
-    var rd_struct = hw_struct("genpmodule_" + name + "_" + data_name_prefix + "genstruct_fifo_wdata")
-
-    var data_req_fifo   = cyclix_gen.fifo_out((data_name_prefix + "req"), rd_struct)
-    var data_resp_fifo  = cyclix_gen.ufifo_in((data_name_prefix + "resp"), 31, 0)
-
     var rf_dim = hw_dim_static()
     var Backoff_ARF = cyclix_gen.uglobal("Backoff_ARF", rf_dim, "0")
 
@@ -162,37 +147,22 @@ class rob_risc(name: String,
 
     var backoff_cmd     = cyclix_gen.ulocal("backoff_cmd", 0, 0, "0")
 
+    var commit_active       = cyclix_gen.ulocal("genrob_commit_active", 0, 0, "1")
+    var entry_mask          = cyclix_gen.uglobal("genrob_entry_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
+    var genrob_instr_ptr    = cyclix_gen.uglobal("genrob_instr_ptr", GetWidthToContain(TRX_BUF_MULTIDIM)-1, 0, "0")
+
     init {
-        busreq_mem_struct.addu("addr",     31, 0, "0")
-        busreq_mem_struct.addu("be",       3,  0, "0")
-        busreq_mem_struct.addu("wdata",    31, 0, "0")
-
-        rd_struct.addu("we", 0, 0, "0")
-        rd_struct.add("wdata", hw_type(busreq_mem_struct), "0")
-
         rf_dim.add(31, 0)
         rf_dim.add(31, 0)
     }
 
-    fun Commit(global_structures: __control_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, commit_cdb : hw_var, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
-
-        var entry_mask          = cyclix_gen.uglobal("genrob_entry_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
-        var commit_active       = cyclix_gen.ulocal("genrob_commit_active", 0, 0, "1")
-
-        var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
-        var mem_data_wdata      = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
-        var mem_data_rdata      = cyclix_gen.local("mem_data_rdata", data_resp_fifo.vartype, "0")
-
-        var commit_cdb_buf      = cyclix_gen.global("commit_cdb_buf", commit_cdb.vartype, "0")
-
-        cyclix_gen.assign(commit_cdb, commit_cdb_buf)
-        cyclix_gen.assign(commit_cdb_buf, 0)
+    fun Commit(global_structures: __control_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
 
         preinit_ctrls()
         init_locals()
 
         cyclix_gen.MSG_COMMENT("Interrupt receive...")
-        cyclix_gen.begif(cyclix_gen.band(!mem_rd_inprogress, MIRQEN))
+        cyclix_gen.begif(MIRQEN)
         run {
             cyclix_gen.assign(irq_recv, cyclix_gen.fifo_rd_unblk(irq_fifo, irq_mcause))
             cyclix_gen.begif(irq_recv)
@@ -208,7 +178,7 @@ class rob_risc(name: String,
         }; cyclix_gen.endif()
         cyclix_gen.MSG_COMMENT("Interrupt receive: done")
 
-        cyclix_gen.MSG_COMMENT("Processing entries...")
+        cyclix_gen.MSG_COMMENT("Regular processing of entries...")
         var single_entry = cyclix_gen.begforall_asc(TRX_LOCAL_PARALLEL)
         run {
             cyclix_gen.MSG_COMMENT("Processing single entry...")
@@ -219,94 +189,35 @@ class rob_risc(name: String,
 
                     switch_to_local(single_entry.iter_num)
 
-                    cyclix_gen.begif(mem_rd_inprogress)
+                    cyclix_gen.begif(cyclix_gen.band(ctrl_active, commit_active))
                     run {
-                        cyclix_gen.assign(commit_active, cyclix_gen.fifo_rd_unblk(data_resp_fifo, mem_data_rdata))
-                        cyclix_gen.begif(commit_active)
+                        cyclix_gen.begif(cyclix_gen.neq2(expected_instraddr, curinstr_addr))
                         run {
-
-                            cyclix_gen.begif(cyclix_gen.eq2(mem_be, 0x1))
-                            run {
-                                cyclix_gen.begif(load_signext)
-                                run {
-                                    mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[7, 0], 32))
-                                }; cyclix_gen.endif()
-                                cyclix_gen.begelse()
-                                run {
-                                    mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[7, 0], 32))
-                                }; cyclix_gen.endif()
-                            }; cyclix_gen.endif()
-
-                            cyclix_gen.begif(cyclix_gen.eq2(mem_be, 0x3))
-                            run {
-                                cyclix_gen.begif(load_signext)
-                                run {
-                                    mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[15, 0], 32))
-                                }; cyclix_gen.endif()
-                                cyclix_gen.begelse()
-                                run {
-                                    mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[15, 0], 32))
-                                }; cyclix_gen.endif()
-                            }; cyclix_gen.endif()
-
-                            var exu_cdb_inst_enb    = commit_cdb_buf.GetFracRef("enb")
-                            var exu_cdb_inst_data   = commit_cdb_buf.GetFracRef("data")
-                            var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
-                            var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
-                            cyclix_gen.assign(exu_cdb_inst_enb, 1)
-                            cyclix_gen.assign(exu_cdb_inst_tag, rd_tag)
-                            cyclix_gen.assign(exu_cdb_inst_wdata, mem_data_rdata)
-
-                            cyclix_gen.assign(rd_wdata, mem_data_rdata)
-                            cyclix_gen.assign(mem_rd_inprogress, 0)
-
+                            cyclix_gen.assign(backoff_cmd, 1)
                         }; cyclix_gen.endif()
-                    }; cyclix_gen.endif()                   // mem_rd_inprogress
+                    }; cyclix_gen.endif()
 
-                    cyclix_gen.begelse()                    // !mem_rd_inprogress
+                    cyclix_gen.assign(commit_active, cyclix_gen.band(ctrl_active, rdy))
+                    cyclix_gen.begif(commit_active)
                     run {
 
-                        cyclix_gen.assign(commit_active, cyclix_gen.band(ctrl_active, rdy))
-                        cyclix_gen.begif(commit_active)
+                        cyclix_gen.assign(commit_active, cyclix_gen.eq2(expected_instraddr, curinstr_addr))
+                        cyclix_gen.begif(commit_active)      // instruction flow fine
                         run {
 
-                            cyclix_gen.assign(commit_active, cyclix_gen.eq2(expected_instraddr, curinstr_addr))
-                            cyclix_gen.begif(commit_active)      // instruction flow fine
+                            cyclix_gen.begif(mret_req)
                             run {
-
-                                cyclix_gen.begif(mem_req)
-                                run {
-
-                                    cyclix_gen.assign(mem_addr, alu_result)
-
-                                    cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
-                                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
-                                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
-                                    cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
-                                    cyclix_gen.assign(commit_active, cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata))
-
-                                    cyclix_gen.begif(cyclix_gen.band(commit_active, !mem_cmd))
-                                    run {
-                                        cyclix_gen.assign(mem_rd_inprogress, 1)
-                                        cyclix_gen.assign(commit_active, 0)
-                                    }; cyclix_gen.endif()
-                                }; cyclix_gen.endif()
-
-                                cyclix_gen.begif(mret_req)
-                                run {
-                                    MIRQEN.assign(1)
-                                }; cyclix_gen.endif()
-
-                            }; cyclix_gen.endif()
-
-                            cyclix_gen.begelse()                          // instruction flow broken
-                            run {
-                                cyclix_gen.assign(backoff_cmd, 1)
+                                MIRQEN.assign(1)
                             }; cyclix_gen.endif()
 
                         }; cyclix_gen.endif()
 
-                    }; cyclix_gen.endif()           // !mem_rd_inprogress
+                        cyclix_gen.begelse()                          // instruction flow broken
+                        run {
+                            cyclix_gen.assign(backoff_cmd, 1)
+                        }; cyclix_gen.endif()
+
+                    }; cyclix_gen.endif()
 
                     cyclix_gen.begif(commit_active)
                     run {
@@ -343,6 +254,12 @@ class rob_risc(name: String,
                             cyclix_gen.begbranch(RD_PC_INC)
                             run {
                                 rd_wdata.assign(nextinstr_addr)
+                                rd_rdy.assign(1)
+                            }; cyclix_gen.endbranch()
+
+                            cyclix_gen.begbranch(RD_MEM)
+                            run {
+                                rd_wdata.assign(alu_result)
                                 rd_rdy.assign(1)
                             }; cyclix_gen.endbranch()
 
@@ -466,11 +383,12 @@ class rob_risc(name: String,
             cyclix_gen.begif(commit_active)     // instruction finished
             run {
                 cyclix_gen.assign(entry_mask.GetFracRef(single_entry.iter_num), 0)
+                cyclix_gen.assign(genrob_instr_ptr, single_entry.iter_num_next)
             }; cyclix_gen.endif()
 
             cyclix_gen.MSG_COMMENT("Processing single entry: done")
         }; cyclix_gen.endloop()
-        cyclix_gen.MSG_COMMENT("Processing entries: done")
+        cyclix_gen.MSG_COMMENT("Regular processing of entries: done")
 
         cyclix_gen.begif(backoff_cmd)
         run {
@@ -485,6 +403,7 @@ class rob_risc(name: String,
             }
             global_structures.RollBack(Backoff_ARF)
             cyclix_gen.assign(entry_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
+            cyclix_gen.assign(genrob_instr_ptr, 0)
         }; cyclix_gen.endif()
 
         cyclix_gen.COMMENT("Vectored ROB entry completion...")
@@ -493,6 +412,7 @@ class rob_risc(name: String,
             cyclix_gen.assign(pop, 1)
             pop_trx()
             cyclix_gen.assign(entry_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
+            cyclix_gen.assign(genrob_instr_ptr, 0)
         }; cyclix_gen.endif()
         cyclix_gen.COMMENT("Vectored ROB entry completion: done")
 

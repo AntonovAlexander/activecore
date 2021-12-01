@@ -30,7 +30,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
     var iq_free_mask        = cyclix_gen.ulocal("gendispatch_iq_free_mask", IQ_insts.size-1, 0, hw_imm_ones(IQ_insts.size))
     var store_iq_free_mask  = cyclix_gen.ulocal("gendispatch_store_iq_free_mask", 0, 0, "1")
 
-    fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, CDB_RISC_COMMIT_POS : Int) {
+    fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, CDB_RISC_LSU_POS : Int) {
 
         cyclix_gen.MSG_COMMENT("sending new operations to IQs...")
 
@@ -74,11 +74,11 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                                 // marking rd src
                                 cyclix_gen.begif(!mem_cmd)
                                 run {
-                                    cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), CDB_RISC_COMMIT_POS)
+                                    cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), CDB_RISC_LSU_POS)
                                 }; cyclix_gen.endif()
 
                                 // marking RRB for ROB
-                                cyclix_gen.assign(rob_push_trx.GetFracRef("rrb_id"), store_iq.RRB_index)
+                                cyclix_gen.assign(rob_push_trx.GetFracRef("cdb_id"), store_iq.CDB_index)
 
                                 // marking op as scheduled
                                 cyclix_gen.assign(entry_toproc_mask.GetFracRef(entry_num), 0)
@@ -113,10 +113,10 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                                             IQ_inst.push_trx(iq_push_trx)
 
                                             // marking rd src
-                                            cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), IQ_inst.RRB_index)
+                                            cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), IQ_inst.CDB_index)
 
                                             // marking RRB for ROB
-                                            cyclix_gen.assign(rob_push_trx.GetFracRef("rrb_id"), IQ_inst.RRB_index)
+                                            cyclix_gen.assign(rob_push_trx.GetFracRef("cdb_id"), IQ_inst.CDB_index)
 
                                             // marking op as scheduled
                                             cyclix_gen.assign(entry_toproc_mask.GetFracRef(entry_num), 0)

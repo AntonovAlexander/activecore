@@ -65,12 +65,11 @@ class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic, MultiExu
     }
 }
 
-class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_ID_WIDTH : Int, MultiExu_CFG : Reordex_CFG) : trx_buffer(cyclix_gen, "geninstr_req", 2, MultiExu_CFG.FrontEnd_width, MultiExu_CFG) {
+class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_ID_WIDTH : Int, MultiExu_CFG : Reordex_CFG, var busreq_mem_struct : hw_struct) : trx_buffer(cyclix_gen, "geninstr_req", 2, MultiExu_CFG.FrontEnd_width, MultiExu_CFG) {
 
     val curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")
     val nextinstr_addr = AdduStageVar("nextinstr_addr", 31, 0, "0")
 
-    var busreq_mem_struct = hw_struct(name + "_busreq_mem_struct")
     val instr_name_prefix = "genmcopipe_instr_mem_"
 
     var wr_struct = hw_struct("genpmodule_" + name + "_" + instr_name_prefix + "genstruct_fifo_wdata")
@@ -84,10 +83,6 @@ class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_I
     var entry_toproc_mask   = cyclix_gen.uglobal("genireq_toproc_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
 
     init {
-        busreq_mem_struct.addu("addr",     31, 0, "0")
-        busreq_mem_struct.addu("be",       3,  0, "0")
-        busreq_mem_struct.addu("wdata",    31, 0, "0")
-
         wr_struct.addu("we", 0, 0, "0")
         wr_struct.add("wdata", hw_type(busreq_mem_struct), "0")
 
