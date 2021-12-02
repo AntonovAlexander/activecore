@@ -608,8 +608,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         } else {            // MultiExu_CFG.mode == REORDEX_MODE.RISC
             (instr_fetch as instr_fetch_buffer).Process(dispatch_uop_buf, MRETADDR, (this as MultiExuRISC).RISCDecode.CSR_MCAUSE)
             (instr_req as instr_req_stage).Process(instr_fetch)
-            //(instr_iaddr as instr_iaddr_stage).Process(instr_req)
-            (instr_iaddr as instr_iaddr_stage).ProcessSingle(instr_req)
+            (instr_iaddr as instr_iaddr_stage).Process(instr_req)
+            //(instr_iaddr as instr_iaddr_stage).ProcessSingle(instr_req)
         }
 
         cyclix_gen.end()
