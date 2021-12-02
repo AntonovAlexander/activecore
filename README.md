@@ -37,7 +37,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 	* **Rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
 	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for Rtl KIP or to C++ sources for Xilinx HLS
 ![pic_test](kernelip/__img/Cyclix.png)
-	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and variable-latency I/O synchronization features. Translates to Cyclix KIP
+	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and variable-latency I/O synchronization features. Translates to Cyclix KIP. Close analogue (but implemented differently): TL-Verilog project
 ![pic_test](kernelip/__img/Pipex.png)
 	* **Reordex** (**reorde**red e**x**ecution) - generator of (co)processors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to Cyclix KIP
 ![pic_test](kernelip/__img/Reordex.png)
@@ -48,7 +48,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 	* **Aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex KIP core
 ![pic_test](designs/rtl/sigma_tile/doc/aquaris_pipeline_structs/aquaris_pipeline_structs.png)
 	* **Ariele** - full xbar generator, based on Pipex KIP core
-	* **Citadel** - OoO FPU coprocessor, based on Reordex KIP core
+	* **Citadel** - OoO FPU coprocessor, based on Reordex KIP core *(needs actualization)*
 	* **Agenda** - OoO RISC-V (RV32I) CPU, based on Reordex KIP core *(passes basic tests, optimization in progress)*
 ![pic_test](designs/rtl/kerygma/doc/agenda.png)
 
