@@ -49,7 +49,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 ![pic_test](designs/rtl/sigma_tile/doc/aquaris_pipeline_structs/aquaris_pipeline_structs.png)
 	* **Ariele** - full xbar generator, based on Pipex KIP core
 	* **Citadel** - OoO FPU coprocessor, based on Reordex KIP core
-	* **Agenda** - OoO RISC-V (RV32I) CPU, based on Reordex KIP core *(passes tests, optimization in progress)*
+	* **Agenda** - OoO RISC-V (RV32I) CPU, based on Reordex KIP core *(passes basic tests, optimization in progress)*
 ![pic_test](designs/rtl/kerygma/doc/agenda.png)
 
 * Auxiliary reusable cores:
@@ -60,7 +60,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 	* **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Can be learned within a single lab work, lab work manual included: https://github.com/AntonovAlexander/activecore/blob/master/designs/rtl/sigma/doc/sigma_lab_manual.pdf. Location: /designs/rtl/sigma
 ![pic_test](designs/rtl/sigma/doc/sigma_struct.png)
 	* **Magma** - NUMA MPSoC consisting of multiple sigma_tile modules connected by Ariele xbar. Location: /designs/rtl/magma
-	* **Kerygma** - MPU based on Agenda CPU. Location: /designs/rtl/kerygma *(passes tests, optimization in progress)*
+	* **Kerygma** - MCU based on 2-wide superscalar Agenda CPU. Location: /designs/rtl/kerygma
 
 ### Publications
 
