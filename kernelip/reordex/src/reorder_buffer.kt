@@ -18,10 +18,9 @@ open class rob(cyclix_gen : cyclix.Generic,
                rrb_num : Int) : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.FrontEnd_width, MultiExu_CFG) {
 
     var trx_id          = AddStageVar(hw_structvar("trx_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(MultiExu_CFG.trx_inflight_num)-1, 0, "0"))
-    var rd_tag_prev     = AddStageVar(hw_structvar("rd_tag_prev",       DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
-    var rd_tag_prev_clr = AddStageVar(hw_structvar("rd_tag_prev_clr",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
     var cdb_id          = AddStageVar(hw_structvar("cdb_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(rrb_num) -1, 0, "0"))
     val rdy             = AddStageVar(hw_structvar("rdy",               DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
+    var rds_ctrl        = ArrayList<ROB_rd_ctrl>()
 
     var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", MultiExu_CFG.trx_inflight_num-1, 0, "0")
 
@@ -63,9 +62,9 @@ open class rob(cyclix_gen : cyclix.Generic,
         run {
             cyclix_gen.begif(rdy)
             run {
-                cyclix_gen.begif(rd_tag_prev_clr)
+                cyclix_gen.begif(rds_ctrl[0].tag_prev_clr)
                 run {
-                    global_structures.FreePRF(rd_tag_prev)
+                    global_structures.FreePRF(rds_ctrl[0].tag_prev)
                 }; cyclix_gen.endif()
                 cyclix_gen.assign(pop, 1)
             }; cyclix_gen.endif()
@@ -90,7 +89,6 @@ class rob_risc(name: String,
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
 
     var rds = ArrayList<RISCDecoder_rd>()
-    var rds_ctrl        = ArrayList<RISCDecoder_rd_ctrl>()
 
     var csr_rdata       = AdduStageVar("csr_rdata", 31, 0, "0")
 
@@ -162,8 +160,10 @@ class rob_risc(name: String,
             )
             for (rd_idx in 0 until MultiExu_CFG.rds.size) {
                 rds_ctrl.add(
-                    RISCDecoder_rd_ctrl(
-                        AdduStageVar("rd" + rd_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+                    ROB_rd_ctrl(
+                        AdduStageVar("rd" + rd_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0"),
+                        AdduStageVar("rd" + rd_idx + "_tag_prev_clr",   0, 0, "0"),
+                        AdduStageVar("rd" + rd_idx + "_tag_prev",       MultiExu_CFG.PRF_addr_width-1, 0, "0")
                     )
                 )
             }
@@ -272,9 +272,9 @@ class rob_risc(name: String,
 
                         }; cyclix_gen.endcase()
 
-                        cyclix_gen.begif(rd_tag_prev_clr)
+                        cyclix_gen.begif(rds_ctrl[0].tag_prev_clr)
                         run {
-                            global_structures.FreePRF(rd_tag_prev)
+                            global_structures.FreePRF(rds_ctrl[0].tag_prev)
                             cyclix_gen.begif(rds[0].req)
                             run {
                                 cyclix_gen.assign(Backoff_ARF.GetFracRef(rds[0].addr), rds[0].wdata)

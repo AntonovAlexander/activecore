@@ -287,8 +287,8 @@ class instr_fetch_buffer(name: String,
                             cyclix_gen.begif(cyclix_gen.band(dispatch_uop_buf.ctrl_rdy, decode_active))
                             run {
 
-                                var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
-                                var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
+                                var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd0_tag_prev")
+                                var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd0_tag_prev_clr")
 
                                 cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rds[0].req))
                                 run {

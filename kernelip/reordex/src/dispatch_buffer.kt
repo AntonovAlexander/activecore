@@ -20,9 +20,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
 
     var fu_id           = AdduStageVar("fu_id",             GetWidthToContain(ExecUnits_size), 0, "0")
 
-    var rds_ctrl        = ArrayList<RISCDecoder_rd_ctrl>()
-    val rd_tag_prev     = AdduStageVar("rd_tag_prev",       MultiExu_CFG.PRF_addr_width-1, 0, "0")
-    val rd_tag_prev_clr = AdduStageVar("rd_tag_prev_clr",   0, 0, "0")
+    var rds_ctrl        = ArrayList<ROB_rd_ctrl>()
 
     val io_req          = AdduStageVar("io_req",            0, 0, "0")
     var mem_cmd         = AdduStageVar("mem_cmd",           0, 0, "1")
@@ -35,8 +33,10 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
     init {
         for (rd_idx in 0 until MultiExu_CFG.rds.size) {
             rds_ctrl.add(
-                RISCDecoder_rd_ctrl(
-                    AdduStageVar("rd" + rd_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+                ROB_rd_ctrl(
+                    AdduStageVar("rd" + rd_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0"),
+                    AdduStageVar("rd" + rd_idx + "_tag_prev_clr",   0, 0, "0"),
+                    AdduStageVar("rd" + rd_idx + "_tag_prev",       MultiExu_CFG.PRF_addr_width-1, 0, "0")
                 )
             )
         }

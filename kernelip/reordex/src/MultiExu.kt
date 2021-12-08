@@ -99,10 +99,11 @@ open class RISCDecodeContainer (MultiExu_CFG : Reordex_CFG) : hw_astc_stdif() {
     }
 }
 
-data class RISCDecoder_rs (var req : hw_var, var addr : hw_var, var rdata : hw_var)
-data class RISCDecoder_rd (var req : hw_var, var source : hw_var, var addr : hw_var, var wdata : hw_var, var rdy : hw_var)
-data class RISCDecoder_rs_ctrl (var rdy : hw_var, var tag : hw_var)
-data class RISCDecoder_rd_ctrl (var tag : hw_var)
+open class RISCDecoder_rs (var req : hw_var, var addr : hw_var, var rdata : hw_var)
+open class RISCDecoder_rd (var req : hw_var, var source : hw_var, var addr : hw_var, var wdata : hw_var, var rdy : hw_var)
+open class RISCDecoder_rs_ctrl (var rdy : hw_var, var tag : hw_var)
+open class RISCDecoder_rd_ctrl (var tag : hw_var)
+open class ROB_rd_ctrl(tag : hw_var, var tag_prev_clr : hw_var, var tag_prev : hw_var) : RISCDecoder_rd_ctrl(tag)
 
 open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiExu_CFG) {
 
