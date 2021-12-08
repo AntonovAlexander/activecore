@@ -100,6 +100,7 @@ open class RISCDecodeContainer (MultiExu_CFG : Reordex_CFG) : hw_astc_stdif() {
 }
 
 data class RISCDecoder_rs (var req : hw_var, var addr : hw_var, var rdata : hw_var)
+data class RISCDecoder_rd (var req : hw_var, var source : hw_var, var addr : hw_var, var wdata : hw_var, var rdy : hw_var)
 data class RISCDecoder_rs_ctrl (var rdy : hw_var, var tag : hw_var)
 data class RISCDecoder_rd_ctrl (var tag : hw_var)
 
@@ -142,14 +143,9 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
 
     // regfile control signals
     var rss = ArrayList<RISCDecoder_rs>()
+    var rds = ArrayList<RISCDecoder_rd>()
 
     var csr_rdata       = ugenvar("csr_rdata", 31, 0, "0")
-
-    var rd_req          = ugenvar("rd_req", 0, 0, "0")
-    var rd_source       = ugenvar("rd_source", 2, 0, RD_ALU.toString())
-    var rd_addr         = ugenvar("rd_addr", 4, 0, "0")
-    var rd_wdata        = ugenvar("rd_wdata", 31, 0, "0")
-    var rd_rdy          = ugenvar("rd_rdy", 0, 0, "0")
 
     var immediate       = ugenvar("immediate", 31, 0, "0")
 
@@ -204,7 +200,6 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
 
     //////////
     var rss_ctrl = ArrayList<RISCDecoder_rs_ctrl>()
-
     var rds_ctrl = ArrayList<RISCDecoder_rd_ctrl>()
 
     var CSR_MCAUSE      = hw_var("CSR_MCAUSE", 7, 0, "0")
@@ -227,6 +222,16 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
             )
         }
         for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+            rds.add(
+                RISCDecoder_rd(
+                    ugenvar("rd" + rd_idx + "_req", 0, 0, "0"),
+                    ugenvar("rd" + rd_idx + "_source", 2, 0, RD_ALU.toString()),
+                    ugenvar("rd" + rd_idx + "_addr", 4, 0, "0"),
+                    ugenvar("rd" + rd_idx + "_wdata", 31, 0, "0"),
+                    ugenvar("rd" + rd_idx + "_rdy", 0, 0, "0")
+                )
+            )
+
             rds_ctrl.add(
                 RISCDecoder_rd_ctrl(
                     ugenvar("rd" + rd_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")

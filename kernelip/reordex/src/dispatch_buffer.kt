@@ -19,9 +19,11 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                          val IQ_insts : ArrayList<iq_buffer>) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.FrontEnd_width, MultiExu_CFG, cdb_num) {
 
     var fu_id           = AdduStageVar("fu_id",             GetWidthToContain(ExecUnits_size), 0, "0")
-    val rd_tag          = AdduStageVar("rd0_tag",           MultiExu_CFG.PRF_addr_width-1, 0, "0")
+
+    var rds_ctrl        = ArrayList<RISCDecoder_rd_ctrl>()
     val rd_tag_prev     = AdduStageVar("rd_tag_prev",       MultiExu_CFG.PRF_addr_width-1, 0, "0")
     val rd_tag_prev_clr = AdduStageVar("rd_tag_prev_clr",   0, 0, "0")
+
     val io_req          = AdduStageVar("io_req",            0, 0, "0")
     var mem_cmd         = AdduStageVar("mem_cmd",           0, 0, "1")
 
@@ -29,6 +31,16 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
     var entry_toproc_mask   = cyclix_gen.uglobal("gendispatch_entry_toproc_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
     var iq_free_mask        = cyclix_gen.ulocal("gendispatch_iq_free_mask", IQ_insts.size-1, 0, hw_imm_ones(IQ_insts.size))
     var store_iq_free_mask  = cyclix_gen.ulocal("gendispatch_store_iq_free_mask", 0, 0, "1")
+
+    init {
+        for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+            rds_ctrl.add(
+                RISCDecoder_rd_ctrl(
+                    AdduStageVar("rd" + rd_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+                )
+            )
+        }
+    }
 
     fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, CDB_RISC_LSU_POS : Int) {
 
@@ -74,7 +86,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                                 // marking rd src
                                 cyclix_gen.begif(!mem_cmd)
                                 run {
-                                    cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), CDB_RISC_LSU_POS)
+                                    cyclix_gen.assign(PRF_src.GetFracRef(rds_ctrl[0].tag), CDB_RISC_LSU_POS)
                                 }; cyclix_gen.endif()
 
                                 // marking RRB for ROB
@@ -113,7 +125,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                                             IQ_inst.push_trx(iq_push_trx)
 
                                             // marking rd src
-                                            cyclix_gen.assign(PRF_src.GetFracRef(rd_tag), IQ_inst.CDB_index)
+                                            cyclix_gen.assign(PRF_src.GetFracRef(rds_ctrl[0].tag), IQ_inst.CDB_index)
 
                                             // marking RRB for ROB
                                             cyclix_gen.assign(rob_push_trx.GetFracRef("cdb_id"), IQ_inst.CDB_index)
@@ -196,26 +208,10 @@ class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
     var jump_src        = AdduStageVar("jump_src", 0, 0, "0")
     var jump_vector     = AdduStageVar("jump_vector", 31, 0, "0")
 
-    // regfile control signals
-    var rs0_req         = AdduStageVar("rs0_req", 0, 0, "0")
-    var rs0_addr        = AdduStageVar("rs0_addr", 4, 0, "0")
-    //var rs0_rdata       = AdduStageVar("rs0_rdata", 31, 0, "0")
-
-    var rs1_req         = AdduStageVar("rs1_req", 0, 0, "0")
-    var rs1_addr        = AdduStageVar("rs1_addr", 4, 0, "0")
-    //var rs1_rdata       = AdduStageVar("rs1_rdata", 31, 0, "0")
-
-    var rs2_req         = AdduStageVar("rs2_req", 0, 0, "0")
-    var rs2_addr        = AdduStageVar("rs2_addr", 4, 0, "0")
-    //var rs2_rdata       = AdduStageVar("rs2_rdata", 31, 0, "0")
+    var rss = ArrayList<RISCDecoder_rs>()
+    var rds = ArrayList<RISCDecoder_rd>()
 
     var csr_rdata       = AdduStageVar("csr_rdata", 31, 0, "0")
-
-    var rd_req          = AdduStageVar("rd_req", 0, 0, "0")
-    var rd_source       = AdduStageVar("rd_source", 2, 0, "0")
-    var rd_addr         = AdduStageVar("rd_addr", 4, 0, "0")
-    var rd_wdata        = AdduStageVar("rd_wdata", 31, 0, "0")
-    var rd_rdy          = AdduStageVar("rd_rdy", 0, 0, "0")
 
     var immediate_I     = AdduStageVar("immediate_I", 31, 0, "0")
     var immediate_S     = AdduStageVar("immediate_S", 31, 0, "0")
@@ -271,4 +267,27 @@ class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
     var load_signext    = AdduStageVar("load_signext", 0, 0, "0")
 
     var mret_req        = AdduStageVar("mret_req", 0, 0, "0")
+
+    init {
+        for (rs_idx in 0 until MultiExu_CFG.srcs.size) {
+            rss.add(
+                RISCDecoder_rs(
+                    AdduStageVar("rs" + rs_idx + "_req", 0, 0, "0"),
+                    AdduStageVar("rs" + rs_idx + "_addr", MultiExu_CFG.ARF_addr_width - 1, 0, "0"),
+                    AdduStageVar("rs" + rs_idx + "_rdata", MultiExu_CFG.RF_width - 1, 0, "0")
+                )
+            )
+        }
+        for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+            rds.add(
+                RISCDecoder_rd(
+                    AdduStageVar("rd" + rd_idx + "_req", 0, 0, "0"),
+                    AdduStageVar("rd" + rd_idx + "_source", 2, 0, "0"),
+                    AdduStageVar("rd" + rd_idx + "_addr", 4, 0, "0"),
+                    AdduStageVar("rd" + rd_idx + "_wdata", 31, 0, "0"),
+                    AdduStageVar("rd" + rd_idx + "_rdy", 0, 0, "0")
+                )
+            )
+        }
+    }
 }

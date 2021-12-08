@@ -89,9 +89,8 @@ class rob_risc(name: String,
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
 
-    var rd_req          = AdduStageVar("rd_req", 0, 0, "0")
-    var rd_addr         = AdduStageVar("rd_addr", 4, 0, "0")
-    var rd_wdata        = AdduStageVar("rd_wdata", MultiExu_CFG.RF_width-1, 0, "0")
+    var rds = ArrayList<RISCDecoder_rd>()
+    var rds_ctrl        = ArrayList<RISCDecoder_rd_ctrl>()
 
     var csr_rdata       = AdduStageVar("csr_rdata", 31, 0, "0")
 
@@ -118,10 +117,6 @@ class rob_risc(name: String,
     val RD_PC_INC	    = 4
     val RD_MEM		    = 5
     val RD_CSR		    = 6
-
-    var rd_source       = AdduStageVar("rd_source", 2, 0, RD_ALU.toString())
-    var rd_rdy          = AdduStageVar("rd_rdy", 0, 0, "0")
-    val rd_tag          = AdduStageVar("rd0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
 
     //// control transfer signals
     // jmp sources
@@ -154,6 +149,25 @@ class rob_risc(name: String,
     init {
         rf_dim.add(31, 0)
         rf_dim.add(31, 0)
+
+        for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+            rds.add(
+                RISCDecoder_rd(
+                    AdduStageVar("rd" + rd_idx + "_req", 0, 0, "0"),
+                    AdduStageVar("rd" + rd_idx + "_source", 2, 0, "0"),
+                    AdduStageVar("rd" + rd_idx + "_addr", 4, 0, "0"),
+                    AdduStageVar("rd" + rd_idx + "_wdata", 31, 0, "0"),
+                    AdduStageVar("rd" + rd_idx + "_rdy", 0, 0, "0")
+                )
+            )
+            for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+                rds_ctrl.add(
+                    RISCDecoder_rd_ctrl(
+                        AdduStageVar("rd" + rd_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+                    )
+                )
+            }
+        }
     }
 
     fun Commit(global_structures: __control_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
@@ -212,48 +226,48 @@ class rob_risc(name: String,
                         }; cyclix_gen.endif()
 
                         // rd wdata processing
-                        cyclix_gen.begcase(rd_source)
+                        cyclix_gen.begcase(rds[0].source)
                         run {
                             cyclix_gen.begbranch(RD_LUI)
                             run {
-                                rd_wdata.assign(immediate)
-                                rd_rdy.assign(1)
+                                rds[0].wdata.assign(immediate)
+                                rds[0].rdy.assign(1)
                             }; cyclix_gen.endbranch()
 
                             cyclix_gen.begbranch(RD_ALU)
                             run {
-                                rd_wdata.assign(alu_result)
-                                rd_rdy.assign(1)
+                                rds[0].wdata.assign(alu_result)
+                                rds[0].rdy.assign(1)
                             }; cyclix_gen.endbranch()
 
                             cyclix_gen.begbranch(RD_CF_COND)
                             run {
-                                rd_wdata.assign(alu_CF)
-                                rd_rdy.assign(1)
+                                rds[0].wdata.assign(alu_CF)
+                                rds[0].rdy.assign(1)
                             }; cyclix_gen.endbranch()
 
                             cyclix_gen.begbranch(RD_OF_COND)
                             run {
-                                rd_wdata.assign(alu_OF)
-                                rd_rdy.assign(1)
+                                rds[0].wdata.assign(alu_OF)
+                                rds[0].rdy.assign(1)
                             }; cyclix_gen.endbranch()
 
                             cyclix_gen.begbranch(RD_PC_INC)
                             run {
-                                rd_wdata.assign(nextinstr_addr)
-                                rd_rdy.assign(1)
+                                rds[0].wdata.assign(nextinstr_addr)
+                                rds[0].rdy.assign(1)
                             }; cyclix_gen.endbranch()
 
                             cyclix_gen.begbranch(RD_MEM)
                             run {
-                                rd_wdata.assign(alu_result)
-                                rd_rdy.assign(1)
+                                rds[0].wdata.assign(alu_result)
+                                rds[0].rdy.assign(1)
                             }; cyclix_gen.endbranch()
 
                             cyclix_gen.begbranch(RD_CSR)
                             run {
-                                rd_wdata.assign(csr_rdata)
-                                rd_rdy.assign(1)
+                                rds[0].wdata.assign(csr_rdata)
+                                rds[0].rdy.assign(1)
                             }; cyclix_gen.endbranch()
 
                         }; cyclix_gen.endcase()
@@ -261,9 +275,9 @@ class rob_risc(name: String,
                         cyclix_gen.begif(rd_tag_prev_clr)
                         run {
                             global_structures.FreePRF(rd_tag_prev)
-                            cyclix_gen.begif(rd_req)
+                            cyclix_gen.begif(rds[0].req)
                             run {
-                                cyclix_gen.assign(Backoff_ARF.GetFracRef(rd_addr), rd_wdata)
+                                cyclix_gen.assign(Backoff_ARF.GetFracRef(rds[0].addr), rds[0].wdata)
                             }; cyclix_gen.endif()
                         }; cyclix_gen.endif()
                         cyclix_gen.COMMENT("committing RF: done")
