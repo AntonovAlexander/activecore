@@ -99,6 +99,10 @@ open class RISCDecodeContainer (MultiExu_CFG : Reordex_CFG) : hw_astc_stdif() {
     }
 }
 
+data class RISCDecoder_rs (var req : hw_var, var addr : hw_var, var rdata : hw_var)
+data class RISCDecoder_rs_ctrl (var rdy : hw_var, var tag : hw_var)
+data class RISCDecoder_rd_ctrl (var tag : hw_var)
+
 open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiExu_CFG) {
 
     var instr_code = ugenvar("instr_code", 31, 0, "0")
@@ -137,17 +141,7 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var jump_vector     = ugenvar("jump_vector", 31, 0, "0")
 
     // regfile control signals
-    var rs0_req         = ugenvar("rs0_req", 0, 0, "0")
-    var rs0_addr        = ugenvar("rs0_addr", 4, 0, "0")
-    var rs0_rdata       = ugenvar("rs0_rdata", 31, 0, "0")
-
-    var rs1_req         = ugenvar("rs1_req", 0, 0, "0")
-    var rs1_addr        = ugenvar("rs1_addr", 4, 0, "0")
-    var rs1_rdata       = ugenvar("rs1_rdata", 31, 0, "0")
-
-    //var rs2_req         = AdduLocal("rs2_req", 0, 0, "0")
-    //var rs2_addr        = AdduLocal("rs2_addr", 4, 0, "0")
-    //var rs2_rdata       = AdduLocal("rs2_rdata", 31, 0, "0")
+    var rss = ArrayList<RISCDecoder_rs>()
 
     var csr_rdata       = ugenvar("csr_rdata", 31, 0, "0")
 
@@ -209,15 +203,37 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var MRETADDR        = ugenvar("MRETADDR", 31, 0, "0")
 
     //////////
-    var rs0_rdy         = ugenvar("rs0_rdy", 0, 0, "0")
-    var rs0_tag         = ugenvar("rs0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+    var rss_ctrl = ArrayList<RISCDecoder_rs_ctrl>()
 
-    var rs1_rdy         = ugenvar("rs1_rdy", 0, 0, "0")
-    var rs1_tag         = ugenvar("rs1_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
-
-    var rd_tag          = ugenvar("rd0_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+    var rds_ctrl = ArrayList<RISCDecoder_rd_ctrl>()
 
     var CSR_MCAUSE      = hw_var("CSR_MCAUSE", 7, 0, "0")
+
+    init {
+        for (rs_idx in 0 until MultiExu_CFG.srcs.size) {
+            rss.add(
+                RISCDecoder_rs(
+                    ugenvar("rs" + rs_idx + "_req", 0, 0, "0"),
+                    ugenvar("rs" + rs_idx + "_addr",  MultiExu_CFG.ARF_addr_width-1, 0, "0"),
+                    ugenvar("rs" + rs_idx + "_rdata", MultiExu_CFG.RF_width-1, 0, "0")
+                )
+            )
+
+            rss_ctrl.add(
+                RISCDecoder_rs_ctrl(
+                    ugenvar("rs" + rs_idx + "_rdy", 0, 0, "0"),
+                    ugenvar("rs" + rs_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+                )
+            )
+        }
+        for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+            rds_ctrl.add(
+                RISCDecoder_rd_ctrl(
+                    ugenvar("rd" + rd_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+                )
+            )
+        }
+    }
 
     fun SrcSetImm(src : Src, imm : hw_param) {
         AddExpr(hw_exec_src_set_imm(src, imm))

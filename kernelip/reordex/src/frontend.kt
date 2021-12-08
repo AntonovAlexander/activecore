@@ -296,8 +296,8 @@ class instr_fetch_buffer(name: String,
                                     cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped, nru_rd_tag_prev))
 
                                     var alloc_rd_tag = global_structures.GetFreePRF()
-                                    cyclix_gen.assign(TranslateVar(MultiExu_inst.RISCDecode.rd_tag), alloc_rd_tag.position)
-                                    global_structures.ReserveRd(TranslateVar(MultiExu_inst.RISCDecode.rd_addr), TranslateVar(MultiExu_inst.RISCDecode.rd_tag))
+                                    cyclix_gen.assign(TranslateVar(MultiExu_inst.RISCDecode.rds_ctrl[0].tag), alloc_rd_tag.position)
+                                    global_structures.ReserveRd(TranslateVar(MultiExu_inst.RISCDecode.rd_addr), TranslateVar(MultiExu_inst.RISCDecode.rds_ctrl[0].tag))
                                 }; cyclix_gen.endif()
 
                                 // forming push trx
