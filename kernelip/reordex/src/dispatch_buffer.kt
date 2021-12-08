@@ -31,15 +31,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
     var store_iq_free_mask  = cyclix_gen.ulocal("gendispatch_store_iq_free_mask", 0, 0, "1")
 
     init {
-        for (rd_idx in 0 until MultiExu_CFG.rds.size) {
-            rds_ctrl.add(
-                ROB_rd_ctrl(
-                    AdduStageVar("rd" + rd_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0"),
-                    AdduStageVar("rd" + rd_idx + "_tag_prev_clr",   0, 0, "0"),
-                    AdduStageVar("rd" + rd_idx + "_tag_prev",       MultiExu_CFG.PRF_addr_width-1, 0, "0")
-                )
-            )
-        }
+        Fill_ROB_rds_ctrl_StageVars(this, MultiExu_CFG.rds.size, rds_ctrl, MultiExu_CFG.PRF_addr_width)
     }
 
     fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, CDB_RISC_LSU_POS : Int) {
@@ -213,12 +205,6 @@ class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
 
     var csr_rdata       = AdduStageVar("csr_rdata", 31, 0, "0")
 
-    var immediate_I     = AdduStageVar("immediate_I", 31, 0, "0")
-    var immediate_S     = AdduStageVar("immediate_S", 31, 0, "0")
-    var immediate_B     = AdduStageVar("immediate_B", 31, 0, "0")
-    var immediate_U     = AdduStageVar("immediate_U", 31, 0, "0")
-    var immediate_J     = AdduStageVar("immediate_J", 31, 0, "0")
-
     var immediate       = AdduStageVar("immediate", 31, 0, "0")
 
     var curinstraddr_imm    = AdduStageVar("curinstraddr_imm", 31, 0, "0")
@@ -269,25 +255,7 @@ class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
     var mret_req        = AdduStageVar("mret_req", 0, 0, "0")
 
     init {
-        for (rs_idx in 0 until MultiExu_CFG.srcs.size) {
-            rss.add(
-                RISCDecoder_rs(
-                    AdduStageVar("rs" + rs_idx + "_req", 0, 0, "0"),
-                    AdduStageVar("rs" + rs_idx + "_addr", MultiExu_CFG.ARF_addr_width - 1, 0, "0"),
-                    AdduStageVar("rs" + rs_idx + "_rdata", MultiExu_CFG.RF_width - 1, 0, "0")
-                )
-            )
-        }
-        for (rd_idx in 0 until MultiExu_CFG.rds.size) {
-            rds.add(
-                RISCDecoder_rd(
-                    AdduStageVar("rd" + rd_idx + "_req", 0, 0, "0"),
-                    AdduStageVar("rd" + rd_idx + "_source", 2, 0, "0"),
-                    AdduStageVar("rd" + rd_idx + "_addr", 4, 0, "0"),
-                    AdduStageVar("rd" + rd_idx + "_wdata", 31, 0, "0"),
-                    AdduStageVar("rd" + rd_idx + "_rdy", 0, 0, "0")
-                )
-            )
-        }
+        Fill_RISCDecoder_rss_StageVars(this, MultiExu_CFG.srcs.size, rss, MultiExu_CFG.ARF_addr_width, MultiExu_CFG.RF_width)
+        Fill_RISCDecoder_rds_StageVars(this, MultiExu_CFG.rds.size, rds, MultiExu_CFG.ARF_addr_width)
     }
 }

@@ -148,26 +148,8 @@ class rob_risc(name: String,
         rf_dim.add(31, 0)
         rf_dim.add(31, 0)
 
-        for (rd_idx in 0 until MultiExu_CFG.rds.size) {
-            rds.add(
-                RISCDecoder_rd(
-                    AdduStageVar("rd" + rd_idx + "_req", 0, 0, "0"),
-                    AdduStageVar("rd" + rd_idx + "_source", 2, 0, "0"),
-                    AdduStageVar("rd" + rd_idx + "_addr", 4, 0, "0"),
-                    AdduStageVar("rd" + rd_idx + "_wdata", 31, 0, "0"),
-                    AdduStageVar("rd" + rd_idx + "_rdy", 0, 0, "0")
-                )
-            )
-            for (rd_idx in 0 until MultiExu_CFG.rds.size) {
-                rds_ctrl.add(
-                    ROB_rd_ctrl(
-                        AdduStageVar("rd" + rd_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0"),
-                        AdduStageVar("rd" + rd_idx + "_tag_prev_clr",   0, 0, "0"),
-                        AdduStageVar("rd" + rd_idx + "_tag_prev",       MultiExu_CFG.PRF_addr_width-1, 0, "0")
-                    )
-                )
-            }
-        }
+        Fill_RISCDecoder_rds_StageVars(this, MultiExu_CFG.rds.size, rds, MultiExu_CFG.ARF_addr_width)
+        Fill_ROB_rds_ctrl_StageVars(this, MultiExu_CFG.rds.size, rds_ctrl, MultiExu_CFG.PRF_addr_width)
     }
 
     fun Commit(global_structures: __control_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
