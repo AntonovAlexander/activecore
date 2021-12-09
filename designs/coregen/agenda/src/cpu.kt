@@ -25,7 +25,7 @@ class CPU_CFG() : Reordex_CFG(32, 32, 2, true, 48, 16, REORDEX_MODE.RISC)
     var alu_ZF          = AddDstUImm("alu_ZF", 1)
     var alu_OF          = AddDstUImm("alu_OF", 1)
 
-    var rd0 = AddRd()
+    var rd = AddRd()
 }
 val CPU_CFG_inst = CPU_CFG()
 
@@ -76,6 +76,9 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
     var immediate_B     = ugenvar("immediate_B", 31, 0, "0")
     var immediate_U     = ugenvar("immediate_U", 31, 0, "0")
     var immediate_J     = ugenvar("immediate_J", 31, 0, "0")
+
+    var op0_source      = ugenvar("op0_source", 1, 0, OP0_SRC_RS.toString())
+    var op1_source      = ugenvar("op1_source", 1, 0, OP1_SRC_RS.toString())
 
     init {
         //// instruction decoding ////
@@ -739,7 +742,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
             alu_overflow.assign(alu_OF)
         }; endif()
 
-        rd0.assign(alu_result)
+        rds[0].assign(alu_result)
         assign(CPU_CFG_inst.alu_CF, alu_CF)
         assign(CPU_CFG_inst.alu_SF, alu_SF)
         assign(CPU_CFG_inst.alu_ZF, alu_ZF)
@@ -792,7 +795,7 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CPU_CFG_inst) {
 
         alu_result.assign(alu_result_wide[31, 0])
 
-        rd0.assign(alu_result)
+        rds[0].assign(alu_result)
     }
 }
 
@@ -801,11 +804,11 @@ class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", CPU_CFG_inst) {
     init {
         begif(eq2(CPU_CFG_inst.exu_opcode, 0))
         run {
-            rd0.assign(rss[0] + rss[1])
+            rds[0].assign(rss[0] + rss[1])
         }; endif()
         begelse()
         run {
-            rd0.assign(rss[0] - rss[1])
+            rds[0].assign(rss[0] - rss[1])
         }; endif()
     }
 }
@@ -813,21 +816,21 @@ class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", CPU_CFG_inst) {
 class EXU_FP_MUL() : reordex.Exu("FP_MUL", CPU_CFG_inst) {
 
     init {
-        rd0.assign(rss[0] * rss[1])
+        rds[0].assign(rss[0] * rss[1])
     }
 }
 
 class EXU_FP_DIV() : reordex.Exu("FP_DIV", CPU_CFG_inst) {
 
     init {
-        rd0.assign(rss[0] / rss[1])
+        rds[0].assign(rss[0] / rss[1])
     }
 }
 
 class EXU_FP_FMA() : reordex.Exu("FP_FMA", CPU_CFG_inst) {
 
     init {
-        rd0.assign((rss[0] * rss[1]) + rss[2])
+        rds[0].assign((rss[0] * rss[1]) + rss[2])
     }
 }
 

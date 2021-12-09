@@ -24,7 +24,7 @@ open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
 
     var src_imms    = ArrayList<hw_var>()
     var rss         = ArrayList<hw_var>()
-    var rd0         = ulocal("rd0", Exu_CFG.RF_width-1, 0, "0")
+    var rds         = ArrayList<hw_var>()
 
     init {
         if (FROZEN_FLAG) ERROR("Failed to begin stage " + name + ": ASTC frozen")
@@ -37,6 +37,10 @@ open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
 
         for (Exu_rs in Exu_CFG.srcs) {
             rss.add(local(Exu_rs.name, Exu_rs.vartype, Exu_rs.defimm))
+        }
+
+        for (rd_idx in 0 until Exu_CFG.rds.size) {
+            rds.add(ulocal("rd" + rd_idx, Exu_CFG.RF_width-1, 0, "0"))
         }
 
     }
