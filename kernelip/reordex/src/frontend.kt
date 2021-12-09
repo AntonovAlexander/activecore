@@ -300,7 +300,7 @@ class instr_fetch_buffer(name: String,
 
                                 // forming push trx
                                 cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
-                                cyclix_gen.assign(new_renamed_uop.GetFracRef("rdy"), !TranslateVar(MultiExu_inst.RISCDecode.alu_req, var_dict))
+                                cyclix_gen.assign(new_renamed_uop.GetFracRef("rdy"), !TranslateVar(MultiExu_inst.RISCDecode.exu_req, var_dict))
                                 cyclix_gen.assign(new_renamed_uop.GetFracRef("io_req"), TranslateVar(MultiExu_inst.RISCDecode.mem_req, var_dict))
                                 cyclix_gen.assign(entry_toproc_mask.GetFracRef(entry_num), 0)
                                 cyclix_gen.assign(dispatch_uop_buf.push, 1)

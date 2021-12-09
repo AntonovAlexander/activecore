@@ -161,15 +161,7 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var zimm            = ugenvar("zimm", 4, 0, "0")
 
     // ALU control
-    var alu_req         = ugenvar("alu_req", 0, 0, "0")
-
-    var alu_result_wide = ugenvar("alu_result_wide", 32, 0, "0")
-    var alu_result      = ugenvar("alu_result", 31, 0, "0")
-    var alu_CF          = ugenvar("alu_CF", 0, 0, "0")
-    var alu_SF          = ugenvar("alu_SF", 0, 0, "0")
-    var alu_ZF          = ugenvar("alu_ZF", 0, 0, "0")
-    var alu_OF          = ugenvar("alu_OF", 0, 0, "0")
-    var alu_overflow    = ugenvar("alu_overflow", 0, 0, "0")
+    var exu_req         = ugenvar("exu_req", 0, 0, "0")
 
     // data memory control
     var mem_req         = ugenvar("mem_req", 0, 0, "0")
