@@ -1594,56 +1594,52 @@ open class hw_astc() : ArrayList<hw_exec>() {
     fun max0(datain : hw_var) : bit_position {
         var found = ugenvar(GetGenName("flag"), 0, 0, "0")
         var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        var iter = begforall_asc(datain)
-        run {
-            begif(!iter.iter_elem)
+        for (bitpos in datain.vartype.dimensions.last().lsb .. datain.vartype.dimensions.last().msb) {
+            begif(!datain.GetFracRef(bitpos))
             run {
                 assign(found, 1)
-                assign(position, iter.iter_num)
+                assign(position, bitpos)
             }; endif()
-        }; endloop()
+        }
         return bit_position(found, position)
     }
 
     fun min0(datain : hw_var) : bit_position {
         var found = ugenvar(GetGenName("flag"), 0, 0, "0")
         var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        var iter = begforall_desc(datain)
-        run {
-            begif(!iter.iter_elem)
+        for (bitpos in datain.vartype.dimensions.last().msb downTo datain.vartype.dimensions.last().lsb) {
+            begif(!datain.GetFracRef(bitpos))
             run {
                 assign(found, 1)
-                assign(position, iter.iter_num)
+                assign(position, bitpos)
             }; endif()
-        }; endloop()
+        }
         return bit_position(found, position)
     }
 
     fun max1(datain : hw_var) : bit_position {
         var found = ugenvar(GetGenName("flag"), 0, 0, "0")
         var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        var iter = begforall_asc(datain)
-        run {
-            begif(iter.iter_elem)
+        for (bitpos in datain.vartype.dimensions.last().lsb .. datain.vartype.dimensions.last().msb) {
+            begif(datain.GetFracRef(bitpos))
             run {
                 assign(found, 1)
-                assign(position, iter.iter_num)
+                assign(position, bitpos)
             }; endif()
-        }; endloop()
+        }
         return bit_position(found, position)
     }
 
     fun min1(datain : hw_var) : bit_position {
         var found = ugenvar(GetGenName("flag"), 0, 0, "0")
         var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        var iter = begforall_desc(datain)
-        run {
-            begif(iter.iter_elem)
+        for (bitpos in datain.vartype.dimensions.last().msb downTo datain.vartype.dimensions.last().lsb) {
+            begif(datain.GetFracRef(bitpos))
             run {
                 assign(found, 1)
-                assign(position, iter.iter_num)
+                assign(position, bitpos)
             }; endif()
-        }; endloop()
+        }
         return bit_position(found, position)
     }
 

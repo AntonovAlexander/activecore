@@ -348,10 +348,6 @@ class instr_fetch_buffer(name: String,
                         cyclix_gen.assign(instr_recv_code, instr_recv_code_buf)
                     }; cyclix_gen.endif()
                 }
-                var fetch_iter_vec = cyclix_gen.begforall_asc(TRX_BUF)
-                run {
-
-                }; cyclix_gen.endloop()
                 cyclix_gen.add_gen(instr_io_rd_ptr.GetFracRef(entry_num), instr_io_rd_ptr.GetFracRef(entry_num), 1)
             }; cyclix_gen.endif()
             cyclix_gen.COMMENT("fetching instruction code: done")
