@@ -162,6 +162,10 @@ class io_buffer(cyclix_gen : cyclix.Generic,
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
     var load_signext    = AdduStageVar("load_signext", 0, 0, "0")
 
+    var mem_addr_generated      = AdduStageVar("mem_addr_generated", 0, 0, "0")
+    var mem_addr_generate       = cyclix_gen.ulocal("mem_addr_generate", 0, 0, "0")
+    var mem_addr_generate_trx   = cyclix_gen.ulocal("mem_addr_generate_trx", GetWidthToContain(TRX_BUF_SIZE)-1, 0, "0")
+
     val data_name_prefix = "genmcopipe_data_mem_"
     var rd_struct = hw_struct("genpmodule_" + cyclix_gen.name + "_" + data_name_prefix + "genstruct_fifo_wdata")
 
@@ -227,7 +231,7 @@ class io_buffer(cyclix_gen : cyclix.Generic,
             cyclix_gen.assign(io_cdb_enb, 0)
             cyclix_gen.assign(io_cdb_data, 0)
 
-            cyclix_gen.add_gen(mem_addr, src_rsrv[0].src_data, immediate)
+            cyclix_gen.assign(mem_addr, src_rsrv[0].src_data)
             cyclix_gen.assign(mem_wdata, src_rsrv[1].src_data)
 
             cyclix_gen.MSG_COMMENT("Load processing...")
@@ -281,40 +285,45 @@ class io_buffer(cyclix_gen : cyclix.Generic,
                 cyclix_gen.begif(ctrl_active)
                 run {
 
-                    var active_trx_id = rob_buf.TRX_LOCAL_PARALLEL.GetFracRef((rob_buf as rob_risc).genrob_instr_ptr).GetFracRef("trx_id")
-                    cyclix_gen.begif(cyclix_gen.eq2(trx_id, active_trx_id))      // IO operation can be executed
+                    cyclix_gen.begif(mem_addr_generated)
                     run {
 
-                        cyclix_gen.assign(rdy, src_rsrv[0].src_rdy)
-                        cyclix_gen.begif(!mem_cmd)
-                        run {
-                            cyclix_gen.band_gen(rdy, rdy, src_rsrv[1].src_rdy)
-                        }; cyclix_gen.endif()
-
-                        cyclix_gen.begif(rdy)
+                        var active_trx_id = rob_buf.TRX_LOCAL_PARALLEL.GetFracRef((rob_buf as rob_risc).genrob_instr_ptr).GetFracRef("trx_id")
+                        cyclix_gen.begif(cyclix_gen.eq2(trx_id, active_trx_id))      // IO operation can be executed
                         run {
 
-                            cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
-                            cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
-                            cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
-                            cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
-
-                            cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata))
+                            cyclix_gen.assign(rdy, src_rsrv[0].src_rdy)
+                            cyclix_gen.begif(!mem_cmd)
                             run {
-                                cyclix_gen.begif(mem_cmd)
-                                run {
-                                    cyclix_gen.assign(pop, 1)
+                                cyclix_gen.band_gen(rdy, rdy, src_rsrv[1].src_rdy)
+                            }; cyclix_gen.endif()
 
-                                    // dummy write to finish transaction
-                                    cyclix_gen.assign(exu_cdb_inst_enb, 1)
-                                    cyclix_gen.assign(exu_cdb_inst_trx_id, trx_id)
-                                    cyclix_gen.assign(exu_cdb_inst_tag, 0)
-                                    cyclix_gen.assign(exu_cdb_inst_wdata, 0)
-                                }; cyclix_gen.endif()
-                                cyclix_gen.begelse()
+                            cyclix_gen.begif(rdy)
+                            run {
+
+                                cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
+                                cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
+                                cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
+                                cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
+
+                                cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata))
                                 run {
-                                    cyclix_gen.assign(mem_rd_inprogress, 1)
+                                    cyclix_gen.begif(mem_cmd)
+                                    run {
+                                        cyclix_gen.assign(pop, 1)
+
+                                        // dummy write to finish transaction
+                                        cyclix_gen.assign(exu_cdb_inst_enb, 1)
+                                        cyclix_gen.assign(exu_cdb_inst_trx_id, trx_id)
+                                        cyclix_gen.assign(exu_cdb_inst_tag, 0)
+                                        cyclix_gen.assign(exu_cdb_inst_wdata, 0)
+                                    }; cyclix_gen.endif()
+                                    cyclix_gen.begelse()
+                                    run {
+                                        cyclix_gen.assign(mem_rd_inprogress, 1)
+                                    }; cyclix_gen.endif()
                                 }; cyclix_gen.endif()
+
                             }; cyclix_gen.endif()
 
                         }; cyclix_gen.endif()
@@ -324,6 +333,23 @@ class io_buffer(cyclix_gen : cyclix.Generic,
                 }; cyclix_gen.endif()
 
             }; cyclix_gen.endif()                   // !mem_rd_inprogress
+
+            cyclix_gen.MSG_COMMENT("Mem addr generating...")
+            for (trx_idx in TRX_BUF.vartype.dimensions.last().msb downTo 0) {
+                var entry_ptr = TRX_BUF.GetFracRef(trx_idx)
+                cyclix_gen.begif(cyclix_gen.band(entry_ptr.GetFracRef("enb"), entry_ptr.GetFracRef("src0_rdy"), !entry_ptr.GetFracRef("mem_addr_generated")))
+                run {
+                    cyclix_gen.assign(mem_addr_generate, 1)
+                    cyclix_gen.assign(mem_addr_generate_trx, trx_idx)
+                }; cyclix_gen.endif()
+            }
+            cyclix_gen.begif(mem_addr_generate)
+            run {
+                var entry_ptr = TRX_BUF.GetFracRef(mem_addr_generate_trx)
+                cyclix_gen.add_gen(entry_ptr.GetFracRef("src0_data"), entry_ptr.GetFracRef("src0_data"), entry_ptr.GetFracRef("immediate"))
+                cyclix_gen.assign(entry_ptr.GetFracRef("mem_addr_generated"), 1)
+            }; cyclix_gen.endif()
+            cyclix_gen.MSG_COMMENT("Mem addr generating: done")
 
             cyclix_gen.begif(pop)
             run {
