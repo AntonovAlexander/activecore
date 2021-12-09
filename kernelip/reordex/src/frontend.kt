@@ -277,8 +277,6 @@ class instr_fetch_buffer(name: String,
                                 )
                             }
 
-                            TranslateVar(MultiExu_inst.RISCDecode.opcode).assign(TranslateVar(MultiExu_inst.RISCDecode.alu_opcode))
-
                             cyclix_gen.begif(cyclix_gen.band(TranslateVar(MultiExu_inst.RISCDecode.rds[0].req), cyclix_gen.rand(global_structures.PRF_mapped)))
                             run {
                                 cyclix_gen.assign(decode_active, 0)
@@ -302,7 +300,6 @@ class instr_fetch_buffer(name: String,
 
                                 // forming push trx
                                 cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
-                                cyclix_gen.assign(new_renamed_uop.GetFracRef("exu_opcode"), TranslateVar(MultiExu_inst.RISCDecode.alu_opcode, var_dict))
                                 cyclix_gen.assign(new_renamed_uop.GetFracRef("rdy"), !TranslateVar(MultiExu_inst.RISCDecode.alu_req, var_dict))
                                 cyclix_gen.assign(new_renamed_uop.GetFracRef("io_req"), TranslateVar(MultiExu_inst.RISCDecode.mem_req, var_dict))
                                 cyclix_gen.assign(entry_toproc_mask.GetFracRef(entry_num), 0)

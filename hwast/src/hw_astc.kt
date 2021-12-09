@@ -109,7 +109,12 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     protected fun AddExpr(new_expr: hw_exec) {
         if (FROZEN_FLAG) ERROR("Failed to add operation " + new_expr.opcode.default_string + ": ASTC frozen")
-        if (size == 0) ERROR("Exec stack size error on opcode: " + new_expr.opcode.default_string + ", exec size: " + size)
+        if (size == 0) {
+            //MSG_COMMENT("Erroneous operation: ")
+            //for (dst in new_expr.dsts) MSG_COMMENT("dst: " + dst.name)
+            //for (param in new_expr.params) MSG_COMMENT("param: " + param.GetString())
+            ERROR("Exec stack size error on opcode: " + new_expr.opcode.default_string + ", exec size: " + size)
+        }
         DistributeVars(new_expr)
         last().expressions.add(last().cursor, new_expr)
         last().cursor++

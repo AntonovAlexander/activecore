@@ -125,7 +125,6 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     val JMP_SRC_IMM     = 0
     val JMP_SRC_ALU     = 1
 
-    var opcode          = ugenvar("opcode", 6, 0, "0")
     val curinstr_addr   = ugenvar("curinstr_addr_decoder", 31, 0, "0")
 
     ///////////////////////
@@ -163,11 +162,6 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
 
     // ALU control
     var alu_req         = ugenvar("alu_req", 0, 0, "0")
-    var alu_op1         = ugenvar("alu_op1", 31, 0, "0")
-    var alu_op2         = ugenvar("alu_op2", 31, 0, "0")
-    var alu_op1_wide    = ugenvar("alu_op1_wide", 32, 0, "0")
-    var alu_op2_wide    = ugenvar("alu_op2_wide", 32, 0, "0")
-    var alu_opcode      = ugenvar("alu_opcode", 3, 0, "0")
 
     var alu_result_wide = ugenvar("alu_result_wide", 32, 0, "0")
     var alu_result      = ugenvar("alu_result", 31, 0, "0")
@@ -230,6 +224,9 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
                 )
             )
         }
+
+        for (src_imm in MultiExu_CFG.src_imms) src_imm.default_astc = this
+
     }
 
     fun SrcSetImm(src : Src, imm : hw_param) {

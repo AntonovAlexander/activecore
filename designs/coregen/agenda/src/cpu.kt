@@ -71,6 +71,8 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
 
     ///////////////////
 
+    var opcode          = ugenvar("opcode", 6, 0, "0")
+
     var immediate_I     = ugenvar("immediate_I", 31, 0, "0")
     var immediate_S     = ugenvar("immediate_S", 31, 0, "0")
     var immediate_B     = ugenvar("immediate_B", 31, 0, "0")
@@ -82,6 +84,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
 
     init {
         //// instruction decoding ////
+        println("Instruction decoding...")
         opcode.assign(instr_code[6, 0])
         assign(CPU_CFG_inst.alu_unsigned, 0)
 
@@ -141,7 +144,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                 op0_source.assign(OP0_SRC_PC)
                 op1_source.assign(OP1_SRC_IMM)
                 alu_req.assign(1)
-                alu_opcode.assign(aluop_ADD)
+                CPU_CFG_inst.exu_opcode.assign(aluop_ADD)
                 rds[0].req.assign(1)
                 rds[0].source.assign(RD_ALU)
                 immediate.assign(immediate_U)
@@ -152,7 +155,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                 op0_source.assign(OP0_SRC_PC)
                 op1_source.assign(OP1_SRC_IMM)
                 alu_req.assign(1)
-                alu_opcode.assign(aluop_ADD)
+                CPU_CFG_inst.exu_opcode.assign(aluop_ADD)
                 rds[0].req.assign(1)
                 rds[0].source.assign(RD_PC_INC)
                 jump_req.assign(1)
@@ -166,7 +169,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                 op0_source.assign(OP0_SRC_RS)
                 op1_source.assign(OP1_SRC_IMM)
                 alu_req.assign(1)
-                alu_opcode.assign(aluop_ADD)
+                CPU_CFG_inst.exu_opcode.assign(aluop_ADD)
                 rds[0].req.assign(1)
                 rds[0].source.assign(RD_PC_INC)
                 jump_req.assign(1)
@@ -179,7 +182,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                 rss[0].req.assign(1)
                 rss[1].req.assign(1)
                 alu_req.assign(1)
-                alu_opcode.assign(aluop_SUB)
+                CPU_CFG_inst.exu_opcode.assign(aluop_SUB)
                 jump_req_cond.assign(1)
                 jump_src.assign(JMP_SRC_ALU)
                 immediate.assign(immediate_B)
@@ -229,14 +232,14 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                     // ADDI
                     begbranch(0x0)
                     run {
-                        alu_opcode.assign(aluop_ADD)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_ADD)
                         rds[0].source.assign(RD_ALU)
                     }; endbranch()
 
                     // SLLI
                     begbranch(0x1)
                     run {
-                        alu_opcode.assign(aluop_SLL)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_SLL)
                         rds[0].source.assign(RD_ALU)
                         immediate.assign(zeroext(instr_code[24, 20], 32))
                     }; endbranch()
@@ -244,14 +247,14 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                     // SLTI
                     begbranch(0x2)
                     run {
-                        alu_opcode.assign(aluop_SLT)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_SLT)
                         rds[0].source.assign(RD_CF_COND)
                     }; endbranch()
 
                     // SLTIU
                     begbranch(0x3)
                     run {
-                        alu_opcode.assign(aluop_SLT)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_SLT)
                         assign(CPU_CFG_inst.alu_unsigned, 1)
                         rds[0].source.assign(RD_CF_COND)
                     }; endbranch()
@@ -259,7 +262,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                     // XORI
                     begbranch(0x4)
                     run {
-                        alu_opcode.assign(aluop_XOR)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_XOR)
                         rds[0].source.assign(RD_ALU)
                     }; endbranch()
 
@@ -269,13 +272,13 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                         // SRAI
                         begif(instr_code[30])
                         run {
-                            alu_opcode.assign(aluop_SRA)
+                            CPU_CFG_inst.exu_opcode.assign(aluop_SRA)
                         }; endif()
 
                         // SRLI
                         begelse()
                         run {
-                            alu_opcode.assign(aluop_SRL)
+                            CPU_CFG_inst.exu_opcode.assign(aluop_SRL)
                         }; endif()
 
                         rds[0].source.assign(RD_ALU)
@@ -285,14 +288,14 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                     // ORI
                     begbranch(0x6)
                     run {
-                        alu_opcode.assign(aluop_OR)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_OR)
                         rds[0].source.assign(RD_ALU)
                     }; endbranch()
 
                     // ANDI
                     begbranch(0x7)
                     run {
-                        alu_opcode.assign(aluop_AND)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_AND)
                         rds[0].source.assign(RD_ALU)
                     }; endbranch()
 
@@ -317,13 +320,13 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                         // SUB
                         begif(instr_code[30])
                         run {
-                            alu_opcode.assign(aluop_SUB)
+                            CPU_CFG_inst.exu_opcode.assign(aluop_SUB)
                         }; endif()
 
                         // ADD
                         begelse()
                         run {
-                            alu_opcode.assign(aluop_ADD)
+                            CPU_CFG_inst.exu_opcode.assign(aluop_ADD)
                         }; endif()
                         rds[0].source.assign(RD_ALU)
                     }; endbranch()
@@ -331,21 +334,21 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                     // SLL
                     begbranch(0x1)
                     run {
-                        alu_opcode.assign(aluop_SLL)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_SLL)
                         rds[0].source.assign(RD_ALU)
                     }; endbranch()
 
                     // SLT
                     begbranch(0x2)
                     run {
-                        alu_opcode.assign(aluop_SLT)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_SLT)
                         rds[0].source.assign(RD_CF_COND)
                     }; endbranch()
 
                     // SLTU
                     begbranch(0x3)
                     run {
-                        alu_opcode.assign(aluop_SLT)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_SLT)
                         assign(CPU_CFG_inst.alu_unsigned, 1)
                         rds[0].source.assign(RD_CF_COND)
                     }; endbranch()
@@ -353,7 +356,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                     // XORI
                     begbranch(0x4)
                     run {
-                        alu_opcode.assign(aluop_XOR)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_XOR)
                         rds[0].source.assign(RD_ALU)
                     }; endbranch()
 
@@ -363,12 +366,12 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                         // SRA
                         begif(instr_code[30])
                         run {
-                            alu_opcode.assign(aluop_SRA)
+                            CPU_CFG_inst.exu_opcode.assign(aluop_SRA)
                         }; endif()
                         // SRL
                         begelse()
                         run {
-                            alu_opcode.assign(aluop_SRL)
+                            CPU_CFG_inst.exu_opcode.assign(aluop_SRL)
                         }; endif()
                         rds[0].source.assign(RD_ALU)
                     }; endbranch()
@@ -376,14 +379,14 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                     // OR
                     begbranch(0x6)
                     run {
-                        alu_opcode.assign(aluop_OR)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_OR)
                         rds[0].source.assign(RD_ALU)
                     }; endbranch()
 
                     // AND
                     begbranch(0x7)
                     run {
-                        alu_opcode.assign(aluop_AND)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_AND)
                         rds[0].source.assign(RD_ALU)
                     }; endbranch()
 
@@ -433,7 +436,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                         rds[0].req.assign(1)
                         rds[0].source.assign(RD_CSR)
                         alu_req.assign(1)
-                        alu_opcode.assign(aluop_OR)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_OR)
                         op0_source.assign(OP0_SRC_RS)
                         op1_source.assign(OP1_SRC_CSR)
                     }; endbranch()
@@ -446,7 +449,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                         rds[0].req.assign(1)
                         rds[0].source.assign(RD_CSR)
                         alu_req.assign(1)
-                        alu_opcode.assign(aluop_CLRB)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_CLRB)
                         op0_source.assign(OP0_SRC_RS)
                         op1_source.assign(OP1_SRC_CSR)
                     }; endbranch()
@@ -468,7 +471,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                         rds[0].req.assign(1)
                         rds[0].source.assign(RD_CSR)
                         alu_req.assign(1)
-                        alu_opcode.assign(aluop_CLRB)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_CLRB)
                         op0_source.assign(OP0_SRC_IMM)
                         op1_source.assign(OP1_SRC_CSR)
                         immediate.assign(zeroext(zimm, 32))
@@ -481,7 +484,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                         rds[0].req.assign(1)
                         rds[0].source.assign(RD_CSR)
                         alu_req.assign(1)
-                        alu_opcode.assign(aluop_CLRB)
+                        CPU_CFG_inst.exu_opcode.assign(aluop_CLRB)
                         op0_source.assign(OP0_SRC_IMM)
                         op1_source.assign(OP1_SRC_CSR)
                         immediate.assign(zeroext(zimm, 32))
@@ -617,6 +620,8 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
             }; endcase()
 
         }; endif()
+
+        println("Instruction decoding: done")
     }
 
 }
@@ -639,7 +644,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op0_wide    = ulocal("alu_op0_wide", 32, 0, "0")
     var alu_op1_wide    = ulocal("alu_op1_wide", 32, 0, "0")
-    var alu_opcode      = ulocal("alu_opcode", 3, 0, "0")
+    var opcode          = ulocal("opcode", 3, 0, "0")
 
     var alu_result_wide = ulocal("alu_result_wide", 32, 0, "0")
     var alu_result      = ulocal("alu_result", 31, 0, "0")
@@ -652,7 +657,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
     init {
         alu_op0.assign(CPU_CFG_inst.src0)
         alu_op1.assign(CPU_CFG_inst.src1)
-        alu_opcode.assign(CPU_CFG_inst.exu_opcode)
+        opcode.assign(CPU_CFG_inst.exu_opcode)
 
         begif(CPU_CFG_inst.alu_unsigned)
         run {
@@ -668,7 +673,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
         alu_result_wide.assign(alu_op0_wide)
 
         // computing result
-        begcase(alu_opcode)
+        begcase(opcode)
         run {
             begbranch(aluop_ADD)
             run {
@@ -728,7 +733,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CPU_CFG_inst) {
         alu_ZF.assign(bnot(ror(alu_result)))
         alu_OF.assign(bor(band(!alu_op0[31], band(!alu_op1[31], alu_result[31])), band(alu_op0[31], band(alu_op1[31], !alu_result[31]))))
 
-        begif(eq2(alu_opcode, aluop_SLT))
+        begif(eq2(opcode, aluop_SLT))
         run {
             alu_result.assign(alu_CF)
         }; endif()
@@ -760,14 +765,14 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CPU_CFG_inst) {
     var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op0_wide    = ulocal("alu_op0_wide", 32, 0, "0")
     var alu_op1_wide    = ulocal("alu_op1_wide", 32, 0, "0")
-    var alu_opcode      = ulocal("alu_opcode", 3, 0, "0")
+    var opcode          = ulocal("opcode", 3, 0, "0")
     var alu_result_wide = ulocal("alu_result_wide", 32, 0, "0")
     var alu_result      = ulocal("alu_result", 31, 0, "0")
 
     init {
         alu_op0.assign(CPU_CFG_inst.src0)
         alu_op1.assign(CPU_CFG_inst.src1)
-        alu_opcode.assign(CPU_CFG_inst.exu_opcode)
+        opcode.assign(CPU_CFG_inst.exu_opcode)
 
         begif(CPU_CFG_inst.alu_unsigned)
         run {
@@ -780,7 +785,7 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CPU_CFG_inst) {
             alu_op1_wide.assign(signext(alu_op1, 33))
         }; endif()
 
-        begcase(alu_opcode)
+        begcase(opcode)
         run {
             begbranch(aluop_MUL)
             run {
