@@ -43,11 +43,10 @@ open class iq_buffer(cyclix_gen : cyclix.Generic,
         cyclix_gen.begif(ctrl_active)
         run {
 
-            var iq_iter = cyclix_gen.begforall_asc(TRX_BUF)
-            run {
+            for (trx_idx in 0 until TRX_BUF_SIZE) {
 
-                var cur_srcs_rdy        = srcs_rdy.GetFracRef(iq_iter.iter_num)
-                var iq_entry            = TRX_BUF.GetFracRef(iq_iter.iter_num)
+                var cur_srcs_rdy        = srcs_rdy.GetFracRef(trx_idx)
+                var iq_entry            = TRX_BUF.GetFracRef(trx_idx)
                 var iq_entry_enb        = iq_entry.GetFracRef("enb")
                 var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
                 var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
@@ -65,13 +64,12 @@ open class iq_buffer(cyclix_gen : cyclix.Generic,
                         cyclix_gen.begif(cur_srcs_rdy)
                         run {
                             cyclix_gen.assign(op_issue, 1)
-                            cyclix_gen.assign(op_issued_num, iq_iter.iter_num)
+                            cyclix_gen.assign(op_issued_num, trx_idx)
                         }; cyclix_gen.endif()
                     }; cyclix_gen.endif()
 
                 }; cyclix_gen.endif()
-
-            }; cyclix_gen.endloop()
+            }
 
             cyclix_gen.MSG_COMMENT("selecting uop to issue: done")
 
@@ -96,10 +94,8 @@ open class iq_buffer(cyclix_gen : cyclix.Generic,
     }
 
     fun FillFromCDB(cdb : hw_var) {
-        var iq_iter = cyclix_gen.begforall_asc(TRX_BUF)
-        run {
-
-            var iq_entry            = TRX_BUF.GetFracRef(iq_iter.iter_num)
+        for (trx_idx in 0 until TRX_BUF_SIZE) {
+            var iq_entry            = TRX_BUF.GetFracRef(trx_idx)
             var iq_entry_enb        = iq_entry.GetFracRef("enb")
             var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
             var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
@@ -142,8 +138,7 @@ open class iq_buffer(cyclix_gen : cyclix.Generic,
                 }; cyclix_gen.endif()
 
             }; cyclix_gen.endif()
-
-        }; cyclix_gen.endloop()
+        }
     }
 }
 

@@ -336,9 +336,8 @@ class instr_fetch_buffer(name: String,
         for (entry_num in 0 until MultiExu_CFG.FrontEnd_width) {
             cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifos[entry_num], instr_recv_code_buf))
             run {
-                var fetch_iter_vec = cyclix_gen.begforall_asc(TRX_BUF)
-                run {
-                    var fetch_iter      = fetch_iter_vec.iter_elem.GetFracRef(entry_num)
+                for (trx_idx in 0 until TRX_BUF_SIZE) {
+                    var fetch_iter      = TRX_BUF.GetFracRef(trx_idx).GetFracRef(entry_num)
                     var instr_io_id_ref = fetch_iter.GetFracRef("geninstr_io_id")
                     var instr_recv      = fetch_iter.GetFracRef("instr_recv")
                     var instr_recv_code = fetch_iter.GetFracRef("instr_recv_code")
@@ -348,6 +347,10 @@ class instr_fetch_buffer(name: String,
                         cyclix_gen.assign(instr_recv, 1)
                         cyclix_gen.assign(instr_recv_code, instr_recv_code_buf)
                     }; cyclix_gen.endif()
+                }
+                var fetch_iter_vec = cyclix_gen.begforall_asc(TRX_BUF)
+                run {
+
                 }; cyclix_gen.endloop()
                 cyclix_gen.add_gen(instr_io_rd_ptr.GetFracRef(entry_num), instr_io_rd_ptr.GetFracRef(entry_num), 1)
             }; cyclix_gen.endif()
