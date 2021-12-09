@@ -73,6 +73,20 @@ fun Fill_ROB_rds_ctrl_StageVars(stage : hw_stage, amount : Int, rds_ctrl : Array
     }
 }
 
+class RISCDecoder_memctrl   (var req : hw_var,
+                             var cmd : hw_var,
+                             var addr : hw_var,
+                             var be : hw_var,
+                             var wdata : hw_var,
+                             var rdata : hw_var,
+                             var rshift : hw_var,
+                             var load_signext : hw_var)
+
+class RISCDecoder_branchctrl(var req: hw_var,
+                             var req_cond: hw_var,
+                             var src: hw_var,
+                             var vector: hw_var)
+
 open class trx_buffer(cyclix_gen : cyclix.Generic,
                       name_prefix : String,
                       TRX_BUF_SIZE : Int,

@@ -158,8 +158,8 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                 CPU_CFG_inst.exu_opcode.assign(aluop_ADD)
                 rds[0].req.assign(1)
                 rds[0].source.assign(RD_PC_INC)
-                jump_req.assign(1)
-                jump_src.assign(JMP_SRC_ALU)
+                branchctrl.req.assign(1)
+                branchctrl.src.assign(JMP_SRC_ALU)
                 immediate.assign(immediate_J)
             }; endbranch()
 
@@ -172,8 +172,8 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                 CPU_CFG_inst.exu_opcode.assign(aluop_ADD)
                 rds[0].req.assign(1)
                 rds[0].source.assign(RD_PC_INC)
-                jump_req.assign(1)
-                jump_src.assign(JMP_SRC_ALU)
+                branchctrl.req.assign(1)
+                branchctrl.src.assign(JMP_SRC_ALU)
                 immediate.assign(immediate_I)
             }; endbranch()
 
@@ -183,8 +183,8 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                 rss[1].req.assign(1)
                 exu_req.assign(1)
                 CPU_CFG_inst.exu_opcode.assign(aluop_SUB)
-                jump_req_cond.assign(1)
-                jump_src.assign(JMP_SRC_ALU)
+                branchctrl.req_cond.assign(1)
+                branchctrl.src.assign(JMP_SRC_ALU)
                 immediate.assign(immediate_B)
 
                 begif(bor(eq2(funct3, 0x6), eq2(funct3, 0x7)))
@@ -201,8 +201,8 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                 rds[0].req.assign(1)
                 rds[0].source.assign(RD_MEM)
                 exu_req.assign(1)
-                mem_req.assign(1)
-                mem_cmd.assign(0)
+                memctrl.req.assign(1)
+                memctrl.cmd.assign(0)
                 immediate.assign(immediate_I)
             }; endbranch()
 
@@ -213,8 +213,8 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                 op0_source.assign(OP0_SRC_RS)
                 op1_source.assign(OP1_SRC_IMM)
                 exu_req.assign(1)
-                mem_req.assign(1)
-                mem_cmd.assign(1)
+                memctrl.req.assign(1)
+                memctrl.cmd.assign(1)
                 immediate.assign(immediate_S)
             }; endbranch()
 
@@ -496,35 +496,35 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
 
         curinstraddr_imm.assign(curinstr_addr + immediate)
 
-        begif(mem_req)
+        begif(memctrl.req)
         run {
             begcase(funct3)
             run {
                 begbranch(0x0)
                 run {
-                    mem_be.assign(0x1)
-                    load_signext.assign(1)
+                    memctrl.be.assign(0x1)
+                    memctrl.load_signext.assign(1)
                 }; endbranch()
 
                 begbranch(0x1)
                 run {
-                    mem_be.assign(0x3)
-                    load_signext.assign(1)
+                    memctrl.be.assign(0x3)
+                    memctrl.load_signext.assign(1)
                 }; endbranch()
 
                 begbranch(0x2)
                 run {
-                    mem_be.assign(0xf)
+                    memctrl.be.assign(0xf)
                 }; endbranch()
 
                 begbranch(0x4)
                 run {
-                    mem_be.assign(0x1)
+                    memctrl.be.assign(0x1)
                 }; endbranch()
 
                 begbranch(0x5)
                 run {
-                    mem_be.assign(0x3)
+                    memctrl.be.assign(0x3)
                 }; endbranch()
             }; endcase()
         }; endif()
@@ -532,9 +532,9 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
         begif(eq2(instr_code, instrcode_MRET))
         run {
             mret_req.assign(1)
-            jump_req.assign(1)
-            jump_req_cond.assign(0)
-            jump_src.assign(JMP_SRC_IMM)
+            branchctrl.req.assign(1)
+            branchctrl.req_cond.assign(0)
+            branchctrl.src.assign(JMP_SRC_IMM)
             immediate.assign(MRETADDR)
         }; endif()
 
@@ -601,7 +601,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
             }; endif()
         }; endif()
 
-        begif (!mem_req)
+        begif (!memctrl.req)
         run {
 
             begcase(op1_source)

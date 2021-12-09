@@ -127,22 +127,19 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
 
     val curinstr_addr   = ugenvar("curinstr_addr_decoder", 31, 0, "0")
 
-    ///////////////////////
-
-    // control transfer signals
-    var jump_req        = ugenvar("jump_req", 0, 0, "0")
-    var jump_req_cond   = ugenvar("jump_req_cond", 0, 0, "0")
-    var jump_src        = ugenvar("jump_src", 0, 0, JMP_SRC_IMM.toString())
-    var jump_vector     = ugenvar("jump_vector", 31, 0, "0")
+    var branchctrl = RISCDecoder_branchctrl(
+        ugenvar("jump_req", 0, 0, "0"),
+        ugenvar("jump_req_cond", 0, 0, "0"),
+        ugenvar("jump_src", 0, 0, JMP_SRC_IMM.toString()),
+        ugenvar("jump_vector", 31, 0, "0")
+    )
 
     // regfile control signals
     var rss = ArrayList<RISCDecoder_rs>()
     var rds = ArrayList<RISCDecoder_rd>()
 
     var csr_rdata       = ugenvar("csr_rdata", 31, 0, "0")
-
     var immediate       = ugenvar("immediate", 31, 0, "0")
-
     var curinstraddr_imm    = ugenvar("curinstraddr_imm", 31, 0, "0")
 
     var funct3          = ugenvar("funct3", 2, 0, "0")
@@ -160,18 +157,18 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var csrnum          = ugenvar("csrnum", 11, 0, "0")
     var zimm            = ugenvar("zimm", 4, 0, "0")
 
-    // ALU control
     var exu_req         = ugenvar("exu_req", 0, 0, "0")
 
-    // data memory control
-    var mem_req         = ugenvar("mem_req", 0, 0, "0")
-    var mem_cmd         = ugenvar("mem_cmd", 0, 0, "0")
-    var mem_addr        = ugenvar("mem_addr", 31, 0, "0")
-    var mem_be          = ugenvar("mem_be", 3, 0, "0")
-    var mem_wdata       = ugenvar("mem_wdata", 31, 0, "0")
-    var mem_rdata       = ugenvar("mem_rdata", 31, 0, "0")
-    var mem_rshift      = ugenvar("mem_rshift", 0, 0, "0")
-    var load_signext    = ugenvar("load_signext", 0, 0, "0")
+    var memctrl         = RISCDecoder_memctrl(
+        ugenvar("mem_req", 0, 0, "0"),
+        ugenvar("mem_cmd", 0, 0, "0"),
+        ugenvar("mem_addr", 31, 0, "0"),
+        ugenvar("mem_be", 3, 0, "0"),
+        ugenvar("mem_wdata", 31, 0, "0"),
+        ugenvar("mem_rdata", 31, 0, "0"),
+        ugenvar("mem_rshift", 0, 0, "0"),
+        ugenvar("load_signext", 0, 0, "0")
+    )
 
     var mret_req        = ugenvar("mret_req", 0, 0, "0")
     var MRETADDR        = ugenvar("MRETADDR", 31, 0, "0")
