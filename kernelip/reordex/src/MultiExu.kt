@@ -135,8 +135,8 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     )
 
     // regfile control signals
-    var rss = mutableMapOf<hw_var, RISCDecoder_rs>()
-    var rds = mutableMapOf<hw_var, RISCDecoder_rd>()
+    var rsctrls = mutableMapOf<hw_var, RISCDecoder_rs>()
+    var rdctrls = mutableMapOf<hw_var, RISCDecoder_rd>()
 
     var csr_rdata       = ugenvar("csr_rdata", 31, 0, "0")
     var immediate       = ugenvar("immediate", 31, 0, "0")
@@ -179,7 +179,7 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     init {
         for (rs_idx in 0 until MultiExu_CFG.srcs.size) {
 
-            rss.put(MultiExu_CFG.srcs[rs_idx], RISCDecoder_rs(
+            rsctrls.put(MultiExu_CFG.srcs[rs_idx], RISCDecoder_rs(
                 ugenvar("rs" + rs_idx + "_req", 0, 0, "0"),
                 ugenvar("rs" + rs_idx + "_addr",  MultiExu_CFG.ARF_addr_width-1, 0, "0"),
                 ugenvar("rs" + rs_idx + "_rdata", MultiExu_CFG.RF_width-1, 0, "0")
@@ -194,7 +194,7 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
         }
         for (rd_idx in 0 until MultiExu_CFG.rds.size) {
 
-            rds.put(MultiExu_CFG.rds[rd_idx], RISCDecoder_rd(
+            rdctrls.put(MultiExu_CFG.rds[rd_idx], RISCDecoder_rd(
                 ugenvar("rd" + rd_idx + "_req", 0, 0, "0"),
                 ugenvar("rd" + rd_idx + "_source", 2, 0, RD_ALU.toString()),
                 ugenvar("rd" + rd_idx + "_addr", 4, 0, "0"),
