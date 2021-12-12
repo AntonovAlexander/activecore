@@ -73,11 +73,16 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
 
     var opcode          = ugenvar("opcode", 6, 0, "0")
 
+    var funct3          = ugenvar("funct3", 2, 0, "0")
+    var funct7          = ugenvar("funct7", 6, 0, "0")
+
     var immediate_I     = ugenvar("immediate_I", 31, 0, "0")
     var immediate_S     = ugenvar("immediate_S", 31, 0, "0")
     var immediate_B     = ugenvar("immediate_B", 31, 0, "0")
     var immediate_U     = ugenvar("immediate_U", 31, 0, "0")
     var immediate_J     = ugenvar("immediate_J", 31, 0, "0")
+    var shamt           = ugenvar("shamt", 4, 0, "0")
+    var zimm            = ugenvar("zimm", 4, 0, "0")
 
     var op0_source      = ugenvar("op0_source", 1, 0, OP0_SRC_RS.toString())
     var op1_source      = ugenvar("op1_source", 1, 0, OP1_SRC_RS.toString())
@@ -528,6 +533,8 @@ class RISCV_Decoder() : reordex.RISCDecoder(CPU_CFG_inst) {
                 }; endbranch()
             }; endcase()
         }; endif()
+
+        brmask.assign(funct3)
 
         begif(eq2(instr_code, instrcode_MRET))
         run {

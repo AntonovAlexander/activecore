@@ -142,9 +142,7 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var immediate       = ugenvar("immediate", 31, 0, "0")
     var curinstraddr_imm    = ugenvar("curinstraddr_imm", 31, 0, "0")
 
-    var funct3          = ugenvar("funct3", 2, 0, "0")
-    var funct7          = ugenvar("funct7", 6, 0, "0")
-    var shamt           = ugenvar("shamt", 4, 0, "0")
+    var brmask          = ugenvar("brmask", 2, 0, "0")
 
     var fencereq        = ugenvar("fencereq", 0, 0, "0")
     var pred            = ugenvar("pred", 3, 0, "0")
@@ -155,7 +153,6 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
 
     var csrreq          = ugenvar("csrreq", 0, 0, "0")
     var csrnum          = ugenvar("csrnum", 11, 0, "0")
-    var zimm            = ugenvar("zimm", 4, 0, "0")
 
     var exu_req         = ugenvar("exu_req", 0, 0, "0")
 

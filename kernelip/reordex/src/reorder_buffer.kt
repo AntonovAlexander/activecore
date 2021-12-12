@@ -95,8 +95,7 @@ class rob_risc(name: String,
     var immediate           = AdduStageVar("immediate", 31, 0, "0")
     var curinstraddr_imm    = AdduStageVar("curinstraddr_imm", 31, 0, "0")
 
-    var funct3          = AdduStageVar("funct3", 2, 0, "0")
-    var funct7          = AdduStageVar("funct7", 6, 0, "0")
+    var brmask          = AdduStageVar("brmask", 2, 0, "0")
 
     var alu_result      = AdduStageVar("alu_result", 31, 0, "0")
     var alu_CF          = AdduStageVar("alu_CF", 0, 0, "0")
@@ -283,7 +282,7 @@ class rob_risc(name: String,
                         cyclix_gen.begif(jump_req_cond)
                         run {
 
-                            cyclix_gen.begcase(funct3)
+                            cyclix_gen.begcase(brmask)
                             run {
                                 // BEQ
                                 cyclix_gen.begbranch(0x0)

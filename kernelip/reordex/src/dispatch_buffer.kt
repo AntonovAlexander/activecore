@@ -209,9 +209,7 @@ class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
 
     var curinstraddr_imm    = AdduStageVar("curinstraddr_imm", 31, 0, "0")
 
-    var funct3          = AdduStageVar("funct3", 2, 0, "0")
-    var funct7          = AdduStageVar("funct7", 6, 0, "0")
-    var shamt           = AdduStageVar("shamt", 4, 0, "0")
+    var brmask          = AdduStageVar("brmask", 2, 0, "0")
 
     var fencereq        = AdduStageVar("fencereq", 0, 0, "0")
     var pred            = AdduStageVar("pred", 3, 0, "0")
