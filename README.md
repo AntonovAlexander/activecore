@@ -8,7 +8,7 @@ ActiveCore is a framework that demonstrates original hardware designing concept 
 KIP core is a hardware generator that provides custom synthesizable execution kernel constructed in accordance to certain microarchitectural template. Each KIP core offers hardware description within custom computational model inferred from computational process organization inside hardware microarchitecture, applies microarchitecture-aware optimizations, and generates design specifications in standard RTL/HLS form.
 
 KIP core's computational model is intended to include:
-* special data types with pre-defined order of initialization, assignment, and transfer of values;
+* data types with pre-defined order of initialization, assignment, and transfer of values;
 * auto-generated data structures and API for flow control, scheduling, communication, and synchronization "services" of the microarchitecture;
 * "microarchitecture-level" event model and handler procedures selectively exposed for behavioral-style programming of custom application functions and mechanisms.
 
