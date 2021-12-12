@@ -209,9 +209,10 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
             )
         }
 
-        for (src_imm in MultiExu_CFG.src_imms) src_imm.default_astc = this
-        for (src in MultiExu_CFG.srcs) src.default_astc = this
-        for (rd in MultiExu_CFG.rds) rd.default_astc = this
+        for (src_imm in MultiExu_CFG.src_imms)  src_imm.default_astc = this
+        for (src in MultiExu_CFG.srcs)          src.default_astc = this
+        for (dst_imm in MultiExu_CFG.dst_imms)  dst_imm.default_astc = this
+        for (rd in MultiExu_CFG.rds)            rd.default_astc = this
 
     }
 

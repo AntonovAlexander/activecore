@@ -43,7 +43,10 @@ open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
             rds.add(ulocal("rd" + rd_idx, Exu_CFG.RF_width-1, 0, "0"))
         }
 
-        for (src in Exu_CFG.srcs) src.default_astc = this
+        for (src_imm in Exu_CFG.src_imms)   src_imm.default_astc = this
+        for (src in Exu_CFG.srcs)           src.default_astc = this
+        for (dst_imm in Exu_CFG.dst_imms)   dst_imm.default_astc = this
+        for (rd in Exu_CFG.rds)             rd.default_astc = this
 
     }
 

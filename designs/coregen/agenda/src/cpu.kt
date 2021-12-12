@@ -652,10 +652,6 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CFG) {
 
     var alu_result_wide = ulocal("alu_result_wide", 32, 0, "0")
     var alu_result      = ulocal("alu_result", 31, 0, "0")
-    var alu_CF          = ulocal("alu_CF", 0, 0, "0")
-    var alu_SF          = ulocal("alu_SF", 0, 0, "0")
-    var alu_ZF          = ulocal("alu_ZF", 0, 0, "0")
-    var alu_OF          = ulocal("alu_OF", 0, 0, "0")
     var alu_overflow    = ulocal("alu_overflow", 0, 0, "0")
 
     init {
@@ -729,31 +725,26 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CFG) {
 
         // formation of result and flags
         alu_result.assign(alu_result_wide[31, 0])
-        alu_CF.assign(alu_result_wide[32])
-        alu_SF.assign(alu_result_wide[31])
-        alu_ZF.assign(bnot(ror(alu_result)))
-        alu_OF.assign(bor(band(!CFG.src0[31], !CFG.src1[31], alu_result[31]), band(CFG.src0[31], CFG.src1[31], !alu_result[31])))
+        CFG.alu_CF.assign(alu_result_wide[32])
+        CFG.alu_SF.assign(alu_result_wide[31])
+        CFG.alu_ZF.assign(bnot(ror(alu_result)))
+        CFG.alu_OF.assign(bor(band(!CFG.src0[31], !CFG.src1[31], alu_result[31]), band(CFG.src0[31], CFG.src1[31], !alu_result[31])))
 
         begif(eq2(CFG.exu_opcode, aluop_SLT))
         run {
-            alu_result.assign(alu_CF)
+            alu_result.assign(CFG.alu_CF)
         }; endif()
 
         begif(CFG.alu_unsigned)
         run {
-            alu_overflow.assign(alu_CF)
+            alu_overflow.assign(CFG.alu_CF)
         }; endif()
         begelse()
         run {
-            alu_overflow.assign(alu_OF)
+            alu_overflow.assign(CFG.alu_OF)
         }; endif()
 
-        //CFG.rd.assign(alu_result)
-        rds[0].assign(alu_result)
-        assign(CFG.alu_CF, alu_CF)
-        assign(CFG.alu_SF, alu_SF)
-        assign(CFG.alu_ZF, alu_ZF)
-        assign(CFG.alu_OF, alu_OF)
+        CFG.rd.assign(alu_result)
     }
 }
 
@@ -796,7 +787,7 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CFG) {
 
         alu_result.assign(alu_result_wide[31, 0])
 
-        rds[0].assign(alu_result)
+        CFG.rd.assign(alu_result)
     }
 }
 
