@@ -210,6 +210,8 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
         }
 
         for (src_imm in MultiExu_CFG.src_imms) src_imm.default_astc = this
+        for (src in MultiExu_CFG.srcs) src.default_astc = this
+        for (rd in MultiExu_CFG.rds) rd.default_astc = this
 
     }
 
@@ -391,6 +393,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                 new_exu_descr.var_dict.put(MultiExu_CFG.src_imms[imm_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.src_imms[imm_num]!!]!!)
             for (src_num in 0 until ExUnit.value.ExecUnit.srcs.size)
                 new_exu_descr.var_dict.put(MultiExu_CFG.srcs[src_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.srcs[src_num]!!]!!)
+            for (rd_num in 0 until ExUnit.value.ExecUnit.rds.size)
+                new_exu_descr.var_dict.put(MultiExu_CFG.rds[rd_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.rds[rd_num]!!]!!)
             MSG("generating locals: done")
 
             MSG("generating globals...")

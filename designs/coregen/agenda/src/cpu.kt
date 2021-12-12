@@ -647,11 +647,8 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CFG) {
     val aluop_CLRB		= 8
     val aluop_SLT		= 9
 
-    var alu_op0         = ulocal("alu_op0", 31, 0, "0")
-    var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op0_wide    = ulocal("alu_op0_wide", 32, 0, "0")
     var alu_op1_wide    = ulocal("alu_op1_wide", 32, 0, "0")
-    var opcode          = ulocal("opcode", 3, 0, "0")
 
     var alu_result_wide = ulocal("alu_result_wide", 32, 0, "0")
     var alu_result      = ulocal("alu_result", 31, 0, "0")
@@ -662,7 +659,6 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CFG) {
     var alu_overflow    = ulocal("alu_overflow", 0, 0, "0")
 
     init {
-        opcode.assign(CFG.exu_opcode)
 
         begif(CFG.alu_unsigned)
         run {
@@ -678,7 +674,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CFG) {
         alu_result_wide.assign(alu_op0_wide)
 
         // computing result
-        begcase(opcode)
+        begcase(CFG.exu_opcode)
         run {
             begbranch(aluop_ADD)
             run {
@@ -738,7 +734,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CFG) {
         alu_ZF.assign(bnot(ror(alu_result)))
         alu_OF.assign(bor(band(!CFG.src0[31], !CFG.src1[31], alu_result[31]), band(CFG.src0[31], CFG.src1[31], !alu_result[31])))
 
-        begif(eq2(opcode, aluop_SLT))
+        begif(eq2(CFG.exu_opcode, aluop_SLT))
         run {
             alu_result.assign(alu_CF)
         }; endif()
@@ -752,6 +748,7 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CFG) {
             alu_overflow.assign(alu_OF)
         }; endif()
 
+        //CFG.rd.assign(alu_result)
         rds[0].assign(alu_result)
         assign(CFG.alu_CF, alu_CF)
         assign(CFG.alu_SF, alu_SF)
@@ -766,31 +763,25 @@ class EXU_MUL_DIV() : reordex.Exu("MUL_DIV", CFG) {
     val aluop_MUL		= 0
     val aluop_DIV		= 1
 
-    var alu_op0         = ulocal("alu_op0", 31, 0, "0")
-    var alu_op1         = ulocal("alu_op1", 31, 0, "0")
     var alu_op0_wide    = ulocal("alu_op0_wide", 32, 0, "0")
     var alu_op1_wide    = ulocal("alu_op1_wide", 32, 0, "0")
-    var opcode          = ulocal("opcode", 3, 0, "0")
     var alu_result_wide = ulocal("alu_result_wide", 32, 0, "0")
     var alu_result      = ulocal("alu_result", 31, 0, "0")
 
     init {
-        alu_op0.assign(CFG.src0)
-        alu_op1.assign(CFG.src1)
-        opcode.assign(CFG.exu_opcode)
 
         begif(CFG.alu_unsigned)
         run {
-            alu_op0_wide.assign(zeroext(alu_op0, 33))
-            alu_op1_wide.assign(zeroext(alu_op1, 33))
+            alu_op0_wide.assign(zeroext(CFG.src0, 33))
+            alu_op1_wide.assign(zeroext(CFG.src1, 33))
         }; endif()
         begelse()
         run {
-            alu_op0_wide.assign(signext(alu_op0, 33))
-            alu_op1_wide.assign(signext(alu_op1, 33))
+            alu_op0_wide.assign(signext(CFG.src0, 33))
+            alu_op1_wide.assign(signext(CFG.src1, 33))
         }; endif()
 
-        begcase(opcode)
+        begcase(CFG.exu_opcode)
         run {
             begbranch(aluop_MUL)
             run {

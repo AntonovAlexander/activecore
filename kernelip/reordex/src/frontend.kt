@@ -268,7 +268,7 @@ class instr_fetch_buffer(name: String,
                                 cyclix_gen.assign(src.src_rdy, 1)
                             }
 
-                            cyclix_gen.MSG_COMMENT("Generating payload")
+                            cyclix_gen.MSG_COMMENT("Generating payload...")
                             for (expr in MultiExu_inst.RISCDecode[0].expressions) {
                                 reconstruct_expression(DEBUG_LEVEL.FULL,
                                     cyclix_gen,
@@ -276,6 +276,7 @@ class instr_fetch_buffer(name: String,
                                     import_expr_context(var_dict)
                                 )
                             }
+                            cyclix_gen.MSG_COMMENT("Generating payload: done")
 
                             cyclix_gen.begif(cyclix_gen.band(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[0]]!!.req), cyclix_gen.rand(global_structures.PRF_mapped)))
                             run {

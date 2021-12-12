@@ -172,13 +172,14 @@ class __control_structures(val cyclix_gen : cyclix.Generic,
     }
 
     fun FillReadRs(fetch_tag : hw_var, fetch_rdy : hw_var, fetch_data : hw_var, raddr : hw_param) {
-        cyclix_gen.MSG_COMMENT("Fetching data from physical registers")
+        cyclix_gen.MSG_COMMENT("Fetching data from physical registers...")
         fetch_tag.assign(RenameReg(raddr))
         fetch_rdy.assign(FetchRsRdy(fetch_tag))
         fetch_data.assign(FetchRs(fetch_tag))
+        cyclix_gen.MSG_COMMENT("Fetching data from physical registers: done")
     }
 
-    fun GetFreePRF() : hwast.hw_astc.bit_position {
+    fun GetFreePRF() : hw_astc.bit_position {
         return cyclix_gen.min0(PRF_mapped)
     }
 
