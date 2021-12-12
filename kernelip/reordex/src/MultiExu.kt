@@ -127,11 +127,12 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
 
     val curinstr_addr   = ugenvar("curinstr_addr_decoder", 31, 0, "0")
 
-    var branchctrl = RISCDecoder_branchctrl(
-        ugenvar("jump_req", 0, 0, "0"),
-        ugenvar("jump_req_cond", 0, 0, "0"),
-        ugenvar("jump_src", 0, 0, JMP_SRC_IMM.toString()),
-        ugenvar("jump_vector", 31, 0, "0")
+    var branchctrl = Branchctrl(
+        ugenvar("genbranch_req", 0, 0, "0"),
+        ugenvar("genbranch_req_cond", 0, 0, "0"),
+        ugenvar("genbranch_src", 0, 0, JMP_SRC_IMM.toString()),
+        ugenvar("genbranch_vector", 31, 0, "0"),
+        ugenvar("genbranch_mask", 2, 0, "0")
     )
 
     // regfile control signals
@@ -141,8 +142,6 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var csr_rdata       = ugenvar("csr_rdata", 31, 0, "0")
     var immediate       = ugenvar("immediate", 31, 0, "0")
     var curinstraddr_imm    = ugenvar("curinstraddr_imm", 31, 0, "0")
-
-    var brmask          = ugenvar("brmask", 2, 0, "0")
 
     var fencereq        = ugenvar("fencereq", 0, 0, "0")
     var pred            = ugenvar("pred", 3, 0, "0")

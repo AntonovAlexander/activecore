@@ -536,7 +536,7 @@ class RISCV_Decoder() : reordex.RISCDecoder(CFG) {
             }; endcase()
         }; endif()
 
-        brmask.assign(funct3)
+        branchctrl.mask.assign(funct3)
 
         begif(eq2(instr_code, instrcode_MRET))
         run {

@@ -191,14 +191,13 @@ class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
 
-    // opcode signals
-    //var opcode          = AdduStageVar("opcode", 6, 0, "0")
-
-    // control transfer signals
-    var jump_req        = AdduStageVar("jump_req", 0, 0, "0")
-    var jump_req_cond   = AdduStageVar("jump_req_cond", 0, 0, "0")
-    var jump_src        = AdduStageVar("jump_src", 0, 0, "0")
-    var jump_vector     = AdduStageVar("jump_vector", 31, 0, "0")
+    var branchctrl = Branchctrl(
+        AdduStageVar("genbranch_req", 0, 0, "0"),
+        AdduStageVar("genbranch_req_cond", 0, 0, "0"),
+        AdduStageVar("genbranch_src", 0, 0, "0"),
+        AdduStageVar("genbranch_vector", 31, 0, "0"),
+        AdduStageVar("genbranch_mask", 2, 0, "0")
+    )
 
     var rss = ArrayList<RISCDecoder_rs>()
     var rds = ArrayList<RISCDecoder_rd>()
@@ -206,10 +205,7 @@ class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
     var csr_rdata       = AdduStageVar("csr_rdata", 31, 0, "0")
 
     var immediate       = AdduStageVar("immediate", 31, 0, "0")
-
     var curinstraddr_imm    = AdduStageVar("curinstraddr_imm", 31, 0, "0")
-
-    var brmask          = AdduStageVar("brmask", 2, 0, "0")
 
     var fencereq        = AdduStageVar("fencereq", 0, 0, "0")
     var pred            = AdduStageVar("pred", 3, 0, "0")
