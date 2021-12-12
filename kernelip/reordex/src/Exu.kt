@@ -23,7 +23,7 @@ open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
     var resp_data = local(GetGenName("resp_data"), Exu_CFG.resp_struct)
 
     var src_imms    = ArrayList<hw_var>()
-    var rss         = ArrayList<hw_var>()
+    var srcs        = ArrayList<hw_var>()
     var rds         = ArrayList<hw_var>()
 
     init {
@@ -35,8 +35,8 @@ open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
             src_imms.add(local(Exu_imm.name, Exu_imm.vartype, Exu_imm.defimm))
         }
 
-        for (Exu_rs in Exu_CFG.srcs) {
-            rss.add(local(Exu_rs.name, Exu_rs.vartype, Exu_rs.defimm))
+        for (Exu_src in Exu_CFG.srcs) {
+            srcs.add(local(Exu_src.name, Exu_src.vartype, Exu_src.defimm))
         }
 
         for (rd_idx in 0 until Exu_CFG.rds.size) {

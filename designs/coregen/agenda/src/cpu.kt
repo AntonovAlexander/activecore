@@ -809,11 +809,11 @@ class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", CPU_CFG_inst) {
     init {
         begif(eq2(CPU_CFG_inst.exu_opcode, 0))
         run {
-            rds[0].assign(rss[0] + rss[1])
+            rds[0].assign(srcs[0] + srcs[1])
         }; endif()
         begelse()
         run {
-            rds[0].assign(rss[0] - rss[1])
+            rds[0].assign(srcs[0] - srcs[1])
         }; endif()
     }
 }
@@ -821,21 +821,21 @@ class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", CPU_CFG_inst) {
 class EXU_FP_MUL() : reordex.Exu("FP_MUL", CPU_CFG_inst) {
 
     init {
-        rds[0].assign(rss[0] * rss[1])
+        rds[0].assign(srcs[0] * srcs[1])
     }
 }
 
 class EXU_FP_DIV() : reordex.Exu("FP_DIV", CPU_CFG_inst) {
 
     init {
-        rds[0].assign(rss[0] / rss[1])
+        rds[0].assign(srcs[0] / srcs[1])
     }
 }
 
 class EXU_FP_FMA() : reordex.Exu("FP_FMA", CPU_CFG_inst) {
 
     init {
-        rds[0].assign((rss[0] * rss[1]) + rss[2])
+        rds[0].assign((srcs[0] * srcs[1]) + srcs[2])
     }
 }
 

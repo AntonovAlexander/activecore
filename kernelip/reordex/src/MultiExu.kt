@@ -174,8 +174,8 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var MRETADDR        = ugenvar("MRETADDR", 31, 0, "0")
 
     //////////
-    var rss_ctrl = ArrayList<RISCDecoder_rs_ctrl>()
-    var rds_ctrl = ArrayList<RISCDecoder_rd_ctrl>()
+    internal var rss_ctrl = ArrayList<RISCDecoder_rs_ctrl>()
+    internal var rds_ctrl = ArrayList<RISCDecoder_rd_ctrl>()
 
     var CSR_MCAUSE      = hw_var("CSR_MCAUSE", 7, 0, "0")
 
@@ -392,8 +392,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                 new_exu_descr.var_dict.put(local, exu_cyclix_gen.local(local.name, local.vartype, local.defimm))
             for (imm_num in 0 until ExUnit.value.ExecUnit.src_imms.size)
                 new_exu_descr.var_dict.put(MultiExu_CFG.src_imms[imm_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.src_imms[imm_num]!!]!!)
-            for (rs_num in 0 until ExUnit.value.ExecUnit.rss.size)
-                new_exu_descr.var_dict.put(MultiExu_CFG.srcs[rs_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.rss[rs_num]!!]!!)
+            for (src_num in 0 until ExUnit.value.ExecUnit.srcs.size)
+                new_exu_descr.var_dict.put(MultiExu_CFG.srcs[src_num], new_exu_descr.var_dict[ExUnit.value.ExecUnit.srcs[src_num]!!]!!)
             MSG("generating locals: done")
 
             MSG("generating globals...")
@@ -418,8 +418,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             for (imm_num in 0 until MultiExu_CFG.src_imms.size) {
                 exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.src_imms[imm_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), MultiExu_CFG.src_imms[imm_num].name))
             }
-            for (rs_num in 0 until MultiExu_CFG.srcs.size) {
-                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.rss[rs_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), "src" + rs_num + "_data"))
+            for (src_num in 0 until MultiExu_CFG.srcs.size) {
+                exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.srcs[src_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), "src" + src_num + "_data"))
             }
 
             for (expr in ExUnit.value.ExecUnit[0].expressions) {
@@ -457,9 +457,9 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             TranslateInfo.exu_assocs.put(ExUnit.value.ExecUnit, exu_info)
             MSG("generating submodule instances: done")
 
-            for (rs_num in 0 until ExUnit.value.ExecUnit.rss.size)
-                if (new_exu_descr.var_dict[ExUnit.value.ExecUnit.rss[rs_num]!!]!!.read_done) {
-                    MSG("Exu waits for: " + ExUnit.value.ExecUnit.rss[rs_num]!!.name)
+            for (src_num in 0 until ExUnit.value.ExecUnit.srcs.size)
+                if (new_exu_descr.var_dict[ExUnit.value.ExecUnit.srcs[src_num]!!]!!.read_done) {
+                    MSG("Exu waits for: " + ExUnit.value.ExecUnit.srcs[src_num]!!.name)
                     new_exu_descr.rs_use_flags.add(true)
                 } else {
                     new_exu_descr.rs_use_flags.add(false)
