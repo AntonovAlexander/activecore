@@ -10,7 +10,7 @@ package reordex
 
 import hwast.*
 
-open class dispatch_buffer(cyclix_gen : cyclix.Generic,
+internal open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                          name_prefix : String,
                          TRX_BUF_SIZE : Int,
                          MultiExu_CFG : Reordex_CFG,
@@ -180,7 +180,7 @@ open class dispatch_buffer(cyclix_gen : cyclix.Generic,
     }
 }
 
-class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
+internal class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
                          name_prefix : String,
                          TRX_BUF_SIZE : Int,
                          MultiExu_CFG : Reordex_CFG,

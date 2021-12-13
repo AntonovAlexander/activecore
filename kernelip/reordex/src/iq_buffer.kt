@@ -11,7 +11,7 @@ package reordex
 import hwast.*
 import cyclix.*
 
-open class iq_buffer(cyclix_gen : cyclix.Generic,
+internal open class iq_buffer(cyclix_gen : cyclix.Generic,
                      ExUnit_name : String,
                      ExUnit_num : Int,
                      name_prefix : String,
@@ -142,7 +142,7 @@ open class iq_buffer(cyclix_gen : cyclix.Generic,
     }
 }
 
-class io_buffer(cyclix_gen : cyclix.Generic,
+internal class io_buffer(cyclix_gen : cyclix.Generic,
                 ExUnit_name : String,
                 ExUnit_num : Int,
                 name_prefix : String,

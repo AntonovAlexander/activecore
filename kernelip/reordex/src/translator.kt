@@ -22,7 +22,7 @@ class __TranslateInfo() {
 open class RISCDecoder_rs (var req : hw_var, var addr : hw_var, var rdata : hw_var)
 
 open class RISCDecoder_rd (var req : hw_var, var source : hw_var, var addr : hw_var, var wdata : hw_var, var rdy : hw_var)
-fun Fill_RISCDecoder_rds_StageVars(stage : hw_stage, amount : Int, rds : ArrayList<RISCDecoder_rd>, ARF_addr_width : Int) {
+internal fun Fill_RISCDecoder_rds_StageVars(stage : hw_stage, amount : Int, rds : ArrayList<RISCDecoder_rd>, ARF_addr_width : Int) {
     for (rd_idx in 0 until amount) {
         rds.add(
             RISCDecoder_rd(
@@ -37,7 +37,7 @@ fun Fill_RISCDecoder_rds_StageVars(stage : hw_stage, amount : Int, rds : ArrayLi
 }
 
 open class RISCDecoder_rs_ctrl (var rdy : hw_var, var tag : hw_var)
-fun Fill_RISCDecoder_rss_StageVars(stage : hw_stage, amount : Int, rss : ArrayList<RISCDecoder_rs>, ARF_addr_width : Int, RF_width: Int) {
+internal fun Fill_RISCDecoder_rss_StageVars(stage : hw_stage, amount : Int, rss : ArrayList<RISCDecoder_rs>, ARF_addr_width : Int, RF_width: Int) {
     for (rs_idx in 0 until amount) {
         rss.add(
             RISCDecoder_rs(
@@ -50,7 +50,7 @@ fun Fill_RISCDecoder_rss_StageVars(stage : hw_stage, amount : Int, rss : ArrayLi
 }
 
 open class RISCDecoder_rd_ctrl (var tag : hw_var)
-fun Fill_RISCDecoder_rds_ctrl_StageVars(stage : hw_stage, amount : Int, rds_ctrl : ArrayList<RISCDecoder_rd_ctrl>, PRF_addr_width : Int) {
+internal fun Fill_RISCDecoder_rds_ctrl_StageVars(stage : hw_stage, amount : Int, rds_ctrl : ArrayList<RISCDecoder_rd_ctrl>, PRF_addr_width : Int) {
     for (rd_idx in 0 until amount) {
         rds_ctrl.add(
             RISCDecoder_rd_ctrl(
@@ -61,7 +61,7 @@ fun Fill_RISCDecoder_rds_ctrl_StageVars(stage : hw_stage, amount : Int, rds_ctrl
 }
 
 open class ROB_rd_ctrl(tag : hw_var, var tag_prev_clr : hw_var, var tag_prev : hw_var) : RISCDecoder_rd_ctrl(tag)
-fun Fill_ROB_rds_ctrl_StageVars(stage : hw_stage, amount : Int, rds_ctrl : ArrayList<ROB_rd_ctrl>, PRF_addr_width : Int) {
+internal fun Fill_ROB_rds_ctrl_StageVars(stage : hw_stage, amount : Int, rds_ctrl : ArrayList<ROB_rd_ctrl>, PRF_addr_width : Int) {
     for (rd_idx in 0 until amount) {
         rds_ctrl.add(
             ROB_rd_ctrl(
@@ -87,6 +87,11 @@ class Branchctrl(var req: hw_var,
                  var src: hw_var,
                  var vector: hw_var,
                  var mask: hw_var)
+
+class ALUStatus(var CF: hw_var,
+                var SF: hw_var,
+                var ZF: hw_var,
+                var OF: hw_var)
 
 open class trx_buffer(cyclix_gen : cyclix.Generic,
                       name_prefix : String,
@@ -146,9 +151,9 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
     }
 }
 
-class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>)
+internal class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>)
 
-class __control_structures(val cyclix_gen : cyclix.Generic,
+internal class __control_structures(val cyclix_gen : cyclix.Generic,
                            val MultiExu_CFG : Reordex_CFG,
                            val PRF : cyclix.hw_global,
                            val PRF_mapped : cyclix.hw_global,

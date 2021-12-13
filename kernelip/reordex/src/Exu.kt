@@ -16,15 +16,22 @@ open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
 
     override var GenNamePrefix   = "reordex"
 
-    var locals          = ArrayList<hw_var>()
-    var globals         = ArrayList<hw_var>()
+    internal var locals          = ArrayList<hw_var>()
+    internal var globals         = ArrayList<hw_var>()
 
-    var req_data = local(GetGenName("req_data"), Exu_CFG.req_struct)
-    var resp_data = local(GetGenName("resp_data"), Exu_CFG.resp_struct)
+    internal var req_data = local(GetGenName("req_data"), Exu_CFG.req_struct)
+    internal var resp_data = local(GetGenName("resp_data"), Exu_CFG.resp_struct)
 
-    var src_imms    = ArrayList<hw_var>()
-    var srcs        = ArrayList<hw_var>()
-    var rds         = ArrayList<hw_var>()
+    internal var src_imms    = ArrayList<hw_var>()
+    internal var srcs        = ArrayList<hw_var>()
+    internal var rds         = ArrayList<hw_var>()
+
+    var aluStatus = ALUStatus(
+        Exu_CFG.alu_CF,
+        Exu_CFG.alu_SF,
+        Exu_CFG.alu_ZF,
+        Exu_CFG.alu_OF
+    )
 
     init {
         if (FROZEN_FLAG) ERROR("Failed to begin stage " + name + ": ASTC frozen")

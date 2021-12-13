@@ -10,7 +10,7 @@ package reordex
 
 import hwast.*
 
-class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic, MultiExu_CFG : Reordex_CFG) : trx_buffer(cyclix_gen, "geninstr_iaddr", 1, MultiExu_CFG) {
+internal class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic, MultiExu_CFG : Reordex_CFG) : trx_buffer(cyclix_gen, "geninstr_iaddr", 1, MultiExu_CFG) {
 
     var pc = cyclix_gen.uglobal("pc", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
     val curinstr_addr  = AdduLocal("curinstr_addr", 31, 0, "0")
@@ -65,7 +65,7 @@ class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic, MultiExu
     }
 }
 
-class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_ID_WIDTH : Int, MultiExu_CFG : Reordex_CFG, var busreq_mem_struct : hw_struct) : trx_buffer(cyclix_gen, "geninstr_req", 2, MultiExu_CFG.FrontEnd_width, MultiExu_CFG) {
+internal class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_ID_WIDTH : Int, MultiExu_CFG : Reordex_CFG, var busreq_mem_struct : hw_struct) : trx_buffer(cyclix_gen, "geninstr_req", 2, MultiExu_CFG.FrontEnd_width, MultiExu_CFG) {
 
     val curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")
     val nextinstr_addr = AdduStageVar("nextinstr_addr", 31, 0, "0")
@@ -164,7 +164,7 @@ class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_I
     }
 }
 
-class instr_fetch_buffer(name: String,
+internal class instr_fetch_buffer(name: String,
                          cyclix_gen : cyclix.Generic,
                          TRX_BUF_SIZE : Int,
                          val MultiExu_inst : MultiExuRISC,
@@ -358,7 +358,7 @@ class instr_fetch_buffer(name: String,
     }
 }
 
-class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val MultiExu_CFG : Reordex_CFG, val global_structures : __control_structures) {
+internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val MultiExu_CFG : Reordex_CFG, val global_structures : __control_structures) {
 
     var cmd_req_struct = hw_struct(name + "_cmd_req_struct")
 

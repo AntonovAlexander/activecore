@@ -20,11 +20,6 @@ class CPU_CFG() : Reordex_CFG(32, 32, 2, true, 48, 16, REORDEX_MODE.RISC)
     var src0 = AddSrc()
     var src1 = AddSrc()
 
-    var alu_CF          = AddDstUImm("alu_CF", 1)
-    var alu_SF          = AddDstUImm("alu_SF", 1)
-    var alu_ZF          = AddDstUImm("alu_ZF", 1)
-    var alu_OF          = AddDstUImm("alu_OF", 1)
-
     var rd = AddRd()
 }
 val CFG = CPU_CFG()
@@ -725,23 +720,23 @@ class EXU_ALU_INTEGER() : reordex.Exu("INTEGER", CFG) {
 
         // formation of result and flags
         alu_result.assign(alu_result_wide[31, 0])
-        CFG.alu_CF.assign(alu_result_wide[32])
-        CFG.alu_SF.assign(alu_result_wide[31])
-        CFG.alu_ZF.assign(bnot(ror(alu_result)))
-        CFG.alu_OF.assign(bor(band(!CFG.src0[31], !CFG.src1[31], alu_result[31]), band(CFG.src0[31], CFG.src1[31], !alu_result[31])))
+        aluStatus.CF.assign(alu_result_wide[32])
+        aluStatus.SF.assign(alu_result_wide[31])
+        aluStatus.ZF.assign(bnot(ror(alu_result)))
+        aluStatus.OF.assign(bor(band(!CFG.src0[31], !CFG.src1[31], alu_result[31]), band(CFG.src0[31], CFG.src1[31], !alu_result[31])))
 
         begif(eq2(CFG.exu_opcode, aluop_SLT))
         run {
-            alu_result.assign(CFG.alu_CF)
+            alu_result.assign(aluStatus.CF)
         }; endif()
 
         begif(CFG.alu_unsigned)
         run {
-            alu_overflow.assign(CFG.alu_CF)
+            alu_overflow.assign(aluStatus.CF)
         }; endif()
         begelse()
         run {
-            alu_overflow.assign(CFG.alu_OF)
+            alu_overflow.assign(aluStatus.OF)
         }; endif()
 
         CFG.rd.assign(alu_result)

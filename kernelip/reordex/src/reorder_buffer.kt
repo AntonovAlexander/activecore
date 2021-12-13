@@ -11,7 +11,7 @@ package reordex
 import hwast.*
 import cyclix.*
 
-open class rob(cyclix_gen : cyclix.Generic,
+internal open class rob(cyclix_gen : cyclix.Generic,
                name_prefix : String,
                TRX_BUF_SIZE : Int,
                MultiExu_CFG : Reordex_CFG,
@@ -78,7 +78,7 @@ open class rob(cyclix_gen : cyclix.Generic,
     }
 }
 
-class rob_risc(name: String,
+internal class rob_risc(name: String,
                cyclix_gen : cyclix.Generic,
                name_prefix : String,
                TRX_BUF_SIZE : Int,
