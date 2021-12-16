@@ -280,26 +280,32 @@ internal class instr_fetch_buffer(name: String,
                             }
                             cyclix_gen.MSG_COMMENT("Generating payload: done")
 
-                            cyclix_gen.begif(cyclix_gen.band(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[0]]!!.req), cyclix_gen.rand(global_structures.PRF_mapped_buf)))
-                            run {
-                                cyclix_gen.assign(decode_active, 0)
-                            }; cyclix_gen.endif()
+                            for (rd_idx in 0 until MultiExu_CFG.rds.size) {         // TODO: sum rd reqs
+                                cyclix_gen.begif(cyclix_gen.band(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req), cyclix_gen.rand(global_structures.PRF_mapped_buf)))
+                                run {
+                                    cyclix_gen.assign(decode_active, 0)
+                                }; cyclix_gen.endif()
+                            }
 
                             cyclix_gen.begif(cyclix_gen.band(dispatch_uop_buf.ctrl_rdy, decode_active))
                             run {
 
-                                var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd0_tag_prev")
-                                var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd0_tag_prev_clr")
+                                for (rd_idx in 0 until MultiExu_CFG.rds.size) {
 
-                                cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[0]]!!.req))
-                                run {
-                                    cyclix_gen.assign(nru_rd_tag_prev, global_structures.RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[0]]!!.addr)))
-                                    cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped_buf, nru_rd_tag_prev))
+                                    var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd" + rd_idx + "_tag_prev")
+                                    var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd" + rd_idx + "_tag_prev_clr")
 
-                                    var alloc_rd_tag = global_structures.GetFreePRF()
-                                    cyclix_gen.assign(TranslateVar(MultiExu_inst.RISCDecode.rds_ctrl[0].tag), alloc_rd_tag.position)
-                                    global_structures.ReserveRd(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[0]]!!.addr), TranslateVar(MultiExu_inst.RISCDecode.rds_ctrl[0].tag))
-                                }; cyclix_gen.endif()
+                                    cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req))
+                                    run {
+                                        cyclix_gen.assign(nru_rd_tag_prev, global_structures.RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr)))
+                                        cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped_buf, nru_rd_tag_prev))
+
+                                        var alloc_rd_tag = global_structures.GetFreePRF()
+                                        cyclix_gen.assign(TranslateVar(MultiExu_inst.RISCDecode.rds_ctrl[rd_idx].tag), alloc_rd_tag.position)
+                                        global_structures.ReserveRd(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr), TranslateVar(MultiExu_inst.RISCDecode.rds_ctrl[rd_idx].tag))
+                                    }; cyclix_gen.endif()
+
+                                }
 
                                 // forming push trx
                                 cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
