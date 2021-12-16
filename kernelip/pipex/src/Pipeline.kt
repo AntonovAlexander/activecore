@@ -36,7 +36,7 @@ open class hw_exec_stage_stat(var stage : hw_pipex_stage, opcode : hw_opcode) : 
 
 class hw_exec_read_remote(stage : hw_pipex_stage, var remote_var : hw_pipex_var) : hw_exec_stage_stat(stage, OP_RD_REMOTE)
 
-open class pipex_import_expr_context(var_dict : MutableMap<hw_var, hw_var>,
+internal open class pipex_import_expr_context(var_dict : MutableMap<hw_var, hw_var>,
                                      var curStage : hw_pipex_stage,
                                      var TranslateInfo: __TranslateInfo,
                                      var curStageInfo : __pstage_info) : import_expr_context(var_dict)
@@ -554,7 +554,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
     }
 
-    fun ProcessSyncOp(expression : hw_exec, Translate_info : __TranslateInfo, pstage_info : __pstage_info, cyclix_gen : cyclix.Generic) {
+    internal fun ProcessSyncOp(expression : hw_exec, Translate_info : __TranslateInfo, pstage_info : __pstage_info, cyclix_gen : cyclix.Generic) {
         if ((expression.opcode == OP1_IF) || (expression.opcode == OP1_WHILE)) {
             for (subexpression in expression.expressions) ProcessSyncOp(subexpression, Translate_info, pstage_info, cyclix_gen)
 
@@ -600,7 +600,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
     }
 
-    fun FillMcopipeReqDict(expression : hw_exec, TranslateInfo : __TranslateInfo) {
+    internal fun FillMcopipeReqDict(expression : hw_exec, TranslateInfo : __TranslateInfo) {
         if ((expression.opcode == OP1_IF) || (expression.opcode == OP1_WHILE)) {
             for (subexpression in expression.expressions) FillMcopipeReqDict(subexpression, TranslateInfo)
         } else if (expression.opcode == OP_MCOPIPE_REQ) {
@@ -609,7 +609,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
     }
 
-    fun FillScopipeReqDict(expression : hw_exec, TranslateInfo : __TranslateInfo) {
+    internal fun FillScopipeReqDict(expression : hw_exec, TranslateInfo : __TranslateInfo) {
         if ((expression.opcode == OP1_IF) || (expression.opcode == OP1_WHILE)) {
             for (subexpression in expression.expressions) FillScopipeReqDict(subexpression, TranslateInfo)
         } else if (expression.opcode == OP_SCOPIPE_REQ) {
@@ -618,7 +618,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
     }
 
-    fun reconstruct_expression(debug_lvl : DEBUG_LEVEL,
+    internal fun reconstruct_expression(debug_lvl : DEBUG_LEVEL,
                                cyclix_gen : hw_astc,
                                expr : hw_exec,
                                context : import_expr_context) {

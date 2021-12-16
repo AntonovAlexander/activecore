@@ -13,7 +13,7 @@ import cyclix.*
 
 val COPIPE_TRX_ID_WIDTH = 4
 
-data class __mcopipe_if_info(   val wr_done : hw_var,
+internal data class __mcopipe_if_info(   val wr_done : hw_var,
                                 val rd_done : hw_var,
                                 val full_flag : hw_var,
                                 val empty_flag : hw_var,
@@ -24,17 +24,17 @@ data class __mcopipe_if_info(   val wr_done : hw_var,
                                 val req_fifo : hw_fifo_out,
                                 var resp_fifo : hw_fifo_in )
 
-data class __mcopipe_handle_info(val struct_descr : hw_struct)
+internal data class __mcopipe_handle_info(val struct_descr : hw_struct)
 
-data class __scopipe_if_info(val req_fifo : hw_fifo_in,
+internal data class __scopipe_if_info(val req_fifo : hw_fifo_in,
                              var resp_fifo : hw_fifo_out)
 
-data class __scopipe_handle_info(val struct_descr : hw_struct)
+internal data class __scopipe_handle_info(val struct_descr : hw_struct)
 
-data class __assign_buf(val req : hw_var,
+internal data class __assign_buf(val req : hw_var,
                         val buf : hw_var)
 
-class __pstage_info(cyclix_gen : cyclix.Generic,
+internal class __pstage_info(cyclix_gen : cyclix.Generic,
                     name_prefix : String,
                     TRX_BUF_SIZE : Int,
                     fc_mode : STAGE_FC_MODE,
@@ -80,7 +80,7 @@ class __pstage_info(cyclix_gen : cyclix.Generic,
     }
 }
 
-class __TranslateInfo(var pipeline : Pipeline) {
+internal class __TranslateInfo(var pipeline : Pipeline) {
     var __global_assocs = mutableMapOf<hw_var, hw_var>()
 
     var __fifo_wr_assocs = mutableMapOf<hw_fifo_out, hw_fifo_out>()

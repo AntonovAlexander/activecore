@@ -161,7 +161,7 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
         default_astc.assign(GetFracRef(msb, lsb), src)
     }
 
-    fun GetDepowered(depow_fracs: hw_fracs): hw_type {
+    internal fun GetDepowered(depow_fracs: hw_fracs): hw_type {
         var ret_dim = hw_dim_static()
         var ret_vartype : DATA_TYPE
         var ret_struct : hw_struct
