@@ -16,7 +16,7 @@ internal open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                          MultiExu_CFG : Reordex_CFG,
                          ExecUnits_size : Int,
                          cdb_num : Int,
-                         val IQ_insts : ArrayList<iq_buffer>) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.FrontEnd_width, MultiExu_CFG, cdb_num) {
+                         val IQ_insts : ArrayList<iq_buffer>) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.DataPath_width, MultiExu_CFG, cdb_num) {
 
     var fu_id           = AdduStageVar("fu_id",             GetWidthToContain(ExecUnits_size), 0, "0")
 
@@ -47,7 +47,7 @@ internal open class dispatch_buffer(cyclix_gen : cyclix.Generic,
         cyclix_gen.begif(cyclix_gen.band(ctrl_active, rob.ctrl_rdy))
         run {
 
-            for (entry_num in 0 until MultiExu_CFG.FrontEnd_width) {
+            for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
 
                 cyclix_gen.begif(TRX_LOCAL_PARALLEL.GetFracRef(entry_num).GetFracRef("enb"))
                 run {

@@ -15,14 +15,20 @@ internal open class rob(cyclix_gen : cyclix.Generic,
                name_prefix : String,
                TRX_BUF_SIZE : Int,
                MultiExu_CFG : Reordex_CFG,
-               rrb_num : Int) : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.FrontEnd_width, MultiExu_CFG) {
+               rrb_num : Int) : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.DataPath_width, MultiExu_CFG) {
 
     var trx_id          = AddStageVar(hw_structvar("trx_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(MultiExu_CFG.trx_inflight_num)-1, 0, "0"))
     var cdb_id          = AddStageVar(hw_structvar("cdb_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(rrb_num) -1, 0, "0"))
     val rdy             = AddStageVar(hw_structvar("rdy",               DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
+    var rds             = ArrayList<RISCDecoder_rd>()
     var rds_ctrl        = ArrayList<ROB_rd_ctrl>()
 
     var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", MultiExu_CFG.trx_inflight_num-1, 0, "0")
+
+    init {
+        Fill_RISCDecoder_rds_StageVars(this, MultiExu_CFG.rds.size, rds, MultiExu_CFG.ARF_addr_width)
+        Fill_ROB_rds_ctrl_StageVars(this, MultiExu_CFG.rds.size, rds_ctrl, MultiExu_CFG.PRF_addr_width)
+    }
 
     fun FillFromCDB(MultiExu_CFG : Reordex_CFG, cdb : hw_var, io_cdb_rs1_wdata_buf : hw_var) {
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB...")
@@ -62,10 +68,12 @@ internal open class rob(cyclix_gen : cyclix.Generic,
         run {
             cyclix_gen.begif(rdy)
             run {
-                cyclix_gen.begif(rds_ctrl[0].tag_prev_clr)
-                run {
-                    global_structures.FreePRF(rds_ctrl[0].tag_prev)
-                }; cyclix_gen.endif()
+                for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+                    cyclix_gen.begif(rds_ctrl[rd_idx].tag_prev_clr)
+                    run {
+                        global_structures.FreePRF(rds_ctrl[rd_idx].tag_prev)
+                    }; cyclix_gen.endif()
+                }
                 cyclix_gen.assign(pop, 1)
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
@@ -87,8 +95,6 @@ internal class rob_risc(name: String,
 
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
-
-    var rds = ArrayList<RISCDecoder_rd>()
 
     var csr_rdata       = AdduStageVar("csr_rdata", 31, 0, "0")
 
@@ -147,9 +153,6 @@ internal class rob_risc(name: String,
     init {
         rf_dim.add(31, 0)
         rf_dim.add(31, 0)
-
-        Fill_RISCDecoder_rds_StageVars(this, MultiExu_CFG.rds.size, rds, MultiExu_CFG.ARF_addr_width)
-        Fill_ROB_rds_ctrl_StageVars(this, MultiExu_CFG.rds.size, rds_ctrl, MultiExu_CFG.PRF_addr_width)
     }
 
     fun Commit(global_structures: __control_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {

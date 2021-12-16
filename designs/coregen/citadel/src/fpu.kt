@@ -22,44 +22,44 @@ class FPU_CFG() : Reordex_CFG(32, 32, 1, true, 64, 64, REORDEX_MODE.COPROCESSOR)
 
     var rd0 = AddRd()
 }
-val FPU_CFG_inst = FPU_CFG()
+val CFG = FPU_CFG()
 
-class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", FPU_CFG_inst) {
+class EXU_FP_ADD_SUB() : reordex.Exu("FP_ADD_SUB", CFG) {
 
     init {
-        begif(eq2(FPU_CFG_inst.opcode, 0))
+        begif(eq2(CFG.opcode, 0))
         run {
-            rd0.assign(add(FPU_CFG_inst.src0, FPU_CFG_inst.src1))
+            CFG.rd0.assign(add(CFG.src0, CFG.src1))
         }; endif()
         begelse()
         run {
-            rd0.assign(sub(FPU_CFG_inst.src0, FPU_CFG_inst.src1))
+            CFG.rd0.assign(sub(CFG.src0, CFG.src1))
         }; endif()
     }
 }
 
-class EXU_FP_MUL() : reordex.Exu("FP_MUL", FPU_CFG_inst) {
+class EXU_FP_MUL() : reordex.Exu("FP_MUL", CFG) {
 
     init {
-        rd0.assign(mul(FPU_CFG_inst.src0, FPU_CFG_inst.src1))
+        CFG.rd0.assign(mul(CFG.src0, CFG.src1))
     }
 }
 
-class EXU_FP_DIV() : reordex.Exu("FP_DIV", FPU_CFG_inst) {
+class EXU_FP_DIV() : reordex.Exu("FP_DIV", CFG) {
 
     init {
-        rd0.assign(div(FPU_CFG_inst.src0, FPU_CFG_inst.src1))
+        CFG.rd0.assign(div(CFG.src0, CFG.src1))
     }
 }
 
-class EXU_FP_FMA() : reordex.Exu("FP_FMA", FPU_CFG_inst) {
+class EXU_FP_FMA() : reordex.Exu("FP_FMA", CFG) {
 
     init {
-        rd0.assign(add(mul(FPU_CFG_inst.src0, FPU_CFG_inst.src1), FPU_CFG_inst.src2))
+        CFG.rd0.assign(add(mul(CFG.src0, CFG.src1), CFG.src2))
     }
 }
 
-class fpu(name : String) : reordex.MultiExuCoproc(name, FPU_CFG_inst, 4) {
+class fpu(name : String) : reordex.MultiExuCoproc(name, CFG, 4) {
 
     init {
         add_exu(EXU_FP_ADD_SUB(), 2, 4, STREAM_PREF_IMPL.HLS)

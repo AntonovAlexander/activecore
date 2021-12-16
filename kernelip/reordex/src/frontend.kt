@@ -26,7 +26,7 @@ internal class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic,
         run {
             var inc_pc = 4
             cyclix_gen.assign(nextinstr_addr, pc)
-            for (entry_num in 0 until MultiExu_CFG.FrontEnd_width) {
+            for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
                 cyclix_gen.assign(curinstr_addr, nextinstr_addr)
                 cyclix_gen.add_gen(nextinstr_addr, pc , inc_pc)
 
@@ -65,7 +65,7 @@ internal class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic,
     }
 }
 
-internal class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_ID_WIDTH : Int, MultiExu_CFG : Reordex_CFG, var busreq_mem_struct : hw_struct) : trx_buffer(cyclix_gen, "geninstr_req", 2, MultiExu_CFG.FrontEnd_width, MultiExu_CFG) {
+internal class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_ID_WIDTH : Int, MultiExu_CFG : Reordex_CFG, var busreq_mem_struct : hw_struct) : trx_buffer(cyclix_gen, "geninstr_req", 2, MultiExu_CFG.DataPath_width, MultiExu_CFG) {
 
     val curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")
     val nextinstr_addr = AdduStageVar("nextinstr_addr", 31, 0, "0")
@@ -86,7 +86,7 @@ internal class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, I
         wr_struct.addu("we", 0, 0, "0")
         wr_struct.add("wdata", hw_type(busreq_mem_struct), "0")
 
-        for (i in 0 until MultiExu_CFG.FrontEnd_width) {
+        for (i in 0 until MultiExu_CFG.DataPath_width) {
             instr_req_fifos.add(cyclix_gen.fifo_out((instr_name_prefix + "req_" + i), wr_struct))
         }
 
@@ -108,7 +108,7 @@ internal class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, I
         cyclix_gen.begif(cyclix_gen.band(ctrl_active, instr_fetch.ctrl_rdy))
         run {
 
-            for (entry_num in 0 until MultiExu_CFG.FrontEnd_width) {
+            for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
                 cyclix_gen.begif(TRX_LOCAL_PARALLEL.GetFracRef(entry_num).GetFracRef("enb"))
                 run {
 
@@ -171,7 +171,7 @@ internal class instr_fetch_buffer(name: String,
                          MultiExu_CFG : Reordex_CFG,
                          val global_structures: __control_structures,
                          cdb_num : Int,
-                         INSTR_IO_ID_WIDTH : Int) : uop_buffer(cyclix_gen, "geninstr_fetch", TRX_BUF_SIZE, MultiExu_CFG.FrontEnd_width, MultiExu_CFG, cdb_num) {
+                         INSTR_IO_ID_WIDTH : Int) : uop_buffer(cyclix_gen, "geninstr_fetch", TRX_BUF_SIZE, MultiExu_CFG.DataPath_width, MultiExu_CFG, cdb_num) {
 
     val curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")
     val nextinstr_addr = AdduStageVar("nextinstr_addr", 31, 0, "0")
@@ -200,7 +200,7 @@ internal class instr_fetch_buffer(name: String,
         for (genvar in MultiExu_inst.RISCDecode[0].genvars) {
             var_dict.put(genvar, AddLocal(genvar.name, genvar.vartype, genvar.defimm))
         }
-        for (i in 0 until MultiExu_CFG.FrontEnd_width) {
+        for (i in 0 until MultiExu_CFG.DataPath_width) {
             instr_resp_fifos.add(cyclix_gen.ufifo_in((instr_name_prefix + "resp_" + i), 31, 0))
         }
 
@@ -248,7 +248,7 @@ internal class instr_fetch_buffer(name: String,
         cyclix_gen.begif(decode_active)
         run {
 
-            for (entry_num in 0 until MultiExu_CFG.FrontEnd_width) {
+            for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
                 cyclix_gen.begif(TRX_LOCAL_PARALLEL.GetFracRef(entry_num).GetFracRef("enb"))
                 run {
 
@@ -342,7 +342,7 @@ internal class instr_fetch_buffer(name: String,
         }; cyclix_gen.endif()
 
         cyclix_gen.COMMENT("fetching instruction code...")
-        for (entry_num in 0 until MultiExu_CFG.FrontEnd_width) {
+        for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
             cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifos[entry_num], instr_recv_code_buf))
             run {
                 for (trx_idx in 0 until TRX_BUF_SIZE) {

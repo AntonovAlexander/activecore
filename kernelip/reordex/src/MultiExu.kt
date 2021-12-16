@@ -18,13 +18,13 @@ enum class REORDEX_MODE {
 
 open class Reordex_CFG(val RF_width : Int,
                        val ARF_depth : Int,
-                       val FrontEnd_width : Int,
+                       val DataPath_width : Int,
                        val rename_RF: Boolean,
                        val PRF_depth : Int,
                        val ROB_size : Int,
                        val mode : REORDEX_MODE) {
 
-    internal val trx_inflight_num = ROB_size * FrontEnd_width;
+    internal val trx_inflight_num = ROB_size * DataPath_width;
 
     internal val ARF_addr_width = GetWidthToContain(ARF_depth)
     internal val PRF_addr_width = GetWidthToContain(PRF_depth)

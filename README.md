@@ -61,7 +61,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 	* **Sigma** - basic MCU consisting of a single sigma_tile module, UDM, and GPIO controller. Can be learned within a single lab work, lab work manual included: https://github.com/AntonovAlexander/activecore/blob/master/designs/rtl/sigma/doc/sigma_lab_manual.pdf. Location: /designs/rtl/sigma
 ![pic_test](designs/rtl/sigma/doc/sigma_struct.png)
 	* **Magma** - NUMA MPSoC consisting of multiple sigma_tile modules connected by Ariele xbar. Location: /designs/rtl/magma
-	* **Kerygma** - MCU based on 2-wide superscalar Agenda CPU. Location: /designs/rtl/kerygma
+	* **Kerygma** - Sigma equivalent based on 2-wide superscalar Agenda CPU. Location: /designs/rtl/kerygma
 
 ### Publications
 
