@@ -48,8 +48,8 @@ Current version of project is implemented as a collection of standalone Kotlin l
 	* **Aquaris** - RISC-V CPU generator with varying-length pipelines (RV32I, 1-6 pipeline stages), based on Pipex KIP core
 ![pic_test](designs/rtl/sigma_tile/doc/aquaris_pipeline_structs/aquaris_pipeline_structs.png)
 	* **Ariele** - full xbar generator, based on Pipex KIP core
-	* **Citadel** - OoO FPU coprocessor, based on Reordex KIP core *(needs actualization)*
-	* **Agenda** - OoO RISC-V (RV32I) CPU, based on Reordex KIP core *(passes basic tests, optimization in progress)*
+	* **Citadel** - OoO FPU coprocessor, based on Reordex KIP core
+	* **Agenda** - OoO RISC-V (RV32I) CPU, based on Reordex KIP core *(passes most tests, bugfixes and optimization in progress)*
 ![pic_test](designs/rtl/kerygma_tile/doc/agenda.png)
 
 * Auxiliary reusable cores:
