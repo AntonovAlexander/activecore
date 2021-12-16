@@ -154,16 +154,18 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
 internal class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>)
 
 internal class __control_structures(val cyclix_gen : cyclix.Generic,
-                           val MultiExu_CFG : Reordex_CFG,
-                           val PRF : cyclix.hw_global,
-                           val PRF_mapped : cyclix.hw_global,
-                           val PRF_rdy : cyclix.hw_global,
-                           val ARF_map : cyclix.hw_global,
-                           val ARF_map_default : hw_imm_arr,
-                           val PRF_src : cyclix.hw_global,
-                           val ExecUnits : MutableMap<String, Exu_CFG>,
-                           val exu_descrs : MutableMap<String, __exu_descr>,
-                           val exu_rst : hw_var) {
+                                    val MultiExu_CFG : Reordex_CFG,
+                                    val PRF : cyclix.hw_global,
+                                    val PRF_mapped : cyclix.hw_global,
+                                    val PRF_rdy : cyclix.hw_global,
+                                    val ARF_map : cyclix.hw_global,
+                                    val ARF_map_default : hw_imm_arr,
+                                    val PRF_src : cyclix.hw_global,
+                                    val ExecUnits : MutableMap<String, Exu_CFG>,
+                                    val exu_descrs : MutableMap<String, __exu_descr>,
+                                    val exu_rst : hw_var) {
+
+    val PRF_mapped_buf = cyclix_gen.global("genPRF_mapped_buf", PRF_mapped.vartype, PRF_mapped.defimm)
 
     fun RenameReg(src_addr : hw_param) : hw_var {
         return ARF_map.GetFracRef(src_addr)
@@ -185,19 +187,25 @@ internal class __control_structures(val cyclix_gen : cyclix.Generic,
         cyclix_gen.MSG_COMMENT("Fetching data from physical registers: done")
     }
 
+    fun InitFreePRFBuf() {
+        cyclix_gen.assign(PRF_mapped_buf, PRF_mapped.readPrev())
+    }
+
     fun GetFreePRF() : hw_astc.bit_position {
-        return cyclix_gen.min0(PRF_mapped)
+        return cyclix_gen.min0(PRF_mapped_buf)
     }
 
     fun ReserveRd(rd_addr : hw_param, rd_tag : hw_param) {
         cyclix_gen.assign(ARF_map.GetFracRef(rd_addr), rd_tag)
         cyclix_gen.assign(PRF_mapped.GetFracRef(rd_tag), 1)
+        cyclix_gen.assign(PRF_mapped_buf.GetFracRef(rd_tag), 1)
         cyclix_gen.assign(PRF_rdy.GetFracRef(rd_tag), 0)
     }
 
     fun ReserveWriteRd(src_rd : hw_param, src_tag : hw_param, src_wdata : hw_param) {
         cyclix_gen.assign(ARF_map.GetFracRef(src_rd), src_tag)
         cyclix_gen.assign(PRF_mapped.GetFracRef(src_tag), 1)
+        cyclix_gen.assign(PRF_mapped_buf.GetFracRef(src_tag), 1)
         cyclix_gen.assign(PRF_rdy.GetFracRef(src_tag), 1)
         cyclix_gen.assign(PRF.GetFracRef(src_tag), src_wdata)
     }

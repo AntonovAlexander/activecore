@@ -50,7 +50,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 	* **Ariele** - full xbar generator, based on Pipex KIP core
 	* **Citadel** - OoO FPU coprocessor, based on Reordex KIP core *(needs actualization)*
 	* **Agenda** - OoO RISC-V (RV32I) CPU, based on Reordex KIP core *(passes basic tests, optimization in progress)*
-![pic_test](designs/rtl/kerygma/doc/agenda.png)
+![pic_test](designs/rtl/kerygma_tile/doc/agenda.png)
 
 * Auxiliary reusable cores:
 	* **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Lab work manual included: https://github.com/AntonovAlexander/activecore/blob/master/designs/rtl/udm/doc/udm_lab_manual.pdf. Location: /designs/rtl/udm
@@ -67,7 +67,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 * A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation (in Russian), ITMO University, Saint-Petersburg, 28.12.2018. URL: http://fppo.ifmo.ru/dissertation/?number=63419
 
-* A. Antonov, “Inferring Custom Synthesizable Kernel for Generation of Coprocessors with Out-of-Order Execution,” in 2021 10th Mediterranean Conference on Embedded Computing (MECO), 2021. URL: https://ieeexplore.ieee.org/document/9460265 Preprint available at: http://embeddedcomputing.meconet.me/wp-content/uploads/2021/05/86.pdf
+* A. Antonov, “Inferring Custom Synthesizable Kernel for Generation of Coprocessors with Out-of-Order Execution,” in 2021 10th Mediterranean Conference on Embedded Computing (MECO), 2021. URL: https://ieeexplore.ieee.org/document/9460265
 
 * A. Antonov, P. Kustarev, “Strategies of Computational Process Synthesis – a System-Level Model of HW/SW (Micro)Architectural Mechanisms,” in 2020 9th Mediterranean Conference on Embedded Computing (MECO), 2020. URL: https://ieeexplore.ieee.org/document/9134071
 
