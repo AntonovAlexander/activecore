@@ -191,8 +191,10 @@ internal class io_buffer(cyclix_gen : cyclix.Generic,
 
     fun ProcessIO(io_cdb_buf : hw_var, io_cdb_rs1_wdata_buf : hw_var, rob_buf : rob) {
 
-        cyclix_gen.assign(commit_cdb, commit_cdb_buf)
-        cyclix_gen.assign(commit_cdb_buf, 0)
+        if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
+            cyclix_gen.assign(commit_cdb, commit_cdb_buf)
+            cyclix_gen.assign(commit_cdb_buf, 0)
+        }
 
         var cmd_resp = DUMMY_FIFO_OUT
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) cmd_resp = cyclix_gen.fifo_out("cmd_resp",  hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(MultiExu_CFG.RF_width-1, 0)))
