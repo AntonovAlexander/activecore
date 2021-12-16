@@ -177,6 +177,7 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
             //println("depow_fraction ..." + depow_fraction.toString())
             if (ret_dim.isSingle()) {
                 // println("undimensioned var")
+                if ((ret_dim.size != 0) && (depow_fraction is hw_frac_SubStruct)) ERROR("Depower index generation incorrect, accessing substruct \"" +  depow_fraction.substruct_name + "\" in dimensional variable " + name)
                 ret_dim.clear()
                 if (depow_fraction is hw_frac_SubStruct) {
                     // println("retrieving structure...")
@@ -188,7 +189,8 @@ open class hw_var(name : String, vartype : hw_type, defimm : hw_imm) : hw_struct
                     // println("retrieving structure: done")
                 } else {
                     // indexing 1-bit (dim) var
-                    ret_dim.add(hw_dim_range_static(0, 0))
+                    if (ret_vartype != DATA_TYPE.STRUCTURED)
+                        ret_dim.add(hw_dim_range_static(0, 0))
                 }
 
             } else {

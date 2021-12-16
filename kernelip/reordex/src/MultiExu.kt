@@ -87,10 +87,12 @@ open class Reordex_CFG(val RF_width : Int,
         resp_struct.addu("tag",     31, 0, "0")         // TODO: clean up
         resp_struct.addu("wdata",     RF_width-1, 0, "0")
 
-        alu_CF          = AddDstUImm("alu_CF", 1)
-        alu_SF          = AddDstUImm("alu_SF", 1)
-        alu_ZF          = AddDstUImm("alu_ZF", 1)
-        alu_OF          = AddDstUImm("alu_OF", 1)
+        if (mode == REORDEX_MODE.RISC) {
+            alu_CF          = AddDstUImm("alu_CF", 1)
+            alu_SF          = AddDstUImm("alu_SF", 1)
+            alu_ZF          = AddDstUImm("alu_ZF", 1)
+            alu_OF          = AddDstUImm("alu_OF", 1)
+        }
     }
 }
 

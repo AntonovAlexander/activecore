@@ -10,9 +10,9 @@ typedef struct s_datain
 {
     unsigned int trx_id;
     unsigned int opcode;
-    float rs0_rdata;
-    float rs1_rdata;
-    float rs2_rdata;
+    float src0_rdata;
+    float src1_rdata;
+    float src2_rdata;
     unsigned int rd0_tag;
 } t_datain;
 

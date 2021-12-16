@@ -377,6 +377,8 @@ internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generi
 
     fun Send_toRenameBuf(dispatch_uop_buf : dispatch_buffer) {
 
+        cyclix_gen.MSG_COMMENT("Decoding operations...")
+
         cmd_req_struct.addu("exec",     0, 0, "0")
         cmd_req_struct.addu("rf_we",       0,  0, "0")
         cmd_req_struct.addu("rf_addr",    MultiExu_CFG.ARF_addr_width-1, 0, "0")
@@ -390,15 +392,16 @@ internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generi
         }
         cmd_req_struct.addu("fu_rd",    MultiExu_CFG.ARF_addr_width-1, 0, "0")
 
-        var new_renamed_uop     = dispatch_uop_buf.GetPushTrx()
+        var new_renamed_uop_vec = dispatch_uop_buf.GetPushTrx()
+        var new_renamed_uop     = new_renamed_uop_vec.GetFracRef(0)
         var nru_enb             = new_renamed_uop.GetFracRef("enb")
         var nru_rdy             = new_renamed_uop.GetFracRef("rdy")
         var nru_fu_req          = new_renamed_uop.GetFracRef("fu_req")
         var nru_fu_id           = new_renamed_uop.GetFracRef("fu_id")
         var nru_io_req          = new_renamed_uop.GetFracRef("io_req")
         var nru_rd_tag          = new_renamed_uop.GetFracRef("rd0_tag")
-        var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd_tag_prev")
-        var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd_tag_prev_clr")
+        var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd0_tag_prev")
+        var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd0_tag_prev_clr")
         var nru_rs_use_mask     = cyclix_gen.ulocal("genrs_use_mask", MultiExu_CFG.srcs.size-1, 0, "0")
 
         cyclix_gen.begif(dispatch_uop_buf.ctrl_rdy)
@@ -522,10 +525,12 @@ internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generi
                 // placing new uop in rename_buf
                 cyclix_gen.begif(dispatch_uop_buf.push)
                 run {
-                    dispatch_uop_buf.push_trx(new_renamed_uop)
+                    dispatch_uop_buf.push_trx(new_renamed_uop_vec)
                 }; cyclix_gen.endif()
 
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
+
+        cyclix_gen.MSG_COMMENT("Decoding operations: done")
     }
 }
