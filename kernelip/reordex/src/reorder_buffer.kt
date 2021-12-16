@@ -23,7 +23,7 @@ internal open class rob(cyclix_gen : cyclix.Generic,
     var rds             = ArrayList<RISCDecoder_rd>()
     var rds_ctrl        = ArrayList<ROB_rd_ctrl>()
 
-    var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", MultiExu_CFG.trx_inflight_num-1, 0, "0")
+    var TRX_ID_COUNTER  = cyclix_gen.uglobal(name_prefix + "_TRX_ID_COUNTER", GetWidthToContain(MultiExu_CFG.trx_inflight_num)-1, 0, "0")
 
     init {
         Fill_RISCDecoder_rds_StageVars(this, MultiExu_CFG.rds.size, rds, MultiExu_CFG.ARF_addr_width)
