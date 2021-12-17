@@ -10,6 +10,7 @@ package hwast
 
 import java.text.SimpleDateFormat
 import java.util.Date
+import kotlin.math.*
 
 open class import_expr_context(var var_dict : MutableMap<hw_var, hw_var>)
 
@@ -1591,56 +1592,193 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     data class bit_position(var found : hw_var, var position: hw_var)
 
-    fun max0(datain : hw_var) : bit_position {
+    fun max0(datain : hw_var, group_size : Int) : bit_position {
+
+        var datain_buf = genvar(GetGenName("datain_buf"), datain.vartype, datain.defimm)
         var found = ugenvar(GetGenName("flag"), 0, 0, "0")
-        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        for (bitpos in datain.vartype.dimensions.last().lsb .. datain.vartype.dimensions.last().msb) {
-            begif(!datain.GetFracRef(bitpos))
+        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain_buf.vartype.dimensions[0].msb+1)-1, 0, "0")
+
+        assign(datain_buf, datain)
+
+        if (datain_buf.GetWidth() < (group_size + 1)) {
+            for (bit_idx in datain_buf.vartype.dimensions[0].lsb .. datain_buf.vartype.dimensions[0].msb) {
+                begif(!datain_buf.GetFracRef(bit_idx))
+                run {
+                    assign(found, 1)
+                    assign(position, bit_idx)
+                }; endif()
+            }
+
+        } else {
+
+            var l_elem_lsb = datain_buf.vartype.dimensions[0].lsb
+            var l_elem_width = ceil(datain_buf.GetWidth().toDouble() / 2 ).toInt()
+            var l_elem_msb = (l_elem_lsb + l_elem_width - 1)
+
+            var h_elem_lsb = l_elem_msb + 1
+            var h_elem_width = datain_buf.GetWidth() - l_elem_width
+            var h_elem_msb = datain_buf.vartype.dimensions[0].msb
+
+            var bit_pos_l = max0(datain_buf.GetFracRef(l_elem_msb, l_elem_lsb), group_size)
+            var bit_pos_h = max0(datain_buf.GetFracRef(h_elem_msb, h_elem_lsb), group_size)
+
+            begif(bit_pos_l.found)
             run {
                 assign(found, 1)
-                assign(position, bitpos)
+                assign(position, bit_pos_l.position)
             }; endif()
+
+            begif(bit_pos_h.found)
+            run {
+                assign(found, 1)
+                assign(position, bit_pos_h.position)
+            }; endif()
+
         }
+
         return bit_position(found, position)
     }
 
-    fun min0(datain : hw_var) : bit_position {
+    fun min0(datain : hw_var, group_size : Int) : bit_position {
+
+        var datain_buf = genvar(GetGenName("datain_buf"), datain.vartype, datain.defimm)
         var found = ugenvar(GetGenName("flag"), 0, 0, "0")
-        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        for (bitpos in datain.vartype.dimensions.last().msb downTo datain.vartype.dimensions.last().lsb) {
-            begif(!datain.GetFracRef(bitpos))
+        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain_buf.vartype.dimensions[0].msb+1)-1, 0, "0")
+
+        assign(datain_buf, datain)
+
+        if (datain_buf.GetWidth() < (group_size + 1)) {
+            for (bit_idx in datain_buf.vartype.dimensions[0].msb downTo datain_buf.vartype.dimensions[0].lsb) {
+                begif(!datain_buf.GetFracRef(bit_idx))
+                run {
+                    assign(found, 1)
+                    assign(position, bit_idx)
+                }; endif()
+            }
+
+        } else {
+
+            var l_elem_lsb = datain_buf.vartype.dimensions[0].lsb
+            var l_elem_width = ceil(datain_buf.GetWidth().toDouble() / 2 ).toInt()
+            var l_elem_msb = (l_elem_lsb + l_elem_width - 1)
+
+            var h_elem_lsb = l_elem_msb + 1
+            var h_elem_width = datain_buf.GetWidth() - l_elem_width
+            var h_elem_msb = datain_buf.vartype.dimensions[0].msb
+
+            var bit_pos_l = min0(datain_buf.GetFracRef(l_elem_msb, l_elem_lsb), group_size)
+            var bit_pos_h = min0(datain_buf.GetFracRef(h_elem_msb, h_elem_lsb), group_size)
+
+            begif(bit_pos_h.found)
             run {
                 assign(found, 1)
-                assign(position, bitpos)
+                assign(position, bit_pos_h.position)
             }; endif()
+
+            begif(bit_pos_l.found)
+            run {
+                assign(found, 1)
+                assign(position, bit_pos_l.position)
+            }; endif()
+
         }
+
         return bit_position(found, position)
     }
 
-    fun max1(datain : hw_var) : bit_position {
+    fun max1(datain : hw_var, group_size : Int) : bit_position {
+
+        var datain_buf = genvar(GetGenName("datain_buf"), datain.vartype, datain.defimm)
         var found = ugenvar(GetGenName("flag"), 0, 0, "0")
-        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        for (bitpos in datain.vartype.dimensions.last().lsb .. datain.vartype.dimensions.last().msb) {
-            begif(datain.GetFracRef(bitpos))
+        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain_buf.vartype.dimensions[0].msb+1)-1, 0, "0")
+
+        assign(datain_buf, datain)
+
+        if (datain_buf.GetWidth() < (group_size + 1)) {
+            for (bit_idx in datain_buf.vartype.dimensions[0].lsb .. datain_buf.vartype.dimensions[0].msb) {
+                begif(datain_buf.GetFracRef(bit_idx))
+                run {
+                    assign(found, 1)
+                    assign(position, bit_idx)
+                }; endif()
+            }
+
+        } else {
+
+            var l_elem_lsb = datain_buf.vartype.dimensions[0].lsb
+            var l_elem_width = ceil(datain_buf.GetWidth().toDouble() / 2 ).toInt()
+            var l_elem_msb = (l_elem_lsb + l_elem_width - 1)
+
+            var h_elem_lsb = l_elem_msb + 1
+            var h_elem_width = datain_buf.GetWidth() - l_elem_width
+            var h_elem_msb = datain_buf.vartype.dimensions[0].msb
+
+            var bit_pos_l = max1(datain_buf.GetFracRef(l_elem_msb, l_elem_lsb), group_size)
+            var bit_pos_h = max1(datain_buf.GetFracRef(h_elem_msb, h_elem_lsb), group_size)
+
+            begif(bit_pos_l.found)
             run {
                 assign(found, 1)
-                assign(position, bitpos)
+                assign(position, bit_pos_l.position)
             }; endif()
+
+            begif(bit_pos_h.found)
+            run {
+                assign(found, 1)
+                assign(position, bit_pos_h.position)
+            }; endif()
+
         }
+
         return bit_position(found, position)
     }
 
-    fun min1(datain : hw_var) : bit_position {
+    fun min1(datain : hw_var, group_size : Int) : bit_position {
+
+        var datain_buf = genvar(GetGenName("datain_buf"), datain.vartype, datain.defimm)
         var found = ugenvar(GetGenName("flag"), 0, 0, "0")
-        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain.GetWidth())-1, 0, "0")
-        for (bitpos in datain.vartype.dimensions.last().msb downTo datain.vartype.dimensions.last().lsb) {
-            begif(datain.GetFracRef(bitpos))
+        var position = ugenvar(GetGenName("position"), GetWidthToContain(datain_buf.vartype.dimensions[0].msb+1)-1, 0, "0")
+
+        assign(datain_buf, datain)
+
+        if (datain_buf.GetWidth() < (group_size + 1)) {
+            for (bit_idx in datain_buf.vartype.dimensions[0].msb downTo datain_buf.vartype.dimensions[0].lsb) {
+                begif(datain_buf.GetFracRef(bit_idx))
+                run {
+                    assign(found, 1)
+                    assign(position, bit_idx)
+                }; endif()
+            }
+
+        } else {
+
+            var l_elem_lsb = datain_buf.vartype.dimensions[0].lsb
+            var l_elem_width = ceil(datain_buf.GetWidth().toDouble() / 2 ).toInt()
+            var l_elem_msb = (l_elem_lsb + l_elem_width - 1)
+
+            var h_elem_lsb = l_elem_msb + 1
+            var h_elem_width = datain_buf.GetWidth() - l_elem_width
+            var h_elem_msb = datain_buf.vartype.dimensions[0].msb
+
+            var bit_pos_l = min1(datain_buf.GetFracRef(l_elem_msb, l_elem_lsb), group_size)
+            var bit_pos_h = min1(datain_buf.GetFracRef(h_elem_msb, h_elem_lsb), group_size)
+
+            begif(bit_pos_h.found)
             run {
                 assign(found, 1)
-                assign(position, bitpos)
+                assign(position, bit_pos_h.position)
             }; endif()
+
+            begif(bit_pos_l.found)
+            run {
+                assign(found, 1)
+                assign(position, bit_pos_l.position)
+            }; endif()
+
         }
+
         return bit_position(found, position)
+
     }
 
     fun import_expr(debug_lvl : DEBUG_LEVEL, expr : hw_exec, context : import_expr_context, process_subexpr : (debug_lvl : DEBUG_LEVEL, astc_gen : hw_astc, expr : hw_exec, context : import_expr_context) -> Unit) {

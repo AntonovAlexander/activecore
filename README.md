@@ -1,5 +1,5 @@
 # ActiveCore
-*Making complex RTL designing rapid, fun, with full control and plenty of insights*
+*Making complex RTL designing rapid, fun, with full control, and plenty of insights*
 
 ### Project description
 

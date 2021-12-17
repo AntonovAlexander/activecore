@@ -192,7 +192,7 @@ internal class __control_structures(val cyclix_gen : cyclix.Generic,
     }
 
     fun GetFreePRF() : hw_astc.bit_position {
-        return cyclix_gen.min0(PRF_mapped_buf)
+        return cyclix_gen.min0(PRF_mapped_buf, 4)
     }
 
     fun ReserveRd(rd_addr : hw_param, rd_tag : hw_param) {

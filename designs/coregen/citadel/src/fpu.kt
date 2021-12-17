@@ -8,8 +8,8 @@
 
 package citadel
 
-import cyclix.STREAM_PREF_IMPL
 import hwast.*
+import cyclix.*
 import reordex.*
 
 class FPU_CFG() : Reordex_CFG(32, 32, 1, true, 64, 64, REORDEX_MODE.COPROCESSOR)
