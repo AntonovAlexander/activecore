@@ -93,6 +93,8 @@ class ALUStatus(var CF: hw_var,
                 var ZF: hw_var,
                 var OF: hw_var)
 
+internal class iq_rd_ctrl (var req: hw_var, var tag: hw_var)
+
 open class trx_buffer(cyclix_gen : cyclix.Generic,
                       name_prefix : String,
                       TRX_BUF_SIZE : Int,

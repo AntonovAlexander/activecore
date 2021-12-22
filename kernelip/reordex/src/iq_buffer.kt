@@ -25,7 +25,7 @@ internal open class iq_buffer(cyclix_gen : cyclix.Generic,
     var trx_id      = AddStageVar(hw_structvar("trx_id",     DATA_TYPE.BV_UNSIGNED, GetWidthToContain(MultiExu_CFG.trx_inflight_num)-1, 0, "0"))
     var fu_pending  = AddStageVar(hw_structvar("fu_pending", DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
     val rs_srcs     = ArrayList<hw_var>()
-    val rd_tag      = AddStageVar(hw_structvar("rd0_tag",   DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
+    var rd_ctrls    = ArrayList<iq_rd_ctrl>()
     val io_req      = AddStageVar(hw_structvar("io_req",    DATA_TYPE.BV_UNSIGNED, 0, 0, "0"))
 
     var srcs_rdy        = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_srcs_rdy"), TRX_BUF_SIZE-1, 0, "0")
@@ -34,6 +34,15 @@ internal open class iq_buffer(cyclix_gen : cyclix.Generic,
 
     val curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")          // for debug purposes
     var immediate      = AdduStageVar("immediate", 31, 0, "0")
+
+    init {
+        for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+            rd_ctrls.add(iq_rd_ctrl(
+                AddStageVar(hw_structvar("rd" + rd_idx + "_req",   DATA_TYPE.BV_UNSIGNED, 0, 0, "0")),
+                AddStageVar(hw_structvar("rd" + rd_idx + "_tag",   DATA_TYPE.BV_UNSIGNED, MultiExu_CFG.PRF_addr_width-1, 0, "0"))
+            ))
+        }
+    }
 
     fun Issue(ExUnit : Exu_CFG, exu_req : hw_var, subproc : hw_subproc, ExUnit_num : Int) {
         cyclix_gen.MSG_COMMENT("selecting uop to issue...")
@@ -118,8 +127,8 @@ internal open class iq_buffer(cyclix_gen : cyclix.Generic,
                         var src_cdb         = cdb.GetFracRef(iq_entry_src_src)
                         var src_cdb_enb     = src_cdb.GetFracRef("enb")
                         var src_cdb_data    = src_cdb.GetFracRef("data")
-                        var src_cdb_tag     = src_cdb_data.GetFracRef("tag")
-                        var src_cdb_wdata   = src_cdb_data.GetFracRef("wdata")
+                        var src_cdb_tag     = src_cdb_data.GetFracRef("rd0_tag")
+                        var src_cdb_wdata   = src_cdb_data.GetFracRef("rd0_wdata")
 
                         cyclix_gen.begif(cyclix_gen.eq2(iq_entry_src_tag, src_cdb_tag))
                         run {
@@ -181,8 +190,8 @@ internal class io_buffer(cyclix_gen : cyclix.Generic,
     var exu_cdb_inst_enb    = commit_cdb_buf.GetFracRef("enb")
     var exu_cdb_inst_data   = commit_cdb_buf.GetFracRef("data")
     var exu_cdb_inst_trx_id = exu_cdb_inst_data.GetFracRef("trx_id")
-    var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
-    var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
+    var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("rd0_tag")       // TODO: fix
+    var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("rd0_wdata")     // TODO: fix
 
     init {
         rd_struct.addu("we", 0, 0, "0")
@@ -227,8 +236,8 @@ internal class io_buffer(cyclix_gen : cyclix.Generic,
             var io_cdb_enb      = io_cdb_buf.GetFracRef("enb")
             var io_cdb_data     = io_cdb_buf.GetFracRef("data")
             var io_cdb_trx_id   = io_cdb_data.GetFracRef("trx_id")
-            var io_cdb_tag      = io_cdb_data.GetFracRef("tag")
-            var io_cdb_wdata    = io_cdb_data.GetFracRef("wdata")
+            var io_cdb_tag      = io_cdb_data.GetFracRef("rd0_tag")
+            var io_cdb_wdata    = io_cdb_data.GetFracRef("rd0_wdata")
 
             cyclix_gen.assign(io_cdb_enb, 0)
             cyclix_gen.assign(io_cdb_data, 0)
@@ -270,7 +279,7 @@ internal class io_buffer(cyclix_gen : cyclix.Generic,
                     // writing loaded data to CDB
                     cyclix_gen.assign(exu_cdb_inst_enb, 1)
                     cyclix_gen.assign(exu_cdb_inst_trx_id, trx_id)
-                    cyclix_gen.assign(exu_cdb_inst_tag, rd_tag)
+                    cyclix_gen.assign(exu_cdb_inst_tag, rd_ctrls[0].tag)
                     cyclix_gen.assign(exu_cdb_inst_wdata, mem_data_rdata)
 
                     cyclix_gen.assign(mem_rd_inprogress, 0)

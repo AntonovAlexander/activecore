@@ -82,10 +82,10 @@ open class Reordex_CFG(val RF_width : Int,
     internal var alu_OF          = DUMMY_VAR
 
     init {
-        req_struct.addu("trx_id",     31, 0, "0")       // TODO: clean up
-        resp_struct.addu("trx_id",     31, 0, "0")      // TODO: clean up
-        resp_struct.addu("tag",     31, 0, "0")         // TODO: clean up
-        resp_struct.addu("wdata",     RF_width-1, 0, "0")
+        req_struct.addu("trx_id",   31, 0, "0")      // TODO: clean up size
+        resp_struct.addu("trx_id",  31, 0, "0")      // TODO: clean up size
+        resp_struct.addu("rd0_tag",     31, 0, "0")      // TODO: clean up size
+        resp_struct.addu("rd0_wdata",   RF_width-1, 0, "0")
 
         if (mode == REORDEX_MODE.RISC) {
             alu_CF          = AddDstUImm("alu_CF", 1)
@@ -383,7 +383,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         var ExUnit_idx = 0
         var fu_num = 0
         for (ExUnit in ExecUnits) {
-            MSG("generating execution unit: " + ExUnit.value.ExecUnit.name + "...")
+            MSG("## generating execution unit: " + ExUnit.value.ExecUnit.name + "... ##")
 
             var new_exu_descr = __exu_descr(mutableMapOf(), ArrayList(), ArrayList())
 
@@ -442,10 +442,11 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                     import_expr_context(new_exu_descr.var_dict))
             }
 
-            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict).GetFracRef("wdata"), TranslateVar(ExUnit.value.ExecUnit.rds[0], new_exu_descr.var_dict) )
+            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict).GetFracRef("rd0_wdata"), TranslateVar(ExUnit.value.ExecUnit.rds[0], new_exu_descr.var_dict) )
 
             exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var, TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict))
-            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("tag"), exu_cyclix_gen.stream_req_var.GetFracRef("rd0_tag"))
+            //exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("rd0_req"), exu_cyclix_gen.stream_req_var.GetFracRef("rd0_req"))        // TODO: fix
+            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("rd0_tag"), exu_cyclix_gen.stream_req_var.GetFracRef("rd0_tag"))        // TODO: fix
             exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("trx_id"), exu_cyclix_gen.stream_req_var.GetFracRef("trx_id"))
 
             exu_cyclix_gen.end()
@@ -481,7 +482,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
             ExUnit_idx++
 
-            MSG("generating execution unit " + ExUnit.value.ExecUnit.name + ": done")
+            MSG("## generating execution unit " + ExUnit.value.ExecUnit.name + ": done ##")
         }
 
         MSG("generating I/O IQ...")
@@ -561,8 +562,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             var exu_cdb_inst        = cdb.GetFracRef(cdb_idx)
             var exu_cdb_inst_enb    = exu_cdb_inst.GetFracRef("enb")
             var exu_cdb_inst_data   = exu_cdb_inst.GetFracRef("data")
-            var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("tag")
-            var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("wdata")
+            var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("rd0_tag")       // TODO: fix
+            var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("rd0_wdata")
 
             cyclix_gen.begif(exu_cdb_inst_enb)
             run {

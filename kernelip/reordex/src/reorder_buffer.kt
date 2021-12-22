@@ -48,7 +48,7 @@ internal open class rob(cyclix_gen : cyclix.Generic,
                     run {
                         cyclix_gen.assign(rob_entry_single.GetFracRef("rdy"), 1)
                         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-                            cyclix_gen.assign(rob_entry_single.GetFracRef("alu_result"), CDB_ref_data.GetFracRef("wdata"))
+                            cyclix_gen.assign(rob_entry_single.GetFracRef("alu_result"), CDB_ref_data.GetFracRef("rd0_wdata"))
                             for (dst_imm in MultiExu_CFG.dst_imms) {
                                 cyclix_gen.assign(rob_entry_single.GetFracRef(dst_imm.name), CDB_ref_data.GetFracRef(dst_imm.name))
                             }
