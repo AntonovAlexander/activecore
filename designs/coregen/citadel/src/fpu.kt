@@ -12,7 +12,7 @@ import hwast.*
 import cyclix.*
 import reordex.*
 
-class FPU_CFG() : Reordex_CFG(32, 32, 1, REG_MGMT_MODE.RENAMING, 64, 64, REORDEX_MODE.COPROCESSOR)
+class FPU_CFG() : Reordex_CFG(32, 32, 1, REG_MGMT_RENAMING(64), 64, REORDEX_MODE.COPROCESSOR)
 {
     var opcode = AddSrcUImm("opcode", 32)
 

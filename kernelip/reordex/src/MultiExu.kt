@@ -16,23 +16,21 @@ enum class REORDEX_MODE {
     RISC
 }
 
-enum class REG_MGMT_MODE {
-    SCOREBOARD,
-    RENAMING
-}
+abstract class REG_MGMT_MODE()
+class REG_MGMT_SCOREBOARD() : REG_MGMT_MODE()
+class REG_MGMT_RENAMING(val PRF_depth: Int) : REG_MGMT_MODE()
 
 open class Reordex_CFG(val RF_width : Int,
                        val ARF_depth : Int,
                        val DataPath_width : Int,
                        val REG_MGMT: REG_MGMT_MODE,
-                       val PRF_depth : Int,
                        val ROB_size : Int,
                        val mode : REORDEX_MODE) {
 
     internal val trx_inflight_num = ROB_size * DataPath_width;
 
     internal val ARF_addr_width = GetWidthToContain(ARF_depth)
-    internal val PRF_addr_width = GetWidthToContain(PRF_depth)
+    internal val PRF_addr_width = GetWidthToContain((REG_MGMT as REG_MGMT_RENAMING).PRF_depth)
 
     internal var req_struct = hw_struct("req_struct")
     internal var resp_struct = hw_struct("resp_struct")

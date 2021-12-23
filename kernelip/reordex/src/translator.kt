@@ -165,8 +165,8 @@ internal class __control_structures(val cyclix_gen : cyclix.Generic,
     var prf_dim = hw_dim_static()
     var PRF = cyclix_gen.uglobal("genPRF", prf_dim, "0")
 
-    var PRF_mapped = cyclix_gen.uglobal("genPRF_mapped", MultiExu_CFG.PRF_depth-1, 0, hw_imm_ones(MultiExu_CFG.ARF_depth))
-    var PRF_rdy = cyclix_gen.uglobal("genPRF_rdy", MultiExu_CFG.PRF_depth-1, 0, hw_imm_ones(MultiExu_CFG.PRF_depth))
+    var PRF_mapped = cyclix_gen.uglobal("genPRF_mapped", (MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth-1, 0, hw_imm_ones(MultiExu_CFG.ARF_depth))
+    var PRF_rdy = cyclix_gen.uglobal("genPRF_rdy", (MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth-1, 0, hw_imm_ones((MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth))
 
     var arf_map_dim = hw_dim_static()
     var ARF_map_default = hw_imm_arr(arf_map_dim)
@@ -177,12 +177,12 @@ internal class __control_structures(val cyclix_gen : cyclix.Generic,
 
     init {
         prf_dim.add(MultiExu_CFG.RF_width-1, 0)
-        prf_dim.add(MultiExu_CFG.PRF_depth-1, 0)
+        prf_dim.add((MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth-1, 0)
 
         arf_map_dim.add(MultiExu_CFG.PRF_addr_width-1, 0)
         arf_map_dim.add(MultiExu_CFG.ARF_depth-1, 0)
 
-        for (RF_idx in 0 until MultiExu_CFG.PRF_depth) {
+        for (RF_idx in 0 until (MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth) {
             if (RF_idx < MultiExu_CFG.ARF_depth) {
                 ARF_map_default.AddSubImm(RF_idx.toString())
             } else {
@@ -191,7 +191,7 @@ internal class __control_structures(val cyclix_gen : cyclix.Generic,
         }
 
         prf_src_dim.add(GetWidthToContain(CDB_NUM)-1, 0)
-        prf_src_dim.add(MultiExu_CFG.PRF_depth-1, 0)
+        prf_src_dim.add((MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth-1, 0)
     }
 
     val PRF_mapped_buf = cyclix_gen.global("genPRF_mapped_buf", PRF_mapped.vartype, PRF_mapped.defimm)
