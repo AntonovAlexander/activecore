@@ -71,8 +71,16 @@ open class Reordex_CFG(val RF_width : Int,
     internal var rds = ArrayList<hw_var>()
     fun AddRd() : hw_var {
         var new_var = hw_var("rd" + rds.size, RF_width-1, 0, "0")
+
+        req_struct.addu("rd" + rds.size + "_req", 0, 0, "0")
         req_struct.addu("rd" + rds.size + "_tag", RF_width-1, 0, "0")
+
+        resp_struct.addu("rd" + rds.size + "_req",     0, 0, "0")      // TODO: clean up size
+        resp_struct.addu("rd" + rds.size + "_tag",     31, 0, "0")      // TODO: clean up size
+        resp_struct.addu("rd" + rds.size + "_wdata",   RF_width-1, 0, "0")
+
         rds.add(new_var)
+
         return new_var
     }
 
@@ -84,8 +92,6 @@ open class Reordex_CFG(val RF_width : Int,
     init {
         req_struct.addu("trx_id",   31, 0, "0")      // TODO: clean up size
         resp_struct.addu("trx_id",  31, 0, "0")      // TODO: clean up size
-        resp_struct.addu("rd0_tag",     31, 0, "0")      // TODO: clean up size
-        resp_struct.addu("rd0_wdata",   RF_width-1, 0, "0")
 
         if (mode == REORDEX_MODE.RISC) {
             alu_CF          = AddDstUImm("alu_CF", 1)
@@ -445,7 +451,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict).GetFracRef("rd0_wdata"), TranslateVar(ExUnit.value.ExecUnit.rds[0], new_exu_descr.var_dict) )
 
             exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var, TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict))
-            //exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("rd0_req"), exu_cyclix_gen.stream_req_var.GetFracRef("rd0_req"))        // TODO: fix
+            exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("rd0_req"), exu_cyclix_gen.stream_req_var.GetFracRef("rd0_req"))        // TODO: fix
             exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("rd0_tag"), exu_cyclix_gen.stream_req_var.GetFracRef("rd0_tag"))        // TODO: fix
             exu_cyclix_gen.assign(exu_cyclix_gen.stream_resp_var.GetFracRef("trx_id"), exu_cyclix_gen.stream_req_var.GetFracRef("trx_id"))
 
