@@ -164,6 +164,147 @@ internal class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, I
     }
 }
 
+val OP_SRC_SET_IMM = hw_opcode("src_set_imm")
+class hw_exec_src_set_imm(val src : Src, val imm : hw_param) : hw_exec(OP_SRC_SET_IMM)
+
+val OP_SRC_RD_REG = hw_opcode("src_rd_reg")
+class hw_exec_src_rd_reg(val src : Src, val raddr : hw_param) : hw_exec(OP_SRC_RD_REG)
+
+open class RISCDecodeContainer (MultiExu_CFG : Reordex_CFG) : hw_astc_stdif() {
+
+    var RootExec = hw_exec(hw_opcode("RISCDecode"))
+
+    init {
+        add(RootExec)
+    }
+}
+
+open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiExu_CFG) {
+
+    var instr_code = ugenvar("instr_code", 31, 0, "0")
+
+    // op1 sources
+    val OP0_SRC_RS      = 0
+    val OP0_SRC_IMM     = 1
+    val OP0_SRC_PC 	    = 2
+    // op2 sources
+    val OP1_SRC_RS      = 0
+    val OP1_SRC_IMM     = 1
+    val OP1_SRC_CSR     = 2
+
+    // rd sources
+    val RD_LUI		    = 0
+    val RD_ALU		    = 1
+    val RD_CF_COND	    = 2
+    val RD_OF_COND	    = 3
+    val RD_PC_INC	    = 4
+    val RD_MEM		    = 5
+    val RD_CSR		    = 6
+
+    // jmp sources
+    val JMP_SRC_IMM     = 0
+    val JMP_SRC_ALU     = 1
+
+    val curinstr_addr   = ugenvar("curinstr_addr_decoder", 31, 0, "0")
+
+    var branchctrl = Branchctrl(
+        ugenvar("genbranch_req", 0, 0, "0"),
+        ugenvar("genbranch_req_cond", 0, 0, "0"),
+        ugenvar("genbranch_src", 0, 0, JMP_SRC_IMM.toString()),
+        ugenvar("genbranch_vector", 31, 0, "0"),
+        ugenvar("genbranch_mask", 2, 0, "0")
+    )
+
+    // regfile control signals
+    var rsctrls = mutableMapOf<hw_var, RISCDecoder_rs>()
+    var rdctrls = mutableMapOf<hw_var, RISCDecoder_rd>()
+
+    var csr_rdata       = ugenvar("csr_rdata", 31, 0, "0")
+    var immediate       = ugenvar("immediate", 31, 0, "0")
+    var curinstraddr_imm    = ugenvar("curinstraddr_imm", 31, 0, "0")
+
+    var fencereq        = ugenvar("fencereq", 0, 0, "0")
+    var pred            = ugenvar("pred", 3, 0, "0")
+    var succ            = ugenvar("succ", 3, 0, "0")
+
+    var ecallreq        = ugenvar("ecallreq", 0, 0, "0")
+    var ebreakreq       = ugenvar("ebreakreq", 0, 0, "0")
+
+    var csrreq          = ugenvar("csrreq", 0, 0, "0")
+    var csrnum          = ugenvar("csrnum", 11, 0, "0")
+
+    var exu_req         = ugenvar("exu_req", 0, 0, "0")
+
+    var memctrl         = RISCDecoder_memctrl(
+        ugenvar("mem_req", 0, 0, "0"),
+        ugenvar("mem_cmd", 0, 0, "0"),
+        ugenvar("mem_addr", 31, 0, "0"),
+        ugenvar("mem_be", 3, 0, "0"),
+        ugenvar("mem_wdata", 31, 0, "0"),
+        ugenvar("mem_rdata", 31, 0, "0"),
+        ugenvar("mem_rshift", 0, 0, "0"),
+        ugenvar("load_signext", 0, 0, "0")
+    )
+
+    var mret_req        = ugenvar("mret_req", 0, 0, "0")
+    var MRETADDR        = ugenvar("MRETADDR", 31, 0, "0")
+
+    //////////
+    internal var rss_ctrl = ArrayList<RISCDecoder_rs_ctrl>()
+    internal var rds_ctrl = ArrayList<RISCDecoder_rd_ctrl>()
+
+    var CSR_MCAUSE      = hw_var("CSR_MCAUSE", 7, 0, "0")
+
+    init {
+        for (rs_idx in 0 until MultiExu_CFG.srcs.size) {
+
+            rsctrls.put(MultiExu_CFG.srcs[rs_idx], RISCDecoder_rs(
+                ugenvar("rs" + rs_idx + "_req", 0, 0, "0"),
+                ugenvar("rs" + rs_idx + "_addr",  MultiExu_CFG.ARF_addr_width-1, 0, "0"),
+                ugenvar("rs" + rs_idx + "_rdata", MultiExu_CFG.RF_width-1, 0, "0")
+            ))
+
+            rss_ctrl.add(
+                RISCDecoder_rs_ctrl(
+                    ugenvar("rs" + rs_idx + "_rdy", 0, 0, "0"),
+                    ugenvar("rs" + rs_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+                )
+            )
+        }
+        for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+
+            rdctrls.put(MultiExu_CFG.rds[rd_idx], RISCDecoder_rd(
+                ugenvar("rd" + rd_idx + "_req", 0, 0, "0"),
+                ugenvar("rd" + rd_idx + "_source", 2, 0, RD_ALU.toString()),
+                ugenvar("rd" + rd_idx + "_addr", 4, 0, "0"),
+                ugenvar("rd" + rd_idx + "_wdata", 31, 0, "0"),
+                ugenvar("rd" + rd_idx + "_rdy", 0, 0, "0")
+            ))
+
+            rds_ctrl.add(
+                RISCDecoder_rd_ctrl(
+                    ugenvar("rd" + rd_idx + "_tag", MultiExu_CFG.PRF_addr_width-1, 0, "0")
+                )
+            )
+        }
+
+        for (src_imm in MultiExu_CFG.src_imms)  src_imm.default_astc = this
+        for (src in MultiExu_CFG.srcs)          src.default_astc = this
+        for (dst_imm in MultiExu_CFG.dst_imms)  dst_imm.default_astc = this
+        for (rd in MultiExu_CFG.rds)            rd.default_astc = this
+
+    }
+
+    fun SrcSetImm(src : Src, imm : hw_param) {
+        AddExpr(hw_exec_src_set_imm(src, imm))
+    }
+
+    fun SrcReadReg(src : Src, raddr : hw_param) {
+        AddExpr(hw_exec_src_rd_reg(src, raddr))
+    }
+
+}
+
 internal class instr_fetch_buffer(name: String,
                                   cyclix_gen : cyclix.Generic,
                                   TRX_BUF_SIZE : Int,
@@ -242,7 +383,8 @@ internal class instr_fetch_buffer(name: String,
 
         var new_renamed_uop_total = dispatch_uop_buf.GetPushTrx()
 
-        (global_structures as __control_structures_renaming).InitFreePRFBuf()
+        if (global_structures is __control_structures_renaming) global_structures.InitFreePRFBuf()
+        else if (global_structures is __control_structures_scoreboarding) global_structures.InitFreeARFRdy()
 
         cyclix_gen.assign(decode_active, cyclix_gen.band(ctrl_active, dispatch_uop_buf.ctrl_rdy))
         cyclix_gen.begif(decode_active)
@@ -280,15 +422,28 @@ internal class instr_fetch_buffer(name: String,
                             }
                             cyclix_gen.MSG_COMMENT("Generating payload: done")
 
-                            for (rd_idx in 0 until MultiExu_CFG.rds.size) {         // TODO: sum rd reqs
-                                cyclix_gen.begif(cyclix_gen.band(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req), cyclix_gen.rand((global_structures as __control_structures_renaming).PRF_mapped_prev)))
-                                run {
-                                    cyclix_gen.assign(decode_active, 0)
-                                }; cyclix_gen.endif()
+                            cyclix_gen.MSG_COMMENT("Identifying rd resources availability...")
+                            if (global_structures is __control_structures_renaming) {
+                                for (rd_idx in 0 until MultiExu_CFG.rds.size) {         // TODO: sum rd reqs
+                                    cyclix_gen.begif(cyclix_gen.band(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req), cyclix_gen.rand((global_structures as __control_structures_renaming).PRF_mapped_prev)))
+                                    run {
+                                        cyclix_gen.assign(decode_active, 0)
+                                    }; cyclix_gen.endif()
+                                }
+                            } else if (global_structures is __control_structures_scoreboarding) {
+                                for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+                                    cyclix_gen.begif(!global_structures.ARF_rdy_prev.GetFracRef(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr)))
+                                    run {
+                                        cyclix_gen.assign(decode_active, 0)
+                                    }; cyclix_gen.endif()
+                                }
                             }
+                            cyclix_gen.MSG_COMMENT("Identifying rd resources availability: done")
 
                             cyclix_gen.begif(cyclix_gen.band(dispatch_uop_buf.ctrl_rdy, decode_active))
                             run {
+
+                                cyclix_gen.MSG_COMMENT("Rds reservation...")
 
                                 for (rd_idx in 0 until MultiExu_CFG.rds.size) {
 
@@ -306,6 +461,8 @@ internal class instr_fetch_buffer(name: String,
                                     }; cyclix_gen.endif()
 
                                 }
+
+                                cyclix_gen.MSG_COMMENT("Rds reservation: done")
 
                                 // forming push trx
                                 cyclix_gen.assign_subStructs(new_renamed_uop, TRX_LOCAL)
