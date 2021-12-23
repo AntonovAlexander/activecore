@@ -175,12 +175,12 @@ internal abstract class __control_structures(val cyclix_gen : cyclix.Generic,
     }
 }
 
-internal class __control_structures_scoreboard(cyclix_gen : cyclix.Generic,
-                                           MultiExu_CFG : Reordex_CFG,
-                                           CDB_NUM : Int,
-                                           ExecUnits : MutableMap<String, Exu_CFG>,
-                                           exu_descrs : MutableMap<String, __exu_descr>,
-                                           exu_rst : hw_var) : __control_structures(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst) {
+internal class __control_structures_scoreboarding(cyclix_gen : cyclix.Generic,
+                                                  MultiExu_CFG : Reordex_CFG,
+                                                  CDB_NUM : Int,
+                                                  ExecUnits : MutableMap<String, Exu_CFG>,
+                                                  exu_descrs : MutableMap<String, __exu_descr>,
+                                                  exu_rst : hw_var) : __control_structures(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst) {
 
     var ARF = cyclix_gen.uglobal("ARF", arf_dim, "0")
     var ARF_rdy = cyclix_gen.uglobal("genARF_rdy", MultiExu_CFG.ARF_depth-1, 0, hw_imm_ones(MultiExu_CFG.ARF_depth))
@@ -199,12 +199,12 @@ internal class __control_structures_scoreboard(cyclix_gen : cyclix.Generic,
     }
 }
 
-internal class __control_structures_rename(cyclix_gen : cyclix.Generic,
-                                           MultiExu_CFG : Reordex_CFG,
-                                           CDB_NUM : Int,
-                                           ExecUnits : MutableMap<String, Exu_CFG>,
-                                           exu_descrs : MutableMap<String, __exu_descr>,
-                                           exu_rst : hw_var) : __control_structures(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst) {
+internal class __control_structures_renaming(cyclix_gen : cyclix.Generic,
+                                             MultiExu_CFG : Reordex_CFG,
+                                             CDB_NUM : Int,
+                                             ExecUnits : MutableMap<String, Exu_CFG>,
+                                             exu_descrs : MutableMap<String, __exu_descr>,
+                                             exu_rst : hw_var) : __control_structures(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst) {
 
     var prf_dim = hw_dim_static()
     var PRF = cyclix_gen.uglobal("genPRF", prf_dim, "0")

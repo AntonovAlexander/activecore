@@ -226,7 +226,7 @@ internal class instr_fetch_buffer(name: String,
 
         } else if (expr is hw_exec_src_rd_reg) {
             var num = MultiExu_CFG.srcs.indexOf(expr.src)
-            (global_structures as __control_structures_rename).FillReadRs(src_rsrv[num].src_tag, src_rsrv[num].src_rdy, src_rsrv[num].src_data, TranslateParam(expr.raddr))
+            (global_structures as __control_structures_renaming).FillReadRs(src_rsrv[num].src_tag, src_rsrv[num].src_rdy, src_rsrv[num].src_data, TranslateParam(expr.raddr))
 
         } else {
             cyclix_gen.import_expr(debug_lvl, expr, context, ::reconstruct_expression)
@@ -242,7 +242,7 @@ internal class instr_fetch_buffer(name: String,
 
         var new_renamed_uop_total = dispatch_uop_buf.GetPushTrx()
 
-        (global_structures as __control_structures_rename).InitFreePRFBuf()
+        (global_structures as __control_structures_renaming).InitFreePRFBuf()
 
         cyclix_gen.assign(decode_active, cyclix_gen.band(ctrl_active, dispatch_uop_buf.ctrl_rdy))
         cyclix_gen.begif(decode_active)
@@ -281,7 +281,7 @@ internal class instr_fetch_buffer(name: String,
                             cyclix_gen.MSG_COMMENT("Generating payload: done")
 
                             for (rd_idx in 0 until MultiExu_CFG.rds.size) {         // TODO: sum rd reqs
-                                cyclix_gen.begif(cyclix_gen.band(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req), cyclix_gen.rand((global_structures as __control_structures_rename).PRF_mapped_prev)))
+                                cyclix_gen.begif(cyclix_gen.band(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req), cyclix_gen.rand((global_structures as __control_structures_renaming).PRF_mapped_prev)))
                                 run {
                                     cyclix_gen.assign(decode_active, 0)
                                 }; cyclix_gen.endif()
@@ -297,7 +297,7 @@ internal class instr_fetch_buffer(name: String,
 
                                     cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req))
                                     run {
-                                        cyclix_gen.assign(nru_rd_tag_prev, (global_structures as __control_structures_rename).RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr)))
+                                        cyclix_gen.assign(nru_rd_tag_prev, (global_structures as __control_structures_renaming).RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr)))
                                         cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped_prev, nru_rd_tag_prev))
 
                                         var alloc_rd_tag = global_structures.GetFreePRF()

@@ -72,7 +72,7 @@ internal open class rob(cyclix_gen : cyclix.Generic,
                 for (rd_idx in 0 until MultiExu_CFG.rds.size) {
                     cyclix_gen.begif(rds_ctrl[rd_idx].tag_prev_clr)
                     run {
-                        (global_structures as __control_structures_rename).FreePRF(rds_ctrl[rd_idx].tag_prev)
+                        (global_structures as __control_structures_renaming).FreePRF(rds_ctrl[rd_idx].tag_prev)
                     }; cyclix_gen.endif()
                 }
                 cyclix_gen.assign(pop, 1)
@@ -253,7 +253,7 @@ internal class rob_risc(name: String,
 
                         cyclix_gen.begif(rds_ctrl[0].tag_prev_clr)
                         run {
-                            (global_structures as __control_structures_rename).FreePRF(rds_ctrl[0].tag_prev)
+                            (global_structures as __control_structures_renaming).FreePRF(rds_ctrl[0].tag_prev)
                             cyclix_gen.begif(rds[0].req)
                             run {
                                 cyclix_gen.assign(control_structures.Backoff_ARF.GetFracRef(rds[0].addr), rds[0].wdata)
@@ -381,7 +381,7 @@ internal class rob_risc(name: String,
                     cyclix_gen.assign(buf_to_clr.TRX_BUF[elem_index].GetFracRef("enb"), 0)
                 }
             }
-            (global_structures as __control_structures_rename).RollBack()
+            (global_structures as __control_structures_renaming).RollBack()
             cyclix_gen.assign(entry_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
             cyclix_gen.assign(genrob_instr_ptr, 0)
         }; cyclix_gen.endif()

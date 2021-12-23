@@ -304,7 +304,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         var exu_descrs = mutableMapOf<String, __exu_descr>()
         var exu_rst = cyclix_gen.ulocal("genexu_rst", 0, 0, "0")
-        var control_structures = __control_structures_rename(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst)
+        var control_structures = __control_structures_renaming(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst)
 
         MSG("generating control structures: done")
 
