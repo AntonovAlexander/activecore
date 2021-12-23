@@ -12,7 +12,7 @@ import hwast.*
 import cyclix.*
 import reordex.*
 
-class CPU_CFG() : Reordex_CFG(32, 32, 2, REG_MGMT_RENAMING(48), 16, REORDEX_MODE.RISC)
+class CPU_CFG : Reordex_CFG(32, 32, 2, REG_MGMT_RENAMING(48), 16, REORDEX_MODE.RISC)
 {
     var exu_opcode      = AddSrcUImm("exu_opcode", 6)
     var alu_unsigned    = AddSrcUImm("alu_unsigned", 1)
@@ -24,7 +24,7 @@ class CPU_CFG() : Reordex_CFG(32, 32, 2, REG_MGMT_RENAMING(48), 16, REORDEX_MODE
 }
 val CFG = CPU_CFG()
 
-class RISCV_Decoder() : reordex.RISCDecoder(CFG) {
+class RISCV_Decoder : reordex.RISCDecoder(CFG) {
 
     //// base opcodes ///////////
 

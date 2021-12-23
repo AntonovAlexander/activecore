@@ -72,7 +72,7 @@ internal open class rob(cyclix_gen : cyclix.Generic,
                 for (rd_idx in 0 until MultiExu_CFG.rds.size) {
                     cyclix_gen.begif(rds_ctrl[rd_idx].tag_prev_clr)
                     run {
-                        global_structures.FreePRF(rds_ctrl[rd_idx].tag_prev)
+                        (global_structures as __control_structures_rename).FreePRF(rds_ctrl[rd_idx].tag_prev)
                     }; cyclix_gen.endif()
                 }
                 cyclix_gen.assign(pop, 1)
@@ -92,7 +92,8 @@ internal class rob_risc(name: String,
                name_prefix : String,
                TRX_BUF_SIZE : Int,
                MultiExu_CFG : Reordex_CFG,
-               rrb_num : Int) : rob(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, rrb_num) {
+               rrb_num : Int,
+               val control_structures : __control_structures) : rob(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, rrb_num) {
 
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
@@ -133,9 +134,6 @@ internal class rob_risc(name: String,
         AdduStageVar("genbranch_mask", 2, 0, "0")
     )
 
-    var rf_dim = hw_dim_static()
-    var Backoff_ARF = cyclix_gen.uglobal("Backoff_ARF", rf_dim, "0")
-
     var expected_instraddr = cyclix_gen.uglobal("expected_instraddr", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
 
     val irq_width   = 8
@@ -150,11 +148,6 @@ internal class rob_risc(name: String,
     var commit_active       = cyclix_gen.ulocal("genrob_commit_active", 0, 0, "1")
     var entry_mask          = cyclix_gen.uglobal("genrob_entry_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
     var genrob_instr_ptr    = cyclix_gen.uglobal("genrob_instr_ptr", GetWidthToContain(TRX_BUF_MULTIDIM)-1, 0, "0")
-
-    init {
-        rf_dim.add(31, 0)
-        rf_dim.add(31, 0)
-    }
 
     fun Commit(global_structures: __control_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
 
@@ -260,10 +253,10 @@ internal class rob_risc(name: String,
 
                         cyclix_gen.begif(rds_ctrl[0].tag_prev_clr)
                         run {
-                            global_structures.FreePRF(rds_ctrl[0].tag_prev)
+                            (global_structures as __control_structures_rename).FreePRF(rds_ctrl[0].tag_prev)
                             cyclix_gen.begif(rds[0].req)
                             run {
-                                cyclix_gen.assign(Backoff_ARF.GetFracRef(rds[0].addr), rds[0].wdata)
+                                cyclix_gen.assign(control_structures.Backoff_ARF.GetFracRef(rds[0].addr), rds[0].wdata)
                             }; cyclix_gen.endif()
                         }; cyclix_gen.endif()
                         cyclix_gen.COMMENT("committing RF: done")
@@ -388,7 +381,7 @@ internal class rob_risc(name: String,
                     cyclix_gen.assign(buf_to_clr.TRX_BUF[elem_index].GetFracRef("enb"), 0)
                 }
             }
-            global_structures.RollBack(Backoff_ARF)
+            (global_structures as __control_structures_rename).RollBack()
             cyclix_gen.assign(entry_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
             cyclix_gen.assign(genrob_instr_ptr, 0)
         }; cyclix_gen.endif()

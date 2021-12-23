@@ -304,7 +304,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         var exu_descrs = mutableMapOf<String, __exu_descr>()
         var exu_rst = cyclix_gen.ulocal("genexu_rst", 0, 0, "0")
-        var control_structures = __control_structures(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst)
+        var control_structures = __control_structures_rename(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst)
 
         MSG("generating control structures: done")
 
@@ -314,7 +314,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         cdb_struct.addu("enb", 0, 0, "0")
         cdb_struct.add("data", MultiExu_CFG.resp_struct)
         var cdb = cyclix_gen.local("gencdb", cdb_struct, hw_dim_static(CDB_NUM-1, 0))       // Common Data Bus
-        var io_cdb_buf  =
+        var io_cdb_buf =
             if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) DUMMY_VAR
             else cyclix_gen.global("io_cdb_buf", cdb_struct)
         var io_cdb_rs1_wdata_buf =
@@ -323,7 +323,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         var rob =
             if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob(cyclix_gen, "genrob", MultiExu_CFG.ROB_size, MultiExu_CFG, CDB_NUM)
-            else rob_risc(name, cyclix_gen, "genrob", MultiExu_CFG.ROB_size, MultiExu_CFG, CDB_NUM)
+            else rob_risc(name, cyclix_gen, "genrob", MultiExu_CFG.ROB_size, MultiExu_CFG, CDB_NUM, control_structures)
 
         var TranslateInfo = __TranslateInfo()
 

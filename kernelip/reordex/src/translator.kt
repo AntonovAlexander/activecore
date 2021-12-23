@@ -155,18 +155,63 @@ open class uop_buffer(cyclix_gen : cyclix.Generic,
 
 internal class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use_flags : ArrayList<Boolean>, var IQ_insts : ArrayList<iq_buffer>)
 
-internal class __control_structures(val cyclix_gen : cyclix.Generic,
-                                    val MultiExu_CFG : Reordex_CFG,
-                                    val CDB_NUM : Int,
-                                    val ExecUnits : MutableMap<String, Exu_CFG>,
-                                    val exu_descrs : MutableMap<String, __exu_descr>,
-                                    val exu_rst : hw_var) {
+internal abstract class __control_structures(val cyclix_gen : cyclix.Generic,
+                                             val MultiExu_CFG : Reordex_CFG,
+                                             val CDB_NUM : Int,
+                                             val ExecUnits : MutableMap<String, Exu_CFG>,
+                                             val exu_descrs : MutableMap<String, __exu_descr>,
+                                             val exu_rst : hw_var) {
+
+    var arf_dim = hw_dim_static()
+    var Backoff_ARF = cyclix_gen.uglobal("Backoff_ARF", arf_dim, "0")
+
+    init {
+        arf_dim.add(MultiExu_CFG.RF_width-1, 0)
+        arf_dim.add(MultiExu_CFG.ARF_depth-1, 0)
+    }
+
+    open fun RollBack() {
+
+    }
+}
+
+internal class __control_structures_scoreboard(cyclix_gen : cyclix.Generic,
+                                           MultiExu_CFG : Reordex_CFG,
+                                           CDB_NUM : Int,
+                                           ExecUnits : MutableMap<String, Exu_CFG>,
+                                           exu_descrs : MutableMap<String, __exu_descr>,
+                                           exu_rst : hw_var) : __control_structures(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst) {
+
+    var ARF = cyclix_gen.uglobal("ARF", arf_dim, "0")
+    var ARF_rdy = cyclix_gen.uglobal("genARF_rdy", MultiExu_CFG.ARF_depth-1, 0, hw_imm_ones(MultiExu_CFG.ARF_depth))
+
+    init {
+        if (!(MultiExu_CFG.REG_MGMT is REG_MGMT_SCOREBOARD)) ERROR("Configuration inconsistent!")
+    }
+
+    override fun RollBack() {
+        cyclix_gen.assign(exu_rst, 1)
+        cyclix_gen.assign(ARF_rdy, ARF_rdy.defimm)
+        //cyclix_gen.assign(ARF_map, ARF_map_default)               // TODO: fix error
+        for (reg_idx in 0 until Backoff_ARF.GetWidth()) {
+            cyclix_gen.assign(ARF.GetFracRef(reg_idx), Backoff_ARF.GetFracRef(reg_idx))
+        }
+    }
+}
+
+internal class __control_structures_rename(cyclix_gen : cyclix.Generic,
+                                           MultiExu_CFG : Reordex_CFG,
+                                           CDB_NUM : Int,
+                                           ExecUnits : MutableMap<String, Exu_CFG>,
+                                           exu_descrs : MutableMap<String, __exu_descr>,
+                                           exu_rst : hw_var) : __control_structures(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst) {
 
     var prf_dim = hw_dim_static()
     var PRF = cyclix_gen.uglobal("genPRF", prf_dim, "0")
 
     var PRF_mapped = cyclix_gen.uglobal("genPRF_mapped", (MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth-1, 0, hw_imm_ones(MultiExu_CFG.ARF_depth))
-    var PRF_rdy = cyclix_gen.uglobal("genPRF_rdy", (MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth-1, 0, hw_imm_ones((MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth))
+
+    var PRF_rdy = cyclix_gen.uglobal("genPRF_rdy", (MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth-1, 0, hw_imm_ones(MultiExu_CFG.REG_MGMT.PRF_depth))
 
     var arf_map_dim = hw_dim_static()
     var ARF_map_default = hw_imm_arr(arf_map_dim)
@@ -175,7 +220,11 @@ internal class __control_structures(val cyclix_gen : cyclix.Generic,
     var prf_src_dim = hw_dim_static()
     var PRF_src = cyclix_gen.uglobal("genPRF_src", prf_src_dim, "0") // uncomputed PRF sources
 
+    val PRF_mapped_prev = cyclix_gen.local("genPRF_mapped_prev", PRF_mapped.vartype, PRF_mapped.defimm)
+
     init {
+        if (!(MultiExu_CFG.REG_MGMT is REG_MGMT_RENAMING)) ERROR("Configuration inconsistent!")
+
         prf_dim.add(MultiExu_CFG.RF_width-1, 0)
         prf_dim.add((MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth-1, 0)
 
@@ -193,8 +242,6 @@ internal class __control_structures(val cyclix_gen : cyclix.Generic,
         prf_src_dim.add(GetWidthToContain(CDB_NUM)-1, 0)
         prf_src_dim.add((MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth-1, 0)
     }
-
-    val PRF_mapped_buf = cyclix_gen.global("genPRF_mapped_buf", PRF_mapped.vartype, PRF_mapped.defimm)
 
     fun RenameReg(src_addr : hw_param) : hw_var {
         return ARF_map.GetFracRef(src_addr)
@@ -217,24 +264,24 @@ internal class __control_structures(val cyclix_gen : cyclix.Generic,
     }
 
     fun InitFreePRFBuf() {
-        cyclix_gen.assign(PRF_mapped_buf, PRF_mapped.readPrev())
+        cyclix_gen.assign(PRF_mapped_prev, (PRF_mapped as cyclix.hw_global).readPrev())
     }
 
     fun GetFreePRF() : hw_astc.bit_position {
-        return cyclix_gen.min0(PRF_mapped_buf, 4)
+        return cyclix_gen.min0(PRF_mapped_prev, 4)
     }
 
     fun ReserveRd(rd_addr : hw_param, rd_tag : hw_param) {
         cyclix_gen.assign(ARF_map.GetFracRef(rd_addr), rd_tag)
         cyclix_gen.assign(PRF_mapped.GetFracRef(rd_tag), 1)
-        cyclix_gen.assign(PRF_mapped_buf.GetFracRef(rd_tag), 1)
+        cyclix_gen.assign(PRF_mapped_prev.GetFracRef(rd_tag), 1)
         cyclix_gen.assign(PRF_rdy.GetFracRef(rd_tag), 0)
     }
 
     fun ReserveWriteRd(src_rd : hw_param, src_tag : hw_param, src_wdata : hw_param) {
         cyclix_gen.assign(ARF_map.GetFracRef(src_rd), src_tag)
         cyclix_gen.assign(PRF_mapped.GetFracRef(src_tag), 1)
-        cyclix_gen.assign(PRF_mapped_buf.GetFracRef(src_tag), 1)
+        cyclix_gen.assign(PRF_mapped_prev.GetFracRef(src_tag), 1)
         cyclix_gen.assign(PRF_rdy.GetFracRef(src_tag), 1)
         cyclix_gen.assign(PRF.GetFracRef(src_tag), src_wdata)
     }
@@ -250,7 +297,7 @@ internal class __control_structures(val cyclix_gen : cyclix.Generic,
             0)
     }
 
-    fun RollBack(Backoff_ARF : hw_var) {
+    override fun RollBack() {
         cyclix_gen.assign(exu_rst, 1)
         cyclix_gen.assign(PRF_mapped, PRF_mapped.defimm)
         cyclix_gen.assign(PRF_rdy, PRF_rdy.defimm)
