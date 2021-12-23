@@ -157,15 +157,42 @@ internal class __exu_descr(var var_dict : MutableMap<hw_var, hw_var>, var rs_use
 
 internal class __control_structures(val cyclix_gen : cyclix.Generic,
                                     val MultiExu_CFG : Reordex_CFG,
-                                    val PRF : cyclix.hw_global,
-                                    val PRF_mapped : cyclix.hw_global,
-                                    val PRF_rdy : cyclix.hw_global,
-                                    val ARF_map : cyclix.hw_global,
-                                    val ARF_map_default : hw_imm_arr,
-                                    val PRF_src : cyclix.hw_global,
+                                    val CDB_NUM : Int,
                                     val ExecUnits : MutableMap<String, Exu_CFG>,
                                     val exu_descrs : MutableMap<String, __exu_descr>,
                                     val exu_rst : hw_var) {
+
+    var prf_dim = hw_dim_static()
+    var PRF = cyclix_gen.uglobal("genPRF", prf_dim, "0")
+
+    var PRF_mapped = cyclix_gen.uglobal("genPRF_mapped", MultiExu_CFG.PRF_depth-1, 0, hw_imm_ones(MultiExu_CFG.ARF_depth))
+    var PRF_rdy = cyclix_gen.uglobal("genPRF_rdy", MultiExu_CFG.PRF_depth-1, 0, hw_imm_ones(MultiExu_CFG.PRF_depth))
+
+    var arf_map_dim = hw_dim_static()
+    var ARF_map_default = hw_imm_arr(arf_map_dim)
+    var ARF_map = cyclix_gen.uglobal("genARF_map", arf_map_dim, ARF_map_default)        // ARF-to-PRF mappings
+
+    var prf_src_dim = hw_dim_static()
+    var PRF_src = cyclix_gen.uglobal("genPRF_src", prf_src_dim, "0") // uncomputed PRF sources
+
+    init {
+        prf_dim.add(MultiExu_CFG.RF_width-1, 0)
+        prf_dim.add(MultiExu_CFG.PRF_depth-1, 0)
+
+        arf_map_dim.add(MultiExu_CFG.PRF_addr_width-1, 0)
+        arf_map_dim.add(MultiExu_CFG.ARF_depth-1, 0)
+
+        for (RF_idx in 0 until MultiExu_CFG.PRF_depth) {
+            if (RF_idx < MultiExu_CFG.ARF_depth) {
+                ARF_map_default.AddSubImm(RF_idx.toString())
+            } else {
+                ARF_map_default.AddSubImm("0")
+            }
+        }
+
+        prf_src_dim.add(GetWidthToContain(CDB_NUM)-1, 0)
+        prf_src_dim.add(MultiExu_CFG.PRF_depth-1, 0)
+    }
 
     val PRF_mapped_buf = cyclix_gen.global("genPRF_mapped_buf", PRF_mapped.vartype, PRF_mapped.defimm)
 
