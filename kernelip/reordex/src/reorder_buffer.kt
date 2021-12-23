@@ -69,11 +69,13 @@ internal open class rob(cyclix_gen : cyclix.Generic,
         run {
             cyclix_gen.begif(rdy)
             run {
-                for (rd_idx in 0 until MultiExu_CFG.rds.size) {
-                    cyclix_gen.begif(rds_ctrl[rd_idx].tag_prev_clr)
-                    run {
-                        (global_structures as __control_structures_renaming).FreePRF(rds_ctrl[rd_idx].tag_prev)
-                    }; cyclix_gen.endif()
+                if (global_structures is __control_structures_renaming) {
+                    for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+                        cyclix_gen.begif(rds_ctrl[rd_idx].tag_prev_clr)
+                        run {
+                            global_structures.FreePRF(rds_ctrl[rd_idx].tag_prev)
+                        }; cyclix_gen.endif()
+                    }
                 }
                 cyclix_gen.assign(pop, 1)
             }; cyclix_gen.endif()
@@ -251,14 +253,18 @@ internal class rob_risc(name: String,
 
                         }; cyclix_gen.endcase()
 
-                        cyclix_gen.begif(rds_ctrl[0].tag_prev_clr)
-                        run {
-                            (global_structures as __control_structures_renaming).FreePRF(rds_ctrl[0].tag_prev)
-                            cyclix_gen.begif(rds[0].req)
+                        if (global_structures is __control_structures_renaming) {
+                            cyclix_gen.begif(rds_ctrl[0].tag_prev_clr)
                             run {
-                                cyclix_gen.assign(control_structures.Backoff_ARF.GetFracRef(rds[0].addr), rds[0].wdata)
+                                global_structures.FreePRF(rds_ctrl[0].tag_prev)
                             }; cyclix_gen.endif()
+                        }
+
+                        cyclix_gen.begif(rds[0].req)
+                        run {
+                            cyclix_gen.assign(control_structures.Backoff_ARF.GetFracRef(rds[0].addr), rds[0].wdata)
                         }; cyclix_gen.endif()
+
                         cyclix_gen.COMMENT("committing RF: done")
 
                         cyclix_gen.COMMENT("control transfer...")

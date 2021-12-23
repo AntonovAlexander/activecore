@@ -26,9 +26,10 @@ internal abstract class __control_structures(val cyclix_gen : cyclix.Generic,
         arf_dim.add(MultiExu_CFG.ARF_depth-1, 0)
     }
 
-    open fun RollBack() {
-
-    }
+    abstract fun RollBack()
+    abstract fun FetchRs(src_tag : hw_param) : hw_var
+    abstract fun FetchRsRdy(src_prf_index : hw_param) : hw_var
+    abstract fun FillReadRs(fetch_tag : hw_var, fetch_rdy : hw_var, fetch_data : hw_var, raddr : hw_param)
 }
 
 internal class __control_structures_scoreboarding(cyclix_gen : cyclix.Generic,
@@ -49,6 +50,31 @@ internal class __control_structures_scoreboarding(cyclix_gen : cyclix.Generic,
 
     fun InitFreeARFRdy() {
         cyclix_gen.assign(ARF_rdy_prev, ARF_rdy.readPrev())
+    }
+
+    override fun FetchRs(src_tag : hw_param) : hw_var {
+        return ARF.GetFracRef(src_tag)
+    }
+
+    override fun FetchRsRdy(src_prf_index : hw_param) : hw_var {
+        return ARF_rdy.GetFracRef(src_prf_index)
+    }
+
+    override fun FillReadRs(fetch_tag : hw_var, fetch_rdy : hw_var, fetch_data : hw_var, raddr : hw_param) {
+        cyclix_gen.MSG_COMMENT("Fetching data from architectural registers...")
+        fetch_tag.assign(raddr)
+        fetch_rdy.assign(FetchRsRdy(fetch_tag))
+        fetch_data.assign(FetchRs(fetch_tag))
+        cyclix_gen.MSG_COMMENT("Fetching data from architectural registers: done")
+    }
+
+    fun ReserveRd(rd_tag : hw_param) {
+        cyclix_gen.assign(ARF_rdy.GetFracRef(rd_tag), 0)
+    }
+
+    fun WriteARF(rd_tag : hw_param, src_wdata : hw_param) {
+        cyclix_gen.assign(ARF_rdy.GetFracRef(rd_tag), 1)
+        cyclix_gen.assign(ARF.GetFracRef(rd_tag), src_wdata)
     }
 
     override fun RollBack() {
@@ -110,15 +136,15 @@ internal class __control_structures_renaming(cyclix_gen : cyclix.Generic,
         return ARF_map.GetFracRef(src_addr)
     }
 
-    fun FetchRs(src_tag : hw_param) : hw_var {
+    override fun FetchRs(src_tag : hw_param) : hw_var {
         return PRF.GetFracRef(src_tag)
     }
 
-    fun FetchRsRdy(src_prf_index : hw_param) : hw_var {
+    override fun FetchRsRdy(src_prf_index : hw_param) : hw_var {
         return PRF_rdy.GetFracRef(src_prf_index)
     }
 
-    fun FillReadRs(fetch_tag : hw_var, fetch_rdy : hw_var, fetch_data : hw_var, raddr : hw_param) {
+    override fun FillReadRs(fetch_tag : hw_var, fetch_rdy : hw_var, fetch_data : hw_var, raddr : hw_param) {
         cyclix_gen.MSG_COMMENT("Fetching data from physical registers...")
         fetch_tag.assign(RenameReg(raddr))
         fetch_rdy.assign(FetchRsRdy(fetch_tag))

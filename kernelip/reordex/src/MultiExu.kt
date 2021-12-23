@@ -163,7 +163,9 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         var exu_descrs = mutableMapOf<String, __exu_descr>()
         var exu_rst = cyclix_gen.ulocal("genexu_rst", 0, 0, "0")
-        var control_structures = __control_structures_renaming(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst)
+        var control_structures =
+            if (MultiExu_CFG.REG_MGMT is REG_MGMT_SCOREBOARD) __control_structures_scoreboarding(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst)
+            else __control_structures_renaming(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst)
 
         MSG("generating control structures: done")
 
@@ -414,7 +416,9 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                     cyclix_gen.begif(exu_cdb_inst_req)
                     run {
 
-                        control_structures.WritePRF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
+                        if (control_structures is __control_structures_scoreboarding) control_structures.WriteARF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
+                        else if (control_structures is __control_structures_renaming) control_structures.WritePRF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
+                        else ERROR("Configuration inconsistent!")
 
                         // broadcasting FU results to dispatch buffer
                         for (dispatch_uop_buf_idx in 0 until dispatch_uop_buf.TRX_BUF_SIZE) {
@@ -459,7 +463,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and dispatch buffer: done")
 
-        dispatch_uop_buf.Process(rob, control_structures.PRF_src, io_iq, ExecUnits, CDB_RISC_LSU_POS)
+        dispatch_uop_buf.Process(rob, (control_structures as __control_structures_renaming).PRF_src, io_iq, ExecUnits, CDB_RISC_LSU_POS)
 
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
             var frontend = coproc_frontend(name, cyclix_gen, MultiExu_CFG, control_structures)

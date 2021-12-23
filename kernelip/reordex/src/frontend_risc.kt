@@ -367,7 +367,7 @@ internal class instr_fetch_buffer(name: String,
 
         } else if (expr is hw_exec_src_rd_reg) {
             var num = MultiExu_CFG.srcs.indexOf(expr.src)
-            (global_structures as __control_structures_renaming).FillReadRs(src_rsrv[num].src_tag, src_rsrv[num].src_rdy, src_rsrv[num].src_data, TranslateParam(expr.raddr))
+            global_structures.FillReadRs(src_rsrv[num].src_tag, src_rsrv[num].src_rdy, src_rsrv[num].src_data, TranslateParam(expr.raddr))
 
         } else {
             cyclix_gen.import_expr(debug_lvl, expr, context, ::reconstruct_expression)
@@ -423,21 +423,21 @@ internal class instr_fetch_buffer(name: String,
                             cyclix_gen.MSG_COMMENT("Generating payload: done")
 
                             cyclix_gen.MSG_COMMENT("Identifying rd resources availability...")
-                            if (global_structures is __control_structures_renaming) {
-                                for (rd_idx in 0 until MultiExu_CFG.rds.size) {         // TODO: sum rd reqs
-                                    cyclix_gen.begif(cyclix_gen.band(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req), cyclix_gen.rand((global_structures as __control_structures_renaming).PRF_mapped_prev)))
-                                    run {
-                                        cyclix_gen.assign(decode_active, 0)
-                                    }; cyclix_gen.endif()
-                                }
-                            } else if (global_structures is __control_structures_scoreboarding) {
+                            if (global_structures is __control_structures_scoreboarding) {
                                 for (rd_idx in 0 until MultiExu_CFG.rds.size) {
                                     cyclix_gen.begif(!global_structures.ARF_rdy_prev.GetFracRef(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr)))
                                     run {
                                         cyclix_gen.assign(decode_active, 0)
                                     }; cyclix_gen.endif()
                                 }
-                            }
+                            } else if (global_structures is __control_structures_renaming) {
+                                for (rd_idx in 0 until MultiExu_CFG.rds.size) {         // TODO: sum rd reqs
+                                    cyclix_gen.begif(cyclix_gen.band(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req), cyclix_gen.rand((global_structures as __control_structures_renaming).PRF_mapped_prev)))
+                                    run {
+                                        cyclix_gen.assign(decode_active, 0)
+                                    }; cyclix_gen.endif()
+                                }
+                            } else ERROR("Configuration inconsistent!")
                             cyclix_gen.MSG_COMMENT("Identifying rd resources availability: done")
 
                             cyclix_gen.begif(cyclix_gen.band(dispatch_uop_buf.ctrl_rdy, decode_active))
@@ -447,19 +447,27 @@ internal class instr_fetch_buffer(name: String,
 
                                 for (rd_idx in 0 until MultiExu_CFG.rds.size) {
 
-                                    var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd" + rd_idx + "_tag_prev")
-                                    var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd" + rd_idx + "_tag_prev_clr")
+                                    if (global_structures is __control_structures_scoreboarding) {
+                                        cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req))
+                                        run {
+                                            (global_structures as __control_structures_scoreboarding).ReserveRd(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr))
+                                        }; cyclix_gen.endif()
 
-                                    cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req))
-                                    run {
-                                        cyclix_gen.assign(nru_rd_tag_prev, (global_structures as __control_structures_renaming).RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr)))
-                                        cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped_prev, nru_rd_tag_prev))
+                                    } else if (global_structures is __control_structures_renaming) {
+                                        var nru_rd_tag_prev     = new_renamed_uop.GetFracRef("rd" + rd_idx + "_tag_prev")
+                                        var nru_rd_tag_prev_clr = new_renamed_uop.GetFracRef("rd" + rd_idx + "_tag_prev_clr")
 
-                                        var alloc_rd_tag = global_structures.GetFreePRF()
-                                        cyclix_gen.assign(TranslateVar(MultiExu_inst.RISCDecode.rds_ctrl[rd_idx].tag), alloc_rd_tag.position)
-                                        global_structures.ReserveRd(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr), TranslateVar(MultiExu_inst.RISCDecode.rds_ctrl[rd_idx].tag))
-                                    }; cyclix_gen.endif()
+                                        cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req))
+                                        run {
+                                            cyclix_gen.assign(nru_rd_tag_prev, (global_structures as __control_structures_renaming).RenameReg(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr)))
+                                            cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed(global_structures.PRF_mapped_prev, nru_rd_tag_prev))
 
+                                            var alloc_rd_tag = global_structures.GetFreePRF()
+                                            cyclix_gen.assign(TranslateVar(MultiExu_inst.RISCDecode.rds_ctrl[rd_idx].tag), alloc_rd_tag.position)
+                                            global_structures.ReserveRd(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr), TranslateVar(MultiExu_inst.RISCDecode.rds_ctrl[rd_idx].tag))
+                                        }; cyclix_gen.endif()
+
+                                    } else ERROR("Configuration inconsistent!")
                                 }
 
                                 cyclix_gen.MSG_COMMENT("Rds reservation: done")
