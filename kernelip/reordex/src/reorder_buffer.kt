@@ -42,6 +42,7 @@ internal open class rob(cyclix_gen : cyclix.Generic,
                 var CDB_ref         = cdb.GetFracRef(rob_entry_single.GetFracRef("cdb_id"))
                 var CDB_ref_enb     = CDB_ref.GetFracRef("enb")
                 var CDB_ref_data    = CDB_ref.GetFracRef("data")
+
                 cyclix_gen.begif(CDB_ref_enb)
                 run {
                     cyclix_gen.begif(cyclix_gen.eq2(rob_entry_single.GetFracRef("trx_id"), CDB_ref_data.GetFracRef("trx_id")))

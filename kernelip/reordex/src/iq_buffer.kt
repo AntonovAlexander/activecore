@@ -107,9 +107,7 @@ internal open class iq_buffer(cyclix_gen : cyclix.Generic,
             var iq_entry            = TRX_BUF.GetFracRef(trx_idx)
             var iq_entry_enb        = iq_entry.GetFracRef("enb")
             var iq_entry_rdy        = iq_entry.GetFracRef("rdy")
-            var iq_entry_rd0_tag    = iq_entry.GetFracRef("rd0_tag")
             var iq_entry_io_req     = iq_entry.GetFracRef("io_req")
-            var iq_entry_fu_pending = iq_entry.GetFracRef("fu_pending")
 
             cyclix_gen.begif(iq_entry_enb)
             run {
@@ -127,15 +125,25 @@ internal open class iq_buffer(cyclix_gen : cyclix.Generic,
                         var src_cdb         = cdb.GetFracRef(iq_entry_src_src)
                         var src_cdb_enb     = src_cdb.GetFracRef("enb")
                         var src_cdb_data    = src_cdb.GetFracRef("data")
-                        var src_cdb_tag     = src_cdb_data.GetFracRef("rd0_tag")
-                        var src_cdb_wdata   = src_cdb_data.GetFracRef("rd0_wdata")
 
-                        cyclix_gen.begif(cyclix_gen.eq2(iq_entry_src_tag, src_cdb_tag))
-                        run {
-                            // setting IQ entry ready
-                            cyclix_gen.assign(iq_entry_src_data, src_cdb_wdata)
-                            cyclix_gen.assign(iq_entry_src_rdy, 1)
-                        }; cyclix_gen.endif()
+                        for (rd_idx in 0 until MultiExu_CFG.rds.size) {
+
+                            var src_cdb_req     = src_cdb_data.GetFracRef("rd" + rd_idx + "_req")
+                            var src_cdb_tag     = src_cdb_data.GetFracRef("rd" + rd_idx + "_tag")
+                            var src_cdb_wdata   = src_cdb_data.GetFracRef("rd" + rd_idx + "_wdata")
+
+                            cyclix_gen.begif(src_cdb_req)
+                            run {
+                                cyclix_gen.begif(cyclix_gen.eq2(iq_entry_src_tag, src_cdb_tag))
+                                run {
+                                    // setting IQ entry ready
+                                    cyclix_gen.assign(iq_entry_src_data, src_cdb_wdata)
+                                    cyclix_gen.assign(iq_entry_src_rdy, 1)
+                                }; cyclix_gen.endif()
+                            }; cyclix_gen.endif()
+
+                        }
+
                     }; cyclix_gen.endif()
                 }
 
@@ -190,6 +198,7 @@ internal class io_buffer(cyclix_gen : cyclix.Generic,
     var exu_cdb_inst_enb    = commit_cdb_buf.GetFracRef("enb")
     var exu_cdb_inst_data   = commit_cdb_buf.GetFracRef("data")
     var exu_cdb_inst_trx_id = exu_cdb_inst_data.GetFracRef("trx_id")
+    var exu_cdb_inst_req    = exu_cdb_inst_data.GetFracRef("rd0_req")       // TODO: fix
     var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("rd0_tag")       // TODO: fix
     var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("rd0_wdata")     // TODO: fix
 
@@ -236,6 +245,7 @@ internal class io_buffer(cyclix_gen : cyclix.Generic,
             var io_cdb_enb      = io_cdb_buf.GetFracRef("enb")
             var io_cdb_data     = io_cdb_buf.GetFracRef("data")
             var io_cdb_trx_id   = io_cdb_data.GetFracRef("trx_id")
+            var io_cdb_req      = io_cdb_data.GetFracRef("rd0_req")
             var io_cdb_tag      = io_cdb_data.GetFracRef("rd0_tag")
             var io_cdb_wdata    = io_cdb_data.GetFracRef("rd0_wdata")
 
@@ -279,6 +289,7 @@ internal class io_buffer(cyclix_gen : cyclix.Generic,
                     // writing loaded data to CDB
                     cyclix_gen.assign(exu_cdb_inst_enb, 1)
                     cyclix_gen.assign(exu_cdb_inst_trx_id, trx_id)
+                    cyclix_gen.assign(exu_cdb_inst_req, 1)
                     cyclix_gen.assign(exu_cdb_inst_tag, rd_ctrls[0].tag)
                     cyclix_gen.assign(exu_cdb_inst_wdata, mem_data_rdata)
 
@@ -323,9 +334,10 @@ internal class io_buffer(cyclix_gen : cyclix.Generic,
                                     run {
                                         cyclix_gen.assign(pop, 1)
 
-                                        // dummy write to finish transaction
+                                        // finishing store (returning to ROB)
                                         cyclix_gen.assign(exu_cdb_inst_enb, 1)
                                         cyclix_gen.assign(exu_cdb_inst_trx_id, trx_id)
+                                        cyclix_gen.assign(exu_cdb_inst_req, 0)
                                         cyclix_gen.assign(exu_cdb_inst_tag, 0)
                                         cyclix_gen.assign(exu_cdb_inst_wdata, 0)
                                     }; cyclix_gen.endif()

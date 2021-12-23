@@ -568,44 +568,54 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             var exu_cdb_inst        = cdb.GetFracRef(cdb_idx)
             var exu_cdb_inst_enb    = exu_cdb_inst.GetFracRef("enb")
             var exu_cdb_inst_data   = exu_cdb_inst.GetFracRef("data")
-            var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("rd0_tag")       // TODO: fix
-            var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("rd0_wdata")
 
             cyclix_gen.begif(exu_cdb_inst_enb)
             run {
 
-                control_structures.WritePRF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
+                for (rd_idx in 0 until MultiExu_CFG.rds.size) {
 
-                // broadcasting FU results to dispatch buffer
-                for (dispatch_uop_buf_idx in 0 until dispatch_uop_buf.TRX_BUF_SIZE) {
-                    var dispatch_uop_buf_entries = dispatch_uop_buf.TRX_BUF.GetFracRef(dispatch_uop_buf_idx)
+                    var exu_cdb_inst_req    = exu_cdb_inst_data.GetFracRef("rd" + rd_idx + "_req")
+                    var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("rd" + rd_idx + "_tag")
+                    var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("rd" + rd_idx + "_wdata")
 
-                    for (dispatch_uop_buf_single_entry_idx in 0 until dispatch_uop_buf_entries.GetWidth()) {
-                        var dispatch_uop_buf_entry = dispatch_uop_buf_entries.GetFracRef(dispatch_uop_buf_single_entry_idx)
+                    cyclix_gen.begif(exu_cdb_inst_req)
+                    run {
 
-                        for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
+                        control_structures.WritePRF(exu_cdb_inst_tag, exu_cdb_inst_wdata)
 
-                            var src_rdy     = dispatch_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_rdy")
-                            var src_tag     = dispatch_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_tag")
-                            var src_data    = dispatch_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_data")
+                        // broadcasting FU results to dispatch buffer
+                        for (dispatch_uop_buf_idx in 0 until dispatch_uop_buf.TRX_BUF_SIZE) {
+                            var dispatch_uop_buf_entries = dispatch_uop_buf.TRX_BUF.GetFracRef(dispatch_uop_buf_idx)
 
-                            cyclix_gen.begif(!src_rdy)
-                            run {
-                                cyclix_gen.begif(cyclix_gen.eq2(src_tag, exu_cdb_inst_tag))
+                            for (dispatch_uop_buf_single_entry_idx in 0 until dispatch_uop_buf_entries.GetWidth()) {
+                                var dispatch_uop_buf_entry = dispatch_uop_buf_entries.GetFracRef(dispatch_uop_buf_single_entry_idx)
+
+                                for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
+
+                                    var src_rdy     = dispatch_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_rdy")
+                                    var src_tag     = dispatch_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_tag")
+                                    var src_data    = dispatch_uop_buf_entry.GetFracRef("src" + RF_rs_idx + "_data")
+
+                                    cyclix_gen.begif(!src_rdy)
+                                    run {
+                                        cyclix_gen.begif(cyclix_gen.eq2(src_tag, exu_cdb_inst_tag))
+                                        run {
+                                            // setting IQ entry ready
+                                            cyclix_gen.assign(src_data, exu_cdb_inst_wdata)
+                                            cyclix_gen.assign(src_rdy, 1)
+                                        }; cyclix_gen.endif()
+                                    }; cyclix_gen.endif()
+                                }
+
+                                //// setting rdy for io_req if data generated ////
+                                cyclix_gen.begif(dispatch_uop_buf_entry.GetFracRef("io_req"))
                                 run {
-                                    // setting IQ entry ready
-                                    cyclix_gen.assign(src_data, exu_cdb_inst_wdata)
-                                    cyclix_gen.assign(src_rdy, 1)
+                                    cyclix_gen.assign(dispatch_uop_buf_entry.GetFracRef("rdy"), dispatch_uop_buf_entry.GetFracRef("src0_rdy"))
                                 }; cyclix_gen.endif()
-                            }; cyclix_gen.endif()
+                            }
                         }
 
-                        //// setting rdy for io_req if data generated ////
-                        cyclix_gen.begif(dispatch_uop_buf_entry.GetFracRef("io_req"))
-                        run {
-                            cyclix_gen.assign(dispatch_uop_buf_entry.GetFracRef("rdy"), dispatch_uop_buf_entry.GetFracRef("src0_rdy"))
-                        }; cyclix_gen.endif()
-                    }
+                    }; cyclix_gen.endif()
                 }
 
             }; cyclix_gen.endif()
