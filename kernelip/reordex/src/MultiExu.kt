@@ -11,108 +11,14 @@ package reordex
 import hwast.*
 import cyclix.*
 
-enum class REORDEX_MODE {
-    COPROCESSOR,
-    RISC
-}
-
-abstract class REG_MGMT_MODE()
-class REG_MGMT_SCOREBOARD() : REG_MGMT_MODE()
-class REG_MGMT_RENAMING(val PRF_depth: Int) : REG_MGMT_MODE()
-
-open class Reordex_CFG(val RF_width : Int,
-                       val ARF_depth : Int,
-                       val DataPath_width : Int,
-                       val REG_MGMT: REG_MGMT_MODE,
-                       val ROB_size : Int,
-                       val mode : REORDEX_MODE) {
-
-    internal val trx_inflight_num = ROB_size * DataPath_width;
-
-    internal val ARF_addr_width = GetWidthToContain(ARF_depth)
-    internal val PRF_addr_width = GetWidthToContain((REG_MGMT as REG_MGMT_RENAMING).PRF_depth)
-
-    internal var req_struct = hw_struct("req_struct")
-    internal var resp_struct = hw_struct("resp_struct")
-
-    internal var src_imms = ArrayList<hw_var>()
-    fun AddSrcImm(name : String, new_type : hw_type) : hw_var {
-        var new_var = hw_var(name, new_type, "0")
-        req_struct.add(name, new_type, "0")
-        src_imms.add(new_var)
-        return new_var
-    }
-    fun AddSrcUImm(name : String, new_width : Int) : hw_var {
-        return AddSrcImm(name, hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(new_width)))
-    }
-    fun AddSrcSImm(name : String, new_width : Int) : hw_var {
-        return AddSrcImm(name, hw_type(DATA_TYPE.BV_SIGNED, hw_dim_static(new_width)))
-    }
-
-    internal var dst_imms = ArrayList<hw_var>()
-    internal fun AddDstImm(name : String, new_type : hw_type) : hw_var {
-        var new_var = hw_var(name, new_type, "0")
-        resp_struct.add(name, new_type, "0")
-        dst_imms.add(new_var)
-        return new_var
-    }
-    internal fun AddDstUImm(name : String, new_width : Int) : hw_var {
-        return AddDstImm(name, hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(new_width)))
-    }
-    internal fun AddDstSImm(name : String, new_width : Int) : hw_var {
-        return AddDstImm(name, hw_type(DATA_TYPE.BV_SIGNED, hw_dim_static(new_width)))
-    }
-
-    internal var srcs = ArrayList<hw_var>()
-    fun AddSrc() : Src {
-        var new_src = Src("src" + srcs.size, RF_width-1, 0, "0")
-        req_struct.addu("src" + srcs.size + "_data", RF_width-1, 0, "0")
-        srcs.add(new_src)
-        return new_src
-    }
-
-    internal var rds = ArrayList<hw_var>()
-    fun AddRd() : hw_var {
-        var new_var = hw_var("rd" + rds.size, RF_width-1, 0, "0")
-
-        req_struct.addu("rd" + rds.size + "_req", 0, 0, "0")
-        req_struct.addu("rd" + rds.size + "_tag", RF_width-1, 0, "0")
-
-        resp_struct.addu("rd" + rds.size + "_req",     0, 0, "0")      // TODO: clean up size
-        resp_struct.addu("rd" + rds.size + "_tag",     31, 0, "0")      // TODO: clean up size
-        resp_struct.addu("rd" + rds.size + "_wdata",   RF_width-1, 0, "0")
-
-        rds.add(new_var)
-
-        return new_var
-    }
-
-    internal var alu_CF          = DUMMY_VAR
-    internal var alu_SF          = DUMMY_VAR
-    internal var alu_ZF          = DUMMY_VAR
-    internal var alu_OF          = DUMMY_VAR
-
-    init {
-        req_struct.addu("trx_id",   31, 0, "0")      // TODO: clean up size
-        resp_struct.addu("trx_id",  31, 0, "0")      // TODO: clean up size
-
-        if (mode == REORDEX_MODE.RISC) {
-            alu_CF          = AddDstUImm("alu_CF", 1)
-            alu_SF          = AddDstUImm("alu_SF", 1)
-            alu_ZF          = AddDstUImm("alu_ZF", 1)
-            alu_OF          = AddDstUImm("alu_OF", 1)
-        }
-    }
-}
-
-data class Exu_CFG(val ExecUnit : Exu,
+internal data class Exu_CFG(val ExecUnit : Exu,
                    val exu_num : Int,
                    val iq_length : Int,
                    val pref_impl : STREAM_PREF_IMPL)
 
 open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val io_iq_size : Int) {
 
-    var ExecUnits  = mutableMapOf<String, Exu_CFG>()
+    internal var ExecUnits  = mutableMapOf<String, Exu_CFG>()
 
     fun add_exu(exu : Exu, exu_num: Int, iq_length: Int, pref_impl : STREAM_PREF_IMPL) {
         if (ExecUnits.put(exu.name, Exu_CFG(exu, exu_num, iq_length, pref_impl)) != null) {
@@ -120,10 +26,10 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         }
     }
 
-    fun reconstruct_expression(debug_lvl : DEBUG_LEVEL,
-                               cyclix_gen : hw_astc,
-                               expr : hw_exec,
-                               context : import_expr_context) {
+    internal fun reconstruct_expression(debug_lvl : DEBUG_LEVEL,
+                                        cyclix_gen : hw_astc,
+                                        expr : hw_exec,
+                                        context : import_expr_context) {
 
         cyclix_gen as cyclix.Streaming
 
@@ -164,7 +70,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         var exu_descrs = mutableMapOf<String, __exu_descr>()
         var exu_rst = cyclix_gen.ulocal("genexu_rst", 0, 0, "0")
         var control_structures =
-            if (MultiExu_CFG.REG_MGMT is REG_MGMT_SCOREBOARD) __control_structures_scoreboarding(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst)
+            if (MultiExu_CFG.REG_MGMT is REG_MGMT_SCOREBOARDING) __control_structures_scoreboarding(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst)
             else __control_structures_renaming(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst)
 
         MSG("generating control structures: done")
@@ -463,7 +369,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         cyclix_gen.MSG_COMMENT("broadcasting FU results to IQ and dispatch buffer: done")
 
-        dispatch_uop_buf.Process(rob, (control_structures as __control_structures_renaming).PRF_src, io_iq, ExecUnits, CDB_RISC_LSU_POS)
+        dispatch_uop_buf.Process(rob, control_structures.PRF_src, io_iq, ExecUnits, CDB_RISC_LSU_POS)
 
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) {
             var frontend = coproc_frontend(name, cyclix_gen, MultiExu_CFG, control_structures)

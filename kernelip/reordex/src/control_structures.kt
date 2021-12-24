@@ -21,6 +21,9 @@ internal abstract class __control_structures(val cyclix_gen : cyclix.Generic,
     var arf_dim = hw_dim_static()
     var Backoff_ARF = cyclix_gen.uglobal("Backoff_ARF", arf_dim, "0")
 
+    var prf_src_dim = hw_dim_static()
+    var PRF_src = cyclix_gen.uglobal("genPRF_src", prf_src_dim, "0") // uncomputed PRF sources
+
     init {
         arf_dim.add(MultiExu_CFG.RF_width-1, 0)
         arf_dim.add(MultiExu_CFG.ARF_depth-1, 0)
@@ -45,7 +48,10 @@ internal class __control_structures_scoreboarding(cyclix_gen : cyclix.Generic,
     val ARF_rdy_prev = cyclix_gen.local("genPRF_mapped_prev", ARF_rdy.vartype, ARF_rdy.defimm)
 
     init {
-        if (!(MultiExu_CFG.REG_MGMT is REG_MGMT_SCOREBOARD)) ERROR("Configuration inconsistent!")
+        if (!(MultiExu_CFG.REG_MGMT is REG_MGMT_SCOREBOARDING)) ERROR("Configuration inconsistent!")
+
+        prf_src_dim.add(GetWidthToContain(CDB_NUM)-1, 0)
+        prf_src_dim.add(MultiExu_CFG.ARF_depth-1, 0)
     }
 
     fun InitFreeARFRdy() {
@@ -106,9 +112,6 @@ internal class __control_structures_renaming(cyclix_gen : cyclix.Generic,
     var ARF_map_default = hw_imm_arr(arf_map_dim)
     var ARF_map = cyclix_gen.uglobal("genARF_map", arf_map_dim, ARF_map_default)        // ARF-to-PRF mappings
 
-    var prf_src_dim = hw_dim_static()
-    var PRF_src = cyclix_gen.uglobal("genPRF_src", prf_src_dim, "0") // uncomputed PRF sources
-
     val PRF_mapped_prev = cyclix_gen.local("genPRF_mapped_prev", PRF_mapped.vartype, PRF_mapped.defimm)
 
     init {
@@ -128,8 +131,8 @@ internal class __control_structures_renaming(cyclix_gen : cyclix.Generic,
             }
         }
 
-        prf_src_dim.add(GetWidthToContain(CDB_NUM) -1, 0)
-        prf_src_dim.add((MultiExu_CFG.REG_MGMT as REG_MGMT_RENAMING).PRF_depth-1, 0)
+        prf_src_dim.add(GetWidthToContain(CDB_NUM)-1, 0)
+        prf_src_dim.add(MultiExu_CFG.REG_MGMT.PRF_depth-1, 0)
     }
 
     fun RenameReg(src_addr : hw_param) : hw_var {

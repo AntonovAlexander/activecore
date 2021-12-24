@@ -387,7 +387,7 @@ internal class rob_risc(name: String,
                     cyclix_gen.assign(buf_to_clr.TRX_BUF[elem_index].GetFracRef("enb"), 0)
                 }
             }
-            (global_structures as __control_structures_renaming).RollBack()
+            global_structures.RollBack()
             cyclix_gen.assign(entry_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
             cyclix_gen.assign(genrob_instr_ptr, 0)
         }; cyclix_gen.endif()
