@@ -450,6 +450,7 @@ internal class instr_fetch_buffer(name: String,
                                     if (global_structures is __control_structures_scoreboarding) {
                                         cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req))
                                         run {
+                                            cyclix_gen.assign(TranslateVar(MultiExu_inst.RISCDecode.rds_ctrl[rd_idx].tag), TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr))
                                             (global_structures as __control_structures_scoreboarding).ReserveRd(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr))
                                         }; cyclix_gen.endif()
 

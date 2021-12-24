@@ -43,7 +43,7 @@ internal class __control_structures_scoreboarding(cyclix_gen : cyclix.Generic,
                                                   exu_rst : hw_var
 ) : __control_structures(cyclix_gen, MultiExu_CFG, CDB_NUM, ExecUnits, exu_descrs, exu_rst) {
 
-    var ARF = cyclix_gen.uglobal("ARF", arf_dim, "0")
+    var ARF = cyclix_gen.uglobal("genARF", arf_dim, "0")
     var ARF_rdy = cyclix_gen.uglobal("genARF_rdy", MultiExu_CFG.ARF_depth-1, 0, hw_imm_ones(MultiExu_CFG.ARF_depth))
     val ARF_rdy_prev = cyclix_gen.local("genPRF_mapped_prev", ARF_rdy.vartype, ARF_rdy.defimm)
 
