@@ -425,9 +425,15 @@ internal class instr_fetch_buffer(name: String,
                             cyclix_gen.MSG_COMMENT("Identifying rd resources availability...")
                             if (global_structures is __control_structures_scoreboarding) {
                                 for (rd_idx in 0 until MultiExu_CFG.rds.size) {
-                                    cyclix_gen.begif(!global_structures.ARF_rdy_prev.GetFracRef(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr)))
+                                    cyclix_gen.begif(TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.req))
                                     run {
-                                        cyclix_gen.assign(decode_active, 0)
+                                        var rd_addr = TranslateVar(MultiExu_inst.RISCDecode.rdctrls[MultiExu_CFG.rds[rd_idx]]!!.addr)
+                                        var ARF_rdy_prev_bitref = (global_structures as __control_structures_scoreboarding).ARF_rdy_prev.GetFracRef(rd_addr)
+                                        cyclix_gen.begif(!ARF_rdy_prev_bitref)
+                                        run {
+                                            cyclix_gen.assign(decode_active, 0)
+                                        }; cyclix_gen.endif()
+                                        cyclix_gen.assign(ARF_rdy_prev_bitref, 0)
                                     }; cyclix_gen.endif()
                                 }
                             } else if (global_structures is __control_structures_renaming) {
