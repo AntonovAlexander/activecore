@@ -11,12 +11,13 @@ package reordex
 import hwast.*
 
 internal open class dispatch_buffer(cyclix_gen : cyclix.Generic,
-                         name_prefix : String,
-                         TRX_BUF_SIZE : Int,
-                         MultiExu_CFG : Reordex_CFG,
-                         ExecUnits_size : Int,
-                         cdb_num : Int,
-                         val IQ_insts : ArrayList<iq_buffer>) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.DataPath_width, MultiExu_CFG, cdb_num) {
+                                    name_prefix : String,
+                                    TRX_BUF_SIZE : Int,
+                                    MultiExu_CFG : Reordex_CFG,
+                                    ExecUnits_size : Int,
+                                    cdb_num : Int,
+                                    val IQ_insts : ArrayList<iq_buffer>,
+                                    val control_structures: __control_structures) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.DataPath_width, MultiExu_CFG, cdb_num) {
 
     var fu_id           = AdduStageVar("fu_id",             GetWidthToContain(ExecUnits_size), 0, "0")
 
@@ -32,6 +33,8 @@ internal open class dispatch_buffer(cyclix_gen : cyclix.Generic,
 
     init {
         Fill_ROB_rds_ctrl_StageVars(this, MultiExu_CFG.rds.size, rds_ctrl, MultiExu_CFG.PRF_addr_width)
+
+        control_structures.states_toRollBack.add(entry_toproc_mask)
     }
 
     fun Process(rob : rob, PRF_src : hw_var, store_iq : iq_buffer, ExecUnits : MutableMap<String, Exu_CFG>, CDB_RISC_LSU_POS : Int) {
@@ -184,7 +187,8 @@ internal class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
                          MultiExu_CFG : Reordex_CFG,
                          ExecUnits_size : Int,
                          cdb_num : Int,
-                         IQ_insts : ArrayList<iq_buffer>) : dispatch_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, ExecUnits_size, cdb_num, IQ_insts) {
+                         IQ_insts : ArrayList<iq_buffer>,
+                         control_structures: __control_structures) : dispatch_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, ExecUnits_size, cdb_num, IQ_insts, control_structures) {
 
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")

@@ -10,7 +10,9 @@ package reordex
 
 import hwast.*
 
-internal class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic, MultiExu_CFG : Reordex_CFG) : trx_buffer(cyclix_gen, "geninstr_iaddr", 1, MultiExu_CFG) {
+internal class instr_iaddr_stage(val name : String,
+                                 cyclix_gen : cyclix.Generic,
+                                 MultiExu_CFG : Reordex_CFG) : trx_buffer(cyclix_gen, "geninstr_iaddr", 1, MultiExu_CFG) {
 
     var pc = cyclix_gen.uglobal("pc", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
     val curinstr_addr  = AdduLocal("curinstr_addr", 31, 0, "0")
@@ -65,7 +67,12 @@ internal class instr_iaddr_stage(val name : String, cyclix_gen : cyclix.Generic,
     }
 }
 
-internal class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, INSTR_IO_ID_WIDTH : Int, MultiExu_CFG : Reordex_CFG, var busreq_mem_struct : hw_struct) : trx_buffer(cyclix_gen, "geninstr_req", 2, MultiExu_CFG.DataPath_width, MultiExu_CFG) {
+internal class instr_req_stage(val name : String,
+                               cyclix_gen : cyclix.Generic,
+                               INSTR_IO_ID_WIDTH : Int,
+                               MultiExu_CFG : Reordex_CFG,
+                               var busreq_mem_struct : hw_struct,
+                               val control_structures: __control_structures) : trx_buffer(cyclix_gen, "geninstr_req", 2, MultiExu_CFG.DataPath_width, MultiExu_CFG) {
 
     val curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")
     val nextinstr_addr = AdduStageVar("nextinstr_addr", 31, 0, "0")
@@ -92,6 +99,8 @@ internal class instr_req_stage(val name : String, cyclix_gen : cyclix.Generic, I
 
         instr_io_wr_ptr_dim.add(INSTR_IO_ID_WIDTH-1, 0)
         instr_io_wr_ptr_dim.add(TRX_BUF_MULTIDIM-1, 0)
+
+        control_structures.states_toRollBack.add(entry_toproc_mask)
     }
 
     fun Process(instr_fetch : instr_fetch_buffer) {
@@ -347,6 +356,8 @@ internal class instr_fetch_buffer(name: String,
 
         instr_io_rd_ptr_dim.add(INSTR_IO_ID_WIDTH-1, 0)
         instr_io_rd_ptr_dim.add(TRX_BUF_MULTIDIM-1, 0)
+
+        global_structures.states_toRollBack.add(entry_toproc_mask)
     }
     fun TranslateVar(var_totran : hw_var) : hw_var {
         return TranslateVar(var_totran, var_dict)

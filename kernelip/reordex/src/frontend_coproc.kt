@@ -10,7 +10,10 @@ package reordex
 
 import hwast.*
 
-internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generic, val MultiExu_CFG : Reordex_CFG, val global_structures : __control_structures) {
+internal class coproc_frontend(val name : String,
+                               val cyclix_gen : cyclix.Generic,
+                               val MultiExu_CFG : Reordex_CFG,
+                               val control_structures : __control_structures) {
 
     var cmd_req_struct = hw_struct(name + "_cmd_req_struct")
 
@@ -27,7 +30,7 @@ internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generi
         cmd_req_struct.addu("rf_we",       0,  0, "0")
         cmd_req_struct.addu("rf_addr",    MultiExu_CFG.ARF_addr_width-1, 0, "0")
         cmd_req_struct.addu("rf_wdata",    MultiExu_CFG.RF_width-1, 0, "0")
-        cmd_req_struct.addu("fu_id",    GetWidthToContain(global_structures.ExecUnits.size)-1, 0, "0")
+        cmd_req_struct.addu("fu_id",    GetWidthToContain(control_structures.ExecUnits.size)-1, 0, "0")
         for (imm_idx in 0 until MultiExu_CFG.src_imms.size) {
             cmd_req_struct.add("fu_imm_" + MultiExu_CFG.src_imms[imm_idx].name, MultiExu_CFG.src_imms[imm_idx].vartype, MultiExu_CFG.src_imms[imm_idx].defimm)
         }
@@ -68,7 +71,7 @@ internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generi
                 // LOAD/STORE commutation
                 cyclix_gen.begif(!cmd_req_data.GetFracRef("exec"))
                 run {
-                    cyclix_gen.assign(nru_fu_id, global_structures.ExecUnits.size)
+                    cyclix_gen.assign(nru_fu_id, control_structures.ExecUnits.size)
 
                     // LOAD
                     cyclix_gen.begif(cmd_req_data.GetFracRef("rf_we"))
@@ -84,7 +87,7 @@ internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generi
                 }; cyclix_gen.endif()
 
                 for (RF_rs_idx in 0 until MultiExu_CFG.srcs.size) {
-                    (global_structures as __control_structures_renaming).FillReadRs(
+                    (control_structures as __control_structures_renaming).FillReadRs(
                         new_renamed_uop.GetFracRef("src" + RF_rs_idx + "_tag"),
                         new_renamed_uop.GetFracRef("src" + RF_rs_idx + "_rdy"),
                         new_renamed_uop.GetFracRef("src" + RF_rs_idx + "_data"),
@@ -92,9 +95,9 @@ internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generi
                     )
                 }
 
-                var rd_tag = (global_structures as __control_structures_renaming).RenameReg(cmd_req_data.GetFracRef("fu_rd"))
+                var rd_tag = (control_structures as __control_structures_renaming).RenameReg(cmd_req_data.GetFracRef("fu_rd"))
 
-                var alloc_rd_tag = (global_structures as __control_structures_renaming).GetFreePRF()
+                var alloc_rd_tag = (control_structures as __control_structures_renaming).GetFreePRF()
 
                 cyclix_gen.begif(cmd_req_data.GetFracRef("exec"))
                 run {
@@ -106,7 +109,7 @@ internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generi
                         // processing RS use mask
                         var nru_rs_use = nru_rs_use_mask.GetFracRef(RF_rs_idx)
                         var exu_descr_idx = 0
-                        for (exu_descr in global_structures.exu_descrs) {
+                        for (exu_descr in control_structures.exu_descrs) {
                             cyclix_gen.begif(cyclix_gen.eq2(nru_fu_id, exu_descr_idx))
                             run {
                                 cyclix_gen.assign(nru_rs_use, hw_imm(exu_descr.value.rs_use_flags[RF_rs_idx]))
@@ -122,9 +125,9 @@ internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generi
 
                     cyclix_gen.assign(nru_rd_tag, alloc_rd_tag.position)            // TODO: check for availability flag
                     cyclix_gen.assign(nru_rd_tag_prev, rd_tag)
-                    cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed((global_structures as __control_structures_renaming).PRF_mapped_prev, rd_tag))
+                    cyclix_gen.assign(nru_rd_tag_prev_clr, cyclix_gen.indexed((control_structures as __control_structures_renaming).PRF_mapped_prev, rd_tag))
 
-                    (global_structures as __control_structures_renaming).ReserveRd(cmd_req_data.GetFracRef("fu_rd"), alloc_rd_tag.position)
+                    (control_structures as __control_structures_renaming).ReserveRd(cmd_req_data.GetFracRef("fu_rd"), alloc_rd_tag.position)
 
                     cyclix_gen.assign(nru_rdy, 0)
                     cyclix_gen.assign(nru_io_req, 0)
@@ -142,9 +145,9 @@ internal class coproc_frontend(val name : String, val cyclix_gen : cyclix.Generi
                         cyclix_gen.assign(nru_rdy, 1)
                         cyclix_gen.assign(nru_rd_tag, alloc_rd_tag.position)        // TODO: check for availability flag
                         cyclix_gen.assign(nru_rd_tag_prev, rd_tag)
-                        cyclix_gen.assign(nru_rd_tag_prev_clr, (global_structures as __control_structures_renaming).PRF_mapped_prev.GetFracRef(rd_tag))
+                        cyclix_gen.assign(nru_rd_tag_prev_clr, (control_structures as __control_structures_renaming).PRF_mapped_prev.GetFracRef(rd_tag))
 
-                        (global_structures as __control_structures_renaming).ReserveWriteRd(cmd_req_data.GetFracRef("fu_rd"), alloc_rd_tag.position, cmd_req_data.GetFracRef("rf_wdata"))
+                        (control_structures as __control_structures_renaming).ReserveWriteRd(cmd_req_data.GetFracRef("fu_rd"), alloc_rd_tag.position, cmd_req_data.GetFracRef("rf_wdata"))
 
                     }; cyclix_gen.endif()
 

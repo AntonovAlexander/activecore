@@ -39,7 +39,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 ![pic_test](kernelip/__img/Cyclix.png)
 	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and variable-latency I/O synchronization features. Translates to Cyclix KIP. Close analogue (but implemented differently): TL-Verilog project
 ![pic_test](kernelip/__img/Pipex.png)
-	* **Reordex** (**reorde**red e**x**ecution) - generator of (co)processors with superscalar out-of-order (OoO) microarchitecture and register renaming. Translates to Cyclix KIP
+	* **Reordex** (**reorde**red e**x**ecution) - generator of (co)processors with superscalar out-of-order (OoO) microarchitecture. Supports switchable scoreboarding and register renaming. Translates to Cyclix KIP
 ![pic_test](kernelip/__img/Reordex.png)
 
 

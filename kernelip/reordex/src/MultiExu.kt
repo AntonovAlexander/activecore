@@ -89,7 +89,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             else cyclix_gen.uglobal("io_cdb_rs1_wdata_buf", MultiExu_CFG.RF_width-1, 0, "0")
 
         var rob =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob(cyclix_gen, "genrob", MultiExu_CFG.ROB_size, MultiExu_CFG, CDB_NUM)
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob(cyclix_gen, "genrob", MultiExu_CFG.ROB_size, MultiExu_CFG, CDB_NUM, control_structures)
             else rob_risc(name, cyclix_gen, "genrob", MultiExu_CFG.ROB_size, MultiExu_CFG, CDB_NUM, control_structures)
 
         var TranslateInfo = __TranslateInfo()
@@ -123,7 +123,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
             instr_fetch = instr_fetch_buffer(name, cyclix_gen, FETCH_BUF_SIZE, (this as MultiExuRISC), MultiExu_CFG, control_structures, CDB_NUM, INSTR_IO_ID_WIDTH)
             instr_fetch.var_dict.put(this.RISCDecode.CSR_MCAUSE, cyclix_CSR_MCAUSE)
-            instr_req = instr_req_stage(name, cyclix_gen, INSTR_IO_ID_WIDTH, MultiExu_CFG, busreq_mem_struct)
+            instr_req = instr_req_stage(name, cyclix_gen, INSTR_IO_ID_WIDTH, MultiExu_CFG, busreq_mem_struct, control_structures)
             instr_iaddr = instr_iaddr_stage(name, cyclix_gen, MultiExu_CFG)
         }
 
@@ -256,8 +256,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         cyclix_gen.MSG_COMMENT("Initializing CDB: done")
 
         var dispatch_uop_buf =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) dispatch_buffer(cyclix_gen, "gendispatch", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
-            else dispatch_buffer_risc(cyclix_gen, "gendispatch", RENAME_BUF_SIZE, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts)
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) dispatch_buffer(cyclix_gen, "gendispatch", 1, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts, control_structures)
+            else dispatch_buffer_risc(cyclix_gen, "gendispatch", RENAME_BUF_SIZE, MultiExu_CFG, ExecUnits.size, CDB_NUM, IQ_insts, control_structures)
 
         cyclix_gen.MSG_COMMENT("ROB committing...")
         if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) rob.Commit(control_structures)
@@ -268,7 +268,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             bufs_to_reset.add(dispatch_uop_buf)
             bufs_to_reset.add(instr_fetch)
             bufs_to_reset.add(instr_req)
-            (rob as rob_risc).Commit(control_structures, (instr_iaddr as instr_iaddr_stage).pc, bufs_to_reset, (IQ_insts as ArrayList<hw_stage>), MRETADDR, cyclix_CSR_MCAUSE)
+            (rob as rob_risc).Commit((instr_iaddr as instr_iaddr_stage).pc, bufs_to_reset, (IQ_insts as ArrayList<hw_stage>), MRETADDR, cyclix_CSR_MCAUSE)
         }
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 

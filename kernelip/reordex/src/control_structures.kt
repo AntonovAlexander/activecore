@@ -29,6 +29,8 @@ internal abstract class __control_structures(val cyclix_gen : cyclix.Generic,
         arf_dim.add(MultiExu_CFG.ARF_depth-1, 0)
     }
 
+    var states_toRollBack = ArrayList<hw_var>()
+
     abstract fun RollBack()
     abstract fun FetchRs(src_tag : hw_param) : hw_var
     abstract fun FetchRsRdy(src_prf_index : hw_param) : hw_var
@@ -87,8 +89,12 @@ internal class __control_structures_scoreboarding(cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(exu_rst, 1)
         cyclix_gen.assign(ARF_rdy, ARF_rdy.defimm)
         //cyclix_gen.assign(ARF_map, ARF_map_default)               // TODO: fix error
+        cyclix_gen.assign(PRF_src, PRF_src.defimm)
         for (reg_idx in 0 until Backoff_ARF.GetWidth()) {
             cyclix_gen.assign(ARF.GetFracRef(reg_idx), Backoff_ARF.GetFracRef(reg_idx))
+        }
+        for (state in states_toRollBack) {
+            cyclix_gen.assign(state, state.defimm)
         }
     }
 }
@@ -200,6 +206,9 @@ internal class __control_structures_renaming(cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(PRF_src, PRF_src.defimm)
         for (reg_idx in 0 until Backoff_ARF.GetWidth()) {
             cyclix_gen.assign(PRF.GetFracRef(reg_idx), Backoff_ARF.GetFracRef(reg_idx))
+        }
+        for (state in states_toRollBack) {
+            cyclix_gen.assign(state, state.defimm)
         }
     }
 }

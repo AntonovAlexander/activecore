@@ -12,10 +12,12 @@ import hwast.*
 import cyclix.*
 
 internal open class rob(cyclix_gen : cyclix.Generic,
-               name_prefix : String,
-               TRX_BUF_SIZE : Int,
-               MultiExu_CFG : Reordex_CFG,
-               rrb_num : Int) : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.DataPath_width, MultiExu_CFG) {
+                        name_prefix : String,
+                        TRX_BUF_SIZE : Int,
+                        MultiExu_CFG : Reordex_CFG,
+                        rrb_num : Int,
+                        var control_structures: __control_structures)
+    : trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.DataPath_width, MultiExu_CFG) {
 
     var trx_id          = AddStageVar(hw_structvar("trx_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(MultiExu_CFG.trx_inflight_num)-1, 0, "0"))
     var cdb_id          = AddStageVar(hw_structvar("cdb_id",            DATA_TYPE.BV_UNSIGNED, GetWidthToContain(rrb_num) -1, 0, "0"))
@@ -61,7 +63,7 @@ internal open class rob(cyclix_gen : cyclix.Generic,
         cyclix_gen.MSG_COMMENT("Filling ROB with data from CDB: done")
     }
 
-    open fun Commit(global_structures: __control_structures) {
+    open fun Commit(control_structures: __control_structures) {
         preinit_ctrls()
         init_locals()
 
@@ -69,11 +71,11 @@ internal open class rob(cyclix_gen : cyclix.Generic,
         run {
             cyclix_gen.begif(rdy)
             run {
-                if (global_structures is __control_structures_renaming) {
+                if (control_structures is __control_structures_renaming) {
                     for (rd_idx in 0 until MultiExu_CFG.rds.size) {
                         cyclix_gen.begif(rds_ctrl[rd_idx].tag_prev_clr)
                         run {
-                            global_structures.FreePRF(rds_ctrl[rd_idx].tag_prev)
+                            control_structures.FreePRF(rds_ctrl[rd_idx].tag_prev)
                         }; cyclix_gen.endif()
                     }
                 }
@@ -95,7 +97,7 @@ internal class rob_risc(name: String,
                TRX_BUF_SIZE : Int,
                MultiExu_CFG : Reordex_CFG,
                rrb_num : Int,
-               val control_structures : __control_structures) : rob(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, rrb_num) {
+               control_structures : __control_structures) : rob(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, rrb_num, control_structures) {
 
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
@@ -151,7 +153,12 @@ internal class rob_risc(name: String,
     var entry_mask          = cyclix_gen.uglobal("genrob_entry_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
     var genrob_instr_ptr    = cyclix_gen.uglobal("genrob_instr_ptr", GetWidthToContain(TRX_BUF_MULTIDIM)-1, 0, "0")
 
-    fun Commit(global_structures: __control_structures, pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
+    init {
+        control_structures.states_toRollBack.add(entry_mask)
+        control_structures.states_toRollBack.add(genrob_instr_ptr)
+    }
+
+    fun Commit(pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
 
         preinit_ctrls()
         init_locals()
@@ -253,10 +260,10 @@ internal class rob_risc(name: String,
 
                         }; cyclix_gen.endcase()
 
-                        if (global_structures is __control_structures_renaming) {
+                        if (control_structures is __control_structures_renaming) {
                             cyclix_gen.begif(rds_ctrl[0].tag_prev_clr)
                             run {
-                                global_structures.FreePRF(rds_ctrl[0].tag_prev)
+                                (control_structures as __control_structures_renaming).FreePRF(rds_ctrl[0].tag_prev)
                             }; cyclix_gen.endif()
                         }
 
@@ -387,9 +394,7 @@ internal class rob_risc(name: String,
                     cyclix_gen.assign(buf_to_clr.TRX_BUF[elem_index].GetFracRef("enb"), 0)
                 }
             }
-            global_structures.RollBack()
-            cyclix_gen.assign(entry_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
-            cyclix_gen.assign(genrob_instr_ptr, 0)
+            control_structures.RollBack()
         }; cyclix_gen.endif()
 
         cyclix_gen.COMMENT("Vectored ROB entry completion...")
