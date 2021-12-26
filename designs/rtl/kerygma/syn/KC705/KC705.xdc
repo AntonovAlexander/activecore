@@ -1132,12 +1132,3 @@ set_property IOSTANDARD LVCMOS25 [get_ports UART_RXD_OUT]
 #set_property IOSTANDARD LVCMOS15 [get_ports LCD_RW_LS]
 #set_property PACKAGE_PIN AB10 [get_ports LCD_E_LS]
 #set_property IOSTANDARD LVCMOS15 [get_ports LCD_E_LS]
-
-
-
-
-
-
-
-
-
