@@ -55,8 +55,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 * Auxiliary reusable cores:
 	* **UDM** - bus transactor controlled via UART interface. Supports bursts and bus timeouts. Communication library for Python 3 included. Lab work manual included: https://github.com/AntonovAlexander/activecore/blob/master/designs/rtl/udm/doc/udm_lab_manual.pdf. Location: /designs/rtl/udm
 	* **sigma_tile** - basic CPU tile consisting of a single Aquaris RISC-V core, tightly coupled scratchpad RAM with single-cycle delay, interrupt controller, timer, Host InterFace (HIF), and eXpansion InterFace (XIF). HIF and XIF protocols are equivalent to UDM bus protocol. Location: /designs/rtl/sigma_tile
-<img src="designs/rtl/sigma_tile/doc/sigma_tile_struct.png" width="491" height="377" />
-	
+![pic_test](designs/rtl/sigma_tile/doc/sigma_tile_struct.png)
 	* **kerygma_tile** - sigma_tile equivalent based on 2-wide superscalar Agenda CPU core and 2-bank RAM. Location: /designs/rtl/kerygma_tile
 
 * Demo FPGA-based SoCs:
