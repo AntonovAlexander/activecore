@@ -21,7 +21,10 @@ module sfr
 
 	, MemSplit32.Slave host
 
-	, output logic sw_reset_o
+	, input sw_reset_enb_i
+    , input sw_reset_set_i
+    , input sw_reset_autoclr_i
+	, output logic core_reset_o
 
 	, output logic [(2**IRQ_NUM_POW)-1:0] irq_en_bo
 	, output logic irq_timer
@@ -42,7 +45,7 @@ localparam TIMER_PERIOD_ADDR 	= 8'h24;
 localparam TIMER_VALUE_ADDR 	= 8'h28;
 
 logic sw_reset, sw_reset_autoclr;
-always @(posedge clk_i) sw_reset_o <= rst_i | sw_reset;
+always @(posedge clk_i) core_reset_o <= rst_i | sw_reset;
 
 logic timer_inprogress, timer_reload;
 logic [31:0] timer_period;
@@ -71,9 +74,15 @@ always @(posedge clk_i)
 		sgi_req_o <= 0;
 		irq_timer <= 1'b0;
 
+		if (sw_reset_enb_i)
+			begin
+			sw_reset <= sw_reset_set_i;
+			sw_reset_autoclr <= sw_reset_autoclr_i;
+			end
+
 		if (sw_reset && sw_reset_autoclr) sw_reset <= 1'b0;
 
-		if (sw_reset_o)
+		if (core_reset_o)
 			begin
 			timer_inprogress <= 1'b0;
 			timer_reload <= 1'b0;

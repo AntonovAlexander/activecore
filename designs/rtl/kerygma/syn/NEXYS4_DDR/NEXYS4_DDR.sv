@@ -22,8 +22,8 @@ sys_clk sys_clk
     , .locked(pll_locked)
 );
 
-wire pss_arst;
-assign pss_arst = !(CPU_RESETN & pll_locked);
+wire arst;
+assign arst = !(CPU_RESETN & pll_locked);
 
 kerygma
 #(
@@ -32,7 +32,7 @@ kerygma
 	, .mem_size(8192)
 ) kerygma (
 	.clk_i(clk_gen)
-	, .arst_i(pss_arst)
+	, .arst_i(arst)
 	, .irq_btn_i(BTNC)
 	, .rx_i(UART_TXD_IN)
 	, .tx_o(UART_RXD_OUT)
