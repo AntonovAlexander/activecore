@@ -7,14 +7,20 @@
  */
 
 
-`timescale 1ns / 1ps
+`timescale 1ps / 1ps
 
-`define HALF_PERIOD			5						//external 100 MHZ
-`define DIVIDER_115200		32'd8680
-`define DIVIDER_19200		32'd52083
-`define DIVIDER_9600		32'd104166
-`define DIVIDER_4800		32'd208333
-`define DIVIDER_2400		32'd416666
+`define HALF_PERIOD			5000					// external 100 MHZ
+//`define HALF_PERIOD			7143					// external 70 MHZ
+//`define HALF_PERIOD			6250					// external 80 MHZ
+//`define HALF_PERIOD			3571					// external 140 MHZ
+//`define HALF_PERIOD			3333					// external 150 MHZ
+//`define HALF_PERIOD			3125					// external 160 MHZ
+
+`define DIVIDER_115200		32'd8680000
+`define DIVIDER_19200		32'd52083000
+`define DIVIDER_9600		32'd104166000
+`define DIVIDER_4800		32'd208333000
+`define DIVIDER_2400		32'd416666000
 
 
 module riscv_tb ();
@@ -126,6 +132,6 @@ end
 //
 always #`HALF_PERIOD CLK_100MHZ = ~CLK_100MHZ;
 
-always #1000 SW = SW + 8'h1;
+always #1000000 SW = SW + 8'h1;
 //
 endmodule
