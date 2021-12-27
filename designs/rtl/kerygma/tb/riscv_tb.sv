@@ -10,6 +10,7 @@
 `timescale 1ns / 1ps
 
 `define CLK_HALF_PERIOD		5						//external 100 MHZ
+
 `define DIVIDER_115200		32'd8680
 `define DIVIDER_19200		32'd52083
 `define DIVIDER_9600		32'd104166
@@ -27,6 +28,7 @@ reg irq_btn;
 kerygma
 #(
 	.UDM_RTX_EXTERNAL_OVERRIDE("YES")
+	, .DEBOUNCER_FACTOR_POW(2)
 	
 	, .mem_init_type("elf")
 	, .mem_init_data("../../sw/apps/heartbeat_variable.riscv")

@@ -40,6 +40,7 @@ sigma
 	//.CPU("riscv_6stage")
 
 	, .UDM_RTX_EXTERNAL_OVERRIDE("YES")
+	, .DEBOUNCER_FACTOR_POW(2)
 	, .delay_test_flag(0)
 	
 	, .mem_init_type("elf")

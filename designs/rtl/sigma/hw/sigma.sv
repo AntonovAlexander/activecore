@@ -11,13 +11,14 @@
 
 module sigma
 #(
-	parameter CPU = "none",
-	parameter UDM_BUS_TIMEOUT = (1024*1024*100),
-	parameter UDM_RTX_EXTERNAL_OVERRIDE = "NO",
-	parameter delay_test_flag = 0,
-	parameter mem_init_type="elf",
-	parameter mem_init_data = "data.elf",
-	parameter mem_size = 1024
+	parameter CPU = "none"
+	, UDM_BUS_TIMEOUT = (1024*1024*100)
+	, UDM_RTX_EXTERNAL_OVERRIDE = "NO"
+	, DEBOUNCER_FACTOR_POW = 20
+	, delay_test_flag = 0
+	, mem_init_type="elf"
+	, mem_init_data = "data.elf"
+	, mem_size = 1024
 )
 (
 	input clk_i
@@ -42,8 +43,10 @@ wire cpu_reset;
 assign cpu_reset = srst | udm_reset;
 
 wire irq_btn_debounced;
-debouncer debouncer
-(
+debouncer
+#(
+    .FACTOR_POW(DEBOUNCER_FACTOR_POW)
+) debouncer (
 	.clk_i(clk_i)
 	, .rst_i(srst)
 	, .in(irq_btn_i)

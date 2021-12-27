@@ -10,7 +10,7 @@
 module udm
 #(
     parameter BUS_TIMEOUT=(1024*1024*100)
-    , parameter RTX_EXTERNAL_OVERRIDE = "NO"
+    , RTX_EXTERNAL_OVERRIDE = "NO"
 )
 (
     input clk_i, rst_i,
