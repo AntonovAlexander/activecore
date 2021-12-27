@@ -9,12 +9,12 @@
 
 `timescale 1ps / 1ps
 
-`define HALF_PERIOD			5000					// external 100 MHZ
-//`define HALF_PERIOD			7143					// external 70 MHZ
-//`define HALF_PERIOD			6250					// external 80 MHZ
-//`define HALF_PERIOD			3571					// external 140 MHZ
-//`define HALF_PERIOD			3333					// external 150 MHZ
-//`define HALF_PERIOD			3125					// external 160 MHZ
+`define CLK_HALF_PERIOD			5000					// external 100 MHZ
+//`define CLK_HALF_PERIOD			7143					// external 70 MHZ
+//`define CLK_HALF_PERIOD			6250					// external 80 MHZ
+//`define CLK_HALF_PERIOD			3571					// external 140 MHZ
+//`define CLK_HALF_PERIOD			3333					// external 150 MHZ
+//`define CLK_HALF_PERIOD			3125					// external 160 MHZ
 
 `define DIVIDER_115200		32'd8680000
 `define DIVIDER_19200		32'd52083000
@@ -25,7 +25,7 @@
 
 module riscv_tb ();
 //
-reg CLK_100MHZ, RST, rx;
+reg CLK, RST, rx;
 reg [31:0] SW;
 wire [31:0] LED;
 reg irq_btn;
@@ -47,7 +47,7 @@ sigma
 	, .mem_size(8192)
 ) sigma
 (
-	.clk_i(CLK_100MHZ)
+	.clk_i(CLK)
 	, .arst_i(RST)
 	, .irq_btn_i(irq_btn)
 	, .rx_i(rx)
@@ -75,7 +75,7 @@ task WAIT
 begin
 for (i=0; i<periods; i=i+1)
 	begin
-	#(`HALF_PERIOD*2);
+	#(`CLK_HALF_PERIOD*2);
 	end
 end
 endtask
@@ -84,13 +84,13 @@ endtask
 ////reset all////
 task RESET_ALL ();
 begin
-	CLK_100MHZ = 1'b0;
+	CLK = 1'b0;
 	RST = 1'b1;
 	irq_btn = 1'b0;
 	rx = 1'b1;
-	#(`HALF_PERIOD/2);
+	#(`CLK_HALF_PERIOD/2);
 	RST = 1;
-	#(`HALF_PERIOD*6);
+	#(`CLK_HALF_PERIOD*6);
 	RST = 0;
 end
 endtask
@@ -130,7 +130,7 @@ begin
 	$stop;
 end
 //
-always #`HALF_PERIOD CLK_100MHZ = ~CLK_100MHZ;
+always #`CLK_HALF_PERIOD CLK = ~CLK;
 
 always #1000000 SW = SW + 8'h1;
 //

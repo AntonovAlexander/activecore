@@ -21,9 +21,9 @@
       <ValueColumnWidth column_width="160"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="15" />
-   <wvobject fp_name="/riscv_tb/CLK_100MHZ" type="logic">
-      <obj_property name="ElementShortName">CLK_100MHZ</obj_property>
-      <obj_property name="ObjectShortName">CLK_100MHZ</obj_property>
+   <wvobject fp_name="/riscv_tb/CLK" type="logic">
+      <obj_property name="ElementShortName">CLK</obj_property>
+      <obj_property name="ObjectShortName">CLK</obj_property>
    </wvobject>
    <wvobject fp_name="/riscv_tb/RST" type="logic">
       <obj_property name="ElementShortName">RST</obj_property>
