@@ -28,7 +28,6 @@ def hw_test_riscv_compliance_template(sigma, instr_name):
     
     return sigma.hw_test_generic(sigma, instr_name, "riscv-compliance/I-" + instr_name + "-01.riscv", 0.1, verify_data)
 
-
 def hw_test_riscv_compliance(sigma):
     
     print("#################################################################################")
@@ -76,7 +75,18 @@ def hw_test_riscv_compliance(sigma):
              "SUB",
              "SW",
              "XOR",
-             "XORI"]
+             "XORI",
+             "DELAY_SLOTS",
+             #"EBREAK",
+             #"ECALL",
+             "ENDIANESS",
+             "IO",
+             #"MISALIGN_JMP",
+             #"MISALIGN_LDST",
+             "NOP",
+             "RF_size",
+             "RF_width",
+             "RF_x0"]
     
     TESTS_SUCC = []
     TESTS_FAIL = []

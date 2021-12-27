@@ -51,19 +51,18 @@ isa_tests = \
 	I-SUB-01 \
 	I-SW-01 \
 	I-XOR-01 \
-	I-XORI-01
-
-#I-DELAY_SLOTS-01
-#I-EBREAK-01
-#I-ECALL-01 \
-#I-ENDIANESS-01
-#I-IO-01
-#I-MISALIGN_JMP-01
-#I-MISALIGN_LDST-01
-#I-NOP-01
-#I-RF_size-01
-#I-RF_width-01
-#I-RF_x0-01
+	I-XORI-01 \
+	I-DELAY_SLOTS-01 \
+	I-EBREAK-01 \
+	I-ECALL-01 \
+	I-ENDIANESS-01 \
+	I-IO-01 \
+	I-MISALIGN_JMP-01 \
+	I-MISALIGN_LDST-01 \
+	I-NOP-01 \
+	I-RF_size-01 \
+	I-RF_width-01 \
+	I-RF_x0-01
 
 #--------------------------------------------------------------------
 # Build rules
