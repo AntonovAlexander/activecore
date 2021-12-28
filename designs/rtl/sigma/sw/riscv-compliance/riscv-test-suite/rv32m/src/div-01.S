@@ -3000,7 +3000,6 @@ RVTEST_DATA_END
 
 RVMODEL_DATA_BEGIN
 
-#define XLEN 32
 signature_x2_0:
     .fill 0*(XLEN/32),4,0xdeadbeef
 

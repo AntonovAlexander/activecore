@@ -17,6 +17,9 @@
 // 
 #include "model_test.h"
 #include "arch_test.h"
+#include "riscv_test_macros.h"
+#include "compliance_test.h"
+#include "compliance_io.h"
 RVTEST_ISA("RV32IM")
 
 .section .text.init

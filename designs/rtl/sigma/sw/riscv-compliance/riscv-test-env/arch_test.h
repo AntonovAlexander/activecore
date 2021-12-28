@@ -1172,3 +1172,5 @@ RVTEST_SIGUPD_F(swreg,destreg,flagreg,offset)
 #ifdef RVTEST_IO_CHECK
   #warning "RVTEST_IO_CHECK is deprecated in v0.2.
 #endif
+
+#define XLEN 32

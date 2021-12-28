@@ -14,7 +14,7 @@ src_dir = .
 # Sources
 #--------------------------------------------------------------------
 
-isa_tests = \
+rv32i_tests = \
 	I-ADD-01 \
 	I-ADDI-01 \
 	I-AND-01 \
@@ -64,13 +64,25 @@ isa_tests = \
 	I-RF_width-01 \
 	I-RF_x0-01
 
+rv32m_tests = \
+	div-01 \
+	divu-01 \
+	mul-01 \
+	mulh-01 \
+	mulhsu-01 \
+	mulhu-01 \
+	rem-01 \
+	remu-01
+
+isa_tests = $(rv32i_tests) $(rv32m_tests)
+
 #--------------------------------------------------------------------
 # Build rules
 #--------------------------------------------------------------------
 
 RISCV_PREFIX ?= riscv$(XLEN)-unknown-elf-
 RISCV_GCC ?= $(RISCV_PREFIX)gcc
-RISCV_GCC_OPTS ?= -mcmodel=medany -static -std=gnu99 -O2 -march=rv32i -mabi=ilp32
+RISCV_GCC_OPTS ?= -mcmodel=medany -static -std=gnu99 -O2 -march=rv32im -mabi=ilp32
 RISCV_LINK ?= $(RISCV_GCC) -T $(src_dir)/../common/sigma.ld $(incs)
 RISCV_LINK_OPTS ?= -static -nostdlib -nostartfiles -lgcc -T $(src_dir)/../common/sigma.ld
 RISCV_OBJDUMP ?= $(RISCV_PREFIX)objdump --disassemble-all --disassemble-zeroes -h
@@ -78,13 +90,20 @@ RISCV_OBJDUMP ?= $(RISCV_PREFIX)objdump --disassemble-all --disassemble-zeroes -
 incs  += -I$(src_dir)/../env -I$(src_dir)/../common -I$(src_dir)/riscv-test-env -I$(src_dir)/riscv-target
 objs  :=
 
-define compile_template
+define rv32i_compile_template
 $(1).riscv: $(wildcard $(src_dir)/$(1)/*) $(wildcard $(src_dir)/../common/*)
 	$$(RISCV_GCC) $$(incs) $$(RISCV_GCC_OPTS) $$(RISCV_LINK_OPTS) -o $$@ $(wildcard $(src_dir)/riscv-test-suite/rv32i/src/$(1).S)
 	hexdump -ve '/4 "%08x" "\n"' $(1).riscv > $(1).riscv.hex
 endef
 
-$(foreach isa_test,$(isa_tests),$(eval $(call compile_template,$(isa_test))))
+define rv32m_compile_template
+$(1).riscv: $(wildcard $(src_dir)/$(1)/*) $(wildcard $(src_dir)/../common/*)
+	$$(RISCV_GCC) $$(incs) $$(RISCV_GCC_OPTS) $$(RISCV_LINK_OPTS) -o $$@ $(wildcard $(src_dir)/riscv-test-suite/rv32m/src/$(1).S)
+	hexdump -ve '/4 "%08x" "\n"' $(1).riscv > $(1).riscv.hex
+endef
+
+$(foreach isa_test,$(rv32i_tests),$(eval $(call rv32i_compile_template,$(isa_test))))
+$(foreach isa_test,$(rv32m_tests),$(eval $(call rv32m_compile_template,$(isa_test))))
 
 #------------------------------------------------------------
 # Build and run benchmarks on riscv simulator
