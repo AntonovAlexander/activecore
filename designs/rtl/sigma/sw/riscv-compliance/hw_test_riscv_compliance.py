@@ -15,7 +15,7 @@ from sigma import *
 
 def hw_test_riscv_compliance_template(sigma, instr_name):
     
-    f = open("riscv-compliance/references/I-" + instr_name + "-01.reference_output", "r")
+    f = open("riscv-compliance/riscv-test-suite/rv32i/references/I-" + instr_name + "-01.reference_output", "r")
 
     verify_data = []
     
