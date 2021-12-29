@@ -69,6 +69,28 @@ module sigma_tile
         , .irq_code_bo(cpu_irq_code)
         , .irq_ack_i(cpu_irq_ack)
     );
+
+    //// M ext ////
+    logic m_ext_send_req, m_ext_send_ack;
+    genpmodule_riscv_5stage_genmcopipe_M_ext_if_genstruct_fifo_wdata m_ext_send_data;
+
+    logic m_ext_recv_req, m_ext_recv_ack;
+    logic [31:0] m_ext_recv_data;
+    assign m_ext_recv_ack = 1'b1;
+
+    genexu_MUL_DIV genexu_MUL_DIV (
+        .clk_i(clk_i)
+        , .rst_i(core_reset_o)
+        
+        , .stream_req_bus_genfifo_req_i(m_ext_send_req)
+        , .stream_req_bus_genfifo_rdata_bi(m_ext_send_data.wdata)
+        , .stream_req_bus_genfifo_ack_o(m_ext_send_ack)
+
+        , .stream_resp_bus_genfifo_req_o(m_ext_recv_req)
+        , .stream_resp_bus_genfifo_wdata_bo(m_ext_recv_data)
+        , .stream_resp_bus_genfifo_ack_i(m_ext_recv_ack)
+    );
+    /////////////////
 	
     // Processor core
     generate
@@ -116,6 +138,16 @@ module sigma_tile
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
+
+                // M ext req bus
+                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
+                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
+                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+
+                // M ext resp bus
+                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
+                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
+                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
             );
     
             end
@@ -164,6 +196,16 @@ module sigma_tile
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
+
+                // M ext req bus
+                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
+                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
+                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+
+                // M ext resp bus
+                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
+                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
+                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
             );
     
             end
@@ -212,6 +254,16 @@ module sigma_tile
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
+
+                // M ext req bus
+                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
+                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
+                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+
+                // M ext resp bus
+                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
+                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
+                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
             );
     
             end
@@ -260,6 +312,16 @@ module sigma_tile
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
+
+                // M ext req bus
+                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
+                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
+                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+
+                // M ext resp bus
+                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
+                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
+                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
             );
     
             end
@@ -308,6 +370,16 @@ module sigma_tile
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
+
+                // M ext req bus
+                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
+                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
+                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+
+                // M ext resp bus
+                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
+                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
+                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
             );
     
             end
@@ -356,6 +428,16 @@ module sigma_tile
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
+
+                // M ext req bus
+                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
+                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
+                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+
+                // M ext resp bus
+                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
+                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
+                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
             );
     
             end

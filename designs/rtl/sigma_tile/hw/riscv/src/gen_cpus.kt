@@ -4,7 +4,7 @@ fun main(args: Array<String>) {
     println("RISC-V: generating all cores")
 
     for (i in 1..6) {
-        var cpu = aquaris.cpu(("riscv_" + i +"stage"), i, 0x200, 0x80, 8)
+        var cpu = aquaris.cpu(("riscv_" + i +"stage"), i, 0x200, 0x80, 8, true)
 
         var cpu_cyclix = cpu.translate_to_cyclix(DEBUG_LEVEL.SILENT)
         var cpu_rtl = cpu_cyclix.export_to_rtl(DEBUG_LEVEL.SILENT)

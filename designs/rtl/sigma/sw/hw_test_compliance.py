@@ -15,6 +15,6 @@ udm = udm('COM1', 921600)
 print("")
 
 sigma = sigma(udm)
-sigma.run_compliance_tests(["RV32I"])
+sigma.run_compliance_tests(["RV32I", "RV32M"])
 
 udm.disconnect()
