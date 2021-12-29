@@ -3658,6 +3658,7 @@ TEST_RR_OP(remu, x12, x10, x11, 0xfff, 0xfffeffff, 0x1000, x5, 776, x7)
 #endif
 
 
+RV_COMPLIANCE_HALT
 RVTEST_CODE_END
 RVMODEL_HALT
 

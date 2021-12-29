@@ -65,12 +65,12 @@ rv32i_tests = \
 	I-RF_x0-01
 
 rv32m_tests = \
-	div-01 \
-	divu-01 \
 	mul-01 \
 	mulh-01 \
 	mulhsu-01 \
 	mulhu-01 \
+	div-01 \
+	divu-01 \
 	rem-01 \
 	remu-01
 

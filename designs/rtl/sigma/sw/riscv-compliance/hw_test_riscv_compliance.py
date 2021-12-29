@@ -88,7 +88,14 @@ def hw_test_riscv_compliance(sigma, testsuites_todo):
                      "I-RF_width",
                      "I-RF_x0"]
     
-    TESTS_RV32M = [  "mul"]
+    TESTS_RV32M = [  "mul",
+                     "mulh",
+                     "mulhsu",
+                     "mulhu",
+                     "div",
+                     "divu",
+                     "rem",
+                     "remu"]
     
     TESTS_SUCC = []
     TESTS_FAIL = []

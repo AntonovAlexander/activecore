@@ -3663,6 +3663,7 @@ TEST_RR_OP(divu, x12, x10, x11, 0x1ff, 0xffdfffff, 0x800000, x6, 784, x25)
 #endif
 
 
+RV_COMPLIANCE_HALT
 RVTEST_CODE_END
 RVMODEL_HALT
 

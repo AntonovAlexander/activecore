@@ -203,7 +203,7 @@ reg cmd_ff, autoinc_ff;
 reg [31:0] RD_DATA_reg;
 reg [31:0] tr_length;
 
-always @(posedge clk_i, posedge reset_i)
+always @(posedge clk_i)
 	begin
 	
 	tx_sendbyte_start <= 1'b0;
