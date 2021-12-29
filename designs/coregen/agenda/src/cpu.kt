@@ -65,6 +65,16 @@ class RISCV_Decoder : reordex.RISCDecoder(CFG) {
     val aluop_CLRB		= 8
     val aluop_SLT		= 9
 
+    // M ext opcodes
+    val aluop_MUL		= 0
+    val aluop_MULH		= 1
+    val aluop_MULHSU	= 2
+    val aluop_MULHU		= 3
+    val aluop_DIV		= 4
+    val aluop_DIVU		= 5
+    val aluop_REM		= 6
+    val aluop_REMU		= 7
+
     ///////////////////
 
     var opcode          = ugenvar("opcode", 6, 0, "0")
@@ -232,6 +242,7 @@ class RISCV_Decoder : reordex.RISCDecoder(CFG) {
 
                 begcase(funct3)
                 run {
+
                     // ADDI
                     begbranch(0x0)
                     run {
@@ -317,6 +328,7 @@ class RISCV_Decoder : reordex.RISCDecoder(CFG) {
 
                 begcase(funct3)
                 run {
+
                     // ADD/SUB
                     begbranch(0x0)
                     run {
@@ -394,6 +406,21 @@ class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                     }; endbranch()
 
                 }; endcase()
+
+                val M_Ext = true
+                if (M_Ext) {
+
+                    begif(eq2(funct7, 1))
+                    run {
+
+                        assign(fu_id, 1)
+                        rd.source.assign(RD_ALU)
+                        CFG.exu_opcode.assign(funct3)
+
+                    }; endif()
+
+                }
+
             }; endbranch()
 
             begbranch(opcode_MISC_MEM)

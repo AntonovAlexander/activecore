@@ -113,8 +113,8 @@ class sigma:
         print("")
         return test_succ_flag
     
-    def run_compliance_tests(self):
-        hw_test_riscv_compliance(self)
+    def run_compliance_tests(self, tests):
+        hw_test_riscv_compliance(self, tests)
     
     def run_app_tests(self):
         """Description:

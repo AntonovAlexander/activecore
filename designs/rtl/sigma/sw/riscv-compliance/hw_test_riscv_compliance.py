@@ -13,9 +13,9 @@ sys.path.append('..')
 import sigma
 from sigma import *
 
-def hw_test_riscv_compliance_template(sigma, instr_name):
+def hw_test_riscv_compliance_template(sigma, instr_name, ref_directory):
     
-    f = open("riscv-compliance/riscv-test-suite/rv32i/references/I-" + instr_name + "-01.reference_output", "r")
+    f = open(ref_directory + instr_name + "-01.reference_output", "r")
 
     verify_data = []
     
@@ -26,9 +26,9 @@ def hw_test_riscv_compliance_template(sigma, instr_name):
     	else:
     		break
     
-    return sigma.hw_test_generic(sigma, instr_name, "riscv-compliance/I-" + instr_name + "-01.riscv", 0.1, verify_data)
+    return sigma.hw_test_generic(sigma, instr_name, "riscv-compliance/" + instr_name + "-01.riscv", 0.1, verify_data)
 
-def hw_test_riscv_compliance(sigma):
+def hw_test_riscv_compliance(sigma, testsuites_todo):
     
     print("#################################################################################")
     print("############################ RISC-V Compliance Test #############################")
@@ -39,65 +39,81 @@ def hw_test_riscv_compliance(sigma):
     test_succ_counter = 0
     test_fail_counter = 0
     
-    TESTS = ["ADD",
-             "ADDI",
-             "AND",
-             "ANDI",
-             "AUIPC",
-             "BEQ",
-             "BGE",
-             "BGEU",
-             "BLT",
-             "BLTU",
-             "BNE",
-             "JAL",
-             "JALR",
-             "LB",
-             "LBU",
-             "LH",
-             "LHU",
-             "LUI",
-             "LW",
-             "OR",
-             "ORI",
-             "SB",
-             "SH",
-             "SLL",
-             "SLLI",
-             "SLT",
-             "SLTI",
-             "SLTIU",
-             "SLTU",
-             "SRA",
-             "SRAI",
-             "SRL",
-             "SRLI",
-             "SUB",
-             "SW",
-             "XOR",
-             "XORI",
-             "DELAY_SLOTS",
-             #"EBREAK",
-             #"ECALL",
-             "ENDIANESS",
-             "IO",
-             #"MISALIGN_JMP",
-             #"MISALIGN_LDST",
-             "NOP",
-             "RF_size",
-             "RF_width",
-             "RF_x0"]
+    TESTS_RV32I = [  "I-ADD",
+                     "I-ADDI",
+                     "I-AND",
+                     "I-ANDI",
+                     "I-AUIPC",
+                     "I-BEQ",
+                     "I-BGE",
+                     "I-BGEU",
+                     "I-BLT",
+                     "I-BLTU",
+                     "I-BNE",
+                     "I-JAL",
+                     "I-JALR",
+                     "I-LB",
+                     "I-LBU",
+                     "I-LH",
+                     "I-LHU",
+                     "I-LUI",
+                     "I-LW",
+                     "I-OR",
+                     "I-ORI",
+                     "I-SB",
+                     "I-SH",
+                     "I-SLL",
+                     "I-SLLI",
+                     "I-SLT",
+                     "I-SLTI",
+                     "I-SLTIU",
+                     "I-SLTU",
+                     "I-SRA",
+                     "I-SRAI",
+                     "I-SRL",
+                     "I-SRLI",
+                     "I-SUB",
+                     "I-SW",
+                     "I-XOR",
+                     "I-XORI",
+                     "I-DELAY_SLOTS",
+                     #"I-EBREAK",
+                     #"I-ECALL",
+                     "I-ENDIANESS",
+                     "I-IO",
+                     #"I-MISALIGN_JMP",
+                     #"I-MISALIGN_LDST",
+                     "I-NOP",
+                     "I-RF_size",
+                     "I-RF_width",
+                     "I-RF_x0"]
+    
+    TESTS_RV32M = [  "mul"]
     
     TESTS_SUCC = []
     TESTS_FAIL = []
     
-    for TEST in TESTS:
-        if (hw_test_riscv_compliance_template(sigma, TEST) == 1):
-            TESTS_SUCC.append(TEST)
-            test_succ_counter = test_succ_counter + 1
+    for testsuite_todo in testsuites_todo:
+        if (testsuite_todo == "RV32I"):
+            for TEST in TESTS_RV32I:
+                if (hw_test_riscv_compliance_template(sigma, TEST, "riscv-compliance/riscv-test-suite/rv32i/references/") == 1):
+                    TESTS_SUCC.append(TEST)
+                    test_succ_counter = test_succ_counter + 1
+                else:
+                    TESTS_FAIL.append(TEST)
+                    test_fail_counter = test_fail_counter + 1
+        elif (testsuite_todo == "RV32M"):
+            for TEST in TESTS_RV32M:    
+                if (hw_test_riscv_compliance_template(sigma, TEST, "riscv-compliance/riscv-test-suite/rv32m/references/") == 1):
+                    TESTS_SUCC.append(TEST)
+                    test_succ_counter = test_succ_counter + 1
+                else:
+                    TESTS_FAIL.append(TEST)
+                    test_fail_counter = test_fail_counter + 1
         else:
-            TESTS_FAIL.append(TEST)
-            test_fail_counter = test_fail_counter + 1
+            raise Exception("Test not recognized!")
+    
+    
     
     print("Total tests PASSED: ", test_succ_counter, ", FAILED: ", test_fail_counter)
     
