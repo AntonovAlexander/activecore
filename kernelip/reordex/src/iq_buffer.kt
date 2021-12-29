@@ -315,7 +315,7 @@ internal class io_buffer(cyclix_gen : cyclix.Generic,
                         run {
 
                             cyclix_gen.assign(rdy, src_rsrv[0].src_rdy)
-                            cyclix_gen.begif(!mem_cmd)
+                            cyclix_gen.begif(mem_cmd)
                             run {
                                 cyclix_gen.band_gen(rdy, rdy, src_rsrv[1].src_rdy)
                             }; cyclix_gen.endif()
