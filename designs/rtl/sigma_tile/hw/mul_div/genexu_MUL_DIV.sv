@@ -60,7 +60,7 @@ always @*
 
 	if (req_acc)
 		begin
-		case (stream_req_bus_genfifo_rdata_bi.exu_opcode)
+		case (stream_req_bus_genfifo_rdata_bi.instr_code[14:12])
 			0: begin mult_req = 1'b1; inst_mul = 1'b1; end
 			1: begin mult_req = 1'b1; inst_mulh = 1'b1; end
 			2: begin mult_req = 1'b1; inst_mulhsu = 1'b1; end

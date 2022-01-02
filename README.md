@@ -24,7 +24,7 @@ The ultimate goal of the project is to provide top-down methodology and reusable
 
 ![pic_test](kernelip/__img/kernelip_model.png)
 
-Aligned to the strategy of e.g. RISC-V project that standardises open (or provides a baseline for) RISC CPU architecture, ActiveCore endeavours to propose open reference implementations of common microarchitectures (decoupled from certain architecture).
+Aligned to the strategy of e.g. RISC-V project that standardises open (or provides a baseline for) RISC CPU architecture, ActiveCore endeavours to propose open reference implementations of common microarchitectural mechanisms (decoupled from certain architecture).
 
 ### Project structure
 
