@@ -36,6 +36,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     val opcode_JALR			= 0x67
     val opcode_JAL			= 0x6f
     val opcode_SYSTEM		= 0x73
+    val opcode_custom_0     = 0x0b
 
     val instrcode_MRET        = 0x30200073
 
@@ -197,8 +198,14 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     var MIRQEN      = uglobal("MIRQEN", 0, 0, "1")
     var MRETADDR    = uglobal("MRETADDR", 31, 0, "0")
 
+    var ext_coproc_req   =
+        if (M_Ext_Coproc || Custom_0_Coproc) ulocal("ext_coproc_req", 0, 0, "0")
+        else DUMMY_VAR
     var m_ext_req   =
         if (M_Ext_Coproc) ulocal("m_ext_req", 0, 0, "0")
+        else DUMMY_VAR
+    var custom0_ext_req   =
+        if (Custom_0_Coproc) ulocal("custom0_ext_req", 0, 0, "0")
         else DUMMY_VAR
     var Ext_coproc_struct = hw_struct(name + "_Ext_coproc_struct")
     var M_ext_if =
@@ -207,12 +214,13 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                                 hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(31, 0)),
         2)
         else instr_mem
-    var M_ext_handle = mcopipe_handle(M_ext_if)
-    var M_ext_busreq =
-        if (M_Ext_Coproc) local("M_ext_busreq", Ext_coproc_struct)
+    // TODO: custom-0 coproc if
+    var Ext_coproc_handle = mcopipe_handle(M_ext_if)
+    var Ext_coproc_busreq =
+        if (M_Ext_Coproc || Custom_0_Coproc) local("Ext_coproc_busreq", Ext_coproc_struct)
         else instr_busreq
-    var M_ext_req_done =
-        if (M_Ext_Coproc) ulocal("M_ext_req_done", 0, 0, "0")
+    var Ext_coproc_req_done =
+        if (M_Ext_Coproc || Custom_0_Coproc) ulocal("Ext_coproc_req_done", 0, 0, "0")
         else instr_req_done
 
     //// RISC-V pipeline macro-operations ////
@@ -573,16 +581,12 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 }; endcase()
 
                 if (M_Ext_Coproc) {
-
                     begif(eq2(funct7, 1))
                     run {
-
+                        assign(ext_coproc_req, 1)
                         assign(m_ext_req, 1)
                         assign(rd_source, RD_COPROC)
-                        assign(alu_opcode, funct3)
-
                     }; endif()
-
                 }
 
             }; endbranch()
@@ -685,6 +689,22 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                     }; endbranch()
                 }; endcase()
             }; endbranch()
+
+            if (Custom_0_Coproc) {
+                begbranch(opcode_custom_0)
+                run {
+                    assign(ext_coproc_req, 1)
+                    assign(custom0_ext_req, 1)
+
+                    // assumed: R-type
+                    rs1_req.assign(1)
+                    rs2_req.assign(1)
+                    op1_source.assign(OP1_SRC_RS1)
+                    op2_source.assign(OP2_SRC_RS2)
+                    rd_req.assign(1)
+                    assign(rd_source, RD_COPROC)
+                }; endbranch()
+            }
 
         }; endcase()
 
@@ -1242,29 +1262,29 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     //// M ext ////
-    fun Pipe_ReqMExt() {
+    fun Pipe_ReqCoproc() {
         begif(m_ext_req)
         run {
-            begif(!M_ext_req_done)
+            begif(!Ext_coproc_req_done)
             run {
-                assign(M_ext_busreq.GetFracRef("instr_code"), instr_code)
-                assign(M_ext_busreq.GetFracRef("src0"), alu_op1)
-                assign(M_ext_busreq.GetFracRef("src1"), alu_op2)
+                assign(Ext_coproc_busreq.GetFracRef("instr_code"), instr_code)
+                assign(Ext_coproc_busreq.GetFracRef("src0"), alu_op1)
+                assign(Ext_coproc_busreq.GetFracRef("src1"), alu_op2)
 
-                M_ext_req_done.accum(M_ext_if.req(M_ext_handle, hw_imm(0), M_ext_busreq))
+                Ext_coproc_req_done.accum(M_ext_if.req(Ext_coproc_handle, hw_imm(0), Ext_coproc_busreq))
             }; endif()
 
-            begif(!M_ext_req_done)
+            begif(!Ext_coproc_req_done)
             run {
                 pstall()
             }; endif()
         }; endif()
     }
 
-    fun Pipe_RespMExt() {
-        begif(m_ext_req)
+    fun Pipe_RespCoproc() {
+        begif(ext_coproc_req)
         run {
-            begif(M_ext_handle.resp(rd_wdata))
+            begif(Ext_coproc_handle.resp(rd_wdata))
             run {
                 rd_rdy.assign(1)
             }; endif()
@@ -1302,7 +1322,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 Pipe_RegFetch()
                 Pipe_ALU_mux()
                 Pipe_FetchIrq()
-                if (M_Ext_Coproc) Pipe_ReqMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_ReqCoproc()
                 Pipe_ALU()
                 Pipe_ComputeCurinstraddrImm()
                 Pipe_GenJump()
@@ -1314,7 +1334,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 Pipe_RespDataMem()
 
                 Pipe_MemRdataToRdWdata()
-                if (M_Ext_Coproc) Pipe_RespMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 
             }; endstage()
@@ -1341,7 +1361,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 Pipe_ALU_mux()
 
                 Pipe_FetchIrq()
-                if (M_Ext_Coproc) Pipe_ReqMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_ReqCoproc()
                 Pipe_ALU()
                 Pipe_ComputeCurinstraddrImm()
                 Pipe_GenJump()
@@ -1354,7 +1374,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 Pipe_RespDataMem()
 
                 Pipe_MemRdataToRdWdata()
-                if (M_Ext_Coproc) Pipe_RespMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 
             }; endstage()
@@ -1383,7 +1403,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 Pipe_ALU_mux()
                 Pipe_FetchIrq()
 
-                if (M_Ext_Coproc) Pipe_ReqMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_ReqCoproc()
                 Pipe_ALU()
                 Pipe_ComputeCurinstraddrImm()
                 Pipe_GenJump()
@@ -1399,7 +1419,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 Pipe_RespDataMem()
 
                 Pipe_MemRdataToRdWdata()
-                if (M_Ext_Coproc) Pipe_RespMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 
             }; endstage()
@@ -1434,7 +1454,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
             run {
                 Pipe_KillIfJump()
                 Pipe_FetchIrq()
-                if (M_Ext_Coproc) Pipe_ReqMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_ReqCoproc()
                 Pipe_ALU()
                 Pipe_ComputeCurinstraddrImm()
 
@@ -1451,7 +1471,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 Pipe_RespDataMem()
 
                 Pipe_MemRdataToRdWdata()
-                if (M_Ext_Coproc) Pipe_RespMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 
             }; endstage()
@@ -1491,7 +1511,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
             run {
                 Pipe_KillIfJump()
                 Pipe_FetchIrq()
-                if (M_Ext_Coproc) Pipe_ReqMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_ReqCoproc()
                 Pipe_ALU()
                 Pipe_ComputeCurinstraddrImm()
                 Pipe_GenJump()
@@ -1510,7 +1530,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
             run {
                 Pipe_RespDataMem()
                 Pipe_MemRdataToRdWdata()
-                if (M_Ext_Coproc) Pipe_RespMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 
             }; endstage()
@@ -1556,7 +1576,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
             run {
                 Pipe_KillIfJump()
                 Pipe_FetchIrq()
-                if (M_Ext_Coproc) Pipe_ReqMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_ReqCoproc()
                 Pipe_ALU()
 
             }; endstage()
@@ -1575,7 +1595,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
             run {
                 Pipe_RespDataMem()
                 Pipe_MemRdataToRdWdata()
-                if (M_Ext_Coproc) Pipe_RespMExt()
+                if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 
             }; endstage()
