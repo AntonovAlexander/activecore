@@ -70,25 +70,47 @@ module sigma_tile
         , .irq_ack_i(cpu_irq_ack)
     );
 
-    //// M ext ////
-    logic m_ext_send_req, m_ext_send_ack;
-    genpmodule_riscv_5stage_genmcopipe_M_ext_if_genstruct_fifo_wdata m_ext_send_data;
+    //// coprocessor M ////
+    logic coproc_M_send_req, coproc_M_send_ack;
+    genpmodule_riscv_5stage_genmcopipe_coproc_M_if_genstruct_fifo_wdata coproc_M_send_data;
 
-    logic m_ext_recv_req, m_ext_recv_ack;
-    logic [31:0] m_ext_recv_data;
-    assign m_ext_recv_ack = 1'b1;
+    logic coproc_M_recv_req, coproc_M_recv_ack;
+    logic [31:0] coproc_M_recv_data;
+    assign coproc_M_recv_ack = 1'b1;
 
     genexu_MUL_DIV genexu_MUL_DIV (
         .clk_i(clk_i)
         , .rst_i(core_reset_o)
         
-        , .stream_req_bus_genfifo_req_i(m_ext_send_req)
-        , .stream_req_bus_genfifo_rdata_bi(m_ext_send_data.wdata)
-        , .stream_req_bus_genfifo_ack_o(m_ext_send_ack)
+        , .stream_req_bus_genfifo_req_i(coproc_M_send_req)
+        , .stream_req_bus_genfifo_rdata_bi(coproc_M_send_data.wdata)
+        , .stream_req_bus_genfifo_ack_o(coproc_M_send_ack)
 
-        , .stream_resp_bus_genfifo_req_o(m_ext_recv_req)
-        , .stream_resp_bus_genfifo_wdata_bo(m_ext_recv_data)
-        , .stream_resp_bus_genfifo_ack_i(m_ext_recv_ack)
+        , .stream_resp_bus_genfifo_req_o(coproc_M_recv_req)
+        , .stream_resp_bus_genfifo_wdata_bo(coproc_M_recv_data)
+        , .stream_resp_bus_genfifo_ack_i(coproc_M_recv_ack)
+    );
+    /////////////////
+
+    //// coprocessor custom-0 ////
+    logic coproc_custom0_send_req, coproc_custom0_send_ack;
+    genpmodule_riscv_5stage_genmcopipe_coproc_custom0_if_genstruct_fifo_wdata coproc_custom0_send_data;
+
+    logic coproc_custom0_recv_req, coproc_custom0_recv_ack;
+    logic [31:0] coproc_custom0_recv_data;
+    assign coproc_custom0_recv_ack = 1'b1;
+
+    coproc_custom0_wrapper coproc_custom0_wrapper (
+        .clk_i(clk_i)
+        , .rst_i(core_reset_o)
+        
+        , .stream_req_bus_genfifo_req_i(coproc_custom0_send_req)
+        , .stream_req_bus_genfifo_rdata_bi(coproc_custom0_send_data.wdata)
+        , .stream_req_bus_genfifo_ack_o(coproc_custom0_send_ack)
+
+        , .stream_resp_bus_genfifo_req_o(coproc_custom0_recv_req)
+        , .stream_resp_bus_genfifo_wdata_bo(coproc_custom0_recv_data)
+        , .stream_resp_bus_genfifo_ack_i(coproc_custom0_recv_ack)
     );
     /////////////////
 	
@@ -123,31 +145,41 @@ module sigma_tile
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
                 , .genmcopipe_instr_mem_req_genfifo_wdata_bo(instr_mem_struct_bus)
                 , .genmcopipe_instr_mem_req_genfifo_ack_i(cpu_instr.ack)
+
+                // instr resp bus
+                , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
+                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
+                // , .genmcopipe_instr_mem_resp_genfifo_ack_o
     
                 // data req bus
                 , .genmcopipe_data_mem_req_genfifo_req_o(cpu_data.req)
                 , .genmcopipe_data_mem_req_genfifo_wdata_bo(data_mem_struct_bus)
                 , .genmcopipe_data_mem_req_genfifo_ack_i(cpu_data.ack)
     
-                // instr resp bus
-                , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
-                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
-                // , .genmcopipe_instr_mem_resp_genfifo_ack_o
-    
                 // data resp bus
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
 
-                // M ext req bus
-                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
-                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
-                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+                // coproc M req bus
+                , .genmcopipe_coproc_M_if_req_genfifo_req_o(coproc_M_send_req)
+                , .genmcopipe_coproc_M_if_req_genfifo_wdata_bo(coproc_M_send_data)
+                , .genmcopipe_coproc_M_if_req_genfifo_ack_i(coproc_M_send_ack)
 
-                // M ext resp bus
-                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
-                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
-                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
+                // coproc M resp bus
+                , .genmcopipe_coproc_M_if_resp_genfifo_req_i(coproc_M_recv_req)
+                , .genmcopipe_coproc_M_if_resp_genfifo_rdata_bi(coproc_M_recv_data)
+                //, .genmcopipe_coproc_M_if_resp_genfifo_ack_o
+
+                // coproc custom0 req bus
+                , .genmcopipe_coproc_custom0_if_req_genfifo_req_o(coproc_custom0_send_req)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_wdata_bo(coproc_custom0_send_data)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_ack_i(coproc_custom0_send_ack)
+
+                // coproc custom0 resp bus
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_req_i(coproc_custom0_recv_req)
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_rdata_bi(coproc_custom0_recv_data)
+                //, .genmcopipe_coproc_custom0_if_resp_genfifo_ack_o
             );
     
             end
@@ -181,31 +213,41 @@ module sigma_tile
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
                 , .genmcopipe_instr_mem_req_genfifo_wdata_bo(instr_mem_struct_bus)
                 , .genmcopipe_instr_mem_req_genfifo_ack_i(cpu_instr.ack)
+
+                // instr resp bus
+                , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
+                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
+                // , .genmcopipe_instr_mem_resp_genfifo_ack_o
     
                 // data req bus
                 , .genmcopipe_data_mem_req_genfifo_req_o(cpu_data.req)
                 , .genmcopipe_data_mem_req_genfifo_wdata_bo(data_mem_struct_bus)
                 , .genmcopipe_data_mem_req_genfifo_ack_i(cpu_data.ack)
     
-                // instr resp bus
-                , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
-                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
-                // , .genmcopipe_instr_mem_resp_genfifo_ack_o
-    
                 // data resp bus
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
 
-                // M ext req bus
-                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
-                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
-                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+                // coproc M req bus
+                , .genmcopipe_coproc_M_if_req_genfifo_req_o(coproc_M_send_req)
+                , .genmcopipe_coproc_M_if_req_genfifo_wdata_bo(coproc_M_send_data)
+                , .genmcopipe_coproc_M_if_req_genfifo_ack_i(coproc_M_send_ack)
 
-                // M ext resp bus
-                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
-                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
-                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
+                // coproc M resp bus
+                , .genmcopipe_coproc_M_if_resp_genfifo_req_i(coproc_M_recv_req)
+                , .genmcopipe_coproc_M_if_resp_genfifo_rdata_bi(coproc_M_recv_data)
+                //, .genmcopipe_coproc_M_if_resp_genfifo_ack_o
+
+                // coproc custom0 req bus
+                , .genmcopipe_coproc_custom0_if_req_genfifo_req_o(coproc_custom0_send_req)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_wdata_bo(coproc_custom0_send_data)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_ack_i(coproc_custom0_send_ack)
+
+                // coproc custom0 resp bus
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_req_i(coproc_custom0_recv_req)
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_rdata_bi(coproc_custom0_recv_data)
+                //, .genmcopipe_coproc_custom0_if_resp_genfifo_ack_o
             );
     
             end
@@ -239,31 +281,41 @@ module sigma_tile
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
                 , .genmcopipe_instr_mem_req_genfifo_wdata_bo(instr_mem_struct_bus)
                 , .genmcopipe_instr_mem_req_genfifo_ack_i(cpu_instr.ack)
+
+                // instr resp bus
+                , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
+                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
+                // , .genmcopipe_instr_mem_resp_genfifo_ack_o
     
                 // data req bus
                 , .genmcopipe_data_mem_req_genfifo_req_o(cpu_data.req)
                 , .genmcopipe_data_mem_req_genfifo_wdata_bo(data_mem_struct_bus)
                 , .genmcopipe_data_mem_req_genfifo_ack_i(cpu_data.ack)
     
-                // instr resp bus
-                , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
-                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
-                // , .genmcopipe_instr_mem_resp_genfifo_ack_o
-    
                 // data resp bus
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
 
-                // M ext req bus
-                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
-                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
-                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+                // coproc M req bus
+                , .genmcopipe_coproc_M_if_req_genfifo_req_o(coproc_M_send_req)
+                , .genmcopipe_coproc_M_if_req_genfifo_wdata_bo(coproc_M_send_data)
+                , .genmcopipe_coproc_M_if_req_genfifo_ack_i(coproc_M_send_ack)
 
-                // M ext resp bus
-                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
-                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
-                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
+                // coproc M resp bus
+                , .genmcopipe_coproc_M_if_resp_genfifo_req_i(coproc_M_recv_req)
+                , .genmcopipe_coproc_M_if_resp_genfifo_rdata_bi(coproc_M_recv_data)
+                //, .genmcopipe_coproc_M_if_resp_genfifo_ack_o
+
+                // coproc custom0 req bus
+                , .genmcopipe_coproc_custom0_if_req_genfifo_req_o(coproc_custom0_send_req)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_wdata_bo(coproc_custom0_send_data)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_ack_i(coproc_custom0_send_ack)
+
+                // coproc custom0 resp bus
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_req_i(coproc_custom0_recv_req)
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_rdata_bi(coproc_custom0_recv_data)
+                //, .genmcopipe_coproc_custom0_if_resp_genfifo_ack_o
             );
     
             end
@@ -297,31 +349,41 @@ module sigma_tile
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
                 , .genmcopipe_instr_mem_req_genfifo_wdata_bo(instr_mem_struct_bus)
                 , .genmcopipe_instr_mem_req_genfifo_ack_i(cpu_instr.ack)
+
+                // instr resp bus
+                , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
+                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
+                // , .genmcopipe_instr_mem_resp_genfifo_ack_o
     
                 // data req bus
                 , .genmcopipe_data_mem_req_genfifo_req_o(cpu_data.req)
                 , .genmcopipe_data_mem_req_genfifo_wdata_bo(data_mem_struct_bus)
                 , .genmcopipe_data_mem_req_genfifo_ack_i(cpu_data.ack)
     
-                // instr resp bus
-                , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
-                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
-                // , .genmcopipe_instr_mem_resp_genfifo_ack_o
-    
                 // data resp bus
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
 
-                // M ext req bus
-                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
-                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
-                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+                // coproc M req bus
+                , .genmcopipe_coproc_M_if_req_genfifo_req_o(coproc_M_send_req)
+                , .genmcopipe_coproc_M_if_req_genfifo_wdata_bo(coproc_M_send_data)
+                , .genmcopipe_coproc_M_if_req_genfifo_ack_i(coproc_M_send_ack)
 
-                // M ext resp bus
-                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
-                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
-                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
+                // coproc M resp bus
+                , .genmcopipe_coproc_M_if_resp_genfifo_req_i(coproc_M_recv_req)
+                , .genmcopipe_coproc_M_if_resp_genfifo_rdata_bi(coproc_M_recv_data)
+                //, .genmcopipe_coproc_M_if_resp_genfifo_ack_o
+
+                // coproc custom0 req bus
+                , .genmcopipe_coproc_custom0_if_req_genfifo_req_o(coproc_custom0_send_req)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_wdata_bo(coproc_custom0_send_data)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_ack_i(coproc_custom0_send_ack)
+
+                // coproc custom0 resp bus
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_req_i(coproc_custom0_recv_req)
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_rdata_bi(coproc_custom0_recv_data)
+                //, .genmcopipe_coproc_custom0_if_resp_genfifo_ack_o
             );
     
             end
@@ -355,31 +417,41 @@ module sigma_tile
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
                 , .genmcopipe_instr_mem_req_genfifo_wdata_bo(instr_mem_struct_bus)
                 , .genmcopipe_instr_mem_req_genfifo_ack_i(cpu_instr.ack)
-    
-                // data req bus
-                , .genmcopipe_data_mem_req_genfifo_req_o(cpu_data.req)
-                , .genmcopipe_data_mem_req_genfifo_wdata_bo(data_mem_struct_bus)
-                , .genmcopipe_data_mem_req_genfifo_ack_i(cpu_data.ack)
-    
+
                 // instr resp bus
                 , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
                 , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
                 // , .genmcopipe_instr_mem_resp_genfifo_ack_o
     
+                // data req bus
+                , .genmcopipe_data_mem_req_genfifo_req_o(cpu_data.req)
+                , .genmcopipe_data_mem_req_genfifo_wdata_bo(data_mem_struct_bus)
+                , .genmcopipe_data_mem_req_genfifo_ack_i(cpu_data.ack)
+
                 // data resp bus
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
 
-                // M ext req bus
-                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
-                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
-                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+                // coproc M req bus
+                , .genmcopipe_coproc_M_if_req_genfifo_req_o(coproc_M_send_req)
+                , .genmcopipe_coproc_M_if_req_genfifo_wdata_bo(coproc_M_send_data)
+                , .genmcopipe_coproc_M_if_req_genfifo_ack_i(coproc_M_send_ack)
 
-                // M ext resp bus
-                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
-                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
-                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
+                // coproc M resp bus
+                , .genmcopipe_coproc_M_if_resp_genfifo_req_i(coproc_M_recv_req)
+                , .genmcopipe_coproc_M_if_resp_genfifo_rdata_bi(coproc_M_recv_data)
+                //, .genmcopipe_coproc_M_if_resp_genfifo_ack_o
+
+                // coproc custom0 req bus
+                , .genmcopipe_coproc_custom0_if_req_genfifo_req_o(coproc_custom0_send_req)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_wdata_bo(coproc_custom0_send_data)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_ack_i(coproc_custom0_send_ack)
+
+                // coproc custom0 resp bus
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_req_i(coproc_custom0_recv_req)
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_rdata_bi(coproc_custom0_recv_data)
+                //, .genmcopipe_coproc_custom0_if_resp_genfifo_ack_o
             );
     
             end
@@ -413,31 +485,41 @@ module sigma_tile
                 , .genmcopipe_instr_mem_req_genfifo_req_o(cpu_instr.req)
                 , .genmcopipe_instr_mem_req_genfifo_wdata_bo(instr_mem_struct_bus)
                 , .genmcopipe_instr_mem_req_genfifo_ack_i(cpu_instr.ack)
+
+                // instr resp bus
+                , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
+                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
+                // , .genmcopipe_instr_mem_resp_genfifo_ack_o
     
                 // data req bus
                 , .genmcopipe_data_mem_req_genfifo_req_o(cpu_data.req)
                 , .genmcopipe_data_mem_req_genfifo_wdata_bo(data_mem_struct_bus)
                 , .genmcopipe_data_mem_req_genfifo_ack_i(cpu_data.ack)
     
-                // instr resp bus
-                , .genmcopipe_instr_mem_resp_genfifo_req_i(cpu_instr.resp)
-                , .genmcopipe_instr_mem_resp_genfifo_rdata_bi(cpu_instr.rdata)
-                // , .genmcopipe_instr_mem_resp_genfifo_ack_o
-    
                 // data resp bus
                 , .genmcopipe_data_mem_resp_genfifo_req_i(cpu_data.resp)
                 , .genmcopipe_data_mem_resp_genfifo_rdata_bi(cpu_data.rdata)
                 //, .genmcopipe_data_mem_resp_genfifo_ack_o
 
-                // M ext req bus
-                , .genmcopipe_M_ext_if_req_genfifo_req_o(m_ext_send_req)
-                , .genmcopipe_M_ext_if_req_genfifo_wdata_bo(m_ext_send_data)
-                , .genmcopipe_M_ext_if_req_genfifo_ack_i(m_ext_send_ack)
+                // coproc M req bus
+                , .genmcopipe_coproc_M_if_req_genfifo_req_o(coproc_M_send_req)
+                , .genmcopipe_coproc_M_if_req_genfifo_wdata_bo(coproc_M_send_data)
+                , .genmcopipe_coproc_M_if_req_genfifo_ack_i(coproc_M_send_ack)
 
-                // M ext resp bus
-                , .genmcopipe_M_ext_if_resp_genfifo_req_i(m_ext_recv_req)
-                , .genmcopipe_M_ext_if_resp_genfifo_rdata_bi(m_ext_recv_data)
-                //, .genmcopipe_M_ext_if_resp_genfifo_ack_o
+                // coproc M resp bus
+                , .genmcopipe_coproc_M_if_resp_genfifo_req_i(coproc_M_recv_req)
+                , .genmcopipe_coproc_M_if_resp_genfifo_rdata_bi(coproc_M_recv_data)
+                //, .genmcopipe_coproc_M_if_resp_genfifo_ack_o
+
+                // coproc custom0 req bus
+                , .genmcopipe_coproc_custom0_if_req_genfifo_req_o(coproc_custom0_send_req)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_wdata_bo(coproc_custom0_send_data)
+                , .genmcopipe_coproc_custom0_if_req_genfifo_ack_i(coproc_custom0_send_ack)
+
+                // coproc custom0 resp bus
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_req_i(coproc_custom0_recv_req)
+                , .genmcopipe_coproc_custom0_if_resp_genfifo_rdata_bi(coproc_custom0_recv_data)
+                //, .genmcopipe_coproc_custom0_if_resp_genfifo_ack_o
             );
     
             end

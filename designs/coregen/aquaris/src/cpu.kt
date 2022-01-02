@@ -208,14 +208,19 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         if (Custom_0_Coproc) ulocal("custom0_ext_req", 0, 0, "0")
         else DUMMY_VAR
     var Ext_coproc_struct = hw_struct(name + "_Ext_coproc_struct")
-    var M_ext_if =
-        if (M_Ext_Coproc) mcopipe_if("M_ext_if",
+    var coproc_M_if =
+        if (M_Ext_Coproc) mcopipe_if("coproc_M_if",
                                 hw_type(Ext_coproc_struct),
                                 hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(31, 0)),
         2)
         else instr_mem
-    // TODO: custom-0 coproc if
-    var Ext_coproc_handle = mcopipe_handle(M_ext_if)
+    var coproc_custom0_if =
+        if (Custom_0_Coproc) mcopipe_if("coproc_custom0_if",
+            hw_type(Ext_coproc_struct),
+            hw_type(DATA_TYPE.BV_UNSIGNED, hw_dim_static(31, 0)),
+            2)
+        else instr_mem
+    var Ext_coproc_handle = mcopipe_handle(coproc_M_if)
     var Ext_coproc_busreq =
         if (M_Ext_Coproc || Custom_0_Coproc) local("Ext_coproc_busreq", Ext_coproc_struct)
         else instr_busreq
@@ -1263,21 +1268,30 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
     //// M ext ////
     fun Pipe_ReqCoproc() {
-        begif(m_ext_req)
+        assign(Ext_coproc_busreq.GetFracRef("instr_code"), instr_code)
+        assign(Ext_coproc_busreq.GetFracRef("src0"), alu_op1)
+        assign(Ext_coproc_busreq.GetFracRef("src1"), alu_op2)
+
+        begif(!Ext_coproc_req_done)
         run {
-            begif(!Ext_coproc_req_done)
+            begif(m_ext_req)
             run {
-                assign(Ext_coproc_busreq.GetFracRef("instr_code"), instr_code)
-                assign(Ext_coproc_busreq.GetFracRef("src0"), alu_op1)
-                assign(Ext_coproc_busreq.GetFracRef("src1"), alu_op2)
-
-                Ext_coproc_req_done.accum(M_ext_if.req(Ext_coproc_handle, hw_imm(0), Ext_coproc_busreq))
+                Ext_coproc_req_done.accum(coproc_M_if.req(Ext_coproc_handle, hw_imm(0), Ext_coproc_busreq))
+                begif(!Ext_coproc_req_done)
+                run {
+                    pstall()
+                }; endif()
             }; endif()
 
-            begif(!Ext_coproc_req_done)
+            begif(custom0_ext_req)
             run {
-                pstall()
+                Ext_coproc_req_done.accum(coproc_custom0_if.req(Ext_coproc_handle, hw_imm(0), Ext_coproc_busreq))
+                begif(!Ext_coproc_req_done)
+                run {
+                    pstall()
+                }; endif()
             }; endif()
+
         }; endif()
     }
 
