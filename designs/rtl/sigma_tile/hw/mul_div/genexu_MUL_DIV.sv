@@ -1,4 +1,4 @@
-`include "genexu_MUL_DIV.svh"
+`include "coproc_if.svh"
 
 module genexu_MUL_DIV (
 	input logic unsigned [0:0] clk_i

@@ -4,8 +4,8 @@
 // Copyright Alexander Antonov <antonov.alex.alex@gmail.com>
 // ===========================================================
 
-`ifndef __genexu_MUL_DIV_h_
-`define __genexu_MUL_DIV_h_
+`ifndef __coproc_if_h_
+`define __coproc_if_h_
 
 `ifndef __genstructdel_resp_struct_
 `define __genstructdel_resp_struct_
@@ -23,4 +23,4 @@ typedef struct packed {
 } req_struct;
 `endif // __genstructdel_req_struct_
 
-`endif // __genexu_MUL_DIV_h_
+`endif // __coproc_if_h_
