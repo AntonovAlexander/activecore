@@ -27,6 +27,8 @@ open class Reordex_CFG(val RF_width : Int,
                        val ROB_size : Int,
                        val mode : REORDEX_MODE) {
 
+    internal var BTAC_SIZE = 16
+
     internal val trx_inflight_num = ROB_size * DataPath_width
 
     internal val ARF_addr_width = GetWidthToContain(ARF_depth)

@@ -9,6 +9,8 @@
 package reordex
 
 import hwast.*
+import cyclix.*
+import kotlin.math.*
 
 internal class instr_iaddr_stage(val name : String,
                                  cyclix_gen : cyclix.Generic,
@@ -17,6 +19,19 @@ internal class instr_iaddr_stage(val name : String,
     var pc = cyclix_gen.uglobal("pc", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
     val curinstr_addr  = AdduLocal("curinstr_addr", 31, 0, "0")
     val nextinstr_addr = AdduLocal("nextinstr_addr", 31, 0, "0")
+
+    var BTAC_struct = hw_struct(name + "_BTAC_struct")
+    var BTAC = cyclix_gen.global("genBTAC", BTAC_struct, MultiExu_CFG.BTAC_SIZE-1, 0)
+    var lru_ptrs = ArrayList<hw_global>()
+
+    init {
+        BTAC_struct.addu("Enb", 0, 0, "0")
+        BTAC_struct.addu("Bpc", 31, 0, "0")
+        BTAC_struct.addu("Btgt", 31, 0, "0")
+        for (i in 0 until log2(MultiExu_CFG.BTAC_SIZE.toDouble()).toInt()) {
+            lru_ptrs.add(cyclix_gen.uglobal("genlru_ptr_lvl" + i, 2.toDouble().pow(i.toDouble()).toInt()-1, 0, "0"))
+        }
+    }
 
     fun Process(instr_req : instr_req_stage) {
 

@@ -268,7 +268,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
             bufs_to_reset.add(dispatch_uop_buf)
             bufs_to_reset.add(instr_fetch)
             bufs_to_reset.add(instr_req)
-            (rob as rob_risc).Commit((instr_iaddr as instr_iaddr_stage).pc, bufs_to_reset, (IQ_insts as ArrayList<hw_stage>), MRETADDR, cyclix_CSR_MCAUSE)
+            (rob as rob_risc).Commit(instr_iaddr as instr_iaddr_stage, bufs_to_reset, (IQ_insts as ArrayList<hw_stage>), MRETADDR, cyclix_CSR_MCAUSE)
         }
         cyclix_gen.MSG_COMMENT("ROB committing: done")
 

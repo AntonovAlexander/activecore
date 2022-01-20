@@ -138,7 +138,8 @@ internal class rob_risc(name: String,
         AdduStageVar("genbranch_mask", 2, 0, "0")
     )
 
-    var expected_instraddr = cyclix_gen.uglobal("expected_instraddr", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
+    var expected_instraddr  = cyclix_gen.uglobal("expected_instraddr", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
+    var prev_instraddr      = cyclix_gen.uglobal("prev_instraddr", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
 
     val irq_width   = 8
     val IRQ_ADDR    = 0x80
@@ -147,18 +148,22 @@ internal class rob_risc(name: String,
     var irq_recv    = cyclix_gen.ulocal("irq_recv", 0, 0, "0")
     var MIRQEN      = cyclix_gen.uglobal("MIRQEN", 0, 0, "1")
 
-    var backoff_cmd     = cyclix_gen.ulocal("backoff_cmd", 0, 0, "0")
+    var backoff_cmd     = cyclix_gen.ulocal("genbackoff_cmd", 0, 0, "0")
 
     var commit_active       = cyclix_gen.ulocal("genrob_commit_active", 0, 0, "1")
     var entry_mask          = cyclix_gen.uglobal("genrob_entry_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
     var genrob_instr_ptr    = cyclix_gen.uglobal("genrob_instr_ptr", GetWidthToContain(TRX_BUF_MULTIDIM)-1, 0, "0")
+
+    var btac_upd_found = cyclix_gen.ulocal("genbtac_upd_found", 0, 0, "0")
+    var btac_upd_ptr = cyclix_gen.ulocal("genbtac_upd_ptr", GetWidthToContain(MultiExu_CFG.BTAC_SIZE)-1, 0, "0")
+    var btac_upd_fetch = cyclix_gen.ulocal("genbtac_upd_fetch", 31, 0, "0")
 
     init {
         control_structures.states_toRollBack.add(entry_mask)
         control_structures.states_toRollBack.add(genrob_instr_ptr)
     }
 
-    fun Commit(pc : hw_var, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
+    fun Commit(instr_iaddr : instr_iaddr_stage, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
 
         preinit_ctrls()
         init_locals()
@@ -359,6 +364,7 @@ internal class rob_risc(name: String,
 
                         }; cyclix_gen.endif()
 
+                        cyclix_gen.assign(prev_instraddr, curinstr_addr)
                         cyclix_gen.assign(expected_instraddr, nextinstr_addr)
                         cyclix_gen.begif(branchctrl.req)
                         run {
@@ -379,9 +385,23 @@ internal class rob_risc(name: String,
 
         }; cyclix_gen.endif()
 
+        cyclix_gen.MSG_COMMENT("Searching BTAC...")
+        for (btac_idx in 0 until MultiExu_CFG.BTAC_SIZE) {
+            var btac_bpc = instr_iaddr.BTAC.GetFracRef(btac_idx).GetFracRef("Bpc")
+            var btac_btgt = instr_iaddr.BTAC.GetFracRef(btac_idx).GetFracRef("Btgt")
+            cyclix_gen.begif(cyclix_gen.eq2(expected_instraddr, btac_bpc))
+            run {
+                cyclix_gen.assign(btac_upd_found, 1)
+                cyclix_gen.assign(btac_upd_ptr, btac_idx)
+                cyclix_gen.assign(btac_upd_fetch, btac_btgt)
+            }; cyclix_gen.endif()
+        }
+        cyclix_gen.MSG_COMMENT("Searching BTAC: done")
+
+        cyclix_gen.MSG_COMMENT("Backing off...")
         cyclix_gen.begif(backoff_cmd)
         run {
-            cyclix_gen.assign(pc, expected_instraddr)
+            cyclix_gen.assign(instr_iaddr.pc, expected_instraddr)
             for (buf_to_rollback in bufs_to_rollback) {
                 buf_to_rollback.Reset()
                 if (buf_to_rollback is io_buffer) {
@@ -394,8 +414,25 @@ internal class rob_risc(name: String,
                     cyclix_gen.assign(buf_to_clr.TRX_BUF[elem_index].GetFracRef("enb"), 0)
                 }
             }
+
+            cyclix_gen.MSG_COMMENT("Rolling back...")
             control_structures.RollBack()
+            cyclix_gen.MSG_COMMENT("Rolling back: done")
+
+            cyclix_gen.MSG_COMMENT("BTAC processing...")
+            cyclix_gen.begif(btac_upd_found)
+            run {
+                cyclix_gen.assign(instr_iaddr.BTAC.GetFracRef(btac_upd_ptr).GetFracRef("Btgt"), expected_instraddr)
+            }; cyclix_gen.endif()
+            cyclix_gen.begelse()
+            run {
+                cyclix_gen.assign(instr_iaddr.BTAC.GetFracRef(0).GetFracRef("Enb"), 1)
+                cyclix_gen.assign(instr_iaddr.BTAC.GetFracRef(0).GetFracRef("Bpc"), prev_instraddr)
+                cyclix_gen.assign(instr_iaddr.BTAC.GetFracRef(0).GetFracRef("Btgt"), expected_instraddr)
+            }; cyclix_gen.endif()
+            cyclix_gen.MSG_COMMENT("BTAC processing: done")
         }; cyclix_gen.endif()
+        cyclix_gen.MSG_COMMENT("Backing off: done")
 
         cyclix_gen.COMMENT("Vectored ROB entry completion...")
         cyclix_gen.begelsif(commit_active)
