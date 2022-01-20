@@ -165,7 +165,7 @@ internal class rob_risc(name: String,
         control_structures.states_toRollBack.add(entry_mask)
         control_structures.states_toRollBack.add(genrob_instr_ptr)
         for (i in 0 until log2(MultiExu_CFG.BTAC_SIZE.toDouble()).toInt()) {
-            btac_upd_lru_ptr.add(cyclix_gen.ulocal("genbtac_upd_lru_ptr_lvl" + i, 0, 0, "0"))
+            btac_upd_lru_ptr.add(cyclix_gen.ulocal("genbtac_upd_ptr_lvl" + i, i, 0, "0"))
         }
     }
 
@@ -393,9 +393,13 @@ internal class rob_risc(name: String,
 
         cyclix_gen.MSG_COMMENT("Searching BTAC...")
         for (i in 0 until log2(MultiExu_CFG.BTAC_SIZE.toDouble()).toInt()) {
-            cyclix_gen.assign(btac_upd_lru_ptr[i], cyclix_gen.bnot(instr_iaddr.mru_ptrs[i]))
+            if (i == 0) {
+                cyclix_gen.assign(btac_upd_lru_ptr[i], cyclix_gen.bnot(instr_iaddr.mru_ptrs[i].readPrev()))
+            } else {
+                cyclix_gen.assign(btac_upd_lru_ptr[i], cyclix_gen.cnct(btac_upd_lru_ptr[i-1], cyclix_gen.bnot(instr_iaddr.mru_ptrs[i].readPrev()).GetFracRef(btac_upd_lru_ptr[i-1])))
+            }
         }
-        cyclix_gen.assign(btac_upd_ptr, cyclix_gen.cnct(btac_upd_lru_ptr as ArrayList<hw_param>))
+        cyclix_gen.assign(btac_upd_ptr, btac_upd_lru_ptr.last())
         for (btac_idx in 0 until MultiExu_CFG.BTAC_SIZE) {
             var btac_enb = instr_iaddr.BTAC.GetFracRef(btac_idx).GetFracRef("Enb")
             var btac_bpc = instr_iaddr.BTAC.GetFracRef(btac_idx).GetFracRef("Bpc")

@@ -891,6 +891,12 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op(OPS_CNCT, src)
     }
 
+    fun cnct(vararg srcs : hw_param): hw_var {
+        var srcsList = ArrayList<hw_param>()
+        for (src in srcs) srcsList.add(src)
+        return cnct(srcsList)
+    }
+
     fun mat_mul(src0: hw_var, src1: hw_var) : hw_var {
         if ((src0.vartype.dimensions.size != src1.vartype.dimensions.size) || (src0.vartype.dimensions.size != 3)) {
             ERROR("Dimensions error of matrix multiplication")

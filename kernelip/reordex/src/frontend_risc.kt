@@ -23,6 +23,8 @@ internal class instr_iaddr_stage(val name : String,
     var BTAC_struct = hw_struct(name + "_BTAC_struct")
     var BTAC = cyclix_gen.global("genBTAC", BTAC_struct, MultiExu_CFG.BTAC_SIZE-1, 0)
     var mru_ptrs = ArrayList<hw_global>()
+    var BTAC_found = cyclix_gen.ulocal("genBTAC_found", 0, 0, "0")
+    var BTAC_index = cyclix_gen.ulocal("genBTAC_index", GetWidthToContain(MultiExu_CFG.BTAC_SIZE)-1, 0, "0")
 
     init {
         BTAC_struct.addu("Enb", 0, 0, "0")
@@ -44,9 +46,38 @@ internal class instr_iaddr_stage(val name : String,
             var inc_pc = 4
             cyclix_gen.assign(nextinstr_addr, pc)
             for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
-                for (i in 0 until mru_ptrs.size) {
-                    cyclix_gen.assign(mru_ptrs[i], 0)
+
+                cyclix_gen.MSG_COMMENT("BTAC search...")
+                for (btac_idx in 0 until MultiExu_CFG.BTAC_SIZE) {
+
+                    var btac_enb = BTAC.GetFracRef(btac_idx).GetFracRef("Enb")
+                    var btac_bpc = BTAC.GetFracRef(btac_idx).GetFracRef("Bpc")
+                    var btac_btgt = BTAC.GetFracRef(btac_idx).GetFracRef("Btgt")
+
+                    cyclix_gen.begif(btac_enb)
+                    run {
+                        cyclix_gen.begif(cyclix_gen.eq2(btac_bpc, curinstr_addr))
+                        run {
+                            cyclix_gen.assign(BTAC_found, 1)
+                            cyclix_gen.assign(BTAC_index, btac_idx)
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endif()
                 }
+                cyclix_gen.MSG_COMMENT("BTAC search: done")
+
+                cyclix_gen.MSG_COMMENT("MRU update...")
+                cyclix_gen.begif(BTAC_found)
+                run {
+                    for (mru_idx in 0 until mru_ptrs.size) {
+                        var bitval = cyclix_gen.srl(BTAC_index, mru_ptrs.size-1-mru_idx).GetFracRef(0)
+                        if (mru_idx == 0) {
+                            cyclix_gen.assign(mru_ptrs[mru_idx], bitval)
+                        } else {
+                            cyclix_gen.assign(mru_ptrs[mru_idx].GetFracRef(cyclix_gen.srl(BTAC_index, mru_ptrs.size-mru_idx)), bitval)
+                        }
+                    }
+                }; cyclix_gen.endif()
+                cyclix_gen.MSG_COMMENT("MRU update: done")
 
                 cyclix_gen.assign(curinstr_addr, nextinstr_addr)
                 cyclix_gen.add_gen(nextinstr_addr, pc , inc_pc)
