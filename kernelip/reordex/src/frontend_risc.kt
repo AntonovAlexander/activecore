@@ -22,14 +22,14 @@ internal class instr_iaddr_stage(val name : String,
 
     var BTAC_struct = hw_struct(name + "_BTAC_struct")
     var BTAC = cyclix_gen.global("genBTAC", BTAC_struct, MultiExu_CFG.BTAC_SIZE-1, 0)
-    var lru_ptrs = ArrayList<hw_global>()
+    var mru_ptrs = ArrayList<hw_global>()
 
     init {
         BTAC_struct.addu("Enb", 0, 0, "0")
         BTAC_struct.addu("Bpc", 31, 0, "0")
         BTAC_struct.addu("Btgt", 31, 0, "0")
         for (i in 0 until log2(MultiExu_CFG.BTAC_SIZE.toDouble()).toInt()) {
-            lru_ptrs.add(cyclix_gen.uglobal("genlru_ptr_lvl" + i, 2.toDouble().pow(i.toDouble()).toInt()-1, 0, "0"))
+            mru_ptrs.add(cyclix_gen.uglobal("genmru_ptr_lvl" + i, 2.toDouble().pow(i.toDouble()).toInt()-1, 0, "0"))
         }
     }
 
@@ -44,6 +44,10 @@ internal class instr_iaddr_stage(val name : String,
             var inc_pc = 4
             cyclix_gen.assign(nextinstr_addr, pc)
             for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
+                for (i in 0 until mru_ptrs.size) {
+                    cyclix_gen.assign(mru_ptrs[i], 0)
+                }
+
                 cyclix_gen.assign(curinstr_addr, nextinstr_addr)
                 cyclix_gen.add_gen(nextinstr_addr, pc , inc_pc)
 

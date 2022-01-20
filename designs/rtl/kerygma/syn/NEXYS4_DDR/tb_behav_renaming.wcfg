@@ -105,21 +105,21 @@
       <obj_property name="ElementShortName">genBTAC[15:0]</obj_property>
       <obj_property name="ObjectShortName">genBTAC[15:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlru_ptr_lvl0" type="array">
-      <obj_property name="ElementShortName">genlru_ptr_lvl0[0:0]</obj_property>
-      <obj_property name="ObjectShortName">genlru_ptr_lvl0[0:0]</obj_property>
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmru_ptr_lvl0" type="array">
+      <obj_property name="ElementShortName">genmru_ptr_lvl0[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genmru_ptr_lvl0[0:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlru_ptr_lvl1" type="array">
-      <obj_property name="ElementShortName">genlru_ptr_lvl1[1:0]</obj_property>
-      <obj_property name="ObjectShortName">genlru_ptr_lvl1[1:0]</obj_property>
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmru_ptr_lvl1" type="array">
+      <obj_property name="ElementShortName">genmru_ptr_lvl1[1:0]</obj_property>
+      <obj_property name="ObjectShortName">genmru_ptr_lvl1[1:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlru_ptr_lvl2" type="array">
-      <obj_property name="ElementShortName">genlru_ptr_lvl2[3:0]</obj_property>
-      <obj_property name="ObjectShortName">genlru_ptr_lvl2[3:0]</obj_property>
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmru_ptr_lvl2" type="array">
+      <obj_property name="ElementShortName">genmru_ptr_lvl2[3:0]</obj_property>
+      <obj_property name="ObjectShortName">genmru_ptr_lvl2[3:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlru_ptr_lvl3" type="array">
-      <obj_property name="ElementShortName">genlru_ptr_lvl3[7:0]</obj_property>
-      <obj_property name="ObjectShortName">genlru_ptr_lvl3[7:0]</obj_property>
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genmru_ptr_lvl3" type="array">
+      <obj_property name="ElementShortName">genmru_ptr_lvl3[7:0]</obj_property>
+      <obj_property name="ObjectShortName">genmru_ptr_lvl3[7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genbackoff_cmd" type="array">
       <obj_property name="ElementShortName">genbackoff_cmd[0:0]</obj_property>

@@ -10,6 +10,8 @@ package reordex
 
 import hwast.*
 import cyclix.*
+import kotlin.math.log2
+import kotlin.math.pow
 
 internal open class rob(cyclix_gen : cyclix.Generic,
                         name_prefix : String,
@@ -157,10 +159,14 @@ internal class rob_risc(name: String,
     var btac_upd_found = cyclix_gen.ulocal("genbtac_upd_found", 0, 0, "0")
     var btac_upd_ptr = cyclix_gen.ulocal("genbtac_upd_ptr", GetWidthToContain(MultiExu_CFG.BTAC_SIZE)-1, 0, "0")
     var btac_upd_fetch = cyclix_gen.ulocal("genbtac_upd_fetch", 31, 0, "0")
+    var btac_upd_lru_ptr = ArrayList<hw_var>()
 
     init {
         control_structures.states_toRollBack.add(entry_mask)
         control_structures.states_toRollBack.add(genrob_instr_ptr)
+        for (i in 0 until log2(MultiExu_CFG.BTAC_SIZE.toDouble()).toInt()) {
+            btac_upd_lru_ptr.add(cyclix_gen.ulocal("genbtac_upd_lru_ptr_lvl" + i, 0, 0, "0"))
+        }
     }
 
     fun Commit(instr_iaddr : instr_iaddr_stage, bufs_to_rollback : ArrayList<hw_stage>, bufs_to_clr : ArrayList<hw_stage>, MRETADDR : hw_var, CSR_MCAUSE : hw_var) {
@@ -386,13 +392,21 @@ internal class rob_risc(name: String,
         }; cyclix_gen.endif()
 
         cyclix_gen.MSG_COMMENT("Searching BTAC...")
+        for (i in 0 until log2(MultiExu_CFG.BTAC_SIZE.toDouble()).toInt()) {
+            cyclix_gen.assign(btac_upd_lru_ptr[i], cyclix_gen.bnot(instr_iaddr.mru_ptrs[i]))
+        }
+        cyclix_gen.assign(btac_upd_ptr, cyclix_gen.cnct(btac_upd_lru_ptr as ArrayList<hw_param>))
         for (btac_idx in 0 until MultiExu_CFG.BTAC_SIZE) {
+            var btac_enb = instr_iaddr.BTAC.GetFracRef(btac_idx).GetFracRef("Enb")
             var btac_bpc = instr_iaddr.BTAC.GetFracRef(btac_idx).GetFracRef("Bpc")
             var btac_btgt = instr_iaddr.BTAC.GetFracRef(btac_idx).GetFracRef("Btgt")
             cyclix_gen.begif(cyclix_gen.eq2(expected_instraddr, btac_bpc))
             run {
-                cyclix_gen.assign(btac_upd_found, 1)
-                cyclix_gen.assign(btac_upd_ptr, btac_idx)
+                cyclix_gen.assign(btac_upd_found, btac_enb)
+                cyclix_gen.begif(btac_enb)
+                run {
+                    cyclix_gen.assign(btac_upd_ptr, btac_idx)
+                }; cyclix_gen.endif()
                 cyclix_gen.assign(btac_upd_fetch, btac_btgt)
             }; cyclix_gen.endif()
         }
@@ -420,17 +434,11 @@ internal class rob_risc(name: String,
             cyclix_gen.MSG_COMMENT("Rolling back: done")
 
             cyclix_gen.MSG_COMMENT("BTAC processing...")
-            cyclix_gen.begif(btac_upd_found)
-            run {
-                cyclix_gen.assign(instr_iaddr.BTAC.GetFracRef(btac_upd_ptr).GetFracRef("Btgt"), expected_instraddr)
-            }; cyclix_gen.endif()
-            cyclix_gen.begelse()
-            run {
-                cyclix_gen.assign(instr_iaddr.BTAC.GetFracRef(0).GetFracRef("Enb"), 1)
-                cyclix_gen.assign(instr_iaddr.BTAC.GetFracRef(0).GetFracRef("Bpc"), prev_instraddr)
-                cyclix_gen.assign(instr_iaddr.BTAC.GetFracRef(0).GetFracRef("Btgt"), expected_instraddr)
-            }; cyclix_gen.endif()
+            cyclix_gen.assign(instr_iaddr.BTAC.GetFracRef(btac_upd_ptr).GetFracRef("Enb"), 1)
+            cyclix_gen.assign(instr_iaddr.BTAC.GetFracRef(btac_upd_ptr).GetFracRef("Bpc"), prev_instraddr)
+            cyclix_gen.assign(instr_iaddr.BTAC.GetFracRef(btac_upd_ptr).GetFracRef("Btgt"), expected_instraddr)
             cyclix_gen.MSG_COMMENT("BTAC processing: done")
+
         }; cyclix_gen.endif()
         cyclix_gen.MSG_COMMENT("Backing off: done")
 
