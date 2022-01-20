@@ -419,6 +419,7 @@ internal class rob_risc(name: String,
         cyclix_gen.MSG_COMMENT("Backing off...")
         cyclix_gen.begif(backoff_cmd)
         run {
+            cyclix_gen.assign(instr_iaddr.iaddr_enb, 0)
             cyclix_gen.assign(instr_iaddr.pc, expected_instraddr)
             for (buf_to_rollback in bufs_to_rollback) {
                 buf_to_rollback.Reset()

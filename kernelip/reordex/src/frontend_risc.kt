@@ -16,6 +16,7 @@ internal class instr_iaddr_stage(val name : String,
                                  cyclix_gen : cyclix.Generic,
                                  MultiExu_CFG : Reordex_CFG) : trx_buffer(cyclix_gen, "geninstr_iaddr", 1, MultiExu_CFG) {
 
+    var iaddr_enb = cyclix_gen.uglobal("iaddr_enb", 0, 0, "1")
     var pc = cyclix_gen.uglobal("pc", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
     val curinstr_addr  = AdduLocal("curinstr_addr", 31, 0, "0")
     val nextinstr_addr = AdduLocal("nextinstr_addr", 31, 0, "0")
@@ -23,8 +24,8 @@ internal class instr_iaddr_stage(val name : String,
     var BTAC_struct = hw_struct(name + "_BTAC_struct")
     var BTAC = cyclix_gen.global("genBTAC", BTAC_struct, MultiExu_CFG.BTAC_SIZE-1, 0)
     var mru_ptrs = ArrayList<hw_global>()
-    var BTAC_found = cyclix_gen.ulocal("genBTAC_found", 0, 0, "0")
-    var BTAC_index = cyclix_gen.ulocal("genBTAC_index", GetWidthToContain(MultiExu_CFG.BTAC_SIZE)-1, 0, "0")
+    var BTAC_found_entries = cyclix_gen.ulocal("genBTAC_found", 0, 0, "0")
+    var BTAC_index_entries = cyclix_gen.ulocal("genBTAC_index", GetWidthToContain(MultiExu_CFG.BTAC_SIZE)-1, 0, "0")
 
     init {
         BTAC_struct.addu("Enb", 0, 0, "0")
@@ -33,6 +34,8 @@ internal class instr_iaddr_stage(val name : String,
         for (i in 0 until log2(MultiExu_CFG.BTAC_SIZE.toDouble()).toInt()) {
             mru_ptrs.add(cyclix_gen.uglobal("genmru_ptr_lvl" + i, 2.toDouble().pow(i.toDouble()).toInt()-1, 0, "0"))
         }
+        BTAC_found_entries.vartype.dimensions.add(MultiExu_CFG.DataPath_width-1, 0)
+        BTAC_index_entries.vartype.dimensions.add(MultiExu_CFG.DataPath_width-1, 0)
     }
 
     fun Process(instr_req : instr_req_stage) {
@@ -41,58 +44,68 @@ internal class instr_iaddr_stage(val name : String,
 
         var new_req_buf_total = instr_req.GetPushTrx()
 
-        cyclix_gen.begif(instr_req.ctrl_rdy)
+        cyclix_gen.begif(iaddr_enb)
         run {
-            var inc_pc = 4
-            cyclix_gen.assign(nextinstr_addr, pc)
-            for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
 
-                cyclix_gen.MSG_COMMENT("BTAC search...")
-                for (btac_idx in 0 until MultiExu_CFG.BTAC_SIZE) {
+            cyclix_gen.begif(instr_req.ctrl_rdy)
+            run {
+                var inc_pc = 4
+                cyclix_gen.assign(nextinstr_addr, pc)
+                for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
 
-                    var btac_enb = BTAC.GetFracRef(btac_idx).GetFracRef("Enb")
-                    var btac_bpc = BTAC.GetFracRef(btac_idx).GetFracRef("Bpc")
-                    var btac_btgt = BTAC.GetFracRef(btac_idx).GetFracRef("Btgt")
+                    var BTAC_found = BTAC_found_entries.GetFracRef(entry_num)
+                    var BTAC_index = BTAC_index_entries.GetFracRef(entry_num)
 
-                    cyclix_gen.begif(btac_enb)
-                    run {
-                        cyclix_gen.begif(cyclix_gen.eq2(btac_bpc, curinstr_addr))
+                    cyclix_gen.MSG_COMMENT("BTAC search...")
+                    for (btac_idx in 0 until MultiExu_CFG.BTAC_SIZE) {
+
+                        var btac_enb = BTAC.GetFracRef(btac_idx).GetFracRef("Enb")
+                        var btac_bpc = BTAC.GetFracRef(btac_idx).GetFracRef("Bpc")
+                        var btac_btgt = BTAC.GetFracRef(btac_idx).GetFracRef("Btgt")
+
+                        cyclix_gen.begif(btac_enb)
                         run {
-                            cyclix_gen.assign(BTAC_found, 1)
-                            cyclix_gen.assign(BTAC_index, btac_idx)
+                            cyclix_gen.begif(cyclix_gen.eq2(btac_bpc, curinstr_addr))
+                            run {
+                                cyclix_gen.assign(BTAC_found, 1)
+                                cyclix_gen.assign(BTAC_index, btac_idx)
+                            }; cyclix_gen.endif()
                         }; cyclix_gen.endif()
-                    }; cyclix_gen.endif()
-                }
-                cyclix_gen.MSG_COMMENT("BTAC search: done")
-
-                cyclix_gen.MSG_COMMENT("MRU update...")
-                cyclix_gen.begif(BTAC_found)
-                run {
-                    for (mru_idx in 0 until mru_ptrs.size) {
-                        var bitval = cyclix_gen.srl(BTAC_index, mru_ptrs.size-1-mru_idx).GetFracRef(0)
-                        if (mru_idx == 0) {
-                            cyclix_gen.assign(mru_ptrs[mru_idx], bitval)
-                        } else {
-                            cyclix_gen.assign(mru_ptrs[mru_idx].GetFracRef(cyclix_gen.srl(BTAC_index, mru_ptrs.size-mru_idx)), bitval)
-                        }
                     }
-                }; cyclix_gen.endif()
-                cyclix_gen.MSG_COMMENT("MRU update: done")
+                    cyclix_gen.MSG_COMMENT("BTAC search: done")
 
-                cyclix_gen.assign(curinstr_addr, nextinstr_addr)
-                cyclix_gen.add_gen(nextinstr_addr, pc , inc_pc)
+                    cyclix_gen.MSG_COMMENT("MRU update...")
+                    cyclix_gen.begif(BTAC_found)
+                    run {
+                        for (mru_idx in 0 until mru_ptrs.size) {
+                            var bitval = cyclix_gen.srl(BTAC_index, mru_ptrs.size-1-mru_idx).GetFracRef(0)
+                            if (mru_idx == 0) {
+                                cyclix_gen.assign(mru_ptrs[mru_idx], bitval)
+                            } else {
+                                cyclix_gen.assign(mru_ptrs[mru_idx].GetFracRef(cyclix_gen.srl(BTAC_index, mru_ptrs.size-mru_idx)), bitval)
+                            }
+                        }
+                    }; cyclix_gen.endif()
+                    cyclix_gen.MSG_COMMENT("MRU update: done")
 
-                var new_req_buf = new_req_buf_total.GetFracRef(entry_num)
-                cyclix_gen.assign(new_req_buf.GetFracRef("enb"), 1)
-                cyclix_gen.assign(new_req_buf.GetFracRef("curinstr_addr"), curinstr_addr)
-                cyclix_gen.assign(new_req_buf.GetFracRef("nextinstr_addr"), nextinstr_addr)
-                inc_pc += 4
-            }
+                    cyclix_gen.assign(curinstr_addr, nextinstr_addr)
+                    cyclix_gen.add_gen(nextinstr_addr, pc , inc_pc)
 
-            cyclix_gen.assign(instr_req.push, 1)
-            instr_req.push_trx(new_req_buf_total)
-            cyclix_gen.assign(pc, nextinstr_addr)
+                    var new_req_buf = new_req_buf_total.GetFracRef(entry_num)
+                    cyclix_gen.assign(new_req_buf.GetFracRef("enb"), 1)
+                    cyclix_gen.assign(new_req_buf.GetFracRef("curinstr_addr"), curinstr_addr)
+                    cyclix_gen.assign(new_req_buf.GetFracRef("nextinstr_addr"), nextinstr_addr)
+                    inc_pc += 4
+                }
+
+                cyclix_gen.assign(instr_req.push, 1)
+                instr_req.push_trx(new_req_buf_total)
+                cyclix_gen.assign(pc, nextinstr_addr)
+            }; cyclix_gen.endif()
+
         }; cyclix_gen.endif()
+
+        cyclix_gen.assign(iaddr_enb, 1)
 
         cyclix_gen.MSG_COMMENT("Generating instruction addresses: done")
     }
