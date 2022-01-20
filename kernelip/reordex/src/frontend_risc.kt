@@ -52,9 +52,11 @@ internal class instr_iaddr_stage(val name : String,
 
             cyclix_gen.begif(instr_req.ctrl_rdy)
             run {
-                var inc_pc = 4
                 cyclix_gen.assign(nextinstr_addr, pc_buf)
                 for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
+
+                    cyclix_gen.assign(curinstr_addr, nextinstr_addr)
+                    cyclix_gen.add_gen(nextinstr_addr, curinstr_addr , 4)
 
                     var BTAC_found = BTAC_found_entries.GetFracRef(entry_num)
                     var BTAC_index = BTAC_index_entries.GetFracRef(entry_num)
@@ -62,9 +64,9 @@ internal class instr_iaddr_stage(val name : String,
                     cyclix_gen.MSG_COMMENT("BTAC search...")
                     for (btac_idx in 0 until MultiExu_CFG.BTAC_SIZE) {
 
-                        var btac_enb = BTAC.GetFracRef(btac_idx).GetFracRef("Enb")
-                        var btac_bpc = BTAC.GetFracRef(btac_idx).GetFracRef("Bpc")
-                        var btac_btgt = BTAC.GetFracRef(btac_idx).GetFracRef("Btgt")
+                        var btac_enb = BTAC.readPrev().GetFracRef(btac_idx).GetFracRef("Enb")
+                        var btac_bpc = BTAC.readPrev().GetFracRef(btac_idx).GetFracRef("Bpc")
+                        var btac_btgt = BTAC.readPrev().GetFracRef(btac_idx).GetFracRef("Btgt")
 
                         cyclix_gen.begif(btac_enb)
                         run {
@@ -77,9 +79,19 @@ internal class instr_iaddr_stage(val name : String,
                     }
                     cyclix_gen.MSG_COMMENT("BTAC search: done")
 
-                    cyclix_gen.MSG_COMMENT("MRU update...")
                     cyclix_gen.begif(BTAC_found)
                     run {
+
+                        /*
+                        cyclix_gen.MSG_COMMENT("PC BTAC redirect...")
+                        cyclix_gen.begif(BTAC_found)
+                        run {
+                            cyclix_gen.assign(nextinstr_addr, BTAC.readPrev().GetFracRef(BTAC_index).GetFracRef("Btgt"))
+                        }; cyclix_gen.endif()
+                        cyclix_gen.MSG_COMMENT("PC BTAC redirect: done")
+                         */
+
+                        cyclix_gen.MSG_COMMENT("MRU update...")
                         for (mru_idx in 0 until mru_ptrs.size) {
                             var bitval = cyclix_gen.srl(BTAC_index, mru_ptrs.size-1-mru_idx).GetFracRef(0)
                             if (mru_idx == 0) {
@@ -88,17 +100,14 @@ internal class instr_iaddr_stage(val name : String,
                                 cyclix_gen.assign(mru_ptrs[mru_idx].GetFracRef(cyclix_gen.srl(BTAC_index, mru_ptrs.size-mru_idx)), bitval)
                             }
                         }
-                    }; cyclix_gen.endif()
-                    cyclix_gen.MSG_COMMENT("MRU update: done")
+                        cyclix_gen.MSG_COMMENT("MRU update: done")
 
-                    cyclix_gen.assign(curinstr_addr, nextinstr_addr)
-                    cyclix_gen.add_gen(nextinstr_addr, pc_buf , inc_pc)
+                    }; cyclix_gen.endif()
 
                     var new_req_buf = new_req_buf_total.GetFracRef(entry_num)
                     cyclix_gen.assign(new_req_buf.GetFracRef("enb"), 1)
                     cyclix_gen.assign(new_req_buf.GetFracRef("curinstr_addr"), curinstr_addr)
                     cyclix_gen.assign(new_req_buf.GetFracRef("nextinstr_addr"), nextinstr_addr)
-                    inc_pc += 4
                 }
 
                 cyclix_gen.assign(instr_req.push, 1)
