@@ -404,7 +404,7 @@ internal class rob_risc(name: String,
             var btac_enb = instr_iaddr.BTAC.GetFracRef(btac_idx).GetFracRef("Enb")
             var btac_bpc = instr_iaddr.BTAC.GetFracRef(btac_idx).GetFracRef("Bpc")
             var btac_btgt = instr_iaddr.BTAC.GetFracRef(btac_idx).GetFracRef("Btgt")
-            cyclix_gen.begif(cyclix_gen.eq2(expected_instraddr, btac_bpc))
+            cyclix_gen.begif(cyclix_gen.eq2(prev_instraddr, btac_bpc))
             run {
                 cyclix_gen.assign(btac_upd_found, btac_enb)
                 cyclix_gen.begif(btac_enb)
