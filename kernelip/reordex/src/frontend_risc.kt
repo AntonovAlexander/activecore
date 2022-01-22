@@ -19,6 +19,7 @@ internal class instr_iaddr_stage(val name : String,
     var iaddr_enb = cyclix_gen.uglobal("iaddr_enb", 0, 0, "1")
     var pc = cyclix_gen.uglobal("pc", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
     var pc_buf = cyclix_gen.ulocal("pc_buf", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
+    var pc_next = cyclix_gen.ulocal("pc_next", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
     val curinstr_addr  = AdduLocal("curinstr_addr", 31, 0, "0")
     val nextinstr_addr = AdduLocal("nextinstr_addr", 31, 0, "0")
 
@@ -52,11 +53,12 @@ internal class instr_iaddr_stage(val name : String,
 
             cyclix_gen.begif(instr_req.ctrl_rdy)
             run {
-                cyclix_gen.assign(nextinstr_addr, pc_buf)
+                cyclix_gen.assign(pc_next, pc_buf)
                 for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
 
-                    cyclix_gen.assign(curinstr_addr, nextinstr_addr)
-                    cyclix_gen.add_gen(nextinstr_addr, curinstr_addr , 4)
+                    cyclix_gen.assign(curinstr_addr, pc_next)
+                    cyclix_gen.add_gen(pc_next, curinstr_addr , 4)
+                    cyclix_gen.assign(nextinstr_addr, pc_next)
 
                     var BTAC_found = BTAC_found_entries.GetFracRef(entry_num)
                     var BTAC_index = BTAC_index_entries.GetFracRef(entry_num)
@@ -86,7 +88,7 @@ internal class instr_iaddr_stage(val name : String,
                         cyclix_gen.MSG_COMMENT("PC BTAC redirect...")
                         cyclix_gen.begif(BTAC_found)
                         run {
-                            cyclix_gen.assign(nextinstr_addr, BTAC.readPrev().GetFracRef(BTAC_index).GetFracRef("Btgt"))
+                            cyclix_gen.assign(pc_next, BTAC.readPrev().GetFracRef(BTAC_index).GetFracRef("Btgt"))
                         }; cyclix_gen.endif()
                         cyclix_gen.MSG_COMMENT("PC BTAC redirect: done")
                         */
@@ -112,7 +114,7 @@ internal class instr_iaddr_stage(val name : String,
 
                 cyclix_gen.assign(instr_req.push, 1)
                 instr_req.push_trx(new_req_buf_total)
-                cyclix_gen.assign(pc_buf, nextinstr_addr)
+                cyclix_gen.assign(pc_buf, pc_next)
             }; cyclix_gen.endif()
 
             cyclix_gen.assign(pc, pc_buf)
@@ -195,6 +197,7 @@ internal class instr_req_stage(val name : String,
         run {
 
             for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
+
                 cyclix_gen.begif(TRX_LOCAL_PARALLEL.GetFracRef(entry_num).GetFracRef("enb"))
                 run {
 
@@ -225,12 +228,12 @@ internal class instr_req_stage(val name : String,
 
                 }; cyclix_gen.endif()
 
-                cyclix_gen.begif(ireq_active)
-                run {
-                    cyclix_gen.assign(pop, 1)
-                }; cyclix_gen.endif()
-
             }
+
+            cyclix_gen.begif(ireq_active)
+            run {
+                cyclix_gen.assign(pop, 1)
+            }; cyclix_gen.endif()
 
             cyclix_gen.begif(instr_fetch.push)
             run {

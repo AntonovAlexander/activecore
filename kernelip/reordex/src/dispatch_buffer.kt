@@ -172,7 +172,6 @@ internal open class dispatch_buffer(cyclix_gen : cyclix.Generic,
         run {
             pop_trx()
             cyclix_gen.assign(entry_toproc_mask, hw_imm_ones(TRX_BUF_MULTIDIM))
-            cyclix_gen.assign(iq_free_mask, hw_imm_ones(IQ_insts.size))
         }; cyclix_gen.endif()
 
         finalize_ctrls()               //  TODO: cleanup
