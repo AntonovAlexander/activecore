@@ -84,14 +84,12 @@ internal class instr_iaddr_stage(val name : String,
                     cyclix_gen.begif(BTAC_found)
                     run {
 
-                        /*
                         cyclix_gen.MSG_COMMENT("PC BTAC redirect...")
                         cyclix_gen.begif(BTAC_found)
                         run {
                             cyclix_gen.assign(pc_next, BTAC.readPrev().GetFracRef(BTAC_index).GetFracRef("Btgt"))
                         }; cyclix_gen.endif()
                         cyclix_gen.MSG_COMMENT("PC BTAC redirect: done")
-                        */
 
                         cyclix_gen.MSG_COMMENT("MRU update...")
                         for (mru_idx in 0 until mru_ptrs.size) {

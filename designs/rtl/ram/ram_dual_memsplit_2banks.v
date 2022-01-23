@@ -148,33 +148,45 @@ module ram_dual_memsplit_2banks
 
     bus0_rdata_xchg_next = 1'b0;
 
-    if (bus0_bank0_req_i && bus0_bank0_addr_bi[2])
-	    begin
-	    bus0_bank1_addr  = bus0_bank0_addr_bi;
-    	bus0_bank1_we    = bus0_bank0_we_fullword;
-    	bus0_bank1_be    = bus0_bank0_be_bi;
-    	bus0_bank1_wdata = bus0_bank0_wdata_bi;
-    	bus0_bank0_ack_o = bus0_bank0_req_i & !bus0_bank1_wb;
-    	if (P0_FRAC=="YES") bus0_bank1_wb_next = bus0_bank0_we_nfullword & !bus0_bank1_wb;
-    	bus0_bank1_resp_next = bus0_bank0_req_i & !bus0_bank0_we;
+    if (bus0_bank0_req_i)
+      begin
+      if (bus0_bank0_addr_bi[2])
+        begin
+        bus0_bank1_addr  = bus0_bank0_addr_bi;
+        bus0_bank1_we    = bus0_bank0_we_fullword;
+        bus0_bank1_be    = bus0_bank0_be_bi;
+        bus0_bank1_wdata = bus0_bank0_wdata_bi;
+        bus0_bank0_we = 1'b0;
+        bus0_bank0_ack_o = bus0_bank0_req_i & !bus0_bank1_wb;
+        if (P0_FRAC=="YES") bus0_bank0_wb_next = 1'b0;
+        if (P0_FRAC=="YES") bus0_bank1_wb_next = bus0_bank0_we_nfullword & !bus0_bank1_wb;
+        bus0_bank0_resp_next = 1'b0;
+        bus0_bank1_resp_next = bus0_bank0_req_i & !bus0_bank0_we;
+        bus0_rdata_xchg_next = 1'b1;
+        end
 
-    	bus0_bank0_we    = 1'b0;
-    	bus0_bank1_ack_o = 1'b0;
-    	if (P0_FRAC=="YES") bus0_bank0_wb_next = 1'b0;
-    	bus0_bank0_resp_next = 1'b0;
-    	bus0_rdata_xchg_next = 1'b1;
+      end
 
-    	if (bus0_bank1_req_i && !bus0_bank1_addr_bi[2])
-	    	begin
-	    	bus0_bank0_addr  = bus0_bank1_addr_bi;
-		    bus0_bank0_we    = bus0_bank1_we_fullword;
-		    bus0_bank0_be    = bus0_bank1_be_bi;
-		    bus0_bank0_wdata = bus0_bank1_wdata_bi;
-		    bus0_bank1_ack_o = bus0_bank1_req_i & !bus0_bank0_wb;
-		    if (P0_FRAC=="YES") bus0_bank0_wb_next = bus0_bank1_we_nfullword & !bus0_bank0_wb;
-		    bus0_bank0_resp_next = bus0_bank1_req_i & !bus0_bank1_we;
-	    	end
-	    end
+    if (bus0_bank1_req_i)
+      begin
+      if (bus0_bank0_req_i && (bus0_bank0_addr_bi[2] == bus0_bank1_addr_bi[2]))
+        begin
+        bus0_bank1_ack_o = 1'b0;
+        if (!bus0_bank1_addr_bi[2]) bus0_bank1_resp_next = 1'b0;
+        end
+      else if (!bus0_bank1_addr_bi[2])
+        begin
+        bus0_bank0_addr  = bus0_bank1_addr_bi;
+        bus0_bank0_we    = bus0_bank1_we_fullword;
+        bus0_bank0_be    = bus0_bank1_be_bi;
+        bus0_bank0_wdata = bus0_bank1_wdata_bi;
+        bus0_bank1_ack_o = bus0_bank1_req_i & !bus0_bank0_wb;
+        if (P0_FRAC=="YES") bus0_bank0_wb_next = bus0_bank1_we_nfullword & !bus0_bank0_wb;
+        bus0_bank0_resp_next = bus0_bank1_req_i & !bus0_bank1_we;
+        if (!bus0_bank0_req_i) bus0_bank1_resp_next = 1'b0;
+        bus0_rdata_xchg_next = 1'b1;
+        end
+      end
 
     if (P0_FRAC=="YES")
         begin
@@ -282,33 +294,45 @@ module ram_dual_memsplit_2banks
 
     bus1_rdata_xchg_next = 1'b0;
 
-    if (bus1_bank0_req_i && bus1_bank0_addr_bi[2])
-	    begin
-	    bus1_bank1_addr  = bus1_bank0_addr_bi;
-    	bus1_bank1_we    = bus1_bank0_we_fullword;
-    	bus1_bank1_be    = bus1_bank0_be_bi;
-    	bus1_bank1_wdata = bus1_bank0_wdata_bi;
-    	bus1_bank0_ack_o = bus1_bank0_req_i & !bus1_bank1_wb;
-    	if (P1_FRAC=="YES") bus1_bank1_wb_next = bus1_bank0_we_nfullword & !bus1_bank1_wb;
-    	bus1_bank1_resp_next = bus1_bank0_req_i & !bus1_bank0_we;
+    if (bus1_bank0_req_i)
+      begin
+      if (bus1_bank0_addr_bi[2])
+        begin
+        bus1_bank1_addr  = bus1_bank0_addr_bi;
+        bus1_bank1_we    = bus1_bank0_we_fullword;
+        bus1_bank1_be    = bus1_bank0_be_bi;
+        bus1_bank1_wdata = bus1_bank0_wdata_bi;
+        bus1_bank0_we = 1'b0;
+        bus1_bank0_ack_o = bus1_bank0_req_i & !bus1_bank1_wb;
+        if (P1_FRAC=="YES") bus1_bank0_wb_next = 1'b0;
+        if (P1_FRAC=="YES") bus1_bank1_wb_next = bus1_bank0_we_nfullword & !bus1_bank1_wb;
+        bus1_bank0_resp_next = 1'b0;
+        bus1_bank1_resp_next = bus1_bank0_req_i & !bus1_bank0_we;
+        bus1_rdata_xchg_next = 1'b1;
+        end
 
-    	bus1_bank0_we    = 1'b0;
-    	bus1_bank1_ack_o = 1'b0;
-    	if (P1_FRAC=="YES") bus1_bank0_wb_next = 1'b0;
-    	bus1_bank0_resp_next = 1'b0;
-    	bus1_rdata_xchg_next = 1'b1;
+      end
 
-    	if (bus1_bank1_req_i && !bus1_bank1_addr_bi[2])
-	    	begin
-	    	bus1_bank0_addr  = bus1_bank1_addr_bi;
-		    bus1_bank0_we    = bus1_bank1_we_fullword;
-		    bus1_bank0_be    = bus1_bank1_be_bi;
-		    bus1_bank0_wdata = bus1_bank1_wdata_bi;
-		    bus1_bank1_ack_o = bus1_bank1_req_i & !bus1_bank0_wb;
-		    if (P1_FRAC=="YES") bus1_bank0_wb_next = bus1_bank1_we_nfullword & !bus1_bank0_wb;
-		    bus1_bank0_resp_next = bus1_bank1_req_i & !bus1_bank1_we;
-	    	end
-	    end
+    if (bus1_bank1_req_i)
+      begin
+      if (bus1_bank0_req_i && (bus1_bank0_addr_bi[2] == bus1_bank1_addr_bi[2]))
+        begin
+        bus1_bank1_ack_o = 1'b0;
+        if (!bus1_bank1_addr_bi[2]) bus1_bank1_resp_next = 1'b0;
+        end
+      else if (!bus1_bank1_addr_bi[2])
+        begin
+        bus1_bank0_addr  = bus1_bank1_addr_bi;
+        bus1_bank0_we    = bus1_bank1_we_fullword;
+        bus1_bank0_be    = bus1_bank1_be_bi;
+        bus1_bank0_wdata = bus1_bank1_wdata_bi;
+        bus1_bank1_ack_o = bus1_bank1_req_i & !bus1_bank0_wb;
+        if (P1_FRAC=="YES") bus1_bank0_wb_next = bus1_bank1_we_nfullword & !bus1_bank0_wb;
+        bus1_bank0_resp_next = bus1_bank1_req_i & !bus1_bank1_we;
+        if (!bus1_bank0_req_i) bus1_bank1_resp_next = 1'b0;
+        bus1_rdata_xchg_next = 1'b1;
+        end
+      end
 
     if (P1_FRAC=="YES")
         begin
