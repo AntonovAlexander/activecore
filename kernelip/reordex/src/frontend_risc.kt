@@ -210,17 +210,18 @@ internal class instr_req_stage(val name : String,
                         cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("be"), 15)
                         cyclix_gen.assign(instr_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), 0)
 
+                        cyclix_gen.assign_subStructs(new_fetch_buf, TRX_LOCAL)
                         cyclix_gen.assign(new_fetch_buf.GetFracRef("geninstr_io_id"), instr_io_wr_ptr_ref)
 
                         cyclix_gen.assign(ireq_active, cyclix_gen.fifo_wr_unblk(instr_req_fifos[entry_num], instr_data_wdata))
+                        cyclix_gen.assign(new_fetch_buf.GetFracRef("enb"), ireq_active)
+
                         cyclix_gen.begif(ireq_active)
                         run {
                             cyclix_gen.assign(entry_toproc_mask.GetFracRef(entry_num), 0)
                             cyclix_gen.assign(instr_fetch.push, 1)
                             cyclix_gen.add_gen(instr_io_wr_ptr_ref, instr_io_wr_ptr_ref, 1)
                         }; cyclix_gen.endif()
-
-                        cyclix_gen.assign_subStructs(new_fetch_buf, TRX_LOCAL)
 
                     }; cyclix_gen.endif()
 
