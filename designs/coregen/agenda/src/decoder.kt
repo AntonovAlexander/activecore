@@ -10,6 +10,40 @@ package agenda
 
 import hwast.*
 
+// ALU opcodes
+val aluop_ADD		= 0
+val aluop_SUB		= 1
+val aluop_AND		= 2
+val aluop_OR		= 3
+val aluop_SLL		= 4
+val aluop_SRL		= 5
+val aluop_SRA		= 6
+val aluop_XOR		= 7
+val aluop_CLRB		= 8
+
+// M ext opcodes
+val aluop_MUL		= 0
+val aluop_MULH		= 1
+val aluop_MULHSU	= 2
+val aluop_MULHU		= 3
+val aluop_DIV		= 4
+val aluop_DIVU		= 5
+val aluop_REM		= 6
+val aluop_REMU		= 7
+
+// jmp sources
+val JMP_SRC_IMM     = 0
+val JMP_SRC_ALU     = 1
+
+// rd sources
+val RD_LUI		    = 0
+val RD_ALU		    = 1
+val RD_CF_COND	    = 2
+val RD_OF_COND	    = 3
+val RD_PC_INC	    = 4
+val RD_MEM		    = 5
+val RD_CSR		    = 6
+
 internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
 
     //// base opcodes ///////////
@@ -38,28 +72,6 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
 
     val instrcode_MRET        = 0x30200073
 
-    // ALU opcodes
-    val aluop_ADD		= 0
-    val aluop_SUB		= 1
-    val aluop_AND		= 2
-    val aluop_OR		= 3
-    val aluop_SLL		= 4
-    val aluop_SRL		= 5
-    val aluop_SRA		= 6
-    val aluop_XOR		= 7
-    val aluop_CLRB		= 8
-    val aluop_SLT		= 9
-
-    // M ext opcodes
-    val aluop_MUL		= 0
-    val aluop_MULH		= 1
-    val aluop_MULHSU	= 2
-    val aluop_MULHU		= 3
-    val aluop_DIV		= 4
-    val aluop_DIVU		= 5
-    val aluop_REM		= 6
-    val aluop_REMU		= 7
-
     ///////////////////
 
     var opcode          = ugenvar("opcode", 6, 0, "0")
@@ -84,7 +96,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
         var rd  = rdctrls[CFG.rd]!!
 
         opcode.assign(instr_code[6, 0])
-        assign(CFG.alu_unsigned, 0)
+        assign(CFG.exu_unsigned, 0)
 
         rs0.addr.assign(instr_code[19, 15])
         rs1.addr.assign(instr_code[24, 20])
@@ -153,11 +165,11 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                 op0_source.assign(OP0_SRC_PC)
                 op1_source.assign(OP1_SRC_IMM)
                 exu_req.assign(1)
+                assign(exu_id, 1)
                 CFG.exu_opcode.assign(aluop_ADD)
                 rd.req.assign(1)
                 rd.source.assign(RD_PC_INC)
-                branchctrl.req.assign(1)
-                branchctrl.src.assign(JMP_SRC_ALU)
+                CFG.brctrl_src.assign(JMP_SRC_ALU)
                 immediate.assign(immediate_J)
             }; endbranch()
 
@@ -167,11 +179,11 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                 op0_source.assign(OP0_SRC_RS)
                 op1_source.assign(OP1_SRC_IMM)
                 exu_req.assign(1)
+                assign(exu_id, 1)
                 CFG.exu_opcode.assign(aluop_ADD)
                 rd.req.assign(1)
                 rd.source.assign(RD_PC_INC)
-                branchctrl.req.assign(1)
-                branchctrl.src.assign(JMP_SRC_ALU)
+                CFG.brctrl_src.assign(JMP_SRC_ALU)
                 immediate.assign(immediate_I)
             }; endbranch()
 
@@ -180,14 +192,15 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                 rs0.req.assign(1)
                 rs1.req.assign(1)
                 exu_req.assign(1)
+                assign(exu_id, 1)
                 CFG.exu_opcode.assign(aluop_SUB)
-                branchctrl.req_cond.assign(1)
-                branchctrl.src.assign(JMP_SRC_ALU)
+                CFG.brctrl_cond.assign(1)
+                CFG.brctrl_src.assign(JMP_SRC_ALU)
                 immediate.assign(immediate_B)
 
                 begif(bor(eq2(funct3, 0x6), eq2(funct3, 0x7)))
                 run {
-                    assign(CFG.alu_unsigned, 1)
+                    assign(CFG.exu_unsigned, 1)
                 }; endif()
             }; endbranch()
 
@@ -246,15 +259,15 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                     // SLTI
                     begbranch(0x2)
                     run {
-                        CFG.exu_opcode.assign(aluop_SLT)
+                        CFG.exu_opcode.assign(aluop_SUB)
                         rd.source.assign(RD_CF_COND)
                     }; endbranch()
 
                     // SLTIU
                     begbranch(0x3)
                     run {
-                        CFG.exu_opcode.assign(aluop_SLT)
-                        assign(CFG.alu_unsigned, 1)
+                        CFG.exu_opcode.assign(aluop_SUB)
+                        assign(CFG.exu_unsigned, 1)
                         rd.source.assign(RD_CF_COND)
                     }; endbranch()
 
@@ -341,15 +354,15 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                     // SLT
                     begbranch(0x2)
                     run {
-                        CFG.exu_opcode.assign(aluop_SLT)
+                        CFG.exu_opcode.assign(aluop_SUB)
                         rd.source.assign(RD_CF_COND)
                     }; endbranch()
 
                     // SLTU
                     begbranch(0x3)
                     run {
-                        CFG.exu_opcode.assign(aluop_SLT)
-                        assign(CFG.alu_unsigned, 1)
+                        CFG.exu_opcode.assign(aluop_SUB)
+                        assign(CFG.exu_unsigned, 1)
                         rd.source.assign(RD_CF_COND)
                     }; endbranch()
 
@@ -398,7 +411,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                     begif(eq2(funct7, 1))
                     run {
 
-                        assign(fu_id, 1)
+                        assign(exu_id, 2)
                         rd.source.assign(RD_ALU)
                         CFG.exu_opcode.assign(funct3)
 
@@ -509,7 +522,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
 
         }; endcase()
 
-        curinstraddr_imm.assign(curinstr_addr + immediate)
+        CFG.curinstraddr_imm.assign(curinstr_addr + immediate)
 
         begif(memctrl.req)
         run {
@@ -544,14 +557,16 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
             }; endcase()
         }; endif()
 
-        branchctrl.mask.assign(funct3)
+        CFG.brctrl_mask.assign(funct3)
+        assign(CFG.exu_rd_source, rd.source)
 
         begif(eq2(instr_code, instrcode_MRET))
         run {
             mret_req.assign(1)
-            branchctrl.req.assign(1)
-            branchctrl.req_cond.assign(0)
-            branchctrl.src.assign(JMP_SRC_IMM)
+            exu_req.assign(1)
+            assign(exu_id, 1)
+            CFG.brctrl_src.assign(JMP_SRC_IMM)
+            op0_source.assign(OP0_SRC_IMM)
             immediate.assign(MRETADDR)
         }; endif()
 

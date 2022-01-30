@@ -19,7 +19,7 @@ internal open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                                     val IQ_insts : ArrayList<iq_buffer>,
                                     val control_structures: __control_structures) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG.DataPath_width, MultiExu_CFG, cdb_num) {
 
-    var fu_id           = AdduStageVar("fu_id",             GetWidthToContain(ExecUnits_size), 0, "0")
+    var exu_id           = AdduStageVar("exu_id",             GetWidthToContain(ExecUnits_size), 0, "0")
 
     var rds_ctrl        = ArrayList<ROB_rd_ctrl>()
 
@@ -107,7 +107,7 @@ internal open class dispatch_buffer(cyclix_gen : cyclix.Generic,
 
                                 cyclix_gen.begif(cyclix_gen.band(entry_toproc_mask.GetFracRef(entry_num), iq_free_mask.GetFracRef(IQ_inst_idx)))
                                 run {
-                                    cyclix_gen.begif(cyclix_gen.eq2(fu_id, IQ_inst.fu_id_num))
+                                    cyclix_gen.begif(cyclix_gen.eq2(exu_id, IQ_inst.exu_id_num))
                                     run {
                                         cyclix_gen.begif(IQ_inst.ctrl_rdy)
                                         run {
@@ -192,21 +192,12 @@ internal class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
 
-    var branchctrl = Branchctrl(
-        AdduStageVar("genbranch_req", 0, 0, "0"),
-        AdduStageVar("genbranch_req_cond", 0, 0, "0"),
-        AdduStageVar("genbranch_src", 0, 0, "0"),
-        AdduStageVar("genbranch_vector", 31, 0, "0"),
-        AdduStageVar("genbranch_mask", 2, 0, "0")
-    )
-
     var rss = ArrayList<RISCDecoder_rs>()
     var rds = ArrayList<RISCDecoder_rd>()
 
     var csr_rdata       = AdduStageVar("csr_rdata", 31, 0, "0")
 
     var immediate       = AdduStageVar("immediate", 31, 0, "0")
-    var curinstraddr_imm    = AdduStageVar("curinstraddr_imm", 31, 0, "0")
 
     var fencereq        = AdduStageVar("fencereq", 0, 0, "0")
     var pred            = AdduStageVar("pred", 3, 0, "0")

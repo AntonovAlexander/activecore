@@ -16,6 +16,9 @@ internal data class Exu_CFG(val ExecUnit : Exu,
                    val iq_length : Int,
                    val pref_impl : STREAM_PREF_IMPL)
 
+internal open class reordex_import_expr_context(var_dict : MutableMap<hw_var, hw_var>,
+                                                var ExUnit : Exu_CFG) : import_expr_context(var_dict)
+
 open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val io_iq_size : Int) {
 
     internal var ExecUnits  = mutableMapOf<String, Exu_CFG>()
@@ -32,6 +35,16 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                                         context : import_expr_context) {
 
         cyclix_gen as cyclix.Streaming
+        context as reordex_import_expr_context
+
+        if ((expr.opcode == OP1_ASSIGN) && (expr.dsts[0] == context.ExUnit.ExecUnit.curinstr_addr)) {
+            cyclix_gen.ERROR("curinstr_addr cannot be written!")
+        }
+
+        if ((expr.opcode == OP1_ASSIGN) && (expr.dsts[0] == context.ExUnit.ExecUnit.nextinstr_addr)) {
+            cyclix_gen.assign(TranslateVar(context.ExUnit.ExecUnit.resp_data, context.var_dict).GetFracRef("branch_req"), 1)
+            cyclix_gen.assign(TranslateVar(context.ExUnit.ExecUnit.resp_data, context.var_dict).GetFracRef("branch_vec"), TranslateParam(expr.params[0], context.var_dict))
+        }
 
         cyclix_gen.import_expr(debug_lvl, expr, context, ::reconstruct_expression)
     }
@@ -182,11 +195,19 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
                 exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.srcs[src_num], new_exu_descr.var_dict), exu_cyclix_gen.subStruct((TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict)), "src" + src_num + "_data"))
             }
 
+            // initializing instr addrs
+            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.curinstr_addr, new_exu_descr.var_dict), TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict).GetFracRef("curinstr_addr"))
+            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.nextinstr_addr, new_exu_descr.var_dict), TranslateVar(ExUnit.value.ExecUnit.req_data, new_exu_descr.var_dict).GetFracRef("nextinstr_addr"))
+
+            // default branching
+            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict).GetFracRef("branch_req"), 0)
+            exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict).GetFracRef("branch_vec"), 0)
+
             for (expr in ExUnit.value.ExecUnit[0].expressions) {
                 reconstruct_expression(debug_lvl,
                     exu_cyclix_gen,
                     expr,
-                    import_expr_context(new_exu_descr.var_dict))
+                    reordex_import_expr_context(new_exu_descr.var_dict, ExUnit.value))
             }
 
             exu_cyclix_gen.assign(TranslateVar(ExUnit.value.ExecUnit.resp_data, new_exu_descr.var_dict).GetFracRef("rd0_wdata"), TranslateVar(ExUnit.value.ExecUnit.rds[0], new_exu_descr.var_dict) )

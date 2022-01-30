@@ -17,7 +17,7 @@ internal open class iq_buffer(cyclix_gen : cyclix.Generic,
                      name_prefix : String,
                      TRX_BUF_SIZE : Int,
                      MultiExu_CFG : Reordex_CFG,
-                     val fu_id_num: hw_imm,
+                     val exu_id_num: hw_imm,
                      val iq_exu: Boolean,
                      var CDB_index : Int,
                      cdb_num : Int) : uop_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, cdb_num) {
@@ -32,7 +32,8 @@ internal open class iq_buffer(cyclix_gen : cyclix.Generic,
     var op_issue        = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_op_issue"), 0, 0, "0")
     var op_issued_num   = cyclix_gen.ulocal((ExUnit_name + ExUnit_num + "_op_issued_num"), GetWidthToContain(TRX_BUF.GetWidth())-1, 0, "0")
 
-    val curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")          // for debug purposes
+    var curinstr_addr  = AdduStageVar("curinstr_addr", 31, 0, "0")
+    var nextinstr_addr = AdduStageVar("nextinstr_addr", 31, 0, "0")
     var immediate      = AdduStageVar("immediate", 31, 0, "0")
 
     init {
@@ -165,12 +166,12 @@ internal class io_buffer(cyclix_gen : cyclix.Generic,
                 name_prefix : String,
                 TRX_BUF_SIZE : Int,
                 MultiExu_CFG : Reordex_CFG,
-                fu_id_num: hw_imm,
+                exu_id_num: hw_imm,
                 iq_exu: Boolean,
                 CDB_index : Int,
                 cdb_num : Int,
                 var busreq_mem_struct : hw_struct,
-                var commit_cdb : hw_var) : iq_buffer(cyclix_gen, ExUnit_name, ExUnit_num, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, fu_id_num, iq_exu, CDB_index, cdb_num) {
+                var commit_cdb : hw_var) : iq_buffer(cyclix_gen, ExUnit_name, ExUnit_num, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, exu_id_num, iq_exu, CDB_index, cdb_num) {
 
     var mem_req         = AdduStageVar("mem_req", 0, 0, "0")
     var mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")

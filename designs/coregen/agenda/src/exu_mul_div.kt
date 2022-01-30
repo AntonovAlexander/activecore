@@ -21,7 +21,7 @@ internal class EXU_MUL_DIV : reordex.Exu("MUL_DIV", CFG) {
 
     init {
 
-        begif(CFG.alu_unsigned)
+        begif(CFG.exu_unsigned)
         run {
             alu_op0_wide.assign(zeroext(CFG.src0, 33))
             alu_op1_wide.assign(zeroext(CFG.src1, 33))

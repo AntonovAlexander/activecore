@@ -26,12 +26,8 @@ open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
     internal var srcs        = ArrayList<hw_var>()
     internal var rds         = ArrayList<hw_var>()
 
-    var aluStatus = ALUStatus(
-        Exu_CFG.alu_CF,
-        Exu_CFG.alu_SF,
-        Exu_CFG.alu_ZF,
-        Exu_CFG.alu_OF
-    )
+    var curinstr_addr  = ulocal("curinstr_addr", 31, 0, "0")
+    var nextinstr_addr = ulocal("nextinstr_addr", 31, 0, "0")
 
     init {
         if (FROZEN_FLAG) ERROR("Failed to begin stage " + name + ": ASTC frozen")

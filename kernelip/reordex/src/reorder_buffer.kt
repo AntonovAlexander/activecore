@@ -11,7 +11,6 @@ package reordex
 import hwast.*
 import cyclix.*
 import kotlin.math.log2
-import kotlin.math.pow
 
 internal open class rob(cyclix_gen : cyclix.Generic,
                         name_prefix : String,
@@ -53,10 +52,14 @@ internal open class rob(cyclix_gen : cyclix.Generic,
                     run {
                         cyclix_gen.assign(rob_entry_single.GetFracRef("rdy"), 1)
                         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-                            cyclix_gen.assign(rob_entry_single.GetFracRef("alu_result"), CDB_ref_data.GetFracRef("rd0_wdata"))
+                            cyclix_gen.assign(rob_entry_single.GetFracRef("rd0_wdata"), CDB_ref_data.GetFracRef("rd0_wdata"))
                             for (dst_imm in MultiExu_CFG.dst_imms) {
                                 cyclix_gen.assign(rob_entry_single.GetFracRef(dst_imm.name), CDB_ref_data.GetFracRef(dst_imm.name))
                             }
+                            cyclix_gen.begif(CDB_ref_data.GetFracRef("branch_req"))
+                            run {
+                                cyclix_gen.assign(rob_entry_single.GetFracRef("nextinstr_addr"), CDB_ref_data.GetFracRef("branch_vec"))
+                            }; cyclix_gen.endif()
                         }
                     }; cyclix_gen.endif()
                 }; cyclix_gen.endif()
@@ -109,7 +112,6 @@ internal class rob_risc(name: String,
     var immediate           = AdduStageVar("immediate", 31, 0, "0")
     var curinstraddr_imm    = AdduStageVar("curinstraddr_imm", 31, 0, "0")
 
-    var alu_result      = AdduStageVar("alu_result", 31, 0, "0")
     var alu_CF          = AdduStageVar("alu_CF", 0, 0, "0")
     var alu_SF          = AdduStageVar("alu_SF", 0, 0, "0")
     var alu_ZF          = AdduStageVar("alu_ZF", 0, 0, "0")
@@ -126,19 +128,6 @@ internal class rob_risc(name: String,
     val RD_PC_INC	    = 4
     val RD_MEM		    = 5
     val RD_CSR		    = 6
-
-    //// control transfer signals
-    // jmp sources
-    val JMP_SRC_IMM     = 0
-    val JMP_SRC_ALU     = 1
-
-    var branchctrl = Branchctrl(
-        AdduStageVar("genbranch_req", 0, 0, "0"),
-        AdduStageVar("genbranch_req_cond", 0, 0, "0"),
-        AdduStageVar("genbranch_src", 0, 0, "0"),
-        AdduStageVar("genbranch_vector", 31, 0, "0"),
-        AdduStageVar("genbranch_mask", 2, 0, "0")
-    )
 
     var expected_instraddr  = cyclix_gen.uglobal("expected_instraddr", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
     var prev_instraddr      = cyclix_gen.uglobal("prev_instraddr", 31, 0, hw_imm(32, IMM_BASE_TYPE.HEX, "200"))
@@ -227,41 +216,6 @@ internal class rob_risc(name: String,
                         // rd wdata processing
                         cyclix_gen.begcase(rds[0].source)
                         run {
-                            cyclix_gen.begbranch(RD_LUI)
-                            run {
-                                rds[0].wdata.assign(immediate)
-                                rds[0].rdy.assign(1)
-                            }; cyclix_gen.endbranch()
-
-                            cyclix_gen.begbranch(RD_ALU)
-                            run {
-                                rds[0].wdata.assign(alu_result)
-                                rds[0].rdy.assign(1)
-                            }; cyclix_gen.endbranch()
-
-                            cyclix_gen.begbranch(RD_CF_COND)
-                            run {
-                                rds[0].wdata.assign(alu_CF)
-                                rds[0].rdy.assign(1)
-                            }; cyclix_gen.endbranch()
-
-                            cyclix_gen.begbranch(RD_OF_COND)
-                            run {
-                                rds[0].wdata.assign(alu_OF)
-                                rds[0].rdy.assign(1)
-                            }; cyclix_gen.endbranch()
-
-                            cyclix_gen.begbranch(RD_PC_INC)
-                            run {
-                                rds[0].wdata.assign(nextinstr_addr)
-                                rds[0].rdy.assign(1)
-                            }; cyclix_gen.endbranch()
-
-                            cyclix_gen.begbranch(RD_MEM)
-                            run {
-                                rds[0].wdata.assign(alu_result)
-                                rds[0].rdy.assign(1)
-                            }; cyclix_gen.endbranch()
 
                             cyclix_gen.begbranch(RD_CSR)
                             run {
@@ -285,99 +239,8 @@ internal class rob_risc(name: String,
 
                         cyclix_gen.COMMENT("committing RF: done")
 
-                        cyclix_gen.COMMENT("control transfer...")
-
-                        cyclix_gen.begcase(branchctrl.src)
-                        run {
-                            cyclix_gen.begbranch(JMP_SRC_IMM)
-                            run {
-                                branchctrl.vector.assign(immediate)
-                            }; cyclix_gen.endbranch()
-
-                            cyclix_gen.begbranch(JMP_SRC_ALU)
-                            run {
-                                branchctrl.vector.assign(alu_result)
-                            }; cyclix_gen.endbranch()
-
-                        }; cyclix_gen.endcase()
-
-                        cyclix_gen.begif(branchctrl.req_cond)
-                        run {
-
-                            cyclix_gen.begcase(branchctrl.mask)
-                            run {
-                                // BEQ
-                                cyclix_gen.begbranch(0x0)
-                                run {
-                                    cyclix_gen.begif(alu_ZF)
-                                    run {
-                                        branchctrl.req.assign(1)
-                                        branchctrl.vector.assign(curinstraddr_imm)
-                                    }; cyclix_gen.endif()
-                                }; cyclix_gen.endbranch()
-
-                                // BNE
-                                cyclix_gen.begbranch(0x1)
-                                run {
-                                    cyclix_gen.begif(!alu_ZF)
-                                    run {
-                                        branchctrl.req.assign(1)
-                                        branchctrl.vector.assign(curinstraddr_imm)
-                                    }; cyclix_gen.endif()
-                                }; cyclix_gen.endbranch()
-
-                                // BLT
-                                cyclix_gen.begbranch(0x4)
-                                run {
-                                    cyclix_gen.begif(alu_CF)
-                                    run {
-                                        branchctrl.req.assign(1)
-                                        branchctrl.vector.assign(curinstraddr_imm)
-                                    }; cyclix_gen.endif()
-                                }; cyclix_gen.endbranch()
-
-                                // BGE
-                                cyclix_gen.begbranch(0x5)
-                                run {
-                                    cyclix_gen.begif(!alu_CF)
-                                    run {
-                                        branchctrl.req.assign(1)
-                                        branchctrl.vector.assign(curinstraddr_imm)
-                                    }; cyclix_gen.endif()
-                                }; cyclix_gen.endbranch()
-
-                                // BLTU
-                                cyclix_gen.begbranch(0x6)
-                                run {
-                                    cyclix_gen.begif(alu_CF)
-                                    run {
-                                        branchctrl.req.assign(1)
-                                        branchctrl.vector.assign(curinstraddr_imm)
-                                    }; cyclix_gen.endif()
-                                }; cyclix_gen.endbranch()
-
-                                // BGEU
-                                cyclix_gen.begbranch(0x7)
-                                run {
-                                    cyclix_gen.begif(!alu_CF)
-                                    run {
-                                        branchctrl.req.assign(1)
-                                        branchctrl.vector.assign(curinstraddr_imm)
-                                    }; cyclix_gen.endif()
-                                }; cyclix_gen.endbranch()
-
-                            }; cyclix_gen.endcase()
-
-                        }; cyclix_gen.endif()
-
                         cyclix_gen.assign(prev_instraddr, curinstr_addr)
                         cyclix_gen.assign(expected_instraddr, nextinstr_addr)
-                        cyclix_gen.begif(branchctrl.req)
-                        run {
-                            cyclix_gen.assign(expected_instraddr, branchctrl.vector)
-                        }; cyclix_gen.endif()
-
-                        cyclix_gen.COMMENT("control transfer: done")
 
                         cyclix_gen.assign(entry_mask.GetFracRef(single_entry_idx), 0)
 

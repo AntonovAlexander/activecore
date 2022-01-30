@@ -39,6 +39,16 @@ open class Reordex_CFG(val RF_width : Int,
     internal var req_struct = hw_struct("req_struct")
     internal var resp_struct = hw_struct("resp_struct")
 
+    init {
+        if (mode == REORDEX_MODE.RISC) {
+            req_struct.add("curinstr_addr", hw_type(DATA_TYPE.BV_UNSIGNED, 31, 0), "0")
+            req_struct.add("nextinstr_addr", hw_type(DATA_TYPE.BV_UNSIGNED, 31, 0), "0")
+
+            resp_struct.add("branch_req", hw_type(DATA_TYPE.BV_UNSIGNED, 0, 0), "0")
+            resp_struct.add("branch_vec", hw_type(DATA_TYPE.BV_UNSIGNED, 31, 0), "0")
+        }
+    }
+
     internal var src_imms = ArrayList<hw_var>()
     fun AddSrcImm(name : String, new_type : hw_type) : hw_var {
         var new_var = hw_var(name, new_type, "0")
@@ -91,21 +101,9 @@ open class Reordex_CFG(val RF_width : Int,
         return new_var
     }
 
-    internal var alu_CF          = DUMMY_VAR
-    internal var alu_SF          = DUMMY_VAR
-    internal var alu_ZF          = DUMMY_VAR
-    internal var alu_OF          = DUMMY_VAR
-
     init {
         req_struct.addu("trx_id",   31, 0, "0")      // TODO: clean up size
         resp_struct.addu("trx_id",  31, 0, "0")      // TODO: clean up size
-
-        if (mode == REORDEX_MODE.RISC) {
-            alu_CF          = AddDstUImm("alu_CF", 1)
-            alu_SF          = AddDstUImm("alu_SF", 1)
-            alu_ZF          = AddDstUImm("alu_ZF", 1)
-            alu_OF          = AddDstUImm("alu_OF", 1)
-        }
     }
 }
 
@@ -137,21 +135,12 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
 
     val curinstr_addr   = ugenvar("curinstr_addr_decoder", 31, 0, "0")
 
-    var branchctrl = Branchctrl(
-        ugenvar("genbranch_req", 0, 0, "0"),
-        ugenvar("genbranch_req_cond", 0, 0, "0"),
-        ugenvar("genbranch_src", 0, 0, JMP_SRC_IMM.toString()),
-        ugenvar("genbranch_vector", 31, 0, "0"),
-        ugenvar("genbranch_mask", 2, 0, "0")
-    )
-
     // regfile control signals
     var rsctrls = mutableMapOf<hw_var, RISCDecoder_rs>()
     var rdctrls = mutableMapOf<hw_var, RISCDecoder_rd>()
 
     var csr_rdata       = ugenvar("csr_rdata", 31, 0, "0")
     var immediate       = ugenvar("immediate", 31, 0, "0")
-    var curinstraddr_imm    = ugenvar("curinstraddr_imm", 31, 0, "0")
 
     var fencereq        = ugenvar("fencereq", 0, 0, "0")
     var pred            = ugenvar("pred", 3, 0, "0")
@@ -164,7 +153,7 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var csrnum          = ugenvar("csrnum", 11, 0, "0")
 
     var exu_req         = ugenvar("exu_req", 0, 0, "0")
-    var fu_id           = ugenvar("fu_id", 0, 0, "0")
+    var exu_id          = ugenvar("exu_id", 31, 0, "0")     // TODO: fix
 
     var memctrl         = RISCDecoder_memctrl(
         ugenvar("mem_req", 0, 0, "0"),

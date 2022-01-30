@@ -41,11 +41,6 @@ always @*
 	end
 assign stream_resp_bus_genfifo_req_o = mult_resp | div_resp;
 
-assign stream_resp_bus_genfifo_wdata_bo.alu_CF = 0;
-assign stream_resp_bus_genfifo_wdata_bo.alu_SF = 0;
-assign stream_resp_bus_genfifo_wdata_bo.alu_ZF = 0;
-assign stream_resp_bus_genfifo_wdata_bo.alu_OF = 0;
-
 always @(posedge clk_i)
 	begin
 	if (req_acc)
