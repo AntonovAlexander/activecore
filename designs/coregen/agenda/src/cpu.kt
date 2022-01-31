@@ -30,8 +30,8 @@ internal class CPU_CFG : Reordex_CFG(32, 32, 2, REG_MGMT_RENAMING(48), 16, REORD
 
     var rd = AddRd()
 }
-internal val CFG = CPU_CFG()
 
+internal val CFG = CPU_CFG()
 
 class cpu(name : String) : reordex.MultiExuRISC(name, CFG, 4, RISCV_Decoder()) {
 

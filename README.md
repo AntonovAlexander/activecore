@@ -31,9 +31,9 @@ Aligned to the strategy of e.g. RISC-V project that standardises open (or provid
 Current version of project is implemented as a collection of standalone Kotlin libraries that can be built using IntelliJ IDEA:
 ![pic_test](kernelip/__img/Framework.png)
 
-* **hwast** - generic AST constructor of behavioral-style HW specifications (/hwast)
+* **hwast** - generic AST constructor of behavioral-style HW specifications (location: /hwast)
 
-* Demo KIP cores based on hwast (/kernelip):
+* Demo KIP cores based on hwast (location: /kernelip):
 	* **Rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
 	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for Rtl KIP or to C++ sources for Xilinx HLS
 ![pic_test](kernelip/__img/Cyclix.png)
@@ -43,7 +43,7 @@ Current version of project is implemented as a collection of standalone Kotlin l
 ![pic_test](kernelip/__img/Reordex.png)
 
 
-* Demo core generators based on KIP cores (/designs/coregen):
+* Demo core generators based on KIP cores (location: /designs/coregen):
 	* **Taylor** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex KIP core. Location: /designs/rtl/taylor
 	* **Aquaris** - RISC-V (RV32I + optional M extension and custom-0 coprocessor interfaces) CPU generator with varying-length pipelines (1-6 pipeline stages), based on Pipex KIP core
 ![pic_test](designs/rtl/sigma_tile/doc/aquaris_pipeline_structs/aquaris_pipeline_structs.png)

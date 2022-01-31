@@ -130,12 +130,6 @@ internal class EXU_ALU_INTEGER : reordex.Exu("INTEGER", CFG) {
             }; endbranch()
 
             /*
-            begbranch(RD_MEM)
-            run {
-                rds[0].wdata.assign(rds[0].wdata)
-                rds[0].rdy.assign(1)
-            }; endbranch()
-
             begbranch(RD_CSR)
             run {
                 rds[0].wdata.assign(csr_rdata)

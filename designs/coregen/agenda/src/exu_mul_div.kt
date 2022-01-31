@@ -1,5 +1,5 @@
 /*
- * exu_mul_div.kt
+ * exu_mul_div.kt (placeholder for mul/div, replaced with custom RTL in implementation)
  *
  *  Created on: 01.04.2021
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>

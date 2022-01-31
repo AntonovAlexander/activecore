@@ -10,6 +10,15 @@ package agenda
 
 import hwast.*
 
+// op0 sources
+val OP0_SRC_RS      = 0
+val OP0_SRC_IMM     = 1
+val OP0_SRC_PC 	    = 2
+// op1 sources
+val OP1_SRC_RS      = 0
+val OP1_SRC_IMM     = 1
+val OP1_SRC_CSR     = 2
+
 // ALU opcodes
 val aluop_ADD		= 0
 val aluop_SUB		= 1
@@ -36,8 +45,8 @@ val JMP_SRC_IMM     = 0
 val JMP_SRC_ALU     = 1
 
 // rd sources
-val RD_LUI		    = 0
-val RD_ALU		    = 1
+val RD_ALU		    = 0
+val RD_LUI		    = 1
 val RD_CF_COND	    = 2
 val RD_OF_COND	    = 3
 val RD_PC_INC	    = 4

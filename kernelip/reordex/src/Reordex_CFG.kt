@@ -9,7 +9,6 @@
 package reordex
 
 import hwast.*
-import cyclix.*
 
 enum class REORDEX_MODE {
     COPROCESSOR,
@@ -111,28 +110,6 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
 
     var instr_code = ugenvar("instr_code", 31, 0, "0")
 
-    // op1 sources
-    val OP0_SRC_RS      = 0
-    val OP0_SRC_IMM     = 1
-    val OP0_SRC_PC 	    = 2
-    // op2 sources
-    val OP1_SRC_RS      = 0
-    val OP1_SRC_IMM     = 1
-    val OP1_SRC_CSR     = 2
-
-    // rd sources
-    val RD_LUI		    = 0
-    val RD_ALU		    = 1
-    val RD_CF_COND	    = 2
-    val RD_OF_COND	    = 3
-    val RD_PC_INC	    = 4
-    val RD_MEM		    = 5
-    val RD_CSR		    = 6
-
-    // jmp sources
-    val JMP_SRC_IMM     = 0
-    val JMP_SRC_ALU     = 1
-
     val curinstr_addr   = ugenvar("curinstr_addr_decoder", 31, 0, "0")
 
     // regfile control signals
@@ -153,7 +130,7 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var csrnum          = ugenvar("csrnum", 11, 0, "0")
 
     var exu_req         = ugenvar("exu_req", 0, 0, "0")
-    var exu_id          = ugenvar("exu_id", 31, 0, "0")     // TODO: fix
+    var exu_id          = ugenvar("exu_id", 31, 0, "0")     // TODO: dimensions fix
 
     var memctrl         = RISCDecoder_memctrl(
         ugenvar("mem_req", 0, 0, "0"),
@@ -195,7 +172,7 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
 
             rdctrls.put(MultiExu_CFG.rds[rd_idx], RISCDecoder_rd(
                 ugenvar("rd" + rd_idx + "_req", 0, 0, "0"),
-                ugenvar("rd" + rd_idx + "_source", 2, 0, RD_ALU.toString()),
+                ugenvar("rd" + rd_idx + "_source", 2, 0, "0"),
                 ugenvar("rd" + rd_idx + "_addr", 4, 0, "0"),
                 ugenvar("rd" + rd_idx + "_wdata", 31, 0, "0"),
                 ugenvar("rd" + rd_idx + "_rdy", 0, 0, "0")
