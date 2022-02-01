@@ -31,6 +31,8 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
     var load_signext    = AdduStageVar("load_signext", 0, 0, "0")
 
+    var mem_ctrlflow_enb    = AdduStageVar("mem_ctrlflow_enb", 0, 0, "0")
+
     var mem_addr_generated      = AdduStageVar("mem_addr_generated", 0, 0, "0")
     var mem_addr_generate       = cyclix_gen.ulocal("mem_addr_generate", 0, 0, "0")
     var mem_addr_generate_trx   = cyclix_gen.ulocal("mem_addr_generate_trx", GetWidthToContain(TRX_BUF_SIZE) -1, 0, "0")
@@ -56,6 +58,8 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
     var exu_cdb_inst_req    = exu_cdb_inst_data.GetFracRef("rd0_req")       // TODO: fix
     var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("rd0_tag")       // TODO: fix
     var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("rd0_wdata")     // TODO: fix
+
+    var search_active = cyclix_gen.ulocal("search_active", 0, 0, "1")
 
     init {
         rd_struct.addu("we", 0, 0, "0")
@@ -140,10 +144,10 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
                 cyclix_gen.begif(mem_addr_generated)
                 run {
 
-                    var active_trx_id = rob_buf.TRX_LOCAL_PARALLEL.GetFracRef((rob_buf as rob_risc).genrob_instr_ptr).GetFracRef("trx_id")
-                    cyclix_gen.begif(cyclix_gen.eq2(trx_id, active_trx_id))      // IO operation can be executed
+                    cyclix_gen.begif(mem_ctrlflow_enb)
                     run {
 
+                        // data is ready identification
                         cyclix_gen.assign(rdy, src_rsrv[0].src_rdy)
                         cyclix_gen.begif(mem_cmd)
                         run {
@@ -208,6 +212,35 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
         run {
             pop_trx()
         }; cyclix_gen.endif()
+
+        cyclix_gen.COMMENT("Memory flow control consistency identification...")
+        var ROB_SEARCH_DEPTH = 4
+        for (rob_trx_idx in 0 until ROB_SEARCH_DEPTH) {
+            for (rob_trx_entry_idx in 0 until rob_buf.TRX_BUF_MULTIDIM) {
+                cyclix_gen.begif(search_active)
+                run {
+                    var lsu_entry = TRX_BUF.GetFracRef(0)
+                    var rob_entry = rob_buf.TRX_BUF.GetFracRef(rob_trx_idx).GetFracRef(rob_trx_entry_idx)
+                    var break_val = (rob_entry.GetFracRef("cf_can_alter") as hw_param)
+                    if (rob_trx_idx == 0) {
+                        break_val = cyclix_gen.band(break_val, (rob_buf as rob_risc).entry_mask.GetFracRef(rob_trx_entry_idx))
+                    }
+                    cyclix_gen.begif(break_val)
+                    run {
+                        search_active.assign(0)
+                    }; cyclix_gen.endif()
+                    cyclix_gen.begelse()
+                    run {
+                        var active_trx_id = rob_entry.GetFracRef("trx_id")
+                        cyclix_gen.begif(cyclix_gen.eq2(lsu_entry.GetFracRef("trx_id"), active_trx_id))
+                        run {
+                            cyclix_gen.assign(lsu_entry.GetFracRef("mem_ctrlflow_enb"), 1)
+                        }; cyclix_gen.endif()
+                    }; cyclix_gen.endif()
+                }; cyclix_gen.endif()
+            }
+        }
+        cyclix_gen.COMMENT("Memory flow control consistency identification: done")
 
         cyclix_gen.MSG_COMMENT("I/O IQ processing: done")
     }

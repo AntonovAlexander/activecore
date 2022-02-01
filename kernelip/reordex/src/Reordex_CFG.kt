@@ -116,6 +116,8 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
     var rsctrls = mutableMapOf<hw_var, RISCDecoder_rs>()
     var rdctrls = mutableMapOf<hw_var, RISCDecoder_rd>()
 
+    var cf_can_alter    = ugenvar("cf_can_alter", 0, 0, "0")
+
     var csr_rdata       = ugenvar("csr_rdata", 31, 0, "0")
     var immediate       = ugenvar("immediate", 31, 0, "0")
 

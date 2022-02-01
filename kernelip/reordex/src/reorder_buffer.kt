@@ -106,6 +106,7 @@ internal class rob_risc(name: String,
 
     var curinstr_addr   = AdduStageVar("curinstr_addr", 31, 0, "0")
     var nextinstr_addr  = AdduStageVar("nextinstr_addr", 31, 0, "0")
+    var cf_can_alter    = AdduStageVar("cf_can_alter", 0, 0, "0")
 
     var csr_rdata       = AdduStageVar("csr_rdata", 31, 0, "0")
 

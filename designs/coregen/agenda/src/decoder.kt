@@ -173,6 +173,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
             run {
                 op0_source.assign(OP0_SRC_PC)
                 op1_source.assign(OP1_SRC_IMM)
+                cf_can_alter.assign(1)
                 exu_req.assign(1)
                 assign(exu_id, 1)
                 CFG.exu_opcode.assign(aluop_ADD)
@@ -187,6 +188,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                 rs0.req.assign(1)
                 op0_source.assign(OP0_SRC_RS)
                 op1_source.assign(OP1_SRC_IMM)
+                cf_can_alter.assign(1)
                 exu_req.assign(1)
                 assign(exu_id, 1)
                 CFG.exu_opcode.assign(aluop_ADD)
@@ -200,6 +202,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
             run {
                 rs0.req.assign(1)
                 rs1.req.assign(1)
+                cf_can_alter.assign(1)
                 exu_req.assign(1)
                 assign(exu_id, 1)
                 CFG.exu_opcode.assign(aluop_SUB)
@@ -572,6 +575,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
         begif(eq2(instr_code, instrcode_MRET))
         run {
             mret_req.assign(1)
+            cf_can_alter.assign(1)
             exu_req.assign(1)
             assign(exu_id, 1)
             CFG.brctrl_src.assign(JMP_SRC_IMM)
