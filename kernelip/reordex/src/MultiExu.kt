@@ -254,8 +254,8 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
 
         MSG("generating I/O IQ...")
         var io_iq =
-            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) io_buffer(cyclix_gen, "genstore", 0, "genstore", io_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, CDB_NUM, busreq_mem_struct, cdb.GetFracRef(CDB_RISC_LSU_POS))
-            else io_buffer(cyclix_gen, "genlsu", 0, "genlsu", io_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, CDB_RISC_LSU_POS, CDB_NUM, busreq_mem_struct, cdb.GetFracRef(CDB_RISC_LSU_POS))
+            if (MultiExu_CFG.mode == REORDEX_MODE.COPROCESSOR) io_buffer_coproc(cyclix_gen, "genstore", 0, "genstore", io_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, fu_num, CDB_NUM, busreq_mem_struct, cdb.GetFracRef(CDB_RISC_LSU_POS))
+            else io_buffer_risc(cyclix_gen, "geniq_LSU", 0, "geniq_LSU", io_iq_size, MultiExu_CFG, hw_imm(GetWidthToContain(ExecUnits.size + 1), ExUnit_idx.toString()), false, CDB_RISC_LSU_POS, CDB_NUM, busreq_mem_struct, cdb.GetFracRef(CDB_RISC_LSU_POS))
         IQ_insts.add(io_iq)
         MSG("generating I/O IQ: done")
 

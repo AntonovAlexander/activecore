@@ -589,62 +589,62 @@
       <obj_property name="label">LSU</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_push" type="array">
-         <obj_property name="ElementShortName">genlsu_push[0:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_push[0:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_push" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_push[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_push[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_PUSHED" type="array">
-         <obj_property name="ElementShortName">genlsu_TRX_PUSHED</obj_property>
-         <obj_property name="ObjectShortName">genlsu_TRX_PUSHED</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_TRX_PUSHED" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_TRX_PUSHED</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_TRX_PUSHED</obj_property>
          <obj_property name="isExpanded"></obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_pop" type="array">
-         <obj_property name="ElementShortName">genlsu_pop[0:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_pop[0:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_pop" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_pop[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_pop[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_genctrl_active" type="array">
-         <obj_property name="ElementShortName">genlsu_genctrl_active[0:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_genctrl_active[0:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_genctrl_active" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_genctrl_active[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_genctrl_active[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_genctrl_working" type="array">
-         <obj_property name="ElementShortName">genlsu_genctrl_working[0:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_genctrl_working[0:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_genctrl_working" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_genctrl_working[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_genctrl_working[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_genctrl_succ" type="array">
-         <obj_property name="ElementShortName">genlsu_genctrl_succ[0:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_genctrl_succ[0:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_genctrl_succ" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_genctrl_succ[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_genctrl_succ[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_genctrl_occupied" type="array">
-         <obj_property name="ElementShortName">genlsu_genctrl_occupied[0:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_genctrl_occupied[0:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_genctrl_occupied" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_genctrl_occupied[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_genctrl_occupied[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_genctrl_rdy" type="array">
-         <obj_property name="ElementShortName">genlsu_genctrl_rdy[0:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_genctrl_rdy[0:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_genctrl_rdy" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_genctrl_rdy[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_genctrl_rdy[0:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/mem_rd_inprogress" type="array">
          <obj_property name="ElementShortName">mem_rd_inprogress[0:0]</obj_property>
          <obj_property name="ObjectShortName">mem_rd_inprogress[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_BUF" type="array">
-         <obj_property name="ElementShortName">genlsu_TRX_BUF[3:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_TRX_BUF[3:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_TRX_BUF" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_TRX_BUF[3:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_TRX_BUF[3:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_BUF_COUNTER" type="array">
-         <obj_property name="ElementShortName">genlsu_TRX_BUF_COUNTER[1:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_TRX_BUF_COUNTER[1:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_TRX_BUF_COUNTER" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_TRX_BUF_COUNTER[1:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_TRX_BUF_COUNTER[1:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_BUF_COUNTER_NEMPTY" type="array">
-         <obj_property name="ElementShortName">genlsu_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_TRX_BUF_COUNTER_NEMPTY" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_BUF_COUNTER_FULL" type="array">
-         <obj_property name="ElementShortName">genlsu_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_TRX_BUF_COUNTER_FULL" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_LOCAL" type="array">
-         <obj_property name="ElementShortName">genlsu_TRX_LOCAL</obj_property>
-         <obj_property name="ObjectShortName">genlsu_TRX_LOCAL</obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_LSU_TRX_LOCAL" type="array">
+         <obj_property name="ElementShortName">geniq_LSU_TRX_LOCAL</obj_property>
+         <obj_property name="ObjectShortName">geniq_LSU_TRX_LOCAL</obj_property>
          <obj_property name="isExpanded"></obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/io_cdb_buf" type="array">

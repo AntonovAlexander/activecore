@@ -286,7 +286,7 @@ internal class rob_risc(name: String,
             cyclix_gen.assign(instr_iaddr.pc, expected_instraddr)
             for (buf_to_rollback in bufs_to_rollback) {
                 buf_to_rollback.Reset()
-                if (buf_to_rollback is io_buffer) {
+                if (buf_to_rollback is io_buffer_coproc) {
                     cyclix_gen.assign(buf_to_rollback.mem_rd_inprogress, 0)
                     cyclix_gen.assign(buf_to_rollback.commit_cdb_buf, 0)
                 }
