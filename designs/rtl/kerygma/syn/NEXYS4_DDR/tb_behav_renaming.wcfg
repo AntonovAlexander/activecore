@@ -5,6 +5,7 @@
    <db_ref_list>
       <db_ref path="riscv_tb_behav.wdb" id="1">
          <top_modules>
+            <top_module name="\$unit_genexu_BRANCH_sv " />
             <top_module name="\$unit_kerygma_tile_sv " />
             <top_module name="glbl" />
             <top_module name="riscv_tb" />
@@ -12,15 +13,23 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="546.201 ns"></ZoomStartTime>
-      <ZoomEndTime time="797.802 ns"></ZoomEndTime>
-      <Cursor1Time time="719.201 ns"></Cursor1Time>
+      <ZoomStartTime time="15.715000 us"></ZoomStartTime>
+      <ZoomEndTime time="38.155001 us"></ZoomEndTime>
+      <Cursor1Time time="25.075000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="704"></NameColumnWidth>
-      <ValueColumnWidth column_width="337"></ValueColumnWidth>
+      <NameColumnWidth column_width="867"></NameColumnWidth>
+      <ValueColumnWidth column_width="310"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="31" />
+   <WVObjectSize size="38" />
+   <wvobject fp_name="/riscv_tb/RST" type="logic">
+      <obj_property name="ElementShortName">RST</obj_property>
+      <obj_property name="ObjectShortName">RST</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/CLK" type="logic">
+      <obj_property name="ElementShortName">CLK</obj_property>
+      <obj_property name="ObjectShortName">CLK</obj_property>
+   </wvobject>
    <wvobject fp_name="/riscv_tb/LED" type="array">
       <obj_property name="ElementShortName">LED[31:0]</obj_property>
       <obj_property name="ObjectShortName">LED[31:0]</obj_property>
@@ -28,6 +37,164 @@
    <wvobject fp_name="/riscv_tb/SW" type="array">
       <obj_property name="ElementShortName">SW[31:0]</obj_property>
       <obj_property name="ObjectShortName">SW[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="group1280" type="group">
+      <obj_property name="label">perf</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/pc" type="array">
+         <obj_property name="ElementShortName">pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genbackoff_cmd" type="array">
+         <obj_property name="ElementShortName">genbackoff_cmd[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genbackoff_cmd[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genPRF_rdy" type="array">
+         <obj_property name="ElementShortName">genPRF_rdy[47:0]</obj_property>
+         <obj_property name="ObjectShortName">genPRF_rdy[47:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="group1439" type="group">
+         <obj_property name="label">rdy flags</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geninstr_req_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">geninstr_req_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geninstr_req_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geninstr_fetch_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">geninstr_fetch_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geninstr_fetch_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">gendispatch_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gendispatch_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">geniq_INTEGER_0_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_INTEGER_0_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_1_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">geniq_INTEGER_1_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_INTEGER_1_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">geniq_BRANCH_0_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_BRANCH_0_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_MUL_DIV_0_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">geniq_MUL_DIV_0_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_MUL_DIV_0_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">genlsu_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genlsu_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrob_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">genrob_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genrob_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group1440" type="group">
+         <obj_property name="label">nempty flags</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrob_TRX_BUF_COUNTER_NEMPTY" type="array">
+            <obj_property name="ElementShortName">genrob_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genrob_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geninstr_fetch_TRX_BUF_COUNTER_NEMPTY" type="array">
+            <obj_property name="ElementShortName">geninstr_fetch_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geninstr_fetch_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geninstr_req_TRX_BUF_COUNTER_NEMPTY" type="array">
+            <obj_property name="ElementShortName">geninstr_req_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geninstr_req_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_BUF_COUNTER_NEMPTY" type="array">
+            <obj_property name="ElementShortName">geniq_INTEGER_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_INTEGER_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_1_TRX_BUF_COUNTER_NEMPTY" type="array">
+            <obj_property name="ElementShortName">geniq_INTEGER_1_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_INTEGER_1_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_TRX_BUF_COUNTER_NEMPTY" type="array">
+            <obj_property name="ElementShortName">geniq_BRANCH_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_BRANCH_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_MUL_DIV_0_TRX_BUF_COUNTER_NEMPTY" type="array">
+            <obj_property name="ElementShortName">geniq_MUL_DIV_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_MUL_DIV_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_BUF_COUNTER_NEMPTY" type="array">
+            <obj_property name="ElementShortName">genlsu_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genlsu_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_TRX_BUF_COUNTER_NEMPTY" type="array">
+            <obj_property name="ElementShortName">gendispatch_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+            <obj_property name="ObjectShortName">gendispatch_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group1441" type="group">
+         <obj_property name="label">buf counters</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geninstr_req_TRX_BUF_COUNTER" type="array">
+            <obj_property name="ElementShortName">geninstr_req_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="ObjectShortName">geninstr_req_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+            <obj_property name="CellHeight">100</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geninstr_fetch_TRX_BUF_COUNTER" type="array">
+            <obj_property name="ElementShortName">geninstr_fetch_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="ObjectShortName">geninstr_fetch_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+            <obj_property name="CellHeight">100</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_TRX_BUF_COUNTER" type="array">
+            <obj_property name="ElementShortName">gendispatch_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="ObjectShortName">gendispatch_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+            <obj_property name="CellHeight">100</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_0_TRX_BUF_COUNTER" type="array">
+            <obj_property name="ElementShortName">geniq_INTEGER_0_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_INTEGER_0_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+            <obj_property name="CellHeight">100</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_INTEGER_1_TRX_BUF_COUNTER" type="array">
+            <obj_property name="ElementShortName">geniq_INTEGER_1_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_INTEGER_1_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+            <obj_property name="CellHeight">100</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_TRX_BUF_COUNTER" type="array">
+            <obj_property name="ElementShortName">geniq_BRANCH_0_TRX_BUF_COUNTER[2:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_BRANCH_0_TRX_BUF_COUNTER[2:0]</obj_property>
+            <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+            <obj_property name="CellHeight">100</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_MUL_DIV_0_TRX_BUF_COUNTER" type="array">
+            <obj_property name="ElementShortName">geniq_MUL_DIV_0_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="ObjectShortName">geniq_MUL_DIV_0_TRX_BUF_COUNTER[1:0]</obj_property>
+            <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+            <obj_property name="CellHeight">100</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_BUF_COUNTER" type="array">
+            <obj_property name="ElementShortName">genlsu_TRX_BUF_COUNTER[2:0]</obj_property>
+            <obj_property name="ObjectShortName">genlsu_TRX_BUF_COUNTER[2:0]</obj_property>
+            <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+            <obj_property name="CellHeight">100</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrob_TRX_BUF_COUNTER" type="array">
+            <obj_property name="ElementShortName">genrob_TRX_BUF_COUNTER[3:0]</obj_property>
+            <obj_property name="ObjectShortName">genrob_TRX_BUF_COUNTER[3:0]</obj_property>
+            <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+            <obj_property name="CellHeight">100</obj_property>
+         </wvobject>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="group626" type="group">
       <obj_property name="label">IRQ adapter</obj_property>
@@ -96,6 +263,14 @@
          <obj_property name="ElementShortName">irq_prior_code[3:0]</obj_property>
          <obj_property name="ObjectShortName">irq_prior_code[3:0]</obj_property>
       </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/MRETADDR" type="array">
+         <obj_property name="ElementShortName">MRETADDR[31:0]</obj_property>
+         <obj_property name="ObjectShortName">MRETADDR[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/CSR_MCAUSE" type="array">
+         <obj_property name="ElementShortName">CSR_MCAUSE[7:0]</obj_property>
+         <obj_property name="ObjectShortName">CSR_MCAUSE[7:0]</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/iaddr_enb" type="array">
       <obj_property name="ElementShortName">iaddr_enb[0:0]</obj_property>
@@ -112,141 +287,10 @@
    <wvobject fp_name="group8666" type="group">
       <obj_property name="label">BTAC</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC" type="array">
          <obj_property name="ElementShortName">genBTAC[15:0]</obj_property>
          <obj_property name="ObjectShortName">genBTAC[15:0]</obj_property>
          <obj_property name="isExpanded"></obj_property>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[15]" type="array">
-            <obj_property name="ElementShortName">[15]</obj_property>
-            <obj_property name="ObjectShortName">[15]</obj_property>
-            <obj_property name="isExpanded"></obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[14]" type="array">
-            <obj_property name="ElementShortName">[14]</obj_property>
-            <obj_property name="ObjectShortName">[14]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[13]" type="array">
-            <obj_property name="ElementShortName">[13]</obj_property>
-            <obj_property name="ObjectShortName">[13]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[12]" type="array">
-            <obj_property name="ElementShortName">[12]</obj_property>
-            <obj_property name="ObjectShortName">[12]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[11]" type="array">
-            <obj_property name="ElementShortName">[11]</obj_property>
-            <obj_property name="ObjectShortName">[11]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[10]" type="array">
-            <obj_property name="ElementShortName">[10]</obj_property>
-            <obj_property name="ObjectShortName">[10]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[9]" type="array">
-            <obj_property name="ElementShortName">[9]</obj_property>
-            <obj_property name="ObjectShortName">[9]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[8]" type="array">
-            <obj_property name="ElementShortName">[8]</obj_property>
-            <obj_property name="ObjectShortName">[8]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[7]" type="array">
-            <obj_property name="ElementShortName">[7]</obj_property>
-            <obj_property name="ObjectShortName">[7]</obj_property>
-            <obj_property name="isExpanded"></obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[6]" type="array">
-            <obj_property name="ElementShortName">[6]</obj_property>
-            <obj_property name="ObjectShortName">[6]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[5]" type="array">
-            <obj_property name="ElementShortName">[5]</obj_property>
-            <obj_property name="ObjectShortName">[5]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[4]" type="array">
-            <obj_property name="ElementShortName">[4]</obj_property>
-            <obj_property name="ObjectShortName">[4]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[3]" type="array">
-            <obj_property name="ElementShortName">[3]</obj_property>
-            <obj_property name="ObjectShortName">[3]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[2]" type="array">
-            <obj_property name="ElementShortName">[2]</obj_property>
-            <obj_property name="ObjectShortName">[2]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[1]" type="array">
-            <obj_property name="ElementShortName">[1]</obj_property>
-            <obj_property name="ObjectShortName">[1]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[0]" type="array">
-            <obj_property name="ElementShortName">[0]</obj_property>
-            <obj_property name="ObjectShortName">[0]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[15]" type="array">
-            <obj_property name="ElementShortName">[15]</obj_property>
-            <obj_property name="ObjectShortName">[15]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[14]" type="array">
-            <obj_property name="ElementShortName">[14]</obj_property>
-            <obj_property name="ObjectShortName">[14]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[13]" type="array">
-            <obj_property name="ElementShortName">[13]</obj_property>
-            <obj_property name="ObjectShortName">[13]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[12]" type="array">
-            <obj_property name="ElementShortName">[12]</obj_property>
-            <obj_property name="ObjectShortName">[12]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[11]" type="array">
-            <obj_property name="ElementShortName">[11]</obj_property>
-            <obj_property name="ObjectShortName">[11]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[10]" type="array">
-            <obj_property name="ElementShortName">[10]</obj_property>
-            <obj_property name="ObjectShortName">[10]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[9]" type="array">
-            <obj_property name="ElementShortName">[9]</obj_property>
-            <obj_property name="ObjectShortName">[9]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[8]" type="array">
-            <obj_property name="ElementShortName">[8]</obj_property>
-            <obj_property name="ObjectShortName">[8]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[7]" type="array">
-            <obj_property name="ElementShortName">[7]</obj_property>
-            <obj_property name="ObjectShortName">[7]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[6]" type="array">
-            <obj_property name="ElementShortName">[6]</obj_property>
-            <obj_property name="ObjectShortName">[6]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[5]" type="array">
-            <obj_property name="ElementShortName">[5]</obj_property>
-            <obj_property name="ObjectShortName">[5]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[4]" type="array">
-            <obj_property name="ElementShortName">[4]</obj_property>
-            <obj_property name="ObjectShortName">[4]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[3]" type="array">
-            <obj_property name="ElementShortName">[3]</obj_property>
-            <obj_property name="ObjectShortName">[3]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[2]" type="array">
-            <obj_property name="ElementShortName">[2]</obj_property>
-            <obj_property name="ObjectShortName">[2]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[1]" type="array">
-            <obj_property name="ElementShortName">[1]</obj_property>
-            <obj_property name="ObjectShortName">[1]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC[0]" type="array">
-            <obj_property name="ElementShortName">[0]</obj_property>
-            <obj_property name="ObjectShortName">[0]</obj_property>
-         </wvobject>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genBTAC_found" type="array">
          <obj_property name="ElementShortName">genBTAC_found[1:0][0:0]</obj_property>
@@ -313,12 +357,10 @@
       <obj_property name="ElementShortName">genARF_map[31:0][5:0]</obj_property>
       <obj_property name="ObjectShortName">genARF_map[31:0][5:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genPRF" type="array">
       <obj_property name="ElementShortName">genPRF[47:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">genPRF[47:0][31:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genPRF_mapped" type="array">
       <obj_property name="ElementShortName">genPRF_mapped[47:0]</obj_property>
@@ -327,11 +369,10 @@
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genPRF_rdy" type="array">
       <obj_property name="ElementShortName">genPRF_rdy[47:0]</obj_property>
       <obj_property name="ObjectShortName">genPRF_rdy[47:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genPRF_src" type="array">
-      <obj_property name="ElementShortName">genPRF_src[47:0][1:0]</obj_property>
-      <obj_property name="ObjectShortName">genPRF_src[47:0][1:0]</obj_property>
+      <obj_property name="ElementShortName">genPRF_src[47:0][2:0]</obj_property>
+      <obj_property name="ObjectShortName">genPRF_src[47:0][2:0]</obj_property>
    </wvobject>
    <wvobject fp_name="group1876" type="group">
       <obj_property name="label">instr_iaddr</obj_property>
@@ -342,6 +383,14 @@
          <obj_property name="ObjectShortName">geninstr_iaddr_TRX_LOCAL</obj_property>
          <obj_property name="isExpanded"></obj_property>
       </wvobject>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genbackoff_cmd" type="array">
+      <obj_property name="ElementShortName">genbackoff_cmd[0:0]</obj_property>
+      <obj_property name="ObjectShortName">genbackoff_cmd[0:0]</obj_property>
    </wvobject>
    <wvobject fp_name="group1293" type="group">
       <obj_property name="label">cpu instr 0</obj_property>
@@ -453,6 +502,14 @@
          <obj_property name="ElementShortName">genbackoff_cmd[0:0]</obj_property>
          <obj_property name="ObjectShortName">genbackoff_cmd[0:0]</obj_property>
       </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genireq_toproc_mask" type="array">
+         <obj_property name="ElementShortName">genireq_toproc_mask[1:0]</obj_property>
+         <obj_property name="ObjectShortName">genireq_toproc_mask[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genireq_active" type="array">
+         <obj_property name="ElementShortName">genireq_active[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genireq_active[0:0]</obj_property>
+      </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geninstr_req_TRX_LOCAL_PARALLEL" type="array">
          <obj_property name="ElementShortName">geninstr_req_TRX_LOCAL_PARALLEL[1:0]</obj_property>
          <obj_property name="ObjectShortName">geninstr_req_TRX_LOCAL_PARALLEL[1:0]</obj_property>
@@ -524,15 +581,14 @@
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_TRX_PUSHED" type="array">
          <obj_property name="ElementShortName">gendispatch_TRX_PUSHED[1:0]</obj_property>
          <obj_property name="ObjectShortName">gendispatch_TRX_PUSHED[1:0]</obj_property>
-         <obj_property name="isExpanded"></obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_pop" type="array">
          <obj_property name="ElementShortName">gendispatch_pop[0:0]</obj_property>
          <obj_property name="ObjectShortName">gendispatch_pop[0:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_TRX_BUF_COUNTER" type="array">
-         <obj_property name="ElementShortName">gendispatch_TRX_BUF_COUNTER[0:0]</obj_property>
-         <obj_property name="ObjectShortName">gendispatch_TRX_BUF_COUNTER[0:0]</obj_property>
+         <obj_property name="ElementShortName">gendispatch_TRX_BUF_COUNTER[1:0]</obj_property>
+         <obj_property name="ObjectShortName">gendispatch_TRX_BUF_COUNTER[1:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_TRX_BUF_COUNTER_NEMPTY" type="array">
          <obj_property name="ElementShortName">gendispatch_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
@@ -551,8 +607,8 @@
          <obj_property name="ObjectShortName">gendispatch_genctrl_active[0:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_iq_free_mask" type="array">
-         <obj_property name="ElementShortName">gendispatch_iq_free_mask[3:0]</obj_property>
-         <obj_property name="ObjectShortName">gendispatch_iq_free_mask[3:0]</obj_property>
+         <obj_property name="ElementShortName">gendispatch_iq_free_mask[4:0]</obj_property>
+         <obj_property name="ObjectShortName">gendispatch_iq_free_mask[4:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_entry_toproc_mask" type="array">
          <obj_property name="ElementShortName">gendispatch_entry_toproc_mask[1:0]</obj_property>
@@ -570,6 +626,18 @@
          <obj_property name="ElementShortName">geniq_MUL_DIV_0_push[0:0]</obj_property>
          <obj_property name="ObjectShortName">geniq_MUL_DIV_0_push[0:0]</obj_property>
       </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_push" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_push[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_push[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_push" type="array">
+         <obj_property name="ElementShortName">genlsu_push[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genlsu_push[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_PUSHED" type="array">
+         <obj_property name="ElementShortName">genlsu_TRX_PUSHED</obj_property>
+         <obj_property name="ObjectShortName">genlsu_TRX_PUSHED</obj_property>
+      </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genbackoff_cmd" type="array">
          <obj_property name="ElementShortName">genbackoff_cmd[0:0]</obj_property>
          <obj_property name="ObjectShortName">genbackoff_cmd[0:0]</obj_property>
@@ -578,10 +646,20 @@
          <obj_property name="ElementShortName">gendispatch_TRX_LOCAL_PARALLEL[1:0]</obj_property>
          <obj_property name="ObjectShortName">gendispatch_TRX_LOCAL_PARALLEL[1:0]</obj_property>
          <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_TRX_LOCAL_PARALLEL[1]" type="array">
+            <obj_property name="ElementShortName">[1]</obj_property>
+            <obj_property name="ObjectShortName">[1]</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_TRX_LOCAL_PARALLEL[0]" type="array">
+            <obj_property name="ElementShortName">[0]</obj_property>
+            <obj_property name="ObjectShortName">[0]</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_TRX_BUF" type="array">
-         <obj_property name="ElementShortName">gendispatch_TRX_BUF[1:0][1:0]</obj_property>
-         <obj_property name="ObjectShortName">gendispatch_TRX_BUF[1:0][1:0]</obj_property>
+         <obj_property name="ElementShortName">gendispatch_TRX_BUF[3:0][1:0]</obj_property>
+         <obj_property name="ObjectShortName">gendispatch_TRX_BUF[3:0][1:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gendispatch_TRX_LOCAL" type="array">
          <obj_property name="ElementShortName">gendispatch_TRX_LOCAL</obj_property>
@@ -731,6 +809,79 @@
          <obj_property name="ObjectShortName">gensticky_geniq_INTEGER_1_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
       </wvobject>
    </wvobject>
+   <wvobject fp_name="group4529" type="group">
+      <obj_property name="label">IQ BRANCH</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_TRX_LOCAL" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_TRX_LOCAL</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_TRX_LOCAL</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_TRX_PUSHED" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_TRX_PUSHED</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_TRX_PUSHED</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_genctrl_active" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_genctrl_active[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_genctrl_active[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_genctrl_working" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_genctrl_working[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_genctrl_working[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_genctrl_succ" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_genctrl_succ[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_genctrl_succ[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_genctrl_occupied" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_genctrl_occupied[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_genctrl_occupied[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_genctrl_rdy" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_genctrl_rdy[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_genctrl_rdy[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_push" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_push[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_push[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_pop" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_pop[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_pop[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_TRX_BUF" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_TRX_BUF[7:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_TRX_BUF[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_TRX_BUF_COUNTER" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_TRX_BUF_COUNTER[2:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_TRX_BUF_COUNTER[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_TRX_BUF_COUNTER_NEMPTY" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/geniq_BRANCH_0_TRX_BUF_COUNTER_FULL" type="array">
+         <obj_property name="ElementShortName">geniq_BRANCH_0_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+         <obj_property name="ObjectShortName">geniq_BRANCH_0_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensticky_geniq_BRANCH_0_TRX_BUF" type="array">
+         <obj_property name="ElementShortName">gensticky_geniq_BRANCH_0_TRX_BUF[7:0]</obj_property>
+         <obj_property name="ObjectShortName">gensticky_geniq_BRANCH_0_TRX_BUF[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensticky_geniq_BRANCH_0_TRX_BUF_COUNTER" type="array">
+         <obj_property name="ElementShortName">gensticky_geniq_BRANCH_0_TRX_BUF_COUNTER[2:0]</obj_property>
+         <obj_property name="ObjectShortName">gensticky_geniq_BRANCH_0_TRX_BUF_COUNTER[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensticky_geniq_BRANCH_0_TRX_BUF_COUNTER_NEMPTY" type="array">
+         <obj_property name="ElementShortName">gensticky_geniq_BRANCH_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensticky_geniq_BRANCH_0_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensticky_geniq_BRANCH_0_TRX_BUF_COUNTER_FULL" type="array">
+         <obj_property name="ElementShortName">gensticky_geniq_BRANCH_0_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensticky_geniq_BRANCH_0_TRX_BUF_COUNTER_FULL[0:0]</obj_property>
+      </wvobject>
+   </wvobject>
    <wvobject fp_name="group255" type="group">
       <obj_property name="label">EXU INTEGER 0</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -797,8 +948,39 @@
          <obj_property name="ObjectShortName">gensubmod_genexu_INTEGER_1_stream_resp_bus_genfifo_ack[0:0]</obj_property>
       </wvobject>
    </wvobject>
+   <wvobject fp_name="group3774" type="group">
+      <obj_property name="label">EXU BRANCH</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_BRANCH_0_stream_req_bus_genfifo_req" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_BRANCH_0_stream_req_bus_genfifo_req[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_BRANCH_0_stream_req_bus_genfifo_req[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_BRANCH_0_stream_req_bus_genfifo_ack" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_BRANCH_0_stream_req_bus_genfifo_ack[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_BRANCH_0_stream_req_bus_genfifo_ack[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_BRANCH_0_stream_req_bus_genfifo_wdata" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_BRANCH_0_stream_req_bus_genfifo_wdata</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_BRANCH_0_stream_req_bus_genfifo_wdata</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_BRANCH_0_stream_resp_bus_genfifo_req" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_BRANCH_0_stream_resp_bus_genfifo_req[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_BRANCH_0_stream_resp_bus_genfifo_req[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_BRANCH_0_stream_resp_bus_genfifo_ack" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_BRANCH_0_stream_resp_bus_genfifo_ack[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_BRANCH_0_stream_resp_bus_genfifo_ack[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensubmod_genexu_BRANCH_0_stream_resp_bus_genfifo_rdata" type="array">
+         <obj_property name="ElementShortName">gensubmod_genexu_BRANCH_0_stream_resp_bus_genfifo_rdata</obj_property>
+         <obj_property name="ObjectShortName">gensubmod_genexu_BRANCH_0_stream_resp_bus_genfifo_rdata</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+   </wvobject>
    <wvobject fp_name="group512" type="group">
-      <obj_property name="label">LSU</obj_property>
+      <obj_property name="label">EXU LSU</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_push" type="array">
@@ -839,12 +1021,12 @@
          <obj_property name="ObjectShortName">mem_rd_inprogress[0:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_BUF" type="array">
-         <obj_property name="ElementShortName">genlsu_TRX_BUF[3:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_TRX_BUF[3:0]</obj_property>
+         <obj_property name="ElementShortName">genlsu_TRX_BUF[7:0]</obj_property>
+         <obj_property name="ObjectShortName">genlsu_TRX_BUF[7:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_BUF_COUNTER" type="array">
-         <obj_property name="ElementShortName">genlsu_TRX_BUF_COUNTER[1:0]</obj_property>
-         <obj_property name="ObjectShortName">genlsu_TRX_BUF_COUNTER[1:0]</obj_property>
+         <obj_property name="ElementShortName">genlsu_TRX_BUF_COUNTER[2:0]</obj_property>
+         <obj_property name="ObjectShortName">genlsu_TRX_BUF_COUNTER[2:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genlsu_TRX_BUF_COUNTER_NEMPTY" type="array">
          <obj_property name="ElementShortName">genlsu_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
@@ -974,6 +1156,14 @@
          <obj_property name="ElementShortName">mem_rd_inprogress[0:0]</obj_property>
          <obj_property name="ObjectShortName">mem_rd_inprogress[0:0]</obj_property>
       </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gensticky_genrob_TRX_BUF_COUNTER_NEMPTY" type="array">
+         <obj_property name="ElementShortName">gensticky_genrob_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+         <obj_property name="ObjectShortName">gensticky_genrob_TRX_BUF_COUNTER_NEMPTY[0:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genrob_pop" type="array">
+         <obj_property name="ElementShortName">genrob_pop[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genrob_pop[0:0]</obj_property>
+      </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/expected_instraddr" type="array">
          <obj_property name="ElementShortName">expected_instraddr[31:0]</obj_property>
          <obj_property name="ObjectShortName">expected_instraddr[31:0]</obj_property>
@@ -995,6 +1185,10 @@
          <obj_property name="ObjectShortName">genrob_TRX_LOCAL_PARALLEL[1:0]</obj_property>
          <obj_property name="isExpanded"></obj_property>
       </wvobject>
+      <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genbackoff_cmd" type="array">
+         <obj_property name="ElementShortName">genbackoff_cmd[0:0]</obj_property>
+         <obj_property name="ObjectShortName">genbackoff_cmd[0:0]</obj_property>
+      </wvobject>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/Backoff_ARF" type="array">
          <obj_property name="ElementShortName">Backoff_ARF[31:0][31:0]</obj_property>
          <obj_property name="ObjectShortName">Backoff_ARF[31:0][31:0]</obj_property>
@@ -1002,14 +1196,13 @@
       </wvobject>
    </wvobject>
    <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/gencdb" type="array">
-      <obj_property name="ElementShortName">gencdb[3:0]</obj_property>
-      <obj_property name="ObjectShortName">gencdb[3:0]</obj_property>
+      <obj_property name="ElementShortName">gencdb[4:0]</obj_property>
+      <obj_property name="ObjectShortName">gencdb[4:0]</obj_property>
       <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="group652" type="group">
       <obj_property name="label">ram_2banks</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/clk_i" type="logic">
          <obj_property name="ElementShortName">clk_i</obj_property>
          <obj_property name="ObjectShortName">clk_i</obj_property>
@@ -1021,9 +1214,14 @@
       <wvobject fp_name="group643" type="group">
          <obj_property name="label">bus 0 bank 0</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank0_req_i" type="array">
             <obj_property name="ElementShortName">bus0_bank0_req_i[0:0]</obj_property>
             <obj_property name="ObjectShortName">bus0_bank0_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank0_ack_o" type="array">
+            <obj_property name="ElementShortName">bus0_bank0_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">bus0_bank0_ack_o[0:0]</obj_property>
          </wvobject>
          <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank0_we_i" type="array">
             <obj_property name="ElementShortName">bus0_bank0_we_i[0:0]</obj_property>
@@ -1040,10 +1238,6 @@
          <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank0_wdata_bi" type="array">
             <obj_property name="ElementShortName">bus0_bank0_wdata_bi[31:0]</obj_property>
             <obj_property name="ObjectShortName">bus0_bank0_wdata_bi[31:0]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank0_ack_o" type="array">
-            <obj_property name="ElementShortName">bus0_bank0_ack_o[0:0]</obj_property>
-            <obj_property name="ObjectShortName">bus0_bank0_ack_o[0:0]</obj_property>
          </wvobject>
          <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank0_resp_o" type="array">
             <obj_property name="ElementShortName">bus0_bank0_resp_o[0:0]</obj_property>
@@ -1105,9 +1299,14 @@
       <wvobject fp_name="group644" type="group">
          <obj_property name="label">bus 0 bank 1</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank1_req_i" type="array">
             <obj_property name="ElementShortName">bus0_bank1_req_i[0:0]</obj_property>
             <obj_property name="ObjectShortName">bus0_bank1_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank1_ack_o" type="array">
+            <obj_property name="ElementShortName">bus0_bank1_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">bus0_bank1_ack_o[0:0]</obj_property>
          </wvobject>
          <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank1_we_i" type="array">
             <obj_property name="ElementShortName">bus0_bank1_we_i[0:0]</obj_property>
@@ -1124,10 +1323,6 @@
          <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank1_wdata_bi" type="array">
             <obj_property name="ElementShortName">bus0_bank1_wdata_bi[31:0]</obj_property>
             <obj_property name="ObjectShortName">bus0_bank1_wdata_bi[31:0]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank1_ack_o" type="array">
-            <obj_property name="ElementShortName">bus0_bank1_ack_o[0:0]</obj_property>
-            <obj_property name="ObjectShortName">bus0_bank1_ack_o[0:0]</obj_property>
          </wvobject>
          <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus0_bank1_resp_o" type="array">
             <obj_property name="ElementShortName">bus0_bank1_resp_o[0:0]</obj_property>
@@ -1189,7 +1384,6 @@
       <wvobject fp_name="group645" type="group">
          <obj_property name="label">bus 1 bank 0</obj_property>
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/bus1_bank0_req_i" type="array">
             <obj_property name="ElementShortName">bus1_bank0_req_i[0:0]</obj_property>
             <obj_property name="ObjectShortName">bus1_bank0_req_i[0:0]</obj_property>
@@ -1424,7 +1618,6 @@
    <wvobject fp_name="group620" type="group">
       <obj_property name="label">io buffer [bank 0]</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/ram_dual_bank0/ram[3072]" type="array">
          <obj_property name="ElementShortName">[3072][31:0]</obj_property>
          <obj_property name="ObjectShortName">[3072][31:0]</obj_property>
@@ -1493,7 +1686,6 @@
    <wvobject fp_name="group637" type="group">
       <obj_property name="label">io buffer [bank 1]</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/ram/ram_dual_bank1/ram[3072]" type="array">
          <obj_property name="ElementShortName">[3072][31:0]</obj_property>
          <obj_property name="ObjectShortName">[3072][31:0]</obj_property>
@@ -1562,7 +1754,6 @@
    <wvobject fp_name="group1158" type="group">
       <obj_property name="label">MUL_DIV</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/riscv_tb/kerygma/kerygma_tile/riscv/genexu_MUL_DIV_0/clk_i" type="array">
          <obj_property name="ElementShortName">clk_i[0:0]</obj_property>
          <obj_property name="ObjectShortName">clk_i[0:0]</obj_property>
