@@ -225,7 +225,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                 rd.source.assign(RD_MEM)
                 exu_req.assign(1)
                 memctrl.req.assign(1)
-                memctrl.cmd.assign(0)
+                memctrl.we.assign(0)
                 immediate.assign(immediate_I)
             }; endbranch()
 
@@ -237,7 +237,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                 op1_source.assign(OP1_SRC_IMM)
                 exu_req.assign(1)
                 memctrl.req.assign(1)
-                memctrl.cmd.assign(1)
+                memctrl.we.assign(1)
                 immediate.assign(immediate_S)
             }; endbranch()
 

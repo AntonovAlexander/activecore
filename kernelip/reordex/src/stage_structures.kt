@@ -66,7 +66,7 @@ internal fun Fill_ROB_rds_ctrl_StageVars(stage : hw_stage, amount : Int, rds_ctr
 }
 
 class RISCDecoder_memctrl   (var req : hw_var,
-                             var cmd : hw_var,
+                             var we : hw_var,
                              var addr : hw_var,
                              var be : hw_var,
                              var wdata : hw_var,

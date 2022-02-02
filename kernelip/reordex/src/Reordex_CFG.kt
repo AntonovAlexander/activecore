@@ -136,13 +136,13 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
 
     var memctrl         = RISCDecoder_memctrl(
         ugenvar("mem_req", 0, 0, "0"),
-        ugenvar("mem_cmd", 0, 0, "0"),
+        ugenvar("mem_we", 0, 0, "0"),
         ugenvar("mem_addr", 31, 0, "0"),
         ugenvar("mem_be", 3, 0, "0"),
         ugenvar("mem_wdata", 31, 0, "0"),
         ugenvar("mem_rdata", 31, 0, "0"),
         ugenvar("mem_rshift", 0, 0, "0"),
-        ugenvar("load_signext", 0, 0, "0")
+        ugenvar("mem_load_signext", 0, 0, "0")
     )
 
     var mret_req        = ugenvar("mret_req", 0, 0, "0")

@@ -25,7 +25,7 @@ internal open class dispatch_buffer(cyclix_gen : cyclix.Generic,
 
     var cf_can_alter    = AdduStageVar("cf_can_alter", 0, 0, "0")
     val io_req          = AdduStageVar("io_req", 0, 0, "0")
-    var mem_cmd         = AdduStageVar("mem_cmd",0, 0, "1")
+    var mem_we         = AdduStageVar("mem_we",0, 0, "1")
 
     var dispatch_active     = cyclix_gen.ulocal("gendispatch_dispatch_active", 0, 0, "1")
     var entry_toproc_mask   = cyclix_gen.uglobal("gendispatch_entry_toproc_mask", TRX_BUF_MULTIDIM-1, 0, hw_imm_ones(TRX_BUF_MULTIDIM))
@@ -80,7 +80,7 @@ internal open class dispatch_buffer(cyclix_gen : cyclix.Generic,
                                 store_iq.push_trx(store_push_trx)
 
                                 // marking rd src
-                                cyclix_gen.begif(!mem_cmd)
+                                cyclix_gen.begif(!mem_we)
                                 run {
                                     cyclix_gen.assign(PRF_src.GetFracRef(rds_ctrl[0].tag), CDB_RISC_LSU_POS)
                                 }; cyclix_gen.endif()
@@ -237,7 +237,7 @@ internal class dispatch_buffer_risc(cyclix_gen : cyclix.Generic,
     var mem_wdata       = AdduStageVar("mem_wdata", 31, 0, "0")
     var mem_rdata       = AdduStageVar("mem_rdata", 31, 0, "0")
     var mem_rshift      = AdduStageVar("mem_rshift", 0, 0, "0")
-    var load_signext    = AdduStageVar("load_signext", 0, 0, "0")
+    var mem_load_signext = AdduStageVar("mem_load_signext", 0, 0, "0")
 
     var mret_req        = AdduStageVar("mret_req", 0, 0, "0")
 

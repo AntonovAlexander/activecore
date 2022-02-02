@@ -284,7 +284,10 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         else {
             var bufs_to_reset = ArrayList<hw_stage>()
             bufs_to_reset.add(rob)
-            for (IQ_inst in IQ_insts) bufs_to_reset.add(IQ_inst)
+            for (IQ_inst in IQ_insts) {
+                bufs_to_reset.add(IQ_inst)
+                if (IQ_inst is io_buffer_risc) bufs_to_reset.add(IQ_inst.resp_buf)
+            }
             bufs_to_reset.add(dispatch_uop_buf)
             bufs_to_reset.add(instr_fetch)
             bufs_to_reset.add(instr_req)

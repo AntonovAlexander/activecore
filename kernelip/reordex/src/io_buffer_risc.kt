@@ -25,11 +25,11 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
 ) : io_buffer_coproc(cyclix_gen, ExUnit_name, ExUnit_num, name_prefix, TRX_BUF_SIZE, MultiExu_CFG, exu_id_num, iq_exu, CDB_index, cdb_num, busreq_mem_struct, commit_cdb) {
 
     var mem_req         = AdduStageVar("mem_req", 0, 0, "0")
-    var mem_cmd         = AdduStageVar("mem_cmd", 0, 0, "0")
+    var mem_we          = AdduStageVar("mem_we", 0, 0, "0")
     var mem_addr        = AdduStageVar("mem_addr", 31, 0, "0")
     var mem_wdata       = AdduStageVar("mem_wdata", 31, 0, "0")
     var mem_be          = AdduStageVar("mem_be", 3, 0, "0")
-    var load_signext    = AdduStageVar("load_signext", 0, 0, "0")
+    var mem_load_signext = AdduStageVar("mem_load_signext", 0, 0, "0")
 
     var mem_ctrlflow_enb    = AdduStageVar("mem_ctrlflow_enb", 0, 0, "0")
 
@@ -45,19 +45,19 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
 
     var mem_data_wdata      = cyclix_gen.local("mem_data_wdata", data_req_fifo.vartype, "0")
     var mem_data_rdata      = cyclix_gen.local("mem_data_rdata", data_resp_fifo.vartype, "0")
-    var mem_rd_inprogress   = cyclix_gen.uglobal("mem_rd_inprogress", 0, 0, "0")
 
     var lsu_iq_done = cyclix_gen.ulocal("lsu_iq_done", 0, 0, "0")
     var lsu_iq_num  = cyclix_gen.ulocal("lsu_iq_num", GetWidthToContain(TRX_BUF.GetWidth()) -1, 0, "0")
     var io_iq_cmd   = TRX_BUF.GetFracRef(lsu_iq_num)
 
-    var commit_cdb_buf      = cyclix_gen.global("commit_cdb_buf", commit_cdb.vartype, "0")
-    var exu_cdb_inst_enb    = commit_cdb_buf.GetFracRef("enb")
-    var exu_cdb_inst_data   = commit_cdb_buf.GetFracRef("data")
+    var exu_cdb_inst_enb    = commit_cdb.GetFracRef("enb")
+    var exu_cdb_inst_data   = commit_cdb.GetFracRef("data")
     var exu_cdb_inst_trx_id = exu_cdb_inst_data.GetFracRef("trx_id")
     var exu_cdb_inst_req    = exu_cdb_inst_data.GetFracRef("rd0_req")       // TODO: fix
     var exu_cdb_inst_tag    = exu_cdb_inst_data.GetFracRef("rd0_tag")       // TODO: fix
     var exu_cdb_inst_wdata  = exu_cdb_inst_data.GetFracRef("rd0_wdata")     // TODO: fix
+
+    var resp_buf = io_buffer_resp_risc(cyclix_gen, "LSU_resp", 4, MultiExu_CFG, data_resp_fifo.vartype.dimensions)
 
     var search_active = cyclix_gen.ulocal("search_active", 0, 0, "1")
 
@@ -68,13 +68,12 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
 
     override fun ProcessIO(io_cdb_buf : hw_var, io_cdb_rs1_wdata_buf : hw_var, rob_buf : rob) {
 
-        cyclix_gen.assign(commit_cdb, commit_cdb_buf)
-        cyclix_gen.assign(commit_cdb_buf, 0)
-
         cyclix_gen.MSG_COMMENT("I/O IQ processing...")
 
         preinit_ctrls()
         init_locals()
+
+        resp_buf.preinit_ctrls()
 
         var io_cdb_enb      = io_cdb_buf.GetFracRef("enb")
         var io_cdb_data     = io_cdb_buf.GetFracRef("data")
@@ -89,97 +88,112 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
         cyclix_gen.assign(mem_addr, src_rsrv[0].src_data)
         cyclix_gen.assign(mem_wdata, src_rsrv[1].src_data)
 
-        cyclix_gen.MSG_COMMENT("Load processing...")
-        cyclix_gen.begif(mem_rd_inprogress)
+        cyclix_gen.MSG_COMMENT("Returning I/O to CDB...")
+
+        var resp_buf_head = resp_buf.TRX_BUF.GetFracRef(0)
+        var resp_buf_head_rdy = resp_buf_head.GetFracRef("rdy")
+        var resp_buf_head_trx_id = resp_buf_head.GetFracRef("trx_id")
+        var resp_buf_head_rd0_req = resp_buf_head.GetFracRef("rd0_req")
+        var resp_buf_head_rd0_tag = resp_buf_head.GetFracRef("rd0_tag")
+        var resp_buf_head_mem_be = resp_buf_head.GetFracRef("mem_be")
+        var resp_buf_head_mem_load_signext = resp_buf_head.GetFracRef("mem_load_signext")
+        var resp_buf_head_mem_data_rdata = resp_buf_head.GetFracRef("mem_data_rdata")
+
+        cyclix_gen.begif(resp_buf.TRX_BUF_COUNTER_NEMPTY)
         run {
-
-            cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, mem_data_rdata))
+            cyclix_gen.begif(resp_buf_head_rdy)
             run {
-
-                cyclix_gen.begif(cyclix_gen.eq2(mem_be, 0x1))
-                run {
-                    cyclix_gen.begif(load_signext)
-                    run {
-                        mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[7, 0], 32))
-                    }; cyclix_gen.endif()
-                    cyclix_gen.begelse()
-                    run {
-                        mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[7, 0], 32))
-                    }; cyclix_gen.endif()
-                }; cyclix_gen.endif()
-
-                cyclix_gen.begif(cyclix_gen.eq2(mem_be, 0x3))
-                run {
-                    cyclix_gen.begif(load_signext)
-                    run {
-                        mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[15, 0], 32))
-                    }; cyclix_gen.endif()
-                    cyclix_gen.begelse()
-                    run {
-                        mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[15, 0], 32))
-                    }; cyclix_gen.endif()
-                }; cyclix_gen.endif()
-
-                // writing loaded data to CDB
                 cyclix_gen.assign(exu_cdb_inst_enb, 1)
-                cyclix_gen.assign(exu_cdb_inst_trx_id, trx_id)
-                cyclix_gen.assign(exu_cdb_inst_req, 1)
-                cyclix_gen.assign(exu_cdb_inst_tag, rd_ctrls[0].tag)
-                cyclix_gen.assign(exu_cdb_inst_wdata, mem_data_rdata)
-
-                cyclix_gen.assign(mem_rd_inprogress, 0)
-
-                cyclix_gen.assign(pop, 1)
-
+                cyclix_gen.assign(exu_cdb_inst_trx_id, resp_buf_head_trx_id)
+                cyclix_gen.assign(exu_cdb_inst_req, resp_buf_head_rd0_req)
+                cyclix_gen.assign(exu_cdb_inst_tag, resp_buf_head_rd0_tag)
+                cyclix_gen.assign(exu_cdb_inst_wdata, resp_buf_head_mem_data_rdata)
+                resp_buf.pop_trx()
             }; cyclix_gen.endif()
-        }; cyclix_gen.endif()                   // mem_rd_inprogress
-        cyclix_gen.MSG_COMMENT("Load processing: done")
+        }; cyclix_gen.endif()
+        cyclix_gen.MSG_COMMENT("Returning I/O to CDB: done")
 
-        cyclix_gen.begelse()
+        cyclix_gen.MSG_COMMENT("Fetching I/O response...")
+        cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, mem_data_rdata))
         run {
 
-            cyclix_gen.begif(ctrl_active)
+            cyclix_gen.begif(cyclix_gen.eq2(resp_buf_head_mem_be, 0x1))
+            run {
+                cyclix_gen.begif(resp_buf_head_mem_load_signext)
+                run {
+                    mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[7, 0], 32))
+                }; cyclix_gen.endif()
+                cyclix_gen.begelse()
+                run {
+                    mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[7, 0], 32))
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
+
+            cyclix_gen.begif(cyclix_gen.eq2(resp_buf_head_mem_be, 0x3))
+            run {
+                cyclix_gen.begif(resp_buf_head_mem_load_signext)
+                run {
+                    mem_data_rdata.assign(cyclix_gen.signext(mem_data_rdata[15, 0], 32))
+                }; cyclix_gen.endif()
+                cyclix_gen.begelse()
+                run {
+                    mem_data_rdata.assign(cyclix_gen.zeroext(mem_data_rdata[15, 0], 32))
+                }; cyclix_gen.endif()
+            }; cyclix_gen.endif()
+
+            cyclix_gen.assign(resp_buf_head_mem_data_rdata, mem_data_rdata)
+            cyclix_gen.assign(resp_buf_head_rdy, 1)
+
+        }; cyclix_gen.endif()
+        cyclix_gen.MSG_COMMENT("Fetching I/O response: done")
+
+        cyclix_gen.MSG_COMMENT("Initiating I/O request...")
+        cyclix_gen.begif(cyclix_gen.band(ctrl_active, resp_buf.ctrl_rdy))
+        run {
+
+            cyclix_gen.begif(mem_addr_generated)
             run {
 
-                cyclix_gen.begif(mem_addr_generated)
+                cyclix_gen.begif(mem_ctrlflow_enb)
                 run {
 
-                    cyclix_gen.begif(mem_ctrlflow_enb)
+                    // data is ready identification
+                    cyclix_gen.assign(rdy, src_rsrv[0].src_rdy)
+                    cyclix_gen.begif(mem_we)
+                    run {
+                        cyclix_gen.band_gen(rdy, rdy, src_rsrv[1].src_rdy)
+                    }; cyclix_gen.endif()
+
+                    cyclix_gen.begif(rdy)
                     run {
 
-                        // data is ready identification
-                        cyclix_gen.assign(rdy, src_rsrv[0].src_rdy)
-                        cyclix_gen.begif(mem_cmd)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_we)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
+                        cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
+
+                        cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata))
                         run {
-                            cyclix_gen.band_gen(rdy, rdy, src_rsrv[1].src_rdy)
-                        }; cyclix_gen.endif()
+                            var resp_trx = resp_buf.GetPushTrx()
+                            var resp_trx_rdy = resp_trx.GetFracRef("rdy")
+                            var resp_trx_trx_id = resp_trx.GetFracRef("trx_id")
+                            var resp_trx_rd0_req = resp_trx.GetFracRef("rd0_req")
+                            var resp_trx_rd0_tag = resp_trx.GetFracRef("rd0_tag")
+                            var resp_trx_mem_be = resp_trx.GetFracRef("mem_be")
+                            var resp_trx_mem_load_signext = resp_trx.GetFracRef("mem_load_signext")
+                            var resp_trx_mem_data_rdata = resp_trx.GetFracRef("mem_data_rdata")
 
-                        cyclix_gen.begif(rdy)
-                        run {
+                            cyclix_gen.assign(resp_trx_rdy, mem_we)
+                            cyclix_gen.assign(resp_trx_trx_id, trx_id)
+                            cyclix_gen.assign(resp_trx_rd0_req, !mem_we)
+                            cyclix_gen.assign(resp_trx_rd0_tag, rd_ctrls[0].tag)
+                            cyclix_gen.assign(resp_trx_mem_be, mem_be)
+                            cyclix_gen.assign(resp_trx_mem_load_signext, mem_load_signext)
+                            cyclix_gen.assign(resp_trx_mem_data_rdata, 0)
 
-                            cyclix_gen.assign(mem_data_wdata.GetFracRef("we"), mem_cmd)
-                            cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("addr"), mem_addr)
-                            cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
-                            cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
-
-                            cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata))
-                            run {
-                                cyclix_gen.begif(mem_cmd)
-                                run {
-                                    cyclix_gen.assign(pop, 1)
-
-                                    // finishing store (returning to ROB)
-                                    cyclix_gen.assign(exu_cdb_inst_enb, 1)
-                                    cyclix_gen.assign(exu_cdb_inst_trx_id, trx_id)
-                                    cyclix_gen.assign(exu_cdb_inst_req, 0)
-                                    cyclix_gen.assign(exu_cdb_inst_tag, 0)
-                                    cyclix_gen.assign(exu_cdb_inst_wdata, 0)
-                                }; cyclix_gen.endif()
-                                cyclix_gen.begelse()
-                                run {
-                                    cyclix_gen.assign(mem_rd_inprogress, 1)
-                                }; cyclix_gen.endif()
-                            }; cyclix_gen.endif()
+                            resp_buf.push_trx(resp_trx)
+                            cyclix_gen.assign(pop, 1)
+                            pop_trx()
 
                         }; cyclix_gen.endif()
 
@@ -189,7 +203,8 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
 
             }; cyclix_gen.endif()
 
-        }; cyclix_gen.endif()                   // !mem_rd_inprogress
+        }; cyclix_gen.endif()
+        cyclix_gen.MSG_COMMENT("Initiating I/O request: done")
 
         cyclix_gen.MSG_COMMENT("Mem addr generating...")
         for (trx_idx in TRX_BUF.vartype.dimensions.last().msb downTo 0) {
@@ -207,11 +222,6 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
             cyclix_gen.assign(entry_ptr.GetFracRef("mem_addr_generated"), 1)
         }; cyclix_gen.endif()
         cyclix_gen.MSG_COMMENT("Mem addr generating: done")
-
-        cyclix_gen.begif(pop)
-        run {
-            pop_trx()
-        }; cyclix_gen.endif()
 
         cyclix_gen.COMMENT("Memory flow control consistency identification...")
         var ROB_SEARCH_DEPTH = 4
@@ -244,4 +254,20 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
 
         cyclix_gen.MSG_COMMENT("I/O IQ processing: done")
     }
+}
+
+internal class io_buffer_resp_risc (cyclix_gen : cyclix.Generic,
+                                    name_prefix : String,
+                                    TRX_BUF_SIZE : Int,
+                                    MultiExu_CFG : Reordex_CFG,
+                                    data_dim : hw_dim_static
+        ): trx_buffer(cyclix_gen, name_prefix, TRX_BUF_SIZE, 0, MultiExu_CFG) {
+
+    var rdy                 = AdduStageVar("rdy", 0, 0, "0")
+    var trx_id              = AddStageVar(hw_structvar("trx_id",     DATA_TYPE.BV_UNSIGNED, GetWidthToContain(MultiExu_CFG.trx_inflight_num)-1, 0, "0"))
+    var rd0_req             = AdduStageVar("rd0_req", 0, 0, "0")
+    var rd0_tag             = AdduStageVar("rd0_tag", 31, 0, "0")    // TODO: fix dims
+    var mem_be              = AdduStageVar("mem_be", 3, 0, "0")
+    var mem_load_signext    = AdduStageVar("mem_load_signext", 0, 0, "0")
+    var mem_data_rdata      = AdduStageVar("mem_data_rdata", data_dim, "0")
 }
