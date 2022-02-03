@@ -10,43 +10,15 @@ package agenda
 
 internal class EXU_CUSTOM_0 : reordex.Exu("CUSTOM_0", CFG) {
 
-    // ALU opcodes
-    val aluop_MUL		= 0
-    val aluop_DIV		= 1
-
-    var alu_op0_wide    = ulocal("alu_op0_wide", 32, 0, "0")
-    var alu_op1_wide    = ulocal("alu_op1_wide", 32, 0, "0")
-    var alu_result_wide = ulocal("alu_result_wide", 32, 0, "0")
-    var alu_result      = ulocal("alu_result", 31, 0, "0")
-
     init {
 
-        begif(CFG.exu_unsigned)
+        begif(gr(CFG.src0, CFG.src1))
         run {
-            alu_op0_wide.assign(zeroext(CFG.src0, 33))
-            alu_op1_wide.assign(zeroext(CFG.src1, 33))
+            CFG.rd.assign(CFG.src0)
         }; endif()
         begelse()
         run {
-            alu_op0_wide.assign(signext(CFG.src0, 33))
-            alu_op1_wide.assign(signext(CFG.src1, 33))
+            CFG.rd.assign(CFG.src1)
         }; endif()
-
-        begcase(CFG.exu_opcode)
-        run {
-            begbranch(aluop_MUL)
-            run {
-                alu_result_wide.assign(alu_op0_wide * alu_op1_wide)
-            }; endbranch()
-
-            begbranch(aluop_DIV)
-            run {
-                alu_result_wide.assign(alu_op0_wide / alu_op1_wide)
-            }; endbranch()
-        }; endcase()
-
-        alu_result.assign(alu_result_wide[31, 0])
-
-        CFG.rd.assign(alu_result)
     }
 }

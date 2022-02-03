@@ -31,7 +31,7 @@ internal class CPU_CFG : Reordex_CFG(32, 32, 2, REG_MGMT_RENAMING(48), 16, REORD
     var rd = AddRd()
 
     val M_Ext = true
-    val Custom0_Ext = false
+    val Custom0_Ext = true
 }
 
 internal val CFG = CPU_CFG()

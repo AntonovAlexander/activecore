@@ -78,6 +78,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
     val opcode_JALR			= 0x67
     val opcode_JAL			= 0x6f
     val opcode_SYSTEM		= 0x73
+    val opcode_custom_0     = 0x0b
 
     val instrcode_MRET        = 0x30200073
 
@@ -433,19 +434,6 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
 
                 }
 
-                if (CFG.Custom0_Ext) {
-
-                    COMMENT("Custom-0 extension decoding")
-                    begif(eq2(funct7, 1))
-                    run {
-
-                        assign(exu_id, GetExuID("CUSTOM_0"))
-                        CFG.exu_opcode.assign(funct3)
-
-                    }; endif()
-
-                }
-
             }; endbranch()
 
             begbranch(opcode_MISC_MEM)
@@ -546,6 +534,22 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                     }; endbranch()
                 }; endcase()
             }; endbranch()
+
+            if (CFG.Custom0_Ext) {
+
+                begbranch(opcode_custom_0)
+                run {
+                    assign(exu_id, GetExuID("CUSTOM_0"))
+                    CFG.exu_opcode.assign(funct3)
+                    // assumed: R-type
+                    rs0.req.assign(1)
+                    rs1.req.assign(1)
+                    op0_source.assign(OP0_SRC_RS)
+                    op1_source.assign(OP1_SRC_RS)
+                    rd.req.assign(1)
+                }; endbranch()
+
+            }
 
         }; endcase()
 
