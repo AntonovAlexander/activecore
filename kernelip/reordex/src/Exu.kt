@@ -11,6 +11,9 @@ package reordex
 import hwast.*
 
 val OP_EXU = hw_opcode("exec_unit")
+val OP_GET_EXU_ID = hw_opcode("get_exu_id")
+
+open class hw_exec_get_exu_id(val srcExuName : String) : hw_exec(OP_GET_EXU_ID)
 
 open class Exu(val name : String, val Exu_CFG : Reordex_CFG) : hw_astc_stdif() {
 

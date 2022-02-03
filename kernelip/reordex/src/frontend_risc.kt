@@ -273,6 +273,7 @@ internal class instr_fetch_buffer(name: String,
                                   TRX_BUF_SIZE : Int,
                                   val MultiExu_inst : MultiExuRISC,
                                   MultiExu_CFG : Reordex_CFG,
+                                  val ExecUnits : MutableMap<String, Exu_CFG>,
                                   val global_structures: __control_structures,
                                   cdb_num : Int,
                                   INSTR_IO_ID_WIDTH : Int) : uop_buffer(cyclix_gen, "geninstr_fetch", TRX_BUF_SIZE, MultiExu_CFG.DataPath_width, MultiExu_CFG, cdb_num) {
@@ -325,7 +326,20 @@ internal class instr_fetch_buffer(name: String,
                                expr : hw_exec,
                                context : import_expr_context) {
 
-        if (expr is hw_exec_src_set_imm) {
+        if (expr is hw_exec_get_exu_id) {
+            var ExUnit_found = false
+            var ExUnit_pos = 0
+            for (ExUnit in ExecUnits) {
+                if (ExUnit.key == expr.srcExuName) {
+                    ExUnit_found = true
+                    break
+                };
+                else ExUnit_pos++
+            }
+            if (!ExUnit_found) ERROR("Exu " + expr.srcExuName + " not found!")
+            cyclix_gen.assign(TranslateVar(expr.dsts[0], context.var_dict), ExUnit_pos)
+
+        } else if (expr is hw_exec_src_set_imm) {
             var num = MultiExu_CFG.srcs.indexOf(expr.src)
             src_rsrv[num].src_rdy.assign(1)
             src_rsrv[num].src_data.assign(TranslateParam(expr.imm))

@@ -37,13 +37,14 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         cyclix_gen as cyclix.Streaming
         context as reordex_import_expr_context
 
-        if ((expr.opcode == OP1_ASSIGN) && (expr.dsts[0] == context.ExUnit.ExecUnit.curinstr_addr)) {
-            cyclix_gen.ERROR("curinstr_addr cannot be written!")
-        }
-
-        if ((expr.opcode == OP1_ASSIGN) && (expr.dsts[0] == context.ExUnit.ExecUnit.nextinstr_addr)) {
-            cyclix_gen.assign(TranslateVar(context.ExUnit.ExecUnit.resp_data, context.var_dict).GetFracRef("branch_req"), 1)
-            cyclix_gen.assign(TranslateVar(context.ExUnit.ExecUnit.resp_data, context.var_dict).GetFracRef("branch_vec"), TranslateParam(expr.params[0], context.var_dict))
+        if (expr.opcode == OP1_ASSIGN) {
+            if (expr.dsts[0] == context.ExUnit.ExecUnit.curinstr_addr) {
+                cyclix_gen.ERROR("curinstr_addr cannot be written!")
+            }
+            if (expr.dsts[0] == context.ExUnit.ExecUnit.nextinstr_addr) {
+                cyclix_gen.assign(TranslateVar(context.ExUnit.ExecUnit.resp_data, context.var_dict).GetFracRef("branch_req"), 1)
+                cyclix_gen.assign(TranslateVar(context.ExUnit.ExecUnit.resp_data, context.var_dict).GetFracRef("branch_vec"), TranslateParam(expr.params[0], context.var_dict))
+            }
         }
 
         cyclix_gen.import_expr(debug_lvl, expr, context, ::reconstruct_expression)
@@ -133,7 +134,7 @@ open class MultiExuCoproc(val name : String, val MultiExu_CFG : Reordex_CFG, val
         var instr_req = (rob as hw_stage)
         var instr_iaddr = (rob as hw_stage)
         if (MultiExu_CFG.mode == REORDEX_MODE.RISC) {
-            instr_fetch = instr_fetch_buffer(name, cyclix_gen, (this as MultiExuRISC).FETCH_BUF_SIZE, (this as MultiExuRISC), MultiExu_CFG, control_structures, CDB_NUM, INSTR_IO_ID_WIDTH)
+            instr_fetch = instr_fetch_buffer(name, cyclix_gen, (this as MultiExuRISC).FETCH_BUF_SIZE, (this as MultiExuRISC), MultiExu_CFG, ExecUnits, control_structures, CDB_NUM, INSTR_IO_ID_WIDTH)
             instr_fetch.var_dict.put(this.RISCDecode.CSR_MCAUSE, cyclix_CSR_MCAUSE)
             instr_req = instr_req_stage(name, cyclix_gen, (this as MultiExuRISC).IREQ_BUF_SIZE, INSTR_IO_ID_WIDTH, MultiExu_CFG, busreq_mem_struct, control_structures)
             instr_iaddr = instr_iaddr_stage(name, cyclix_gen, MultiExu_CFG)

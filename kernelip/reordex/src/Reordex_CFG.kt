@@ -194,6 +194,16 @@ open class RISCDecoder (MultiExu_CFG : Reordex_CFG) : RISCDecodeContainer(MultiE
 
     }
 
+    fun GetExuID(srcExuName : String) : hw_var {
+        var new_expr = hw_exec_get_exu_id(srcExuName)
+        var genvar = hw_var(GetGenName("getExuID"), 31, 0, "0")
+        genvar.default_astc = this
+        new_expr.AddGenVar(genvar)
+        new_expr.AddDst(genvar)
+        AddExpr(new_expr)
+        return genvar
+    }
+
     fun SrcSetImm(src : Src, imm : hw_param) {
         AddExpr(hw_exec_src_set_imm(src, imm))
     }

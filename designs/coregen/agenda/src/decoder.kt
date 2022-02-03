@@ -147,6 +147,8 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
         immediate_J_src.add(hw_imm(1, "0"))
         immediate_J.assign(signext(cnct(immediate_J_src), 32))
 
+        assign(exu_id, GetExuID("INTEGER"))
+
         begcase(opcode)
         run {
             begbranch(opcode_LUI)
@@ -175,7 +177,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                 op1_source.assign(OP1_SRC_IMM)
                 cf_can_alter.assign(1)
                 exu_req.assign(1)
-                assign(exu_id, 1)
+                assign(exu_id, GetExuID("BRANCH"))
                 CFG.exu_opcode.assign(aluop_ADD)
                 rd.req.assign(1)
                 rd.source.assign(RD_PC_INC)
@@ -190,7 +192,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                 op1_source.assign(OP1_SRC_IMM)
                 cf_can_alter.assign(1)
                 exu_req.assign(1)
-                assign(exu_id, 1)
+                assign(exu_id, GetExuID("BRANCH"))
                 CFG.exu_opcode.assign(aluop_ADD)
                 rd.req.assign(1)
                 rd.source.assign(RD_PC_INC)
@@ -204,7 +206,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
                 rs1.req.assign(1)
                 cf_can_alter.assign(1)
                 exu_req.assign(1)
-                assign(exu_id, 1)
+                assign(exu_id, GetExuID("BRANCH"))
                 CFG.exu_opcode.assign(aluop_SUB)
                 CFG.brctrl_cond.assign(1)
                 CFG.brctrl_src.assign(JMP_SRC_ALU)
@@ -417,14 +419,27 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
 
                 }; endcase()
 
-                val M_Ext = true
-                if (M_Ext) {
+                if (CFG.M_Ext) {
 
+                    COMMENT("M extension decoding")
                     begif(eq2(funct7, 1))
                     run {
 
-                        assign(exu_id, 2)
+                        assign(exu_id, GetExuID("MUL_DIV"))
                         rd.source.assign(RD_ALU)
+                        CFG.exu_opcode.assign(funct3)
+
+                    }; endif()
+
+                }
+
+                if (CFG.Custom0_Ext) {
+
+                    COMMENT("Custom-0 extension decoding")
+                    begif(eq2(funct7, 1))
+                    run {
+
+                        assign(exu_id, GetExuID("CUSTOM_0"))
                         CFG.exu_opcode.assign(funct3)
 
                     }; endif()
@@ -577,7 +592,7 @@ internal class RISCV_Decoder : reordex.RISCDecoder(CFG) {
             mret_req.assign(1)
             cf_can_alter.assign(1)
             exu_req.assign(1)
-            assign(exu_id, 1)
+            assign(exu_id, GetExuID("BRANCH"))
             CFG.brctrl_src.assign(JMP_SRC_IMM)
             op0_source.assign(OP0_SRC_IMM)
             immediate.assign(MRETADDR)
