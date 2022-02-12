@@ -25,7 +25,7 @@ reg [31:0] SW;
 wire [31:0] LED;
 reg irq_btn;
 	
-kerygma
+sigrun
 #(
 	.UDM_RTX_EXTERNAL_OVERRIDE("YES")
 	, .DEBOUNCER_FACTOR_POW(2)
@@ -33,7 +33,7 @@ kerygma
 	, .mem_init_type("elf")
 	, .mem_init_data("../../sw/apps/heartbeat_variable.riscv")
 	, .mem_size(8192)
-) kerygma (
+) sigrun (
 	.clk_i(CLK)
 	, .arst_i(RST)
 	, .irq_btn_i(irq_btn)
@@ -83,7 +83,7 @@ end
 endtask
 
 `define UDM_RX_SIGNAL rx
-`define UDM_BLOCK kerygma.udm
+`define UDM_BLOCK sigrun.udm
 `include "udm.svh"
 udm_driver udm;
 

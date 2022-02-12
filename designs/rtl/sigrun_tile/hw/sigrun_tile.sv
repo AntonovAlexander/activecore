@@ -1,5 +1,5 @@
 /*
- * kerygma_tile.sv
+ * sigrun_tile.sv
  *
  *  Created on: 22.07.2021
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
@@ -11,7 +11,7 @@
 
 `include "agenda_cpu.svh"
 
-module kerygma_tile
+module sigrun_tile
 #(
     parameter corenum=0
     , mem_init_type="elf"

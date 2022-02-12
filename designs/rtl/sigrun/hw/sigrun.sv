@@ -1,5 +1,5 @@
 /*
- * kerygma.sv
+ * sigrun.sv
  *
  *  Created on: 22.07.2021
  *      Author: Alexander Antonov <antonov.alex.alex@gmail.com>
@@ -9,7 +9,7 @@
 
 `include "sigma_tile.svh"
 
-module kerygma
+module sigrun
 #(
 	parameter UDM_BUS_TIMEOUT = (1024*1024*100)
 	, UDM_RTX_EXTERNAL_OVERRIDE = "NO"
@@ -54,13 +54,13 @@ debouncer
 MemSplit32 hif();
 MemSplit32 xif();
 
-kerygma_tile #(
+sigrun_tile #(
 	.corenum(0)
 	, .mem_init_type(mem_init_type)
 	, .mem_init_data(mem_init_data)
 	, .mem_size(mem_size)
 	, .PATH_THROUGH("YES")
-) kerygma_tile (
+) sigrun_tile (
 	.clk_i(clk_i)
 	, .rst_i(cpu_reset)
 

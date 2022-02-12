@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="55" Path="C:/Users/anton/PROJECTS/activecore/designs/rtl/kerygma/syn/KC705/KC705.xpr">
+<Project Version="7" Minor="55" Path="C:/Users/anton/PROJECTS/activecore/designs/rtl/sigrun/syn/KC705/KC705.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="dbe4f722851248e3976cc912f1a3ff99"/>
@@ -67,13 +67,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="30"/>
-    <Option Name="WTModelSimExportSim" Val="30"/>
-    <Option Name="WTQuestaExportSim" Val="30"/>
-    <Option Name="WTIesExportSim" Val="30"/>
-    <Option Name="WTVcsExportSim" Val="30"/>
-    <Option Name="WTRivieraExportSim" Val="30"/>
-    <Option Name="WTActivehdlExportSim" Val="30"/>
+    <Option Name="WTXSimExportSim" Val="32"/>
+    <Option Name="WTModelSimExportSim" Val="32"/>
+    <Option Name="WTQuestaExportSim" Val="32"/>
+    <Option Name="WTIesExportSim" Val="32"/>
+    <Option Name="WTVcsExportSim" Val="32"/>
+    <Option Name="WTRivieraExportSim" Val="32"/>
+    <Option Name="WTActivehdlExportSim" Val="32"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -121,7 +121,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../hw/kerygma.sv">
+      <File Path="$PPRDIR/../../hw/sigrun.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -211,46 +211,46 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../kerygma_tile/hw/agenda_gen/coregen/sverilog/genexu_INTEGER/genexu_INTEGER.svh">
+      <File Path="$PPRDIR/../../../sigrun_tile/hw/agenda_gen/coregen/sverilog/genexu_INTEGER/genexu_INTEGER.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../kerygma_tile/hw/agenda_gen/coregen/sverilog/agenda_cpu.svh">
+      <File Path="$PPRDIR/../../../sigrun_tile/hw/agenda_gen/coregen/sverilog/agenda_cpu.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../kerygma_tile/hw/agenda_gen/coregen/sverilog/genexu_MUL_DIV/genexu_MUL_DIV.svh">
+      <File Path="$PPRDIR/../../../sigrun_tile/hw/agenda_gen/coregen/sverilog/genexu_MUL_DIV/genexu_MUL_DIV.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../kerygma_tile/hw/kerygma_tile.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../kerygma_tile/hw/agenda_gen/coregen/sverilog/agenda_cpu.sv">
+      <File Path="$PPRDIR/../../../sigrun_tile/hw/sigrun_tile.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../kerygma_tile/hw/agenda_gen/coregen/sverilog/genexu_INTEGER/genexu_INTEGER.sv">
+      <File Path="$PPRDIR/../../../sigrun_tile/hw/agenda_gen/coregen/sverilog/agenda_cpu.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../kerygma_tile/hw/mul_div/genexu_MUL_DIV.sv">
+      <File Path="$PPRDIR/../../../sigrun_tile/hw/agenda_gen/coregen/sverilog/genexu_INTEGER/genexu_INTEGER.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../sigrun_tile/hw/mul_div/genexu_MUL_DIV.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -271,26 +271,26 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../kerygma_tile/hw/agenda_gen/coregen/sverilog/genexu_BRANCH/genexu_BRANCH.svh">
+      <File Path="$PPRDIR/../../../sigrun_tile/hw/agenda_gen/coregen/sverilog/genexu_BRANCH/genexu_BRANCH.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../kerygma_tile/hw/agenda_gen/coregen/sverilog/genexu_BRANCH/genexu_BRANCH.sv">
+      <File Path="$PPRDIR/../../../sigrun_tile/hw/agenda_gen/coregen/sverilog/genexu_BRANCH/genexu_BRANCH.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../kerygma_tile/hw/agenda_gen/coregen/sverilog/genexu_CUSTOM_0/genexu_CUSTOM_0.svh">
+      <File Path="$PPRDIR/../../../sigrun_tile/hw/agenda_gen/coregen/sverilog/genexu_CUSTOM_0/genexu_CUSTOM_0.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../kerygma_tile/hw/agenda_gen/coregen/sverilog/genexu_CUSTOM_0/genexu_CUSTOM_0.sv">
+      <File Path="$PPRDIR/../../../sigrun_tile/hw/agenda_gen/coregen/sverilog/genexu_CUSTOM_0/genexu_CUSTOM_0.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>

@@ -33,12 +33,12 @@ sys_clk sys_clk
 wire arst;
 assign arst = CPU_RESET | !pll_locked;
 
-kerygma
+sigrun
 #(
 	.mem_init_type("none")
 	, .mem_init_data("../sigma/sw/apps/heartbeat_variable.riscv.hex")
 	, .mem_size(8192)
-) kerygma (
+) sigrun (
 	.clk_i(clk_gen)
 	, .arst_i(arst)
 	, .irq_btn_i(BTNC)
