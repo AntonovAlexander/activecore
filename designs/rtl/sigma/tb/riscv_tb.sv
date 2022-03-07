@@ -93,6 +93,7 @@ begin
 	RST = 1;
 	#(`CLK_HALF_PERIOD*6);
 	RST = 0;
+	while (sigma.srst) WAIT(10);
 end
 endtask
 
@@ -114,10 +115,12 @@ begin
 	SW = 8'h30;
 	RESET_ALL();
 	WAIT(1000);
+
 	irq_btn = 1'b0;
 	WAIT(100);
 	irq_btn = 1'b0;
 	WAIT(50);
+	
 	udm.check();
 	//udm.hreset();
 	WAIT(100);

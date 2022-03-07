@@ -51,6 +51,7 @@ task RESET_ALL ();
     RST = 1;
     #(`HALF_PERIOD*6);
     RST = 0;
+    while (DUT.srst) WAIT(10);
     end
 endtask
 
@@ -86,11 +87,11 @@ initial
     
 	$display ("### SIMULATION STARTED ###");
 	
-	udm.cfg(`DIVIDER_115200, 2'b00);
-
 	SW = 8'h30;
 	RESET_ALL();
 	WAIT(100);
+
+	udm.cfg(`DIVIDER_115200, 2'b00);
 	udm.check();
 	udm.hreset();
 	WAIT(100);
