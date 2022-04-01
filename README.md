@@ -68,6 +68,8 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 * A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation (in Russian), ITMO University, Saint-Petersburg, 28.12.2018. URL: http://fppo.ifmo.ru/dissertation/?number=63419
 
+* A. Antonov, “Structured Design of Complex Hardware Microarchitectures Based on Explicit Generic Implementations of Custom Microarchitectural Mechanisms,” Electronics 2022, Vol. 11, Issue 7, article 1055, 28.03.2022. URL: https://www.mdpi.com/2079-9292/11/7/1055
+
 * A. Antonov, “Inferring Custom Synthesizable Kernel for Generation of Coprocessors with Out-of-Order Execution,” in 2021 10th Mediterranean Conference on Embedded Computing (MECO), 2021. URL: https://ieeexplore.ieee.org/document/9460265
 
 * A. Antonov, P. Kustarev, “Strategies of Computational Process Synthesis – a System-Level Model of HW/SW (Micro)Architectural Mechanisms,” in 2020 9th Mediterranean Conference on Embedded Computing (MECO), 2020. URL: https://ieeexplore.ieee.org/document/9134071
