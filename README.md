@@ -66,9 +66,9 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 ### Publications
 
-* A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation (in Russian), ITMO University, Saint-Petersburg, 28.12.2018. URL: http://fppo.ifmo.ru/dissertation/?number=63419
-
 * A. Antonov, “Structured Design of Complex Hardware Microarchitectures Based on Explicit Generic Implementations of Custom Microarchitectural Mechanisms,” Electronics 2022, Vol. 11, Issue 7, article 1055, 28.03.2022. URL: https://www.mdpi.com/2079-9292/11/7/1055
+
+* A. Antonov, “Superscalar Out-of-Order RISC-V ASIP Based on Programmable Hardware Generator with Decoupled Computations and Flow Control,” in 2022 11th Mediterranean Conference on Embedded Computing (MECO), 2022. URL: https://ieeexplore.ieee.org/document/9797182
 
 * A. Antonov, “Inferring Custom Synthesizable Kernel for Generation of Coprocessors with Out-of-Order Execution,” in 2021 10th Mediterranean Conference on Embedded Computing (MECO), 2021. URL: https://ieeexplore.ieee.org/document/9460265
 
@@ -78,4 +78,6 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 * A. Antonov, P. Kustarev, S. Bikovsky, "Improving Microarchitecture Design and Hardware Generation using Micro-Language IP Cores", in Proc. IEEE Nordic Circuits and Systems Conference (NORCAS) / NORCHIP and International Symposium of System-on-Chip (SoC) - 2017, pp. 1-6. URL: https://ieeexplore.ieee.org/document/8124952
 
-* A. Аntonov, "Design of Computer Microarchitecture Basing on Problem-Oriented Languages", Journal of Instrument Engineering, 2017, Vol. 60, No. 10, pp. 980—985. URL: http://pribor.ifmo.ru/en/article/17220/proektirovanie_mikroarhitektury_vychisliteley_na_baze_problemno-orientirovannyh_yazykov.htm
+* A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation (in Russian), ITMO University, Saint-Petersburg, 28.12.2018. URL: http://fppo.ifmo.ru/dissertation/?number=63419
+
+* A. Аntonov, "Design of Computer Microarchitecture Basing on Problem-Oriented Languages", Journal of Instrument Engineering (in Russian), 2017, Vol. 60, No. 10, pp. 980—985. URL: http://pribor.ifmo.ru/en/article/17220/proektirovanie_mikroarhitektury_vychisliteley_na_baze_problemno-orientirovannyh_yazykov.htm
