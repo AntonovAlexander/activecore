@@ -235,6 +235,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         run {
             pc.assign(jump_vector_cmd)
             jump_req_cmd.assign(0)
+            instr_req_done.accum(0)
         }; endif()
 
         curinstr_addr.assign(pc)
@@ -244,11 +245,6 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     }
 
     fun Pipe_ReqInstrMem() {
-        begif(jump_req_cmd)
-        run {
-            instr_req_done.accum(0)
-        }; endif()
-
         assign(instr_busreq.GetFracRef("addr"), curinstr_addr)
         assign(instr_busreq.GetFracRef("be"), 0xf)
         assign(instr_busreq.GetFracRef("wdata"), 0)

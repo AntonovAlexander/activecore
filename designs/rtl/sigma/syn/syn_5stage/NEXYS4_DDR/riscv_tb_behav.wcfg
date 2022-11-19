@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="riscv_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_arb_1m2s_sv " />
+            <top_module name="glbl" />
+            <top_module name="riscv_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="259610961fs"></ZoomEndTime>
+      <Cursor1Time time="688400000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="853"></NameColumnWidth>
+      <ValueColumnWidth column_width="324"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="18" />
+   <wvobject fp_name="/riscv_tb/CLK" type="logic">
+      <obj_property name="ElementShortName">CLK</obj_property>
+      <obj_property name="ObjectShortName">CLK</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/RST" type="logic">
+      <obj_property name="ElementShortName">RST</obj_property>
+      <obj_property name="ObjectShortName">RST</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/rx" type="logic">
+      <obj_property name="ElementShortName">rx</obj_property>
+      <obj_property name="ObjectShortName">rx</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/SW" type="array">
+      <obj_property name="ElementShortName">SW[31:0]</obj_property>
+      <obj_property name="ObjectShortName">SW[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/LED" type="array">
+      <obj_property name="ElementShortName">LED[31:0]</obj_property>
+      <obj_property name="ObjectShortName">LED[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/irq_btn" type="logic">
+      <obj_property name="ElementShortName">irq_btn</obj_property>
+      <obj_property name="ObjectShortName">irq_btn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/CPU_RAM_ADDR" type="array">
+      <obj_property name="ElementShortName">CPU_RAM_ADDR[31:0]</obj_property>
+      <obj_property name="ObjectShortName">CPU_RAM_ADDR[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/CSR_LED_ADDR" type="array">
+      <obj_property name="ElementShortName">CSR_LED_ADDR[31:0]</obj_property>
+      <obj_property name="ObjectShortName">CSR_LED_ADDR[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/CSR_SW_ADDR" type="array">
+      <obj_property name="ElementShortName">CSR_SW_ADDR[31:0]</obj_property>
+      <obj_property name="ObjectShortName">CSR_SW_ADDR[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_TRX_LOCAL" type="array">
+      <obj_property name="ElementShortName">genpstage_EXEC_TRX_LOCAL</obj_property>
+      <obj_property name="ObjectShortName">genpstage_EXEC_TRX_LOCAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_pc" type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">genpsticky_glbl_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">genpsticky_glbl_pc[31:0]</obj_property>
+      <obj_property name="label">PC</obj_property>
+   </wvobject>
+   <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpsticky_glbl_regfile" type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">genpsticky_glbl_regfile[31:1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">genpsticky_glbl_regfile[31:1][31:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <obj_property name="label">CPU registers</obj_property>
+   </wvobject>
+   <wvobject fp_name="group215" type="group">
+      <obj_property name="label">data mem</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="group213" type="group">
+         <obj_property name="label">data mem req</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_req_genfifo_ack_i" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_req_genfifo_ack_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_req_genfifo_ack_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_req_genfifo_req_o" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_req_genfifo_req_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_req_genfifo_req_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_req_genfifo_wdata_bo" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_req_genfifo_wdata_bo</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_req_genfifo_wdata_bo</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group214" type="group">
+         <obj_property name="label">data mem ack</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_resp_genfifo_ack_o" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_resp_genfifo_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_resp_genfifo_ack_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_resp_genfifo_req_i" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_resp_genfifo_req_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_resp_genfifo_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genmcopipe_data_mem_resp_genfifo_rdata_bi" type="array">
+            <obj_property name="ElementShortName">genmcopipe_data_mem_resp_genfifo_rdata_bi[31:0]</obj_property>
+            <obj_property name="ObjectShortName">genmcopipe_data_mem_resp_genfifo_rdata_bi[31:0]</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group396" type="group">
+      <obj_property name="label">Coproc custom0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="group397" type="group">
+         <obj_property name="label">req bus</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/coproc_custom0_wrapper/stream_req_bus_genfifo_req_i" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_req_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/coproc_custom0_wrapper/stream_req_bus_genfifo_ack_o" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_ack_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/coproc_custom0_wrapper/stream_req_bus_genfifo_rdata_bi" type="array">
+            <obj_property name="ElementShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+            <obj_property name="ObjectShortName">stream_req_bus_genfifo_rdata_bi</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group398" type="group">
+         <obj_property name="label">resp bus</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/coproc_custom0_wrapper/stream_resp_bus_genfifo_req_o" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_req_o[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/coproc_custom0_wrapper/stream_resp_bus_genfifo_ack_i" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_ack_i[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/coproc_custom0_wrapper/stream_resp_bus_genfifo_wdata_bo" type="array">
+            <obj_property name="ElementShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+            <obj_property name="ObjectShortName">stream_resp_bus_genfifo_wdata_bo</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group473" type="group">
+      <obj_property name="label">cpu instr mem</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/cpu_instr/req" type="logic">
+         <obj_property name="ElementShortName">req</obj_property>
+         <obj_property name="ObjectShortName">req</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/cpu_instr/ack" type="logic">
+         <obj_property name="ElementShortName">ack</obj_property>
+         <obj_property name="ObjectShortName">ack</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/cpu_instr/addr" type="array">
+         <obj_property name="ElementShortName">addr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">addr[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/cpu_instr/we" type="logic">
+         <obj_property name="ElementShortName">we</obj_property>
+         <obj_property name="ObjectShortName">we</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/cpu_instr/wdata" type="array">
+         <obj_property name="ElementShortName">wdata[31:0]</obj_property>
+         <obj_property name="ObjectShortName">wdata[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/cpu_instr/be" type="array">
+         <obj_property name="ElementShortName">be[3:0]</obj_property>
+         <obj_property name="ObjectShortName">be[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/cpu_instr/resp" type="logic">
+         <obj_property name="ElementShortName">resp</obj_property>
+         <obj_property name="ObjectShortName">resp</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/cpu_instr/rdata" type="array">
+         <obj_property name="ElementShortName">rdata[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rdata[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group353" type="group">
+      <obj_property name="label">Pipeline</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="group354" type="group">
+         <obj_property name="label">IFETCH</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IFETCH_genctrl_active" type="array">
+            <obj_property name="ElementShortName">genpstage_IFETCH_genctrl_active[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IFETCH_genctrl_active[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IFETCH_genctrl_working" type="array">
+            <obj_property name="ElementShortName">genpstage_IFETCH_genctrl_working[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IFETCH_genctrl_working[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IFETCH_genctrl_succ" type="array">
+            <obj_property name="ElementShortName">genpstage_IFETCH_genctrl_succ[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IFETCH_genctrl_succ[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IFETCH_genctrl_occupied" type="array">
+            <obj_property name="ElementShortName">genpstage_IFETCH_genctrl_occupied[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IFETCH_genctrl_occupied[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IFETCH_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">genpstage_IFETCH_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IFETCH_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IFETCH_genctrl_new" type="array">
+            <obj_property name="ElementShortName">genpstage_IFETCH_genctrl_new[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IFETCH_genctrl_new[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IFETCH_genctrl_finish" type="array">
+            <obj_property name="ElementShortName">genpstage_IFETCH_genctrl_finish[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IFETCH_genctrl_finish[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IFETCH_genpctrl_flushreq" type="array">
+            <obj_property name="ElementShortName">genpstage_IFETCH_genpctrl_flushreq[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IFETCH_genpctrl_flushreq[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IFETCH_genctrl_stalled_glbl" type="array">
+            <obj_property name="ElementShortName">genpstage_IFETCH_genctrl_stalled_glbl[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IFETCH_genctrl_stalled_glbl[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IFETCH_TRX_LOCAL" type="array">
+            <obj_property name="ElementShortName">genpstage_IFETCH_TRX_LOCAL</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IFETCH_TRX_LOCAL</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IFETCH_TRX_PUSHED" type="array">
+            <obj_property name="ElementShortName">genpstage_IFETCH_TRX_PUSHED</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IFETCH_TRX_PUSHED</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group355" type="group">
+         <obj_property name="label">IDECODE</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IDECODE_genctrl_active" type="array">
+            <obj_property name="ElementShortName">genpstage_IDECODE_genctrl_active[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IDECODE_genctrl_active[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IDECODE_genctrl_working" type="array">
+            <obj_property name="ElementShortName">genpstage_IDECODE_genctrl_working[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IDECODE_genctrl_working[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IDECODE_genctrl_succ" type="array">
+            <obj_property name="ElementShortName">genpstage_IDECODE_genctrl_succ[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IDECODE_genctrl_succ[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IDECODE_genctrl_occupied" type="array">
+            <obj_property name="ElementShortName">genpstage_IDECODE_genctrl_occupied[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IDECODE_genctrl_occupied[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IDECODE_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">genpstage_IDECODE_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IDECODE_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IDECODE_genctrl_new" type="array">
+            <obj_property name="ElementShortName">genpstage_IDECODE_genctrl_new[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IDECODE_genctrl_new[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IDECODE_genctrl_finish" type="array">
+            <obj_property name="ElementShortName">genpstage_IDECODE_genctrl_finish[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IDECODE_genctrl_finish[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IDECODE_genpctrl_flushreq" type="array">
+            <obj_property name="ElementShortName">genpstage_IDECODE_genpctrl_flushreq[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IDECODE_genpctrl_flushreq[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IDECODE_genctrl_stalled_glbl" type="array">
+            <obj_property name="ElementShortName">genpstage_IDECODE_genctrl_stalled_glbl[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IDECODE_genctrl_stalled_glbl[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IDECODE_TRX_LOCAL" type="array">
+            <obj_property name="ElementShortName">genpstage_IDECODE_TRX_LOCAL</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IDECODE_TRX_LOCAL</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_IDECODE_TRX_PUSHED" type="array">
+            <obj_property name="ElementShortName">genpstage_IDECODE_TRX_PUSHED</obj_property>
+            <obj_property name="ObjectShortName">genpstage_IDECODE_TRX_PUSHED</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group356" type="group">
+         <obj_property name="label">EXEC</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_genctrl_active" type="array">
+            <obj_property name="ElementShortName">genpstage_EXEC_genctrl_active[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_EXEC_genctrl_active[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_genctrl_working" type="array">
+            <obj_property name="ElementShortName">genpstage_EXEC_genctrl_working[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_EXEC_genctrl_working[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_genctrl_succ" type="array">
+            <obj_property name="ElementShortName">genpstage_EXEC_genctrl_succ[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_EXEC_genctrl_succ[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_genctrl_occupied" type="array">
+            <obj_property name="ElementShortName">genpstage_EXEC_genctrl_occupied[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_EXEC_genctrl_occupied[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">genpstage_EXEC_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_EXEC_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_genctrl_new" type="array">
+            <obj_property name="ElementShortName">genpstage_EXEC_genctrl_new[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_EXEC_genctrl_new[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_genctrl_finish" type="array">
+            <obj_property name="ElementShortName">genpstage_EXEC_genctrl_finish[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_EXEC_genctrl_finish[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_genctrl_stalled_glbl" type="array">
+            <obj_property name="ElementShortName">genpstage_EXEC_genctrl_stalled_glbl[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_EXEC_genctrl_stalled_glbl[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_genpctrl_flushreq" type="array">
+            <obj_property name="ElementShortName">genpstage_EXEC_genpctrl_flushreq[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_EXEC_genpctrl_flushreq[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_TRX_LOCAL" type="array">
+            <obj_property name="ElementShortName">genpstage_EXEC_TRX_LOCAL</obj_property>
+            <obj_property name="ObjectShortName">genpstage_EXEC_TRX_LOCAL</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_EXEC_TRX_PUSHED" type="array">
+            <obj_property name="ElementShortName">genpstage_EXEC_TRX_PUSHED</obj_property>
+            <obj_property name="ObjectShortName">genpstage_EXEC_TRX_PUSHED</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group357" type="group">
+         <obj_property name="label">MEM</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_MEM_genctrl_active" type="array">
+            <obj_property name="ElementShortName">genpstage_MEM_genctrl_active[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_MEM_genctrl_active[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_MEM_genctrl_working" type="array">
+            <obj_property name="ElementShortName">genpstage_MEM_genctrl_working[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_MEM_genctrl_working[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_MEM_genctrl_succ" type="array">
+            <obj_property name="ElementShortName">genpstage_MEM_genctrl_succ[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_MEM_genctrl_succ[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_MEM_genctrl_occupied" type="array">
+            <obj_property name="ElementShortName">genpstage_MEM_genctrl_occupied[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_MEM_genctrl_occupied[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_MEM_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">genpstage_MEM_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_MEM_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_MEM_genctrl_new" type="array">
+            <obj_property name="ElementShortName">genpstage_MEM_genctrl_new[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_MEM_genctrl_new[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_MEM_genctrl_finish" type="array">
+            <obj_property name="ElementShortName">genpstage_MEM_genctrl_finish[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_MEM_genctrl_finish[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_MEM_genpctrl_flushreq" type="array">
+            <obj_property name="ElementShortName">genpstage_MEM_genpctrl_flushreq[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_MEM_genpctrl_flushreq[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_MEM_genctrl_stalled_glbl" type="array">
+            <obj_property name="ElementShortName">genpstage_MEM_genctrl_stalled_glbl[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_MEM_genctrl_stalled_glbl[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_MEM_TRX_LOCAL" type="array">
+            <obj_property name="ElementShortName">genpstage_MEM_TRX_LOCAL</obj_property>
+            <obj_property name="ObjectShortName">genpstage_MEM_TRX_LOCAL</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_MEM_TRX_PUSHED" type="array">
+            <obj_property name="ElementShortName">genpstage_MEM_TRX_PUSHED</obj_property>
+            <obj_property name="ObjectShortName">genpstage_MEM_TRX_PUSHED</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group358" type="group">
+         <obj_property name="label">WB</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_WB_genctrl_active" type="array">
+            <obj_property name="ElementShortName">genpstage_WB_genctrl_active[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_WB_genctrl_active[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_WB_genctrl_working" type="array">
+            <obj_property name="ElementShortName">genpstage_WB_genctrl_working[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_WB_genctrl_working[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_WB_genctrl_succ" type="array">
+            <obj_property name="ElementShortName">genpstage_WB_genctrl_succ[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_WB_genctrl_succ[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_WB_genctrl_occupied" type="array">
+            <obj_property name="ElementShortName">genpstage_WB_genctrl_occupied[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_WB_genctrl_occupied[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_WB_genctrl_rdy" type="array">
+            <obj_property name="ElementShortName">genpstage_WB_genctrl_rdy[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_WB_genctrl_rdy[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_WB_genctrl_new" type="array">
+            <obj_property name="ElementShortName">genpstage_WB_genctrl_new[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_WB_genctrl_new[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_WB_genctrl_finish" type="array">
+            <obj_property name="ElementShortName">genpstage_WB_genctrl_finish[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_WB_genctrl_finish[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_WB_genpctrl_flushreq" type="array">
+            <obj_property name="ElementShortName">genpstage_WB_genpctrl_flushreq[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_WB_genpctrl_flushreq[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_WB_genctrl_stalled_glbl" type="array">
+            <obj_property name="ElementShortName">genpstage_WB_genctrl_stalled_glbl[0:0]</obj_property>
+            <obj_property name="ObjectShortName">genpstage_WB_genctrl_stalled_glbl[0:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_WB_TRX_LOCAL" type="array">
+            <obj_property name="ElementShortName">genpstage_WB_TRX_LOCAL</obj_property>
+            <obj_property name="ObjectShortName">genpstage_WB_TRX_LOCAL</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+         <wvobject fp_name="/riscv_tb/sigma/sigma_tile/\genblk1.riscv /genpstage_WB_TRX_PUSHED" type="array">
+            <obj_property name="ElementShortName">genpstage_WB_TRX_PUSHED</obj_property>
+            <obj_property name="ObjectShortName">genpstage_WB_TRX_PUSHED</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group86" type="group">
+      <obj_property name="label">ram</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[0]" type="array">
+         <obj_property name="ElementShortName">[0][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[0][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[1]" type="array">
+         <obj_property name="ElementShortName">[1][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[2]" type="array">
+         <obj_property name="ElementShortName">[2][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[2][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[3]" type="array">
+         <obj_property name="ElementShortName">[3][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[3][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[4]" type="array">
+         <obj_property name="ElementShortName">[4][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[4][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[5]" type="array">
+         <obj_property name="ElementShortName">[5][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[5][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6]" type="array">
+         <obj_property name="ElementShortName">[6][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[7]" type="array">
+         <obj_property name="ElementShortName">[7][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[7][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[8]" type="array">
+         <obj_property name="ElementShortName">[8][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[8][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[9]" type="array">
+         <obj_property name="ElementShortName">[9][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[9][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[10]" type="array">
+         <obj_property name="ElementShortName">[10][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[10][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[11]" type="array">
+         <obj_property name="ElementShortName">[11][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[11][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[12]" type="array">
+         <obj_property name="ElementShortName">[12][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[12][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[13]" type="array">
+         <obj_property name="ElementShortName">[13][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[13][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[14]" type="array">
+         <obj_property name="ElementShortName">[14][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[14][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[15]" type="array">
+         <obj_property name="ElementShortName">[15][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[15][31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group58" type="group">
+      <obj_property name="label">io buffer</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6144]" type="array">
+         <obj_property name="ElementShortName">[6144][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6144][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6145]" type="array">
+         <obj_property name="ElementShortName">[6145][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6145][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6146]" type="array">
+         <obj_property name="ElementShortName">[6146][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6146][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6147]" type="array">
+         <obj_property name="ElementShortName">[6147][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6147][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6148]" type="array">
+         <obj_property name="ElementShortName">[6148][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6148][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6149]" type="array">
+         <obj_property name="ElementShortName">[6149][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6149][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6150]" type="array">
+         <obj_property name="ElementShortName">[6150][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6150][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6151]" type="array">
+         <obj_property name="ElementShortName">[6151][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6151][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6152]" type="array">
+         <obj_property name="ElementShortName">[6152][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6152][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6153]" type="array">
+         <obj_property name="ElementShortName">[6153][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6153][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6154]" type="array">
+         <obj_property name="ElementShortName">[6154][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6154][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6155]" type="array">
+         <obj_property name="ElementShortName">[6155][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6155][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6156]" type="array">
+         <obj_property name="ElementShortName">[6156][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6156][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6157]" type="array">
+         <obj_property name="ElementShortName">[6157][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6157][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6158]" type="array">
+         <obj_property name="ElementShortName">[6158][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6158][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6159]" type="array">
+         <obj_property name="ElementShortName">[6159][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6159][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6160]" type="array">
+         <obj_property name="ElementShortName">[6160][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6160][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6161]" type="array">
+         <obj_property name="ElementShortName">[6161][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6161][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6162]" type="array">
+         <obj_property name="ElementShortName">[6162][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6162][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6163]" type="array">
+         <obj_property name="ElementShortName">[6163][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6163][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6164]" type="array">
+         <obj_property name="ElementShortName">[6164][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6164][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6165]" type="array">
+         <obj_property name="ElementShortName">[6165][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6165][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6166]" type="array">
+         <obj_property name="ElementShortName">[6166][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6166][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6167]" type="array">
+         <obj_property name="ElementShortName">[6167][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6167][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6168]" type="array">
+         <obj_property name="ElementShortName">[6168][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6168][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6169]" type="array">
+         <obj_property name="ElementShortName">[6169][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6169][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6170]" type="array">
+         <obj_property name="ElementShortName">[6170][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6170][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6171]" type="array">
+         <obj_property name="ElementShortName">[6171][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6171][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6172]" type="array">
+         <obj_property name="ElementShortName">[6172][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6172][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6173]" type="array">
+         <obj_property name="ElementShortName">[6173][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6173][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6174]" type="array">
+         <obj_property name="ElementShortName">[6174][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6174][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6175]" type="array">
+         <obj_property name="ElementShortName">[6175][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6175][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6176]" type="array">
+         <obj_property name="ElementShortName">[6176][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6176][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6177]" type="array">
+         <obj_property name="ElementShortName">[6177][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6177][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6178]" type="array">
+         <obj_property name="ElementShortName">[6178][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6178][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/riscv_tb/sigma/sigma_tile/ram/ram_dual/ram[6179]" type="array">
+         <obj_property name="ElementShortName">[6179][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6179][31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>
