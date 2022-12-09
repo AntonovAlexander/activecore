@@ -21,6 +21,6 @@ fun main() {
         map,
         4,
         4,
-        true)
-    xbar.export_to_sv("coregen", true)
+        DEBUG_LEVEL.FULL)
+    xbar.export_to_sv("coregen", DEBUG_LEVEL.FULL)
 }
