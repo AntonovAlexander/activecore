@@ -86,7 +86,7 @@ endtask
 `define UDM_RX_SIGNAL rx
 `define UDM_BLOCK sigrun.udm
 `include "udm.svh"
-udm_driver udm;
+udm_driver udm = new();
 
 ///////////////////
 // initial block //

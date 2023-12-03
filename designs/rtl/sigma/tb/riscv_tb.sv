@@ -46,8 +46,7 @@ sigma
 	, .mem_init_type("elf")
 	, .mem_init_data("../../sw/apps/heartbeat_variable.riscv")
 	, .mem_size(8192)
-) sigma
-(
+) sigma (
 	.clk_i(CLK)
 	, .arst_i(RST)
 	, .irq_btn_i(irq_btn)
@@ -100,7 +99,7 @@ endtask
 `define UDM_RX_SIGNAL rx
 `define UDM_BLOCK sigma.udm
 `include "udm.svh"
-udm_driver udm;
+udm_driver udm = new();
 
 ///////////////////
 // initial block //
