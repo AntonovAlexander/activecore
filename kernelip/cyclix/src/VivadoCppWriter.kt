@@ -543,6 +543,24 @@ class VivadoCppWriter(var cyclix_module : Generic) {
                     ";\n")
         }
 
+        // Processing dlychains
+        for (dlychain in cyclix_module.dlychains) {
+            for (i in dlychain.dlyvars.lastIndex downTo 1) {
+                wrFileModule.write(
+                    GetParamString(dlychain.dlyvars[i]) +
+                            " = " +
+                            dlychain.dlyvars[i-1] +
+                            ";\n")
+            }
+            if (dlychain.dlyvars.size > 0) {
+                wrFileModule.write(
+                    GetParamString(dlychain.dlyvars[0]) +
+                            " = " +
+                            dlychain.src_var +
+                            ";\n")
+            }
+        }
+
         // Reading streaming input data
         if (cyclix_module is Streaming) {
             wrFileModule.write("\t\t" + (cyclix_module as Streaming).stream_req_var.name + " = " + (cyclix_module as Streaming).stream_req_bus.name + ".read();\n")

@@ -22,6 +22,7 @@ open class Generic(name_in : String) : hw_astc_stdif() {
 
     var globals = ArrayList<hw_var>()
     var locals = ArrayList<hw_var>()
+    var dlychains = ArrayList<hw_dlychain>()
 
     var __global_buf_assocs = mutableMapOf<hw_var, hw_var>()
     var Subprocs            = mutableMapOf<String, hw_subproc>()

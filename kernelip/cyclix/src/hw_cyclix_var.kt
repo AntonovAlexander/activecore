@@ -90,3 +90,19 @@ open class hw_global(name : String, vartype : hw_type, defimm : hw_imm) : hw_var
 
 }
 
+open class hw_dlychain (var src_var : hw_var, chainLength : Int) {
+
+    var dlyvars = ArrayList<hw_var>()
+
+    fun getdly(dlyval : Int) : hw_var {
+        if (dlyval > dlyvars.lastIndex) {
+            for (i in (dlyvars.lastIndex+1)..dlyval) {
+                var new_global = (src_var.default_astc as Generic).global((src_var.name + "gendlybuf" + i), src_var.vartype, src_var.defimm)
+                dlyvars.add(new_global)
+            }
+            return dlyvars.last()
+        } else {
+            return dlyvars[dlyval]
+        }
+    }
+}

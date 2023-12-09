@@ -341,6 +341,12 @@ class RtlGenerator(var cyclix_module : Generic) {
                 rtl_gen.assign(TranslateVar(global_assoc.value, var_dict), TranslateVar(global_assoc.key, var_dict))
             }
 
+            rtl_gen.MSG_COMMENT("Processing dlychains")
+            for (dlychain in cyclix_module.dlychains) {
+                for (i in dlychain.dlyvars.lastIndex downTo 1) rtl_gen.assign(dlychain.dlyvars[i], dlychain.dlyvars[i-1])
+                if (dlychain.dlyvars.size > 0) rtl_gen.assign(dlychain.dlyvars[0], dlychain.src_var)
+            }
+
             rtl_gen.MSG_COMMENT("fifo_in buffering")
             for (fifo_in in fifo_in_dict) {
                 rtl_gen.assign(fifo_in.value.buf_req, fifo_in.value.ext_req)
