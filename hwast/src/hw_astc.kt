@@ -611,12 +611,32 @@ open class hw_astc() : ArrayList<hw_exec>() {
         return AddExpr_op2(OP2_ARITH_ADD, src0, src1)
     }
 
+    fun add_satur(limit : hw_imm, vararg srcs : hw_param): hw_var {
+        var srcList = ArrayList<hw_param>()
+        for (src in srcs) srcList.add(src)
+        var ret_var = add(srcList)
+        begif (gr(ret_var, limit))
+        run {
+            assign(ret_var, limit)
+        }; endif()
+        return ret_var
+    }
+
     fun sub(src0: hw_param, src1: hw_param): hw_var {
         return AddExpr_op2(OP2_ARITH_SUB, src0, src1)
     }
 
     fun sub(src0: hw_param, src1: Int): hw_var {
         return AddExpr_op2(OP2_ARITH_SUB, src0, src1)
+    }
+
+    fun sub_satur(limit : hw_imm, src0: hw_param, src1: hw_param): hw_var {
+        var ret_var = sub(src0, src1)
+        begif(less(ret_var, limit))
+        run {
+            assign(ret_var, limit)
+        }; endif()
+        return ret_var
     }
 
     fun mul(srcs : ArrayList<hw_param>): hw_var {
@@ -631,6 +651,17 @@ open class hw_astc() : ArrayList<hw_exec>() {
 
     fun mul(src0: hw_param, src1: Int): hw_var {
         return AddExpr_op2(OP2_ARITH_MUL, src0, src1)
+    }
+
+    fun mul_satur(limit : hw_imm, vararg srcs : hw_param): hw_var {
+        var srcList = ArrayList<hw_param>()
+        for (src in srcs) srcList.add(src)
+        var ret_var = mul(srcList)
+        begif (gr(ret_var, limit))
+        run {
+            assign(ret_var, limit)
+        }; endif()
+        return ret_var
     }
 
     fun div(src0: hw_param, src1: hw_param): hw_var {
