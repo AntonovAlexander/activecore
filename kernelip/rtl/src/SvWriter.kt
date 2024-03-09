@@ -636,7 +636,7 @@ class SvWriter(var mod : module) {
         // Cprocs
         MSG("Exporting cprocs...")
         for (cproc in mod.Cprocs) {
-            wrFileModule.write("always @*\n")
+            wrFileModule.write("always_comb\n")
             tab_Counter = 1
             PrintTab(wrFileModule)
             wrFileModule.write("begin\n")
