@@ -491,8 +491,8 @@ class SvWriter(var mod : module) {
                 var reset_condition = ""
                 if (mem.rst_present)
                 {
-                    if (mem.rst_lvl == SYNC_LVL.POS) reset_condition = (mem.rst_signal.name + " == 1")
-                    else reset_condition = (mem.rst_signal.name + " == 0")
+                    if (mem.rst_lvl == SYNC_LVL.POS) reset_condition = (mem.rst_signal.name)
+                    else reset_condition = ("~" + mem.rst_signal.name)
                 }
 
                 var always_suffix = if (mem.sync_type == SYNC_TYPE.EDGE) "_ff" else "_latch"
