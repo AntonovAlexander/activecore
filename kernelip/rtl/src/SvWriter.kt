@@ -495,6 +495,8 @@ class SvWriter(var mod : module) {
                     else reset_condition = (mem.rst_signal.name + " == 0")
                 }
 
+                var always_suffix = if (mem.sync_type == SYNC_TYPE.EDGE) "_ff" else "_latch"
+
                 for (mem_src in mem.mem_srcs)
                 {
                     var sync_sensivity = ""
@@ -505,7 +507,7 @@ class SvWriter(var mod : module) {
                     }
 
                     if (mem.rst_present) {
-                        wrFileModule.write("always @("
+                        wrFileModule.write("always" + always_suffix + " @("
                                 + sync_sensivity
                                 + mem_src.sync_signal.name
                                 + reset_sensivity
@@ -605,7 +607,7 @@ class SvWriter(var mod : module) {
                         wrFileModule.write("\t\tend\n")
 
                     } else {
-                        wrFileModule.write("always @("
+                        wrFileModule.write("always" + always_suffix + " @("
                                 + sync_sensivity
                                 + mem_src.sync_signal.name
                                 + reset_sensivity
