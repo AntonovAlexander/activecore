@@ -93,13 +93,9 @@ localparam TESTMEM_ADDR         = 32'h80000000;
 localparam TESTMEM_WSIZE_POW    = 10;
 localparam TESTMEM_WSIZE        = 2**TESTMEM_WSIZE_POW;
 
-logic testmem_udm_enb;
-assign testmem_udm_enb = (!(udm_bus.addr < TESTMEM_ADDR) && (udm_bus.addr < (TESTMEM_ADDR + (TESTMEM_WSIZE*4))));
-
-logic testmem_udm_we;
-logic [TESTMEM_WSIZE_POW-1:0] testmem_udm_addr;
-logic [31:0] testmem_udm_wdata;
-logic [31:0] testmem_udm_rdata;
+logic udm_testmem_enb;
+assign udm_testmem_enb = ((udm_bus.addr >= TESTMEM_ADDR) && (udm_bus.addr < (TESTMEM_ADDR + (TESTMEM_WSIZE*4))));
+logic [31:0] udm_testmem_rdata;
 
 logic testmem_p1_we;
 logic [TESTMEM_WSIZE_POW-1:0] testmem_p1_addr;
@@ -120,79 +116,64 @@ ram_dual #(
 ) testmem (
     .clk(clk_gen)
 
-    , .dat0_i(testmem_udm_wdata)
-    , .adr0_i(testmem_udm_addr)
-    , .we0_i(testmem_udm_we)
-    , .dat0_o(testmem_udm_rdata)
+    , .dat0_i(udm_bus.wdata)
+    , .adr0_i(udm_bus.addr[31:2])
+    , .we0_i(udm_bus.req && udm_bus.we && udm_testmem_enb)
+    , .dat0_o(udm_testmem_rdata)
 
     , .dat1_i(testmem_p1_wdata)
     , .adr1_i(testmem_p1_addr)
     , .we1_i(testmem_p1_we)
-    , .dat1_o(testmem_p1_rdata)
+    , .dat1_o(testmem_p1_rdata) 
 );
 
 assign udm_bus.ack = udm_bus.req;   // bus always ready to accept request
-logic csr_resp, testmem_resp, testmem_resp_dly;
-logic [31:0] csr_rdata;
+logic udm_csr_resp, udm_testmem_resp;
+logic [31:0] udm_csr_rdata;
 
 // bus request
 always @(posedge clk_gen)
     begin
+    udm_csr_resp <= 1'b0;
+    udm_testmem_resp <= 1'b0;
     
-    testmem_udm_we <= 1'b0;
-    testmem_udm_addr <= 0;
-    testmem_udm_wdata <= 0;
+    if (srst)
+        begin
+        LED <= 16'hffff;
+        end
     
-    csr_resp <= 1'b0;
-    testmem_resp_dly <= 1'b0;
-    testmem_resp <= testmem_resp_dly;
-    
-    if (srst) LED <= 16'hffff;
-    
-    if (udm_bus.req && udm_bus.ack)
+    else
         begin
         
-        if (udm_bus.we)     // writing
+        if (udm_bus.req && udm_bus.ack)
             begin
-            if (udm_bus.addr == CSR_LED_ADDR) LED <= udm_bus.wdata;
-            if (testmem_udm_enb)
+            
+            if (udm_bus.we)     // writing
                 begin
-                testmem_udm_we <= 1'b1;
-                testmem_udm_addr <= udm_bus.addr[31:2];     // 4-byte aligned access only
-                testmem_udm_wdata <= udm_bus.wdata;
+                if (udm_bus.addr == CSR_LED_ADDR) LED <= udm_bus.wdata;
+                end
+            
+            else                // reading
+                begin
+                if (udm_bus.addr == CSR_LED_ADDR)
+                    begin
+                    udm_csr_resp <= 1'b1;
+                    udm_csr_rdata <= LED;
+                    end
+                if (udm_bus.addr == CSR_SW_ADDR)
+                    begin
+                    udm_csr_resp <= 1'b1;
+                    udm_csr_rdata <= SW;
+                    end
+                udm_testmem_resp <= udm_testmem_enb;
                 end
             end
         
-        else            // reading
-            begin
-            if (udm_bus.addr == CSR_LED_ADDR)
-                begin
-                csr_resp <= 1'b1;
-                csr_rdata <= LED;
-                end
-            if (udm_bus.addr == CSR_SW_ADDR)
-                begin
-                csr_resp <= 1'b1;
-                csr_rdata <= SW;
-                end
-            if (testmem_udm_enb)
-                begin
-                testmem_udm_we <= 1'b0;
-                testmem_udm_addr <= udm_bus.addr[31:2];     // 4-byte aligned access only
-                testmem_udm_wdata <= udm_bus.wdata;
-                testmem_resp_dly <= 1'b1;
-                end
-            end
         end
     end
 
 // bus response
-always @*
-    begin
-    udm_bus.resp = csr_resp | testmem_resp;
-    udm_bus.rdata = 0;
-    if (csr_resp)       udm_bus.rdata = csr_rdata;
-    if (testmem_resp)   udm_bus.rdata = testmem_udm_rdata;
-    end
+assign udm_bus.resp = udm_csr_resp | udm_testmem_resp;
+assign udm_bus.rdata = (udm_csr_rdata & {32{udm_csr_resp}}) | (udm_testmem_rdata & {32{udm_testmem_resp}});
 
 endmodule
