@@ -220,4 +220,8 @@ class DebugWriter(val filename: String) {
         WriteExecExpr(exec)
         tabNum = 0
     }
+
+    fun Close() {
+        wrDebugFile.close()
+    }
 }
