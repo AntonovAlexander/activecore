@@ -8,6 +8,7 @@
 
 package hwast
 
+import java.io.File
 import kotlin.math.log2
 import java.io.OutputStreamWriter
 import java.text.SimpleDateFormat
@@ -183,4 +184,40 @@ fun ReconstructFractions(fracs_in : hw_fracs, var_dict: MutableMap<hw_var, hw_va
         else ERROR("dimensions error")
     }
     return fractions
+}
+
+class DebugWriter(val filename: String) {
+    val wrDebugFile = File(filename).writer()
+    var tabNum = 0
+    var printChild = 0
+
+    init {
+        WriteGenSrcHeader(wrDebugFile, "DEBUG_LOG")
+    }
+
+    private fun WriteExecExpr(exec: hw_exec) {
+        if (tabNum > 0) for (i in 0 until tabNum-1) wrDebugFile.write("  ")
+        if (printChild == 1) {
+            wrDebugFile.write("└─")
+            printChild = 0
+        } else {
+            if (tabNum > 0) wrDebugFile.write("  ")
+        }
+        wrDebugFile.write("op::" + exec.opcode.default_string)
+        for (dst in exec.dsts) wrDebugFile.write(" dst::" + dst.GetString())
+        for (param in exec.params) wrDebugFile.write(" param::" + param.GetString())
+        wrDebugFile.write("\n")
+        if (exec.expressions.size > 0) {
+            tabNum++
+            printChild = 1
+            for (child_exec in exec.expressions) WriteExecExpr(child_exec)
+            tabNum--
+        }
+    }
+
+    fun WriteExec(exec : hw_exec) {
+        tabNum = 0
+        WriteExecExpr(exec)
+        tabNum = 0
+    }
 }
