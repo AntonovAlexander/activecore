@@ -186,7 +186,7 @@ fun ReconstructFractions(fracs_in : hw_fracs, var_dict: MutableMap<hw_var, hw_va
     return fractions
 }
 
-class DebugWriter(val filename: String) {
+class HwDebugWriter(val filename: String) {
     val wrDebugFile = File(filename).writer()
     var tabNum = 0
     var printChild = 0
