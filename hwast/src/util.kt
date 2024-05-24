@@ -196,12 +196,12 @@ class DebugWriter(val filename: String) {
     }
 
     private fun WriteExecExpr(exec: hw_exec) {
-        if (tabNum > 0) for (i in 0 until tabNum-1) wrDebugFile.write("  ")
+        if (tabNum > 0) for (i in 0 until tabNum-1) wrDebugFile.write("    ")
         if (printChild == 1) {
-            wrDebugFile.write("└─")
+            wrDebugFile.write("└── ")
             printChild = 0
         } else {
-            if (tabNum > 0) wrDebugFile.write("  ")
+            if (tabNum > 0) wrDebugFile.write("    ")
         }
         wrDebugFile.write("op::" + exec.opcode.default_string)
         for (dst in exec.dsts) wrDebugFile.write(" dst::" + dst.GetString())
