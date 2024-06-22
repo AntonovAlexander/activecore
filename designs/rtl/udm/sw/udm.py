@@ -129,11 +129,13 @@ class udm:
         self.check()
     
     def __sendbyte(self, databyte):
-        if ((databyte == self.__sync_byte) or (databyte == self.__escape_byte)):
-            wdata = (struct.pack('B', self.__escape_byte))
-            self.ser.write(wdata)
         wdata = (struct.pack('B', databyte))
         self.ser.write(wdata)
+    
+    def __senddatabyte(self, databyte):
+        if ((databyte == self.__sync_byte) or (databyte == self.__escape_byte)):
+            self.__sendbyte(self.__escape_byte)
+        self.__sendbyte(databyte)
     
     def rst(self):
         """Description:
@@ -162,10 +164,10 @@ class udm:
         self.nrst()
     
     def __sendword32(self, dataword):
-        self.__sendbyte((dataword >> 0) & 0xff)
-        self.__sendbyte((dataword >> 8) & 0xff)
-        self.__sendbyte((dataword >> 16) & 0xff)
-        self.__sendbyte((dataword >> 24) & 0xff)
+        self.__senddatabyte((dataword >> 0) & 0xff)
+        self.__senddatabyte((dataword >> 8) & 0xff)
+        self.__senddatabyte((dataword >> 16) & 0xff)
+        self.__senddatabyte((dataword >> 24) & 0xff)
     
     def __wr_finalize(self):
         rdata = self.__getbyte()
