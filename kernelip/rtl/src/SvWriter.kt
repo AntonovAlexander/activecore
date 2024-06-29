@@ -481,6 +481,8 @@ class SvWriter(var mod : module) {
         MSG("Exporting mems...")
         for (mem in mod.Mems) {
 
+            MSG("Exporting mem: " + mem.name + "...")
+
             export_structvar("","logic ", ";\n", mem, wrFileModule)
 
             if (mem.mem_srcs.size == 0) throw Exception("Mem signals with no sources is not supported, mem signal: %s!\n")
@@ -523,42 +525,57 @@ class SvWriter(var mod : module) {
                                     + "};\n")
                         } else if (mem.vartype.dimensions.size == 1) {
                             wrFileModule.write("\t\t" + mem.name + " <= " + GetParamString(mem.rst_src) +";\n")
-                        } else if (mem.vartype.dimensions.size == 2) {
-                            var power = mem.vartype.dimensions[1].GetWidth()
-                            for (k in 0 until power) {
+                        } else if (mem.vartype.dimensions.size > 1) {
+                            var dim_iter_num = ArrayList<Int>()
+                            for (dim_idx in 1 .. mem.vartype.dimensions.size-1) dim_iter_num.add(mem.vartype.dimensions[dim_idx].lsb)
+                            while (true) {
+                                var dim_iter_num_string = ""
+                                for (dim_iter in dim_iter_num) dim_iter_num_string += ("[" + dim_iter + "]")
+                                MSG("wrk dimension (rst): " + dim_iter_num_string)
                                 if (mem.rst_src is hw_var)
                                     wrFileModule.write("\t\t"
                                             + mem.name
-                                            + "["
-                                            + (k + mem.vartype.dimensions[1].lsb)
-                                            + "] <= "
+                                            + dim_iter_num_string
+                                            + " <= "
                                             + GetParamString(mem.rst_src)
-                                            + "["
-                                            + (k + mem.rst_src.GetDimensions()[1].lsb)
+                                            + dim_iter_num_string
                                             + "];\n")
                                 else if (mem.rst_src is hw_imm)
                                     if (mem.rst_src is hw_imm_arr) {
                                         wrFileModule.write("\t\t"
                                                 + mem.name
-                                                + "["
-                                                + (k + mem.vartype.dimensions[1].lsb)
-                                                + "] <= "
-                                                + GetParamString((mem.rst_src as hw_imm_arr).subimms[k])
+                                                + dim_iter_num_string
+                                                + " <= 0"
+                                                //+ GetParamString((mem.rst_src as hw_imm_arr).subimms[k])
                                                 + ";\n")
                                     } else {
                                         wrFileModule.write("\t\t"
                                                 + mem.name
-                                                + "["
-                                                + (k + mem.vartype.dimensions[1].lsb)
-                                                + "] <= "
+                                                + dim_iter_num_string
+                                                + " <= "
                                                 + GetParamString(mem.rst_src as hw_imm)
                                                 + ";\n")
                                     }
                                 else ERROR("mem.rst_src.type unrecognized!\n")
+
+                                // dim update
+                                var dim_idx_iter_fin = true
+                                for (dim_idx in 1 .. mem.vartype.dimensions.size-1) {
+                                    if (dim_iter_num[dim_idx-1] != mem.vartype.dimensions[dim_idx].msb) dim_idx_iter_fin = false
+                                }
+                                if (dim_idx_iter_fin) break
+                                else {
+                                    for (dim_idx in mem.vartype.dimensions.size-1 downTo 1) {
+                                        if (dim_iter_num[dim_idx-1] == mem.vartype.dimensions[dim_idx].msb) {
+                                            dim_iter_num[dim_idx-1] = 0
+                                        } else {
+                                            dim_iter_num[dim_idx-1]++
+                                            break
+                                        }
+                                    }
+                                }
                             }
-                        } else if (mem.vartype.dimensions.size > 2)
-                            ERROR("Large dimensions for mems (reset) are currently not supported!\n")
-                        else
+                        } else
                             ERROR("Undimensioned mems (reset) are currently not supported!\n")
 
                         wrFileModule.write("\t\tend\n")
@@ -570,31 +587,48 @@ class SvWriter(var mod : module) {
                                     + " <= "
                                     + GetParamString(mem_src.sync_src)
                                     + ";\n")
-                        } else if (mem.vartype.dimensions.size == 2) {
-                            var power = mem.vartype.dimensions[1].GetWidth()
-                            for (k in 0 until power) {
+                        } else if (mem.vartype.dimensions.size > 1) {
+                            var dim_iter_num = ArrayList<Int>()
+                            for (dim_idx in 1 .. mem.vartype.dimensions.size-1) dim_iter_num.add(mem.vartype.dimensions[dim_idx].lsb)
+                            while (true) {
+                                var dim_iter_num_string = ""
+                                for (dim_iter in dim_iter_num) dim_iter_num_string += ("[" + dim_iter + "]")
+                                MSG("wrk dimension (sync): " + dim_iter_num_string)
                                 if (mem_src.sync_src is hw_var)
                                     wrFileModule.write("\t\t"
                                             + mem.name
-                                            + "["
-                                            + (k + mem.vartype.dimensions[1].lsb)
-                                            + "] <= "
+                                            + dim_iter_num_string
+                                            + " <= "
                                             + GetParamString(mem_src.sync_src)
-                                            + "["
-                                            + (k + mem_src.sync_src.GetDimensions()[1].lsb)
-                                            + "];\n")
+                                            + dim_iter_num_string
+                                            + ";\n")
                                 else
                                     wrFileModule.write("\t\t"
                                             + mem.name
                                             + "["
-                                            + (k + mem.vartype.dimensions[1].lsb)
+                                            + dim_iter_num_string
                                             + "] <= "
                                             + GetParamString(mem_src.sync_src)
                                             + ";\n")
+
+                                // dim update
+                                var dim_idx_iter_fin = true
+                                for (dim_idx in 1 .. mem.vartype.dimensions.size-1) {
+                                    if (dim_iter_num[dim_idx-1] != mem.vartype.dimensions[dim_idx].msb) dim_idx_iter_fin = false
+                                }
+                                if (dim_idx_iter_fin) break
+                                else {
+                                    for (dim_idx in mem.vartype.dimensions.size-1 downTo 1) {
+                                        if (dim_iter_num[dim_idx-1] == mem.vartype.dimensions[dim_idx].msb) {
+                                            dim_iter_num[dim_idx-1] = 0
+                                        } else {
+                                            dim_iter_num[dim_idx-1]++
+                                            break
+                                        }
+                                    }
+                                }
                             }
-                        } else if (mem.vartype.dimensions.size > 2)
-                            ERROR("Large dimensions for mems (data) are currently not supported!\n")
-                        else {
+                        } else {
                             if (mem.vartype.DataType == DATA_TYPE.STRUCTURED) {
                                 wrFileModule.write("\t\t"
                                         + mem.name
