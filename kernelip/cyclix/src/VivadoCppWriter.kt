@@ -519,7 +519,38 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         for (global in cyclix_module.globals) {
             if (global.vartype.dimensions.size < 2) {
                 wrFileModule.write("\t\t" + global.name + " = " + GetParamString(global.defimm) + ";\n")
-            } else if (global.vartype.dimensions.size == 2) {
+            } else if (global.vartype.dimensions.size > 1) {
+                var dim_iter_num = ArrayList<Int>()
+                for (dim_idx in 1 .. global.vartype.dimensions.size-1) dim_iter_num.add(global.vartype.dimensions[dim_idx].lsb)
+                while (true) {
+                    var dim_iter_num_string = ""
+                    for (dim_iter in dim_iter_num) dim_iter_num_string = "[" + dim_iter + "]" + dim_iter_num_string
+
+                    if (global.defimm is hw_imm_arr) {
+                        wrFileModule.write("\t\t" + global.name + dim_iter_num_string + " = " + "0" + ";\n")
+                    } else {
+                        wrFileModule.write("\t\t" + global.name + dim_iter_num_string + " = " + GetParamString(global.defimm) + ";\n")
+                    }
+
+                    // dim update
+                    var dim_idx_iter_fin = true
+                    for (dim_idx in 1 .. global.vartype.dimensions.size-1) {
+                        if (dim_iter_num[dim_idx-1] != global.vartype.dimensions[dim_idx].msb) dim_idx_iter_fin = false
+                    }
+                    if (dim_idx_iter_fin) break
+                    else {
+                        for (dim_idx in 1 .. global.vartype.dimensions.size-1) {
+                            if (dim_iter_num[dim_idx-1] == global.vartype.dimensions[dim_idx].msb) {
+                                dim_iter_num[dim_idx-1] = 0
+                            } else {
+                                dim_iter_num[dim_idx-1]++
+                                break
+                            }
+                        }
+                    }
+                }
+
+
                 for (i in global.vartype.dimensions[1].lsb..global.vartype.dimensions[1].msb) {
                     if (global.defimm is hw_imm_arr) {
                         wrFileModule.write("\t\t" + global.name + "[" + i + "] = " + GetParamString((global.defimm as hw_imm_arr).subimms[i]) + ";\n")

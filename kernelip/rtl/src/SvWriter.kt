@@ -530,8 +530,7 @@ class SvWriter(var mod : module) {
                             for (dim_idx in 1 .. mem.vartype.dimensions.size-1) dim_iter_num.add(mem.vartype.dimensions[dim_idx].lsb)
                             while (true) {
                                 var dim_iter_num_string = ""
-                                for (dim_iter in dim_iter_num) dim_iter_num_string += ("[" + dim_iter + "]")
-                                MSG("wrk dimension (rst): " + dim_iter_num_string)
+                                for (dim_iter in dim_iter_num) dim_iter_num_string = "[" + dim_iter + "]" + dim_iter_num_string
                                 if (mem.rst_src is hw_var)
                                     wrFileModule.write("\t\t"
                                             + mem.name
@@ -565,7 +564,7 @@ class SvWriter(var mod : module) {
                                 }
                                 if (dim_idx_iter_fin) break
                                 else {
-                                    for (dim_idx in mem.vartype.dimensions.size-1 downTo 1) {
+                                    for (dim_idx in 1 .. mem.vartype.dimensions.size-1) {
                                         if (dim_iter_num[dim_idx-1] == mem.vartype.dimensions[dim_idx].msb) {
                                             dim_iter_num[dim_idx-1] = 0
                                         } else {
@@ -592,8 +591,7 @@ class SvWriter(var mod : module) {
                             for (dim_idx in 1 .. mem.vartype.dimensions.size-1) dim_iter_num.add(mem.vartype.dimensions[dim_idx].lsb)
                             while (true) {
                                 var dim_iter_num_string = ""
-                                for (dim_iter in dim_iter_num) dim_iter_num_string += ("[" + dim_iter + "]")
-                                MSG("wrk dimension (sync): " + dim_iter_num_string)
+                                for (dim_iter in dim_iter_num) dim_iter_num_string = "[" + dim_iter + "]" + dim_iter_num_string
                                 if (mem_src.sync_src is hw_var)
                                     wrFileModule.write("\t\t"
                                             + mem.name
@@ -618,7 +616,7 @@ class SvWriter(var mod : module) {
                                 }
                                 if (dim_idx_iter_fin) break
                                 else {
-                                    for (dim_idx in mem.vartype.dimensions.size-1 downTo 1) {
+                                    for (dim_idx in 1 .. mem.vartype.dimensions.size-1) {
                                         if (dim_iter_num[dim_idx-1] == mem.vartype.dimensions[dim_idx].msb) {
                                             dim_iter_num[dim_idx-1] = 0
                                         } else {
