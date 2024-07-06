@@ -32,6 +32,8 @@ class udm:
     __TRX_ERR_RESP_BYTE   = 0x02
     __TRX_IRQ_BYTE        = 0x80
     
+    __MAX_RD_CHUNK = 65536
+    
     def connect(self, com_num, baudrate):
         """Description:
             Connect to COM port
@@ -207,7 +209,7 @@ class udm:
 
         Parameters:
             address (int): Starting address
-            datawords (int[]): Data words
+            datawords (int[]): 32-bit data words
 
         """
         try:
@@ -261,18 +263,7 @@ class udm:
             self.discon()
             raise Exception()
     
-    def rdarr32(self, address, length):
-        """Description:
-            Burst read into array
-
-        Parameters:
-            address (int): Starting address
-            length (int): Number of data words
-
-        Returns:
-            int[]: Read data
-
-        """
+    def __rdarr32(self, address, length):
         try:
             self.ser.flush()
             self.__sendbyte(self.__sync_byte)
@@ -286,6 +277,32 @@ class udm:
         except:
             self.discon()
             raise Exception()
+    
+    def rdarr32(self, address, length):
+        """Description:
+            Burst read into array
+
+        Parameters:
+            address (int): Starting address
+            length (int): Number of 32-bit data words
+
+        Returns:
+            int[]: Read data
+
+        """
+        rdatawords = []
+        trx_length_todo = length
+        trx_length_done = 0
+        while True:
+            trx_length = trx_length_todo
+            if trx_length > self.__MAX_RD_CHUNK:
+                trx_length = self.__MAX_RD_CHUNK
+            rdatawords += self.__rdarr32((address + (trx_length_done << 2)), trx_length)
+            trx_length_todo -= trx_length
+            trx_length_done += trx_length
+            if trx_length_done == length:
+                break
+        return rdatawords
     
     def wrbin32_le(self, address, filename):
         """Description:
