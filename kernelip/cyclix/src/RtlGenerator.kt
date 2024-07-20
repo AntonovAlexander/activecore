@@ -191,6 +191,10 @@ class RtlGenerator(var cyclix_module : Generic) {
         MSG("Generating ports...")
         var clk = rtl_gen.uinput("clk_i", 0, 0, "0")
         var rst = rtl_gen.uinput("rst_i", 0, 0, "1")
+        for (port in cyclix_module.Ports) {
+            var new_port = rtl_gen.port(port.name, port.port_dir, port.vartype, port.defimm)
+            var_dict.put(port, new_port)
+        }
         MSG("Generating ports: done")
 
         MSG("Generating combinationals...")
