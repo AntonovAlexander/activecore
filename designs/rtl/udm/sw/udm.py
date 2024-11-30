@@ -32,6 +32,7 @@ class udm:
     __TRX_ERR_RESP_BYTE   = 0x02
     __TRX_IRQ_BYTE        = 0x80
     
+    __MAX_WR_CHUNK = 8192
     __MAX_RD_CHUNK = 1024
     
     def connect(self, com_num, baudrate):
@@ -203,15 +204,7 @@ class udm:
             self.discon()
             raise Exception()
     
-    def wrarr32(self, address, datawords):
-        """Description:
-            Burst write of array
-
-        Parameters:
-            address (int): Starting address
-            datawords (int[]): 32-bit data words
-
-        """
+    def __wrarr32(self, address, datawords):
         try:
             self.ser.flush()
             self.__sendbyte(self.__sync_byte)
@@ -226,6 +219,39 @@ class udm:
         except:
             self.discon()
             raise Exception()
+    
+    def wrarr32(self, address, datawords):
+        """Description:
+            Burst write of array
+
+        Parameters:
+            address (int): Starting address
+            datawords (int[]): 32-bit data words
+
+        """
+        wdatawords = []
+        trx_length_todo = len(datawords)
+        trx_length_done = 0
+        trx_progress_display = 0
+        if trx_length_todo > self.__MAX_WR_CHUNK:
+            print("udm array writing...", end="")
+            trx_progress_display = 1
+        while True:
+            trx_length = trx_length_todo
+            if trx_length > self.__MAX_WR_CHUNK:
+                trx_length = self.__MAX_WR_CHUNK
+            wdatawords = datawords[trx_length_done:(trx_length_done+trx_length)]
+            self.__wrarr32((address + (trx_length_done << 2)), wdatawords)
+            trx_length_todo -= trx_length
+            trx_length_done += trx_length
+            if trx_progress_display:
+                print("%d%%" % (trx_length_done*100/len(datawords)), end="")
+            if trx_length_done == len(datawords):
+                if trx_progress_display:
+                    print("")
+                break
+            else:
+                print("...", end="")
     
     def clr(self, address, size):
         """Description:
