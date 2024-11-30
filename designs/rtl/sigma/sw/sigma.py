@@ -91,13 +91,13 @@ class sigma:
         
         print("Loading test program...")
         sigma.tile.loadelf(firmware_filename)
-        print("Test program written!")
+        print("Test program loaded")
     
         time.sleep(sleep_secs)
         
         print("Reading data buffer...")
         rdarr = sigma.tile.udm.rdarr32(0x6000, len(verify_data))
-        print("Data buffer read!")
+        print("Data buffer read")
     
         test_succ_flag = 1
         for i in range(len(verify_data)):

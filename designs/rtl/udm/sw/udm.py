@@ -32,7 +32,7 @@ class udm:
     __TRX_ERR_RESP_BYTE   = 0x02
     __TRX_IRQ_BYTE        = 0x80
     
-    __MAX_RD_CHUNK = 65536
+    __MAX_RD_CHUNK = 1024
     
     def connect(self, com_num, baudrate):
         """Description:
@@ -293,6 +293,10 @@ class udm:
         rdatawords = []
         trx_length_todo = length
         trx_length_done = 0
+        trx_progress_display = 0
+        if trx_length_todo > self.__MAX_RD_CHUNK:
+            print("udm array reading...", end="")
+            trx_progress_display = 1
         while True:
             trx_length = trx_length_todo
             if trx_length > self.__MAX_RD_CHUNK:
@@ -300,8 +304,14 @@ class udm:
             rdatawords += self.__rdarr32((address + (trx_length_done << 2)), trx_length)
             trx_length_todo -= trx_length
             trx_length_done += trx_length
+            if trx_progress_display:
+                print("%d%%" % (trx_length_done*100/length), end="")
             if trx_length_done == length:
+                if trx_progress_display:
+                    print("")
                 break
+            else:
+                print("...", end="")
         return rdatawords
     
     def wrbin32_le(self, address, filename):

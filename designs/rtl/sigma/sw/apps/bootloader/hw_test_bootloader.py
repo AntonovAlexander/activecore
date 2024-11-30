@@ -23,9 +23,9 @@ def hw_test_bootloader(sigma, firmware_filename, app_filename):
     sigma.tile.sw_rst()
     print("Loading bootloader...")
     sigma.udm.wrelf32(0x0, firmware_filename)
-    print("Loading test ELF image...")
+    print("Writing test ELF image...")
     sigma.udm.wrbin32_le(0x6000, app_filename)
-    print("Test written!")
+    print("Test ELF image written")
     sigma.tile.sw_nrst()
     
     time.sleep(0.1)
