@@ -53,7 +53,7 @@ internal class coproc_frontend(val name : String,
 
         cyclix_gen.begif(dispatch_uop_buf.ctrl_rdy)
         run {
-            cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(cmd_req, cmd_req_data))
+            cyclix_gen.begif(cyclix_gen.try_fifo_rd(cmd_req, cmd_req_data))
             run {
 
                 // decoding input

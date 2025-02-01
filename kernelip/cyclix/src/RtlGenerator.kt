@@ -64,9 +64,9 @@ class RtlGenerator(var cyclix_module : Generic) {
         // for (param in expr.params) MSG("param: " + param.GetString())
         // for (wrvar in expr.dsts) MSG("wrvar: " + wrvar.name)
 
-        if (expr.opcode == OP_FIFO_WR_UNBLK) {
+        if (expr.opcode == OP_TRY_FIFO_WR) {
 
-            var fifo = TranslateFifoOut((expr as hw_exec_fifo_wr_unblk).fifo)
+            var fifo = TranslateFifoOut((expr as hw_exec_try_fifo_wr).fifo)
             var wdata_translated = TranslateParam(expr.params[0], var_dict)
             var fifo_rdy = TranslateVar(expr.dsts[0], var_dict)
 
@@ -87,9 +87,9 @@ class RtlGenerator(var cyclix_module : Generic) {
                 rtl_gen.assign(fifo.reqbuf_req, 1)
             }; rtl_gen.endif()
 
-        } else if (expr.opcode == OP_FIFO_RD_UNBLK) {
+        } else if (expr.opcode == OP_TRY_FIFO_RD) {
 
-            var fifo = TranslateFifoIn((expr as hw_exec_fifo_rd_unblk).fifo)
+            var fifo = TranslateFifoIn((expr as hw_exec_try_fifo_rd).fifo)
             var fifo_rdy = TranslateVar(expr.dsts[0], var_dict)
             var rdata_translated = TranslateVar(expr.dsts[1], var_dict)
 
@@ -113,7 +113,7 @@ class RtlGenerator(var cyclix_module : Generic) {
                 }; rtl_gen.endif()
             }; rtl_gen.endif()
 
-        } else if (expr.opcode == OP_FIFO_INTERNAL_WR_UNBLK) {
+        } else if (expr.opcode == OP_TRY_FIFO_INTERNAL_WR) {
 
             var subproc = (expr as hw_exec_fifo_internal_wr_unblk).subproc
             var fifo_name = expr.fifo_name
@@ -145,7 +145,7 @@ class RtlGenerator(var cyclix_module : Generic) {
                 rtl_gen.assign(submod_insts_fifos_in[subproc]!![fifo_name]!!.reqbuf_req, 1)
             }; rtl_gen.endif()
 
-        } else if (expr.opcode == OP_FIFO_INTERNAL_RD_UNBLK) {
+        } else if (expr.opcode == OP_TRY_FIFO_INTERNAL_RD) {
 
             var subproc = (expr as hw_exec_fifo_internal_rd_unblk).subproc
             var fifo_name = expr.fifo_name

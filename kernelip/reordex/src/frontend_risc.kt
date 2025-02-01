@@ -214,7 +214,7 @@ internal class instr_req_stage(val name : String,
                         cyclix_gen.assign_subStructs(new_fetch_buf, TRX_LOCAL)
                         cyclix_gen.assign(new_fetch_buf.GetFracRef("geninstr_io_id"), instr_io_wr_ptr_ref)
 
-                        cyclix_gen.assign(ireq_active, cyclix_gen.fifo_wr_unblk(instr_req_fifos[entry_num], instr_data_wdata))
+                        cyclix_gen.assign(ireq_active, cyclix_gen.try_fifo_wr(instr_req_fifos[entry_num], instr_data_wdata))
                         cyclix_gen.assign(new_fetch_buf.GetFracRef("enb"), ireq_active)
 
                         cyclix_gen.begif(ireq_active)
@@ -494,7 +494,7 @@ internal class instr_fetch_buffer(name: String,
 
         cyclix_gen.COMMENT("fetching instruction code...")
         for (entry_num in 0 until MultiExu_CFG.DataPath_width) {
-            cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(instr_resp_fifos[entry_num], instr_recv_code_buf))
+            cyclix_gen.begif(cyclix_gen.try_fifo_rd(instr_resp_fifos[entry_num], instr_recv_code_buf))
             run {
                 for (trx_idx in 0 until TRX_BUF_SIZE) {
                     var fetch_iter      = TRX_BUF.GetFracRef(trx_idx).GetFracRef(entry_num)

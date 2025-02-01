@@ -746,22 +746,22 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.ctrl_finish
             )
 
-        } else if (expr.opcode == OP_FIFO_WR_UNBLK) {
+        } else if (expr.opcode == OP_TRY_FIFO_WR) {
             var wdata_translated = context.curStageInfo.TranslateParam(expr.params[0])
             var ack_translated = context.curStageInfo.TranslateVar(expr.dsts[0])
-            var fifo_wr_translated = context.TranslateInfo.__fifo_wr_assocs[(expr as hw_exec_fifo_wr_unblk).fifo]!!
+            var fifo_wr_translated = context.TranslateInfo.__fifo_wr_assocs[(expr as hw_exec_try_fifo_wr).fifo]!!
             cyclix_gen.begif(context.curStageInfo.ctrl_active)
             run {
-                cyclix_gen.assign(ack_translated, cyclix_gen.fifo_wr_unblk(fifo_wr_translated, wdata_translated))
+                cyclix_gen.assign(ack_translated, cyclix_gen.try_fifo_wr(fifo_wr_translated, wdata_translated))
             }; cyclix_gen.endif()
 
-        } else if (expr.opcode == OP_FIFO_RD_UNBLK) {
+        } else if (expr.opcode == OP_TRY_FIFO_RD) {
             var ack_translated = context.curStageInfo.TranslateVar(expr.dsts[0])
             var rdata_translated = context.curStageInfo.TranslateVar(expr.dsts[1])
-            var fifo_rd_translated = context.TranslateInfo.__fifo_rd_assocs[(expr as hw_exec_fifo_rd_unblk).fifo]!!
+            var fifo_rd_translated = context.TranslateInfo.__fifo_rd_assocs[(expr as hw_exec_try_fifo_rd).fifo]!!
             cyclix_gen.begif(context.curStageInfo.ctrl_active)
             run {
-                cyclix_gen.assign(ack_translated, cyclix_gen.fifo_rd_unblk(fifo_rd_translated, rdata_translated))
+                cyclix_gen.assign(ack_translated, cyclix_gen.try_fifo_rd(fifo_rd_translated, rdata_translated))
                 if (context.TranslateInfo.pipeline.local_assigned_flags.containsKey(expr.dsts[1])) {
                     var rdy_flag = context.curStageInfo.TranslateVar(context.TranslateInfo.pipeline.local_assigned_flags[expr.dsts[1]]!!)
                     cyclix_gen.assign(rdy_flag, hw_imm(0, 0, "1"))
@@ -801,7 +801,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                     cyclix_gen.assign(req_struct.GetFracRef("we"), cmd_translated)
                     cyclix_gen.assign(req_struct.GetFracRef("wdata"), wdata_translated)
 
-                    cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(mcopipe_if_assoc.req_fifo, req_struct))
+                    cyclix_gen.begif(cyclix_gen.try_fifo_wr(mcopipe_if_assoc.req_fifo, req_struct))
                     run {
 
                         // req management
@@ -865,7 +865,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                     scopipe_if_assoc.req_fifo.vartype,
                     scopipe_if_assoc.req_fifo.defimm)
 
-                cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(scopipe_if_assoc.req_fifo, req_struct))
+                cyclix_gen.begif(cyclix_gen.try_fifo_rd(scopipe_if_assoc.req_fifo, req_struct))
                 run {
                     cyclix_gen.subStruct_gen(context.curStageInfo.TranslateVar(expr.dsts[0]),  req_struct, "we")
                     cyclix_gen.subStruct_gen(context.curStageInfo.TranslateVar(expr.dsts[1]),  req_struct, "wdata")
@@ -892,7 +892,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
                     cyclix_gen.begif(cyclix_gen.eq2(if_id, context.TranslateInfo.__scopipe_handle_reqdict[scopipe_handle]!!.indexOf(scopipe_if)))
                     run {
-                        cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.dsts[0]), cyclix_gen.fifo_wr_unblk(scopipe_if_assoc.resp_fifo, context.curStageInfo.TranslateVar(expr.rdvars[0])))
+                        cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.dsts[0]), cyclix_gen.try_fifo_wr(scopipe_if_assoc.resp_fifo, context.curStageInfo.TranslateVar(expr.rdvars[0])))
                     }; cyclix_gen.endif()
                 }
             }; cyclix_gen.endif()
@@ -1311,7 +1311,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
                                         var fifo_rdata = cyclix_gen.local(GetGenName("mcopipe_rdata"), mcopipe_if.rdata_vartype, "0")
 
-                                        cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(mcopipe_if_assoc.resp_fifo, fifo_rdata))
+                                        cyclix_gen.begif(cyclix_gen.try_fifo_rd(mcopipe_if_assoc.resp_fifo, fifo_rdata))
                                         run {
                                             // acquiring data
                                             cyclix_gen.assign(rdreq_pending, 0)

@@ -185,17 +185,17 @@ class VivadoCppWriter(var cyclix_module : Generic) {
         else if (expr.opcode == OP1_CASEBRANCH) 	opstring = ""
         else if (expr.opcode == OP1_WHILE) 	    opstring = ""
 
-        else if (expr.opcode == OP_FIFO_WR_UNBLK) 	    opstring = ""
-        else if (expr.opcode == OP_FIFO_RD_UNBLK) 	    opstring = ""
+        else if (expr.opcode == OP_TRY_FIFO_WR) 	    opstring = ""
+        else if (expr.opcode == OP_TRY_FIFO_RD) 	    opstring = ""
 
-        else if (expr.opcode == OP_FIFO_WR_BLK) 	    opstring = ""
-        else if (expr.opcode == OP_FIFO_RD_BLK) 	    opstring = ""
+        else if (expr.opcode == OP_FIFO_WR) 	    opstring = ""
+        else if (expr.opcode == OP_FIFO_RD) 	    opstring = ""
 
-        else if (expr.opcode == OP_FIFO_INTERNAL_WR_UNBLK) 	    opstring = ""
-        else if (expr.opcode == OP_FIFO_INTERNAL_RD_UNBLK) 	    opstring = ""
+        else if (expr.opcode == OP_TRY_FIFO_INTERNAL_WR) 	    opstring = ""
+        else if (expr.opcode == OP_TRY_FIFO_INTERNAL_RD) 	    opstring = ""
 
-        else if (expr.opcode == OP_FIFO_INTERNAL_WR_BLK) 	    opstring = ""
-        else if (expr.opcode == OP_FIFO_INTERNAL_RD_BLK) 	    opstring = ""
+        else if (expr.opcode == OP_FIFO_INTERNAL_WR) 	    opstring = ""
+        else if (expr.opcode == OP_FIFO_INTERNAL_RD) 	    opstring = ""
 
         else ERROR("operation " + expr.opcode.default_string + " not recognized")
 
@@ -336,23 +336,23 @@ class VivadoCppWriter(var cyclix_module : Generic) {
             PrintTab(wrFile)
             wrFile.write("}\n")
 
-        } else if (expr.opcode == OP_FIFO_WR_UNBLK) {
-            wrFile.write(GetParamString(expr.wrvars[0]) + " = " + (expr as hw_exec_fifo_wr_unblk).fifo.name + ".write_nb(" + expr.params[0].GetString() + ");\n")
+        } else if (expr.opcode == OP_TRY_FIFO_WR) {
+            wrFile.write(GetParamString(expr.wrvars[0]) + " = " + (expr as hw_exec_try_fifo_wr).fifo.name + ".write_nb(" + expr.params[0].GetString() + ");\n")
 
-        } else if (expr.opcode == OP_FIFO_RD_UNBLK) {
-            wrFile.write(GetParamString(expr.wrvars[0]) + " = " + (expr as hw_exec_fifo_rd_unblk).fifo.name + ".read_nb(" + expr.wrvars[1].name + ");\n")
+        } else if (expr.opcode == OP_TRY_FIFO_RD) {
+            wrFile.write(GetParamString(expr.wrvars[0]) + " = " + (expr as hw_exec_try_fifo_rd).fifo.name + ".read_nb(" + expr.wrvars[1].name + ");\n")
 
-        } else if (expr.opcode == OP_FIFO_WR_BLK) {
-            wrFile.write((expr as hw_exec_fifo_wr_blk).fifo.name + ".write(" + GetParamString(expr.params[0]) + ");\n")
+        } else if (expr.opcode == OP_FIFO_WR) {
+            wrFile.write((expr as hw_exec_fifo_wr).fifo.name + ".write(" + GetParamString(expr.params[0]) + ");\n")
 
-        } else if (expr.opcode == OP_FIFO_RD_BLK) {
-            wrFile.write(GetParamString(expr.wrvars[0]) + " = " + (expr as hw_exec_fifo_rd_blk).fifo.name + ".read();\n")
+        } else if (expr.opcode == OP_FIFO_RD) {
+            wrFile.write(GetParamString(expr.wrvars[0]) + " = " + (expr as hw_exec_fifo_rd).fifo.name + ".read();\n")
 
-        } else if (expr.opcode == OP_FIFO_INTERNAL_WR_UNBLK) {
-            wrFile.write("OPERATION: OP_FIFO_INTERNAL_WR_UNBLK\n")
+        } else if (expr.opcode == OP_TRY_FIFO_INTERNAL_WR) {
+            wrFile.write("OPERATION: OP_TRY_FIFO_INTERNAL_WR\n")
 
-        } else if (expr.opcode == OP_FIFO_INTERNAL_RD_UNBLK) {
-            wrFile.write("OPERATION: OP_FIFO_INTERNAL_RD_UNBLK\n")
+        } else if (expr.opcode == OP_TRY_FIFO_INTERNAL_RD) {
+            wrFile.write("OPERATION: OP_TRY_FIFO_INTERNAL_RD\n")
 
         } else ERROR("undefined opcode")
     }

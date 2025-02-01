@@ -923,7 +923,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         run {
             begif(!irq_recv)
             run {
-                irq_recv.accum(fifo_rd_unblk(irq_fifo, irq_mcause))
+                irq_recv.accum(try_fifo_rd(irq_fifo, irq_mcause))
                 irq_mcause.accum(irq_mcause)
             }; endif()
             begif(irq_recv)

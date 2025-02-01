@@ -167,7 +167,7 @@ internal class rob_risc(name: String,
         cyclix_gen.MSG_COMMENT("Interrupt receive...")
         cyclix_gen.begif(MIRQEN)
         run {
-            cyclix_gen.assign(irq_recv, cyclix_gen.fifo_rd_unblk(irq_fifo, irq_mcause))
+            cyclix_gen.assign(irq_recv, cyclix_gen.try_fifo_rd(irq_fifo, irq_mcause))
             cyclix_gen.begif(irq_recv)
             run {
                 MIRQEN.assign(0)

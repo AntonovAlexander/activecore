@@ -2,7 +2,7 @@ import hwast.*
 import cyclix.*
 import pipex.*
 
-class taylor_pipeline() : pipex.Pipeline("taylor_pipeline", PIPELINE_FC_MODE.CREDIT_BASED) {
+class taylor_pipeline() : pipex.Pipeline("taylor_pipeline", PIPELINE_FC_MODE. STALLABLE) {
 
     val x               = ulocal("x", 15, 0, "0")
     val div6            = hw_imm(16, IMM_BASE_TYPE.HEX, "2a")
@@ -22,12 +22,14 @@ class taylor_pipeline() : pipex.Pipeline("taylor_pipeline", PIPELINE_FC_MODE.CRE
     var ext_datain    = ufifo_in("ext_datain", 15, 0)
     var ext_dataout   = ufifo_out("ext_dataout", 15, 0)
 
-    var ST_ACQ_POW2         = stage_handler("ST_ACQ_POW2", STAGE_FC_MODE.FALL_THROUGH)
-    var ST_POW3             = stage_handler("ST_POW3", STAGE_FC_MODE.FALL_THROUGH)
-    var ST_TERM1_POW5       = stage_handler("ST_TERM1_POW5", STAGE_FC_MODE.FALL_THROUGH)
-    var ST_TERM2            = stage_handler("ST_TERM2", STAGE_FC_MODE.FALL_THROUGH)
-    var ST_GENRESULT        = stage_handler("ST_GENRESULT", STAGE_FC_MODE.FALL_THROUGH)
-    var ST_SENDRESULT       = stage_handler("ST_SENDRESULT", STAGE_FC_MODE.FALL_THROUGH)
+    var ST_ACQ_POW2
+        = stage_handler("ST_ACQ_POW2", STAGE_FC_MODE.FALL_THROUGH)
+    var ST_POW3_TERM1_POW5
+        = stage_handler("ST_POW3_TERM1_POW5", STAGE_FC_MODE.FALL_THROUGH)
+    var ST_TERM2_GENRESULT
+        = stage_handler("ST_TERM2_GENRESULT", STAGE_FC_MODE.FALL_THROUGH)
+    var ST_SENDRESULT
+        = stage_handler("ST_SENDRESULT", STAGE_FC_MODE.FALL_THROUGH)
 
     init {
 
@@ -35,7 +37,7 @@ class taylor_pipeline() : pipex.Pipeline("taylor_pipeline", PIPELINE_FC_MODE.CRE
         run {
             begif(!datain_done)
             run {
-                datain_done.accum(fifo_rd_unblk(ext_datain, x))
+                datain_done.accum(try_fifo_rd(ext_datain, x))
                 x.accum(x)
             }; endif()
             begif(!datain_done)
@@ -46,34 +48,27 @@ class taylor_pipeline() : pipex.Pipeline("taylor_pipeline", PIPELINE_FC_MODE.CRE
             pow2.assign(srl(mul(x, x), 8))
         }; endstage()
 
-        ST_POW3.begin()
+        ST_POW3_TERM1_POW5.begin()
         run {
             pow3.assign(srl(mul(pow2, x), 8))
-        }; endstage()
-
-        ST_TERM1_POW5.begin()
-        run {
             term1.assign(srl(mul(pow3, div6), 8))
             pow5.assign(srl(mul(pow2, pow3), 8))
         }; endstage()
 
-        ST_TERM2.begin()
+        ST_TERM2_GENRESULT.begin()
         run {
             term2.assign(srl(mul(pow5, div120), 8))
             term0_min_term1.assign(sub(term0, term1))
-        }; endstage()
-
-        ST_GENRESULT.begin()
-        run {
             y.assign(add(term0_min_term1, term2))
         }; endstage()
 
         ST_SENDRESULT.begin()
         run {
-            begif(!fifo_wr_unblk(ext_dataout, y))
+            begif(!try_fifo_wr(ext_dataout, y))
             run {
                 pstall()
             }; endif()
         }; endstage()
     }
 }
+

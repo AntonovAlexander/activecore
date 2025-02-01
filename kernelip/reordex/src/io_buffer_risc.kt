@@ -114,7 +114,7 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
         cyclix_gen.MSG_COMMENT("Returning I/O to CDB: done")
 
         cyclix_gen.MSG_COMMENT("Fetching I/O response...")
-        cyclix_gen.begif(cyclix_gen.fifo_rd_unblk(data_resp_fifo, mem_data_rdata))
+        cyclix_gen.begif(cyclix_gen.try_fifo_rd(data_resp_fifo, mem_data_rdata))
         run {
 
             cyclix_gen.begif(cyclix_gen.eq2(resp_buf_head_mem_be, 0x1))
@@ -172,7 +172,7 @@ internal class io_buffer_risc(cyclix_gen : cyclix.Generic,
                         cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("be"), mem_be)
                         cyclix_gen.assign(mem_data_wdata.GetFracRef("wdata").GetFracRef("wdata"), mem_wdata)
 
-                        cyclix_gen.begif(cyclix_gen.fifo_wr_unblk(data_req_fifo, mem_data_wdata))
+                        cyclix_gen.begif(cyclix_gen.try_fifo_wr(data_req_fifo, mem_data_wdata))
                         run {
                             var resp_trx = resp_buf.GetPushTrx()
                             var resp_trx_rdy = resp_trx.GetFracRef("rdy")

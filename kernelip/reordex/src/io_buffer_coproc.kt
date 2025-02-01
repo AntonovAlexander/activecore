@@ -37,7 +37,7 @@ internal open class io_buffer_coproc(cyclix_gen : cyclix.Generic,
         run {
             cyclix_gen.begif(src_rsrv[0].src_rdy)
             run {
-                cyclix_gen.assign(pop, cyclix_gen.fifo_wr_unblk(cmd_resp, src_rsrv[0].src_data))
+                cyclix_gen.assign(pop, cyclix_gen.try_fifo_wr(cmd_resp, src_rsrv[0].src_data))
             }; cyclix_gen.endif()
         }; cyclix_gen.endif()
         // popping
