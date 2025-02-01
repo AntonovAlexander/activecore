@@ -11,7 +11,7 @@ package pipex
 import hwast.*
 import cyclix.*
 
-val OP_RD_REMOTE        = hw_opcode("rd_remote")
+val OP_GET_REMOTE        = hw_opcode("get_remote")
 val OP_ISACTIVE         = hw_opcode("isactive")
 val OP_ISWORKING        = hw_opcode("isworking")
 val OP_ISSTALLED        = hw_opcode("isstalled")
@@ -25,6 +25,7 @@ val OP_PFLUSH           = hw_opcode("pflush")
 val OP_ACCUM            = hw_opcode("accum")
 val OP_ASSIGN_SUCC      = hw_opcode("assign_succ")
 val OP_ASSIGN_ALWAYS    = hw_opcode("assign_always")
+val OP_ISASSIGNED       = hw_opcode("isassigned")
 val OP_RD_PREV          = hw_opcode("rd_prev")
 
 enum class PIPELINE_FC_MODE {
@@ -34,7 +35,7 @@ enum class PIPELINE_FC_MODE {
 
 open class hw_exec_stage_stat(var stage : hw_pipex_stage, opcode : hw_opcode) : hw_exec(opcode)
 
-class hw_exec_read_remote(stage : hw_pipex_stage, var remote_var : hw_pipex_var) : hw_exec_stage_stat(stage, OP_RD_REMOTE)
+class hw_exec_get_remote(stage : hw_pipex_stage, var remote_var : hw_pipex_var) : hw_exec_stage_stat(stage, OP_GET_REMOTE)
 
 internal open class pipex_import_expr_context(var_dict : MutableMap<hw_var, hw_var>,
                                      var curStage : hw_pipex_stage,
@@ -50,6 +51,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
     var locals          = ArrayList<hw_var>()
     var globals         = ArrayList<hw_global>()
+    var local_assigned_flags = mutableMapOf<hw_local, hw_local>()
 
     var copipe_ifs = mutableMapOf<String, hw_copipe>()
     var mcopipe_ifs = ArrayList<hw_mcopipe_if>()
@@ -400,14 +402,26 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         return new_scopipe
     }
 
-    fun readremote(remote_stage : hw_pipex_stage, remote_local: hw_pipex_var) : hw_var {
-        var new_expr = hw_exec_read_remote(remote_stage, remote_local)
+    fun getremote(remote_stage : hw_pipex_stage, remote_local: hw_local) : hw_var {
+        var new_expr = hw_exec_get_remote(remote_stage, remote_local)
         var genvar = hw_var(GetGenName("var"), remote_local.vartype, "0")
         remote_stage.AddRdVar(remote_local)
         new_expr.AddDst(genvar)
         new_expr.AddGenVar(genvar)
         AddExpr(new_expr)
         return genvar
+    }
+
+    fun getremote_isassigned(remote_stage : hw_pipex_stage, remote_local: hw_local) : hw_var {
+        var remote_local_flag = remote_local
+        if (local_assigned_flags.containsKey(remote_local)) {
+            remote_local_flag = local_assigned_flags[remote_local]!!
+        } else {
+            remote_local_flag = ulocal(("genisassigned_" + remote_local.name), 0, 0, "0")
+            remote_local_flag.default_astc = this
+            local_assigned_flags.put(remote_local, remote_local_flag)
+        }
+        return getremote(remote_stage, remote_local_flag)
     }
 
     fun isactive(remote_stage : hw_pipex_stage) : hw_var {
@@ -491,6 +505,18 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         accum(tgt, hw_imm(src))
     }
 
+    fun isassigned(src : hw_local) : hw_local {
+        var retvar = src
+        if (local_assigned_flags.containsKey(src)) {
+            retvar = local_assigned_flags[src]!!
+        } else {
+            retvar = ulocal(("genisassigned_" + src.name), 0, 0, "0")
+            retvar.default_astc = this
+            local_assigned_flags.put(src, retvar)
+        }
+        return retvar
+    }
+
     fun readPrev(src : hw_pipex_var) : hw_pipex_var {
         var new_expr = hw_exec(OP_RD_PREV)
         var genvar = hw_pipex_var(GetGenName("readPrev"), src.vartype, src.defimm)
@@ -554,9 +580,9 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
     }
 
-    internal fun ProcessSyncOp(expression : hw_exec, Translate_info : __TranslateInfo, pstage_info : __pstage_info, cyclix_gen : cyclix.Generic) {
+    internal fun PreProcessOps(expression : hw_exec, Translate_info : __TranslateInfo, pstage_info : __pstage_info, cyclix_gen : cyclix.Generic) {
         if ((expression.opcode == OP1_IF) || (expression.opcode == OP1_WHILE)) {
-            for (subexpression in expression.expressions) ProcessSyncOp(subexpression, Translate_info, pstage_info, cyclix_gen)
+            for (subexpression in expression.expressions) PreProcessOps(subexpression, Translate_info, pstage_info, cyclix_gen)
 
         } else if (expression.opcode == OP_ACCUM) {
             if (!pstage_info.accum_tgts.contains(expression.dsts[0])) {
@@ -568,17 +594,28 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 val req = cyclix_gen.ulocal(GetGenName("succreq"), 0, 0, "0")
 
                 var buf = DUMMY_VAR
-                if (expression.dsts[0] is hw_pipex_var) buf = cyclix_gen.local(GetGenName("succbuf"), expression.dsts[0].vartype, expression.dsts[0].defimm)
-                else if (expression.dsts[0] is hw_var_frac) buf = cyclix_gen.local(GetGenName("succbuf"), ((expression.dsts[0] as hw_var_frac).src_var as hw_pipex_var).vartype, expression.dsts[0].defimm)
-                else ERROR("ProcessSyncOp")
+                if (expression.dsts[0] is hw_pipex_var) buf =
+                    cyclix_gen.local(GetGenName("succbuf"), expression.dsts[0].vartype, expression.dsts[0].defimm)
+                else if (expression.dsts[0] is hw_var_frac) buf = cyclix_gen.local(
+                    GetGenName("succbuf"),
+                    ((expression.dsts[0] as hw_var_frac).src_var as hw_pipex_var).vartype,
+                    expression.dsts[0].defimm
+                )
+                else ERROR("PreProcessOps")
 
-                if (expression.dsts[0] is hw_pipex_var) pstage_info.assign_succ_assocs.put((expression.dsts[0] as hw_pipex_var), __assign_buf(req, buf))
-                else if (expression.dsts[0] is hw_var_frac) pstage_info.assign_succ_assocs.put(((expression.dsts[0] as hw_var_frac).src_var as hw_pipex_var), __assign_buf(req, buf))
-                else ERROR("ProcessSyncOp")
+                if (expression.dsts[0] is hw_pipex_var) pstage_info.assign_succ_assocs.put(
+                    (expression.dsts[0] as hw_pipex_var),
+                    __assign_buf(req, buf)
+                )
+                else if (expression.dsts[0] is hw_var_frac) pstage_info.assign_succ_assocs.put(
+                    ((expression.dsts[0] as hw_var_frac).src_var as hw_pipex_var),
+                    __assign_buf(req, buf)
+                )
+                else ERROR("PreProcessOps")
             }
 
-        } else if (expression.opcode == OP_RD_REMOTE) {
-            (expression as hw_exec_read_remote).stage.AddRdVar(expression.remote_var)
+        } else if (expression.opcode == OP_GET_REMOTE) {
+            (expression as hw_exec_get_remote).stage.AddRdVar(expression.remote_var)
 
         } else if (expression.opcode == OP_MCOPIPE_REQ) {
             if (!pstage_info.mcopipe_handle_reqs.contains((expression as hw_exec_mcopipe_req).mcopipe_handle)) {
@@ -633,7 +670,6 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         for (wrvar in expr.wrvars)  MSG(debug_lvl, "\t\twrvar: "   + wrvar.GetString())
 
         if ((expr.opcode == OP1_ASSIGN)) {
-
             if (expr.dsts[0] is hw_global) {
                 cyclix_gen.begif(context.curStageInfo.ctrl_active)
                 run {
@@ -641,6 +677,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 }; cyclix_gen.endif()
             } else {
                 cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.dsts[0]), context.curStageInfo.TranslateParam(expr.params[0]))
+                if (context.TranslateInfo.pipeline.local_assigned_flags.containsKey(expr.dsts[0])) {
+                    var local_isassigned_flag = context.TranslateInfo.pipeline.local_assigned_flags[expr.dsts[0]]!!
+                    cyclix_gen.assign(context.curStageInfo.TranslateVar(local_isassigned_flag), hw_imm(0, 0, "1"))
+                }
             }
 
         } else if (expr.opcode == OP_PKILL) {
@@ -685,8 +725,8 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
                 cyclix_gen.assign(context.curStageInfo.assign_succ_assocs[(expr.dsts[0] as hw_var_frac).src_var]!!.buf.GetFracRef(TranslateFractions((expr.dsts[0] as hw_var_frac).depow_fractions, context.curStageInfo.var_dict)), context.curStageInfo.TranslateParam(expr.params[0]))
             } else ERROR("ASSIGN_SUCC")
 
-        } else if (expr.opcode == OP_RD_REMOTE) {
-            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.dsts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_read_remote).stage]!!.TranslateVar(expr.remote_var))
+        } else if (expr.opcode == OP_GET_REMOTE) {
+            cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.dsts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_get_remote).stage]!!.TranslateVar(expr.remote_var))
 
         } else if (expr.opcode == OP_ISACTIVE) {
             cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.dsts[0]), context.TranslateInfo.__stage_assocs[(expr as hw_exec_stage_stat).stage]!!.ctrl_active)
@@ -722,6 +762,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             cyclix_gen.begif(context.curStageInfo.ctrl_active)
             run {
                 cyclix_gen.assign(ack_translated, cyclix_gen.fifo_rd_unblk(fifo_rd_translated, rdata_translated))
+                if (context.TranslateInfo.pipeline.local_assigned_flags.containsKey(expr.dsts[1])) {
+                    var rdy_flag = context.curStageInfo.TranslateVar(context.TranslateInfo.pipeline.local_assigned_flags[expr.dsts[1]]!!)
+                    cyclix_gen.assign(rdy_flag, hw_imm(0, 0, "1"))
+                }
             }; cyclix_gen.endif()
 
         } else if (expr.opcode == OP_MCOPIPE_REQ) {
@@ -791,6 +835,10 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
             cyclix_gen.begif(resp_done)
             run {
                 cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.dsts[1]), rdata)
+                if (context.TranslateInfo.pipeline.local_assigned_flags.containsKey(expr.dsts[1])) {
+                    var rdy_flag = context.curStageInfo.TranslateVar(context.TranslateInfo.pipeline.local_assigned_flags[expr.dsts[1]]!!)
+                    cyclix_gen.assign(rdy_flag, hw_imm(0, 0, "1"))
+                }
             }; cyclix_gen.endif()
 
             cyclix_gen.assign(context.curStageInfo.TranslateVar(expr.dsts[0]), resp_done)
@@ -1033,7 +1081,7 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
 
             TranslateInfo.__stage_assocs.put(stage, pstage_info)
             for (expression in stage.expressions) {
-                ProcessSyncOp(expression, TranslateInfo, pstage_info, cyclix_gen)
+                PreProcessOps(expression, TranslateInfo, pstage_info, cyclix_gen)
             }
         }
         if (pipeline_fc_mode == PIPELINE_FC_MODE.CREDIT_BASED) TranslateInfo.gencredit_counter = cyclix_gen.uglobal("gencredit_counter", GetWidthToContain(Stages.size)-1, 0, "0")
@@ -1107,6 +1155,11 @@ open class Pipeline(val name : String, val pipeline_fc_mode : PIPELINE_FC_MODE, 
         }
 
         // Generate resources for locals
+        for (local_isassigned in local_assigned_flags) {
+            if (!TranslateInfo.StageList[0].wrvars.contains(local_isassigned.value)) {
+                TranslateInfo.StageList[0].wrvars.add(local_isassigned.value)
+            }
+        }
         for (CUR_STAGE_INDEX in 0 until TranslateInfo.StageList.size) {
             var curStage = TranslateInfo.StageList[CUR_STAGE_INDEX]
             var curStageInfo = TranslateInfo.StageInfoList[CUR_STAGE_INDEX]

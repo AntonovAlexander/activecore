@@ -106,7 +106,6 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     var rd_source       = ulocal("rd_source", 2, 0, RD_ALU.toString())
     var rd_addr         = ulocal("rd_addr", 4, 0, "0")
     var rd_wdata        = ulocal("rd_wdata", 31, 0, "0")
-    var rd_rdy          = ulocal("rd_rdy", 0, 0, "0")
 
     var immediate_I     = ulocal("immediate_I", 31, 0, "0")
     var immediate_S     = ulocal("immediate_S", 31, 0, "0")
@@ -783,27 +782,27 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     // unblocking forwarding
     fun Pipe_ForwardUnblk (fw_stage : pipex.hw_pipex_stage) {
 
-        begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
+        begif(band(fw_stage.isworking(), fw_stage.getremote(rd_req)))
         run {
 
             begif(rs1_req)
             run {
-                begif(eq2(fw_stage.readremote(rd_addr), rs1_addr))
+                begif(eq2(fw_stage.getremote(rd_addr), rs1_addr))
                 run {
-                    begif(fw_stage.readremote(rd_rdy))
+                    begif(fw_stage.getremote_isassigned(rd_wdata))
                     run {
-                        rs1_rdata.accum(fw_stage.readremote(rd_wdata))
+                        rs1_rdata.accum(fw_stage.getremote(rd_wdata))
                     }; endif()
                 }; endif()
             }; endif()
 
             begif(rs2_req)
             run {
-                begif(eq2(fw_stage.readremote(rd_addr), rs2_addr))
+                begif(eq2(fw_stage.getremote(rd_addr), rs2_addr))
                 run {
-                    begif(fw_stage.readremote(rd_rdy))
+                    begif(fw_stage.getremote_isassigned(rd_wdata))
                     run {
-                        rs2_rdata.accum(fw_stage.readremote(rd_wdata))
+                        rs2_rdata.accum(fw_stage.getremote(rd_wdata))
                     }; endif()
                 }; endif()
             }; endif()
@@ -814,16 +813,16 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     // blocking forwarding
     fun Pipe_ForwardBlk (fw_stage : pipex.hw_pipex_stage) {
 
-        begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
+        begif(band(fw_stage.isworking(), fw_stage.getremote(rd_req)))
         run {
 
             begif(rs1_req)
             run {
-                begif(eq2(fw_stage.readremote(rd_addr), rs1_addr))
+                begif(eq2(fw_stage.getremote(rd_addr), rs1_addr))
                 run {
-                    begif(fw_stage.readremote(rd_rdy))
+                    begif(fw_stage.getremote_isassigned(rd_wdata))
                     run {
-                        rs1_rdata.accum(fw_stage.readremote(rd_wdata))
+                        rs1_rdata.accum(fw_stage.getremote(rd_wdata))
                     }; endif()
                     begelse()
                     run {
@@ -834,11 +833,11 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             begif(rs2_req)
             run {
-                begif(eq2(fw_stage.readremote(rd_addr), rs2_addr))
+                begif(eq2(fw_stage.getremote(rd_addr), rs2_addr))
                 run {
-                    begif(fw_stage.readremote(rd_rdy))
+                    begif(fw_stage.getremote_isassigned(rd_wdata))
                     run {
-                        rs2_rdata.accum(fw_stage.readremote(rd_wdata))
+                        rs2_rdata.accum(fw_stage.getremote(rd_wdata))
                     }; endif()
                     begelse()
                     run {
@@ -853,12 +852,12 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     // interlocking
     fun Pipe_InterlockIfDHazard (fw_stage : pipex.hw_pipex_stage) {
 
-        begif(band(fw_stage.isworking(), fw_stage.readremote(rd_req)))
+        begif(band(fw_stage.isworking(), fw_stage.getremote(rd_req)))
         run {
 
             begif(rs1_req)
             run {
-                begif(eq2(fw_stage.readremote(rd_addr), rs1_addr))
+                begif(eq2(fw_stage.getremote(rd_addr), rs1_addr))
                 run {
                     pstall()
                 }; endif()
@@ -866,7 +865,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
 
             begif(rs2_req)
             run {
-                begif(eq2(fw_stage.readremote(rd_addr), rs2_addr))
+                begif(eq2(fw_stage.getremote(rd_addr), rs2_addr))
                 run {
                     pstall()
                 }; endif()
@@ -1044,37 +1043,31 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
             begbranch(RD_LUI)
             run {
                 rd_wdata.assign(immediate)
-                rd_rdy.assign(1)
             }; endbranch()
 
             begbranch(RD_ALU)
             run {
                 rd_wdata.assign(alu_result)
-                rd_rdy.assign(1)
             }; endbranch()
 
             begbranch(RD_CF_COND)
             run {
                 rd_wdata.assign(alu_CF)
-                rd_rdy.assign(1)
             }; endbranch()
 
             begbranch(RD_OF_COND)
             run {
                 rd_wdata.assign(alu_OF)
-                rd_rdy.assign(1)
             }; endbranch()
 
             begbranch(RD_PC_INC)
             run {
                 rd_wdata.assign(nextinstr_addr)
-                rd_rdy.assign(1)
             }; endbranch()
 
             begbranch(RD_CSR)
             run {
                 rd_wdata.assign(csr_rdata)
-                rd_rdy.assign(1)
             }; endbranch()
 
         }; endcase()
@@ -1213,8 +1206,36 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
             run {
                 begif(data_handle.resp(mem_rdata))
                 run {
-                    rd_rdy.assign(1)
+                    begif(eq2(mem_be, 0x1))
+                    run {
+                        begif(load_signext)
+                        run {
+                            mem_rdata.assign(signext(mem_rdata[7, 0], 32))
+                        }; endif()
+                        begelse()
+                        run {
+                            mem_rdata.assign(zeroext(mem_rdata[7, 0], 32))
+                        }; endif()
+                    }; endif()
+
+                    begif(eq2(mem_be, 0x3))
+                    run {
+                        begif(load_signext)
+                        run {
+                            mem_rdata.assign(signext(mem_rdata[15, 0], 32))
+                        }; endif()
+                        begelse()
+                        run {
+                            mem_rdata.assign(zeroext(mem_rdata[15, 0], 32))
+                        }; endif()
+                    }; endif()
+
+                    begif(eq2(rd_source, RD_MEM))
+                    run {
+                        rd_wdata.assign(mem_rdata)
+                    }; endif()
                 }; endif()
+
                 begelse()
                 run {
                     pstall()
@@ -1223,40 +1244,8 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
         }; endif()
     }
 
-    fun Pipe_MemRdataToRdWdata() {
-
-        begif(eq2(mem_be, 0x1))
-        run {
-            begif(load_signext)
-            run {
-                mem_rdata.assign(signext(mem_rdata[7, 0], 32))
-            }; endif()
-            begelse()
-            run {
-                mem_rdata.assign(zeroext(mem_rdata[7, 0], 32))
-            }; endif()
-        }; endif()
-
-        begif(eq2(mem_be, 0x3))
-        run {
-            begif(load_signext)
-            run {
-                mem_rdata.assign(signext(mem_rdata[15, 0], 32))
-            }; endif()
-            begelse()
-            run {
-                mem_rdata.assign(zeroext(mem_rdata[15, 0], 32))
-            }; endif()
-        }; endif()
-
-        begif(eq2(rd_source, RD_MEM))
-        run {
-            rd_wdata.assign(mem_rdata)
-        }; endif()
-    }
-
     fun Pipe_RegWB() {
-        begif(land(rd_req, rd_rdy))
+        begif(land(rd_req, rd_wdata.isassigned()))
         run {
             assign(regfile.GetFracRef(rd_addr), rd_wdata)
         }; endif()
@@ -1294,11 +1283,7 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
     fun Pipe_RespCoproc() {
         begif(ext_coproc_req)
         run {
-            begif(Ext_coproc_handle.resp(rd_wdata))
-            run {
-                rd_rdy.assign(1)
-            }; endif()
-            begelse()
+            begif(bnot(Ext_coproc_handle.resp(rd_wdata)))
             run {
                 pstall()
             }; endif()
@@ -1343,7 +1328,6 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 Pipe_ReqDataMem()
                 Pipe_RespDataMem()
 
-                Pipe_MemRdataToRdWdata()
                 if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 
@@ -1383,7 +1367,6 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 Pipe_ReqDataMem()
                 Pipe_RespDataMem()
 
-                Pipe_MemRdataToRdWdata()
                 if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 
@@ -1428,7 +1411,6 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 Pipe_ReqDataMem()
                 Pipe_RespDataMem()
 
-                Pipe_MemRdataToRdWdata()
                 if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 
@@ -1480,7 +1462,6 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
                 Pipe_ReqDataMem()
                 Pipe_RespDataMem()
 
-                Pipe_MemRdataToRdWdata()
                 if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 
@@ -1539,7 +1520,6 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
             WB.begin()
             run {
                 Pipe_RespDataMem()
-                Pipe_MemRdataToRdWdata()
                 if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 
@@ -1604,7 +1584,6 @@ class cpu(name : String, val num_stages : Int, val START_ADDR : Int, val IRQ_ADD
             WB.begin()
             run {
                 Pipe_RespDataMem()
-                Pipe_MemRdataToRdWdata()
                 if (M_Ext_Coproc || Custom_0_Coproc) Pipe_RespCoproc()
                 Pipe_RegWB()
 

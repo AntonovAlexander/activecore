@@ -9,6 +9,9 @@
 package pipex
 
 import cyclix.STAGE_FC_MODE
+import hwast.DATA_TYPE
+import hwast.hw_type
+import hwast.hw_var
 
 val OP_STAGE = hwast.hw_opcode("pstage")
 
@@ -30,8 +33,12 @@ class hw_pipex_stage(val name : String, val fc_mode : STAGE_FC_MODE, val BUF_SIZ
         pipeline.begstage(this)
     }
 
-    fun readremote(remote_local: hw_pipex_var) : hwast.hw_var {
-        return pipeline.readremote(this, remote_local)
+    fun getremote(remote_local: hw_local) : hwast.hw_var {
+        return pipeline.getremote(this, remote_local)
+    }
+
+    fun getremote_isassigned(remote_local: hw_local) : hw_var {
+        return pipeline.getremote_isassigned(this, remote_local)
     }
 
     fun isactive() : hwast.hw_var {

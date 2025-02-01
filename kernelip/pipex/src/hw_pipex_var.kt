@@ -47,6 +47,12 @@ class hw_local(name : String, vartype : hw_type, defimm : hw_imm)
         if (default_astc is Pipeline) (default_astc as Pipeline).accum(this, src)
         else ERROR("accum cmd is out of place!")
     }
+
+    fun isassigned() : hw_local {
+        if (default_astc is Pipeline) return (default_astc as Pipeline).isassigned(this)
+        else ERROR("iassigned cmd is out of place!")
+        return this
+    }
 }
 
 class hw_global(name : String, vartype : hw_type, defimm : hw_imm)

@@ -1,4 +1,5 @@
 import hwast.DEBUG_LEVEL
+import hwast.HwDebugWriter
 
 fun main(args: Array<String>) {
     println("RISC-V: generating all cores")
@@ -12,5 +13,9 @@ fun main(args: Array<String>) {
         var dirname = "coregen/riscv_" + i +"stage" + "/"
         cpu_rtl.export_to_sv(dirname + "sverilog", DEBUG_LEVEL.SILENT)
         cpu_cyclix.export_to_vivado_cpp(dirname + "vivado_cpp", DEBUG_LEVEL.SILENT)
+
+        var Dbg = HwDebugWriter("debug_log.txt")
+        Dbg.WriteExec(cpu_cyclix.proc)
+        Dbg.Close()
     }
 }
