@@ -409,22 +409,22 @@ class udm:
                 print("-- e_machine: ", hex(e_machine[0]))
             
             e_version = f.read(4)
-            e_version = struct.unpack("L", e_version)
+            e_version = struct.unpack("=L", e_version)
             
             e_entry = f.read(4)
-            e_entry = struct.unpack("L", e_entry)
+            e_entry = struct.unpack("=L", e_entry)
             #print("-- e_entry: ", hex(e_entry[0]))
     
             e_phoff = f.read(4)
-            e_phoff = struct.unpack("L", e_phoff)
+            e_phoff = struct.unpack("=L", e_phoff)
             #print("-- e_phoff: ", hex(e_phoff[0]))
     
             e_shoff = f.read(4)
-            e_shoff = struct.unpack("L", e_shoff)
+            e_shoff = struct.unpack("=L", e_shoff)
             #print("-- e_shoff: ", hex(e_shoff[0]))
     
             e_flags = f.read(4)
-            e_flags = struct.unpack("L", e_flags)
+            e_flags = struct.unpack("=L", e_flags)
             #print("-- e_flags: ", hex(e_flags[0]))
     
             e_ehsize = f.read(2)
@@ -458,10 +458,11 @@ class udm:
             phnum = 0
             for h in range(e_phnum[0]):
                 prog_header = f.read(32)
-                prog_header = struct.unpack("LLLLLLLL", prog_header)
+                prog_header = struct.unpack("=LLLLLLLL", prog_header)
                 PT_LOAD = 1
                 if prog_header[0] != PT_LOAD:
-                    raise Exception("Error: p_type incorrect: 0x%08x" % prog_header[0])
+                    continue
+                #    raise Exception("Error: p_type incorrect: 0x%08x" % prog_header[0])
                 print("%2d" % phnum, "| 0x%08x" % prog_header[0], "| 0x%08x" % prog_header[1], "| 0x%08x" % prog_header[2], "| 0x%08x" % prog_header[3], "| 0x%08x" % prog_header[4], "| 0x%08x" % prog_header[5], "| 0x%08x" % prog_header[6], "| 0x%08x" % prog_header[7])
                 prog_headers.append((prog_header[1], prog_header[2], prog_header[4]))
                 phnum+=1
@@ -474,7 +475,7 @@ class udm:
                 print("LOADING: file offset: 0x%08x" % offset, ", hw addr: 0x%08x" % vaddr, "size: 0x%08x" % size)
                 f.seek(offset)
                 dbs = f.read(size)
-                dbs = struct.unpack('{}L'.format(len(dbs)>>2), dbs)
+                dbs = struct.unpack('={}L'.format(len(dbs)>>2), dbs)
                 self.wrarr32((base_offset + vaddr), dbs)
     
         finally:
