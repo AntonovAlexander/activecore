@@ -82,7 +82,7 @@ isa_tests = $(rv32i_tests) $(rv32m_tests)
 
 RISCV_PREFIX ?= riscv$(XLEN)-unknown-elf-
 RISCV_GCC ?= $(RISCV_PREFIX)gcc
-RISCV_GCC_OPTS ?= -mcmodel=medany -static -std=gnu99 -O2 -march=rv32im -mabi=ilp32
+RISCV_GCC_OPTS ?= -mcmodel=medany -static -std=gnu99 -O2 -march=rv32im_zicsr -mabi=ilp32
 RISCV_LINK ?= $(RISCV_GCC) -T $(src_dir)/../common/sigma.ld $(incs)
 RISCV_LINK_OPTS ?= -static -nostdlib -nostartfiles -lgcc -T $(src_dir)/../common/sigma.ld
 RISCV_OBJDUMP ?= $(RISCV_PREFIX)objdump --disassemble-all --disassemble-zeroes -h
