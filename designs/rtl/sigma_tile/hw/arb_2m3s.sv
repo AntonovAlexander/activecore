@@ -157,7 +157,7 @@ module arb_2m3s
 					s2.be 		= m0.be;
 					s2.wdata 	= m0.wdata;
 					m0.ack 		= s2.ack;
-					m0_s2_rd_inprogress_next = !m0.we;
+					m0_s2_rd_inprogress_next = !m0.we & s2.ack;
 					s2_busy = 1'b1;
 					end
 				end
@@ -171,7 +171,7 @@ module arb_2m3s
 					s1.be 		= m0.be;
 					s1.wdata 	= m0.wdata;
 					m0.ack 		= s1.ack;
-					m0_s1_rd_inprogress_next = !m0.we;
+					m0_s1_rd_inprogress_next = !m0.we & s1.ack;
 					s1_busy = 1'b1;
 					end
 				end
@@ -185,7 +185,7 @@ module arb_2m3s
 					s0.be 		= m0.be;
 					s0.wdata 	= m0.wdata;
 					m0.ack 		= s0.ack;
-					m0_s0_rd_inprogress_next = !m0.we;
+					m0_s0_rd_inprogress_next = !m0.we & s0.ack;
 					s0_busy = 1'b1;
 					end
 				end
@@ -203,7 +203,7 @@ module arb_2m3s
 					s2.be 		= m1.be;
 					s2.wdata 	= m1.wdata;
 					m1.ack 		= s2.ack;
-					m1_s2_rd_inprogress_next = !m1.we;
+					m1_s2_rd_inprogress_next = !m1.we & s2.ack;
 					s2_busy = 1'b1;
 					end
 				end
@@ -217,7 +217,7 @@ module arb_2m3s
 					s1.be 		= m1.be;
 					s1.wdata 	= m1.wdata;
 					m1.ack 		= s1.ack;
-					m1_s1_rd_inprogress_next = !m1.we;
+					m1_s1_rd_inprogress_next = !m1.we & s1.ack;
 					s1_busy = 1'b1;
 					end
 				end
@@ -231,7 +231,7 @@ module arb_2m3s
 					s0.be 		= m1.be;
 					s0.wdata 	= m1.wdata;
 					m1.ack 		= s0.ack;
-					m1_s0_rd_inprogress_next = !m1.we;
+					m1_s0_rd_inprogress_next = !m1.we & s0.ack;
 					s0_busy = 1'b1;
 					end
 				end
