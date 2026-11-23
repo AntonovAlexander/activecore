@@ -9,12 +9,12 @@
 
 `include "sigma_tile.svh"
 
-`include "riscv_1stage.svh"
-`include "riscv_2stage.svh"
-`include "riscv_3stage.svh"
-`include "riscv_4stage.svh"
-`include "riscv_5stage.svh"
-`include "riscv_6stage.svh"
+import riscv_1stage_genpkg::*;
+import riscv_2stage_genpkg::*;
+import riscv_3stage_genpkg::*;
+import riscv_4stage_genpkg::*;
+import riscv_5stage_genpkg::*;
+import riscv_6stage_genpkg::*;
 
 module sigma_tile
 #(

@@ -186,7 +186,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_3stage/sverilog/riscv_3stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_3stage/sverilog/riscv_3stage_genpkg.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -213,31 +213,31 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_5stage/sverilog/riscv_5stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_5stage/sverilog/riscv_5stage_genpkg.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_1stage/sverilog/riscv_1stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_1stage/sverilog/riscv_1stage_genpkg.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_6stage/sverilog/riscv_6stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_6stage/sverilog/riscv_6stage_genpkg.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_2stage/sverilog/riscv_2stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_2stage/sverilog/riscv_2stage_genpkg.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_4stage/sverilog/riscv_4stage.svh">
+      <File Path="$PPRDIR/../../../../sigma_tile/hw/riscv/coregen/riscv_4stage/sverilog/riscv_4stage_genpkg.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>

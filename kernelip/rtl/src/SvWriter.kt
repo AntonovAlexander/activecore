@@ -368,32 +368,26 @@ class SvWriter(var mod : module) {
         MSG("Exporting structs...")
 
         File(pathname).mkdirs()
-        val wrFileInterface = File(pathname + "/" + mod.name + ".svh").writer()
+        val wrFileInterface = File(pathname + "/" + mod.name + "_genpkg.sv").writer()
 
         // writing header
         WriteGenSrcHeader(wrFileInterface, "RTL")
 
-        wrFileInterface.write("`ifndef __" + mod.name +"_h_\n")
-        wrFileInterface.write("`define __" + mod.name +"_h_\n")
-        wrFileInterface.write("\n")
+        wrFileInterface.write("package " + mod.name + "_genpkg;\n");
 
         structsIfToPrint.clear()
         for (port in mod.Ports) {
             AddStructsIfToPrint(port)
         }
         for (hw_struct in structsIfToPrint) {
-            val STRUCT_DECL_STRING = "__genstructdel_" + hw_struct.value.name + "_"
-            wrFileInterface.write("`ifndef " + STRUCT_DECL_STRING + "\n")
-            wrFileInterface.write("`define " + STRUCT_DECL_STRING + "\n")
-            wrFileInterface.write("typedef struct packed {\n")
+            wrFileInterface.write("\ntypedef struct packed {\n")
             if (hw_struct.value.isEmpty()) hw_struct.value.addu("DUMMY", 0, 0, "0")
             for (structvar in hw_struct.value) {
                 export_structvar("\t", "logic ", ";\n", structvar, wrFileInterface)
             }
             wrFileInterface.write("} " + hw_struct.value.name + ";\n")
-            wrFileInterface.write("`endif // " + STRUCT_DECL_STRING + "\n\n")
         }
-        wrFileInterface.write("`endif // __" + mod.name +"_h_\n")
+        wrFileInterface.write("\nendpackage // " + mod.name +"_genpkg\n")
         wrFileInterface.close()
         MSG("Exporting structs: done")
 
@@ -418,15 +412,10 @@ class SvWriter(var mod : module) {
                 mods_included.add(incl)
             }
         }
-        for (submodule in mod.Submodules) {
-            if (submodule.value.include_needed)            // Workaround for HLS-generated modules, TODO: fix
-                if (!mods_included.contains(submodule.value.src_module.name))
-                    mods_included.add(submodule.value.src_module.name)
-        }
-        mods_included.add(mod.name)
         for (incl_file in mods_included) {
             wrFileModule.write("`include \"" + incl_file + ".svh\"\n")
         }
+        wrFileModule.write("import " + mod.name + "_genpkg::*;\n")
 
         wrFileModule.write("\n")
         wrFileModule.write("module " + mod.name + " (\n")
