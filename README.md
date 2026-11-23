@@ -44,7 +44,9 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 
 KIP cores concept have proven to be convenient for hardware generation based on ***transaction-level descriptions*** where transaction is can be defined in "microarchitectural" context as [I. Lukashov, A. Antonov]:
+
 **Transaction** - data structure whose fields share a common order of initialization, circulation, and termination within the data path of a hardware unit, and which triggers modifications to internal and external states in accordance with specified processing functions as it circulates through the stages of this data path.
+
 (see also close analogue, though implemented differently: TL-Verilog project)
 
 * Demo core generators based on KIP cores (location: /designs/coregen):
