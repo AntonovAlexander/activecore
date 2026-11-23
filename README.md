@@ -13,9 +13,9 @@ KIP core's computational model is intended to include:
 * "microarchitecture-level" event model and handler procedures selectively exposed for behavioral-style programming of custom application functions and mechanisms.
 
 Compared to other hardware generation frameworks, ActiveCore is constructed according to the following principles:
+* Providing reusable generic AST constructor/container of behavioral HW specifications (see **hwast**) for various KIP cores, with its content being fully accessible for analysis and manipulation;
 * Dynamic generation of all hardware-related content, including data instances, structures, dimensions, expressions, procedural blocks, etc;
-* Decoupling generation logic from certain programming styles (e.g. functional one). ActiveCore relies on basic object-oriented capabilities, however, you can use any paradigm in your generators;
-* Reusing generic AST constructor/container of behavioral HW specifications (see **hwast**) for various KIP cores, with its content being fully accessible for analysis and manipulation.
+* Decoupling generation logic from certain programming styles (e.g. functional one). ActiveCore relies on basic object-oriented capabilities, however, you can use any paradigm in your generators.
 
 The ultimate goal of the project is to provide top-down methodology and reusable components for explicit allocation of intermediate ***“microarchitectural middleware”*** design level for complex hardware. This design level (inspired by OS, VM, and various middleware in software stacks) decouples application-related logic from selected management mechanisms of hardware microarchitectures, addressing:
 * rapid design of ***functionally differentianted*** IP blocks with common microarchitectural mechanisms;
@@ -35,13 +35,17 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 * Demo KIP cores based on hwast (location: /kernelip):
 	* **Rtl** - generator of behavioral RTL. Exports to SystemVerilog HDL
-	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic statically scheduled computations. Translates either to synchronous RTL for Rtl KIP or to C++ sources for Xilinx HLS
+	* **Cyclix** (**cycli**c e**x**ecution) - generator of hardware performing cyclic computations. Translates either to synchronous RTL for Rtl KIP (serving as synthesizable cycle-accurate model) or to C++ sources for Xilinx HLS (for further rescheduling)
 ![pic_test](kernelip/__img/Cyclix.png)
-	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and variable-latency I/O synchronization features. Translates to Cyclix KIP. Close analogue (but implemented differently): TL-Verilog project
+	* **Pipex** (**pipe**lined e**x**ecution) - generator of hardware with dynamically scheduled scalar in-order pipelined microarchitecture. Supports inter-stage communication and variable-latency I/O synchronization features. Translates to Cyclix KIP.
 ![pic_test](kernelip/__img/Pipex.png)
 	* **Reordex** (**reorde**red e**x**ecution) - generator of (co)processors with superscalar out-of-order (OoO) microarchitecture. Supports switchable scoreboarding and register renaming. Translates to Cyclix KIP
 ![pic_test](kernelip/__img/Reordex.png)
 
+
+KIP cores concept have proven to be convenient for hardware generation based on ***transaction-level descriptions*** where transaction is can be defined in "microarchitectural" context as [I. Lukashov, A. Antonov]:
+**Transaction** - data structure whose fields share a common order of initialization, circulation, and termination within the data path of a hardware unit, and which triggers modifications to internal and external states in accordance with specified processing functions as it circulates through the stages of this data path.
+(see also close analogue, though implemented differently: TL-Verilog project)
 
 * Demo core generators based on KIP cores (location: /designs/coregen):
 	* **Taylor** - sine wave generator demonstrating usage of stalling and credit-based flow control mechanisms, based on Pipex KIP core. Location: /designs/rtl/taylor
@@ -78,6 +82,10 @@ Current version of project is implemented as a collection of standalone Kotlin l
 
 * A. Antonov, P. Kustarev, S. Bikovsky, "Improving Microarchitecture Design and Hardware Generation using Micro-Language IP Cores", in Proc. IEEE Nordic Circuits and Systems Conference (NORCAS) / NORCHIP and International Symposium of System-on-Chip (SoC) - 2017, pp. 1-6. URL: https://ieeexplore.ieee.org/document/8124952
 
-* A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation (in Russian), ITMO University, Saint-Petersburg, 28.12.2018. URL: http://fppo.ifmo.ru/dissertation/?number=63419
-
 * A. Аntonov, "Design of Computer Microarchitecture Basing on Problem-Oriented Languages", Journal of Instrument Engineering (in Russian), 2017, Vol. 60, No. 10, pp. 980—985. URL: http://pribor.ifmo.ru/en/article/17220/proektirovanie_mikroarhitektury_vychisliteley_na_baze_problemno-orientirovannyh_yazykov.htm
+
+### PhD theses
+
+* A. Antonov, “Methods and Tools for Computer-Aided Synthesis of Processors Based on Microarchitectural Programmable Hardware Generators,” Ph.D dissertation (in Russian), ITMO University, Saint-Petersburg, 28.12.2018. URL: https://dissovet.itmo.ru/dissertation/?number=63419
+
+* I. Lukashov, “Methods and Tools for Electronic Design Automation of Neuromorphic Processor Microarchitecture at the Transactional Description Level,” Ph.D dissertation (in Russian), ITMO University, Saint-Petersburg, 23.12.2025. URL: https://dissovet.itmo.ru/dissertation/?number=49188134
