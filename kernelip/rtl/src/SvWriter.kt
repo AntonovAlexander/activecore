@@ -71,7 +71,7 @@ class SvWriter(var mod : module) {
         return ret_val
     }
 
-    fun export_structvar(preambule_uncond : String, preambule_cond : String, trailer : String, structvar : hw_structvar, wrFile : java.io.OutputStreamWriter) {
+    fun export_structvar(preambule_uncond : String, preambule_cond : String, preambule_pkg : String, trailer : String, structvar : hw_structvar, wrFile : java.io.OutputStreamWriter) {
         var dimstring = ""
         if (structvar.vartype.DataType == DATA_TYPE.STRUCTURED) {
             if (!structvar.vartype.dimensions.isEmpty()) {
@@ -80,6 +80,7 @@ class SvWriter(var mod : module) {
                 }
             }
             wrFile.write(preambule_uncond
+                    + preambule_pkg
                     + structvar.vartype.src_struct.name
                     + " "
                     + structvar.name
@@ -383,7 +384,7 @@ class SvWriter(var mod : module) {
             wrFileInterface.write("\ntypedef struct packed {\n")
             if (hw_struct.value.isEmpty()) hw_struct.value.addu("DUMMY", 0, 0, "0")
             for (structvar in hw_struct.value) {
-                export_structvar("\t", "logic ", ";\n", structvar, wrFileInterface)
+                export_structvar("\t", "logic ", "", ";\n", structvar, wrFileInterface)
             }
             wrFileInterface.write("} " + hw_struct.value.name + ";\n")
         }
@@ -415,7 +416,6 @@ class SvWriter(var mod : module) {
         for (incl_file in mods_included) {
             wrFileModule.write("`include \"" + incl_file + ".svh\"\n")
         }
-        wrFileModule.write("import " + mod.name + "_genpkg::*;\n")
 
         wrFileModule.write("\n")
         wrFileModule.write("module " + mod.name + " (\n")
@@ -423,6 +423,7 @@ class SvWriter(var mod : module) {
         for (port in mod.Ports) {
             wrFileModule.write(preambule)
             var preambule_cond = "logic "
+            var preambule_pkg = if (port.vartype.DataType == DATA_TYPE.STRUCTURED) (mod.name + "_genpkg::") else ""
             var dir_string = ""
             //var assign_default_string = (" = " + getStringAssignDefval(port, port.defval))
             var assign_default_string = ""
@@ -430,12 +431,13 @@ class SvWriter(var mod : module) {
             else if (port.port_dir == PORT_DIR.OUT) dir_string = "output"
             else if (port.port_dir == PORT_DIR.INOUT) dir_string = "inout"
             else ERROR("port type unrecognized!")
-            export_structvar((dir_string + " "), preambule_cond, assign_default_string, port, wrFileModule)
+            export_structvar((dir_string + " "), preambule_cond, preambule_pkg, assign_default_string, port, wrFileModule)
             preambule = "\n\t, "
         }
 
         wrFileModule.write("\n);\n")
         wrFileModule.write("\n")
+        wrFileModule.write("import " + mod.name + "_genpkg::*;\n\n")
 
         MSG("Exporting modules and ports: done")
 
@@ -450,7 +452,7 @@ class SvWriter(var mod : module) {
             wrFileModule.write("typedef struct packed {\n")
             if (hw_struct.value.isEmpty()) hw_struct.value.addu("DUMMY", 0, 0, "0")
             for (structvar in hw_struct.value) {
-                export_structvar("\t", "logic ", ";\n", structvar, wrFileModule)
+                export_structvar("\t", "logic ", "", ";\n", structvar, wrFileModule)
             }
             wrFileModule.write("} " + hw_struct.value.name + ";\n\n")
         }
@@ -460,7 +462,7 @@ class SvWriter(var mod : module) {
 
         MSG("Exporting combinationals...")
         for (comb in mod.Combs) {
-            export_structvar("", "logic ", ";\n", comb, wrFileModule)
+            export_structvar("", "logic ", "", ";\n", comb, wrFileModule)
         }
         wrFileModule.write("\n")
 
@@ -472,7 +474,7 @@ class SvWriter(var mod : module) {
 
             MSG("Exporting mem: " + mem.name + "...")
 
-            export_structvar("","logic ", ";\n", mem, wrFileModule)
+            export_structvar("","logic ", "", ";\n", mem, wrFileModule)
 
             if (mem.mem_srcs.size == 0) throw Exception("Mem signals with no sources is not supported, mem signal: %s!\n")
             else {

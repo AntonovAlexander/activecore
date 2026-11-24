@@ -9,13 +9,6 @@
 
 `include "sigma_tile.svh"
 
-import riscv_1stage_genpkg::*;
-import riscv_2stage_genpkg::*;
-import riscv_3stage_genpkg::*;
-import riscv_4stage_genpkg::*;
-import riscv_5stage_genpkg::*;
-import riscv_6stage_genpkg::*;
-
 module sigma_tile
 #(
     parameter corenum=0
@@ -41,6 +34,13 @@ module sigma_tile
     , MemSplit32.Slave hif     // host interface
     , MemSplit32.Master xif    // expansion interface
 );
+
+import riscv_1stage_genpkg::*;
+import riscv_2stage_genpkg::*;
+import riscv_3stage_genpkg::*;
+import riscv_4stage_genpkg::*;
+import riscv_5stage_genpkg::*;
+import riscv_6stage_genpkg::*;
 
     localparam XIF_BITSEL  = 31;
     localparam SFR_BITSEL  = 20;
